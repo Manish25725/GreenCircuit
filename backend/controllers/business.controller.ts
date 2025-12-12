@@ -835,6 +835,16 @@ export const scheduleBusinessPickup = async (req: Request, res: Response) => {
       return sendError(res, 'Business profile not found', 404);
     }
 
+    // Check if user already has an active pickup (limit to 1)
+    const activePickup = await Booking.findOne({
+      userId,
+      status: { $in: ['pending', 'confirmed', 'in-progress'] }
+    });
+
+    if (activePickup) {
+      return sendError(res, 'You already have an active pickup scheduled. Please wait until it is completed or cancel it before scheduling a new one.', 400);
+    }
+
     // Calculate total weight
     const totalWeight = items.reduce((sum: number, item: any) => sum + ((item.weight || 0) * (item.quantity || 1)), 0);
 

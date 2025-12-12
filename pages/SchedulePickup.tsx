@@ -114,8 +114,9 @@ const SchedulePickup = () => {
         b.status === 'pending' || b.status === 'confirmed' || b.status === 'in-progress'
       );
       if (active) {
-        // Redirect to limit page immediately
-        window.location.hash = '#/pickup-limit';
+        setLimitExceeded(true);
+        setActiveBooking(active);
+        // Don't redirect, show limit page inline
         return;
       }
     } catch (e) {

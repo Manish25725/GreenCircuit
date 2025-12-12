@@ -12,13 +12,18 @@ interface AnalyticsData {
   };
   wasteByCategory: Array<{ _id: string; totalWeight: number; count: number }>;
   monthlyTrends: Array<{ _id: string; totalWeight: number; bookings: number; co2Saved: number }>;
+  topAgencies: Array<{ _id: string; bookings: number; totalWeight: number; agency: { name: string; logo?: string; rating?: number } }>;
+  recentBookings?: Array<any>;
 }
+
+const API_BASE = 'http://localhost:3001/api';
 
 const BusinessAnalytics = () => {
   const user = getCurrentUser();
   const [timeRange, setTimeRange] = useState('30d');
   const [loading, setLoading] = useState(true);
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
+  const [recentActivity, setRecentActivity] = useState<any[]>([]);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -26,15 +31,24 @@ const BusinessAnalytics = () => {
     window.location.hash = '#/login';
   };
 
+  const getAuthHeaders = () => {
+    const token = localStorage.getItem('token');
+    return {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    };
+  };
+
   useEffect(() => {
     fetchAnalytics();
+    fetchRecentActivity();
   }, [timeRange]);
 
   const fetchAnalytics = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const res = await fetch(`http://localhost:3001/api/business/analytics?period=${timeRange}`, {
-        headers: { 'Authorization': `Bearer ${token}` }
+      setLoading(true);
+      const res = await fetch(`${API_BASE}/business/analytics?period=${timeRange}`, {
+        headers: getAuthHeaders()
       });
       const data = await res.json();
       if (data.success) {
@@ -47,56 +61,111 @@ const BusinessAnalytics = () => {
     }
   };
 
-  // Mock/fallback data for charts
+  const fetchRecentActivity = async () => {
+    try {
+      const res = await fetch(`${API_BASE}/business/bookings?limit=5`, {
+        headers: getAuthHeaders()
+      });
+      const data = await res.json();
+      if (data.success) {
+        const bookings = data.data?.bookings || [];
+        const activities = bookings.map((b: any) => {
+          let action = 'Pickup Scheduled';
+          let icon = 'local_shipping';
+          let color = 'text-[#8b5cf6]';
+          
+          if (b.status === 'completed') {
+            action = 'Disposal Completed';
+            icon = 'check_circle';
+            color = 'text-[#10b981]';
+          } else if (b.status === 'confirmed') {
+            action = 'Pickup Confirmed';
+            icon = 'verified';
+            color = 'text-[#06b6d4]';
+          } else if (b.status === 'in-progress') {
+            action = 'Pickup In Progress';
+            icon = 'sync';
+            color = 'text-amber-400';
+          } else if (b.status === 'cancelled') {
+            action = 'Pickup Cancelled';
+            icon = 'cancel';
+            color = 'text-red-400';
+          }
+          
+          const detail = `${b.totalWeight?.toFixed(1) || 0} kg • ${b.agencyId?.name || 'Agency'}`;
+          const time = getRelativeTime(b.createdAt);
+          
+          return { action, detail, time, icon, color };
+        });
+        setRecentActivity(activities);
+      }
+    } catch (error) {
+      console.error('Error fetching recent activity:', error);
+    }
+  };
+
+  const getRelativeTime = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diff = now.getTime() - date.getTime();
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    const days = Math.floor(hours / 24);
+    
+    if (hours < 1) return 'Just now';
+    if (hours < 24) return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+    if (days < 7) return `${days} day${days > 1 ? 's' : ''} ago`;
+    return date.toLocaleDateString();
+  };
+
+  const getMonthName = (monthStr: string) => {
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const monthNum = parseInt(monthStr.split('-')[1]) - 1;
+    return months[monthNum] || monthStr;
+  };
+
+  // Process monthly data from API
   const monthlyData = analytics?.monthlyTrends?.length ? analytics.monthlyTrends.map(t => ({
-    month: t._id.split('-')[1],
-    disposed: t.totalWeight,
+    month: getMonthName(t._id),
+    disposed: Math.round(t.totalWeight),
     target: 200
-  })) : [
-    { month: 'Jul', disposed: 180, target: 200 },
-    { month: 'Aug', disposed: 220, target: 200 },
-    { month: 'Sep', disposed: 195, target: 200 },
-    { month: 'Oct', disposed: 280, target: 200 },
-    { month: 'Nov', disposed: 310, target: 200 },
-    { month: 'Dec', disposed: 245, target: 200 },
-  ];
+  })) : [];
 
   const categoryColors: Record<string, string> = {
     'IT Equipment': '#06b6d4',
     'Batteries': '#f59e0b',
     'Monitors': '#8b5cf6',
     'Cables': '#10b981',
+    'Cables & Wiring': '#10b981',
     'Mobile Devices': '#ec4899',
+    'Appliances': '#3b82f6',
     'Other': '#64748b'
   };
 
-  const totalCategoryWeight = analytics?.wasteByCategory?.reduce((sum, c) => sum + c.totalWeight, 0) || 100;
+  const totalCategoryWeight = analytics?.wasteByCategory?.reduce((sum, c) => sum + c.totalWeight, 0) || 0;
   const categoryData = analytics?.wasteByCategory?.length ? analytics.wasteByCategory.map(c => ({
     name: c._id || 'Other',
-    value: Math.round((c.totalWeight / totalCategoryWeight) * 100),
+    value: totalCategoryWeight > 0 ? Math.round((c.totalWeight / totalCategoryWeight) * 100) : 0,
+    weight: c.totalWeight,
+    count: c.count,
     color: categoryColors[c._id] || '#64748b'
-  })) : [
-    { name: 'IT Equipment', value: 45, color: '#06b6d4' },
-    { name: 'Batteries', value: 20, color: '#f59e0b' },
-    { name: 'Monitors', value: 15, color: '#8b5cf6' },
-    { name: 'Cables', value: 12, color: '#10b981' },
-    { name: 'Other', value: 8, color: '#64748b' },
-  ];
+  })) : [];
 
-  const recentActivity = [
-    { action: 'Disposal Completed', detail: '450 kg IT Equipment', time: '2 hours ago', icon: 'check_circle', color: 'text-[#06b6d4]' },
-    { action: 'Certificate Issued', detail: 'CRT-2025-142', time: '5 hours ago', icon: 'verified', color: 'text-[#10b981]' },
-    { action: 'New Pickup Scheduled', detail: 'Server Room B', time: 'Yesterday', icon: 'local_shipping', color: 'text-[#8b5cf6]' },
-    { action: 'Inventory Updated', detail: '+25 Laptops added', time: '2 days ago', icon: 'inventory_2', color: 'text-amber-400' },
-  ];
-
-  const maxValue = Math.max(...monthlyData.map(d => d.disposed), 1);
+  const maxValue = Math.max(...monthlyData.map(d => d.disposed), 200);
   
-  // Use API data or defaults
-  const totalDisposed = analytics?.summary?.totalWasteProcessed || 1430;
-  const co2Saved = analytics?.summary?.co2Saved || 3575;
-  const recyclingRate = analytics?.summary?.complianceScore || 94.2;
+  // Use API data
+  const totalDisposed = analytics?.summary?.totalWasteProcessed || 0;
+  const co2Saved = analytics?.summary?.co2Saved || 0;
+  const treesEquivalent = analytics?.summary?.treesEquivalent || 0;
+  const totalBookings = analytics?.summary?.totalBookings || 0;
+  const complianceScore = analytics?.summary?.complianceScore || 0;
   const costSavings = Math.round(totalDisposed * 15); // ₹15 per kg estimate
+  const waterConserved = Math.round(totalDisposed * 8.7); // ~8.7L per kg e-waste
+  const energySaved = Math.round(totalDisposed * 5.7); // ~5.7 kWh per kg
+
+  // Default activity if none from API
+  const displayActivity = recentActivity.length > 0 ? recentActivity : [
+    { action: 'No recent activity', detail: 'Schedule a pickup to get started', time: '', icon: 'info', color: 'text-gray-400' }
+  ];
 
   return (
     <Layout title="" role="Business" fullWidth hideSidebar>
@@ -160,13 +229,25 @@ const BusinessAnalytics = () => {
                       <option value="90d">Last Quarter</option>
                       <option value="1y">This Year</option>
                     </select>
-                    <button className="bg-[#06b6d4] text-white px-5 py-2.5 rounded-xl font-bold text-sm hover:bg-[#0891b2] transition-colors flex items-center gap-2">
+                    <button 
+                      onClick={() => window.open(`${API_BASE}/business/reports/export?period=${timeRange}`, '_blank')}
+                      className="bg-[#06b6d4] text-white px-5 py-2.5 rounded-xl font-bold text-sm hover:bg-[#0891b2] transition-colors flex items-center gap-2"
+                    >
                       <span className="material-symbols-outlined text-lg">download</span>
                       Export
                     </button>
                   </div>
                 </div>
 
+                {loading ? (
+                  <div className="flex items-center justify-center py-20">
+                    <div className="text-center">
+                      <div className="animate-spin w-12 h-12 border-4 border-[#06b6d4] border-t-transparent rounded-full mx-auto mb-4"></div>
+                      <p className="text-gray-400">Loading analytics...</p>
+                    </div>
+                  </div>
+                ) : (
+                  <>
                 {/* Key Metrics */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                   <div className="bg-[#151F26] rounded-2xl p-6 border border-white/5 relative overflow-hidden group hover:border-[#06b6d4]/20 transition-all">
@@ -175,10 +256,12 @@ const BusinessAnalytics = () => {
                       <div className="p-3 bg-[#06b6d4]/10 rounded-xl text-[#06b6d4]">
                         <span className="material-symbols-outlined">scale</span>
                       </div>
+                      {totalDisposed > 0 && (
                       <span className="text-xs font-bold text-[#06b6d4] bg-[#06b6d4]/10 px-2 py-1 rounded-full flex items-center gap-1">
-                        <span className="material-symbols-outlined text-xs">trending_up</span>
-                        +12%
+                        <span className="material-symbols-outlined text-xs">check</span>
+                        Active
                       </span>
+                      )}
                     </div>
                     <h3 className="text-3xl font-black text-white relative z-10">{totalDisposed.toLocaleString()} <span className="text-lg font-medium text-gray-500">kg</span></h3>
                     <p className="text-sm text-[#94a3b8] relative z-10">Total Disposed</p>
@@ -204,8 +287,8 @@ const BusinessAnalytics = () => {
                       </div>
                       <span className="text-xs font-bold text-[#8b5cf6] bg-[#8b5cf6]/10 px-2 py-1 rounded-full">Rate</span>
                     </div>
-                    <h3 className="text-3xl font-black text-white relative z-10">{recyclingRate.toFixed(1)} <span className="text-lg font-medium text-gray-500">%</span></h3>
-                    <p className="text-sm text-[#94a3b8] relative z-10">Recycling Rate</p>
+                    <h3 className="text-3xl font-black text-white relative z-10">{complianceScore.toFixed(1)} <span className="text-lg font-medium text-gray-500">%</span></h3>
+                    <p className="text-sm text-[#94a3b8] relative z-10">Compliance Score</p>
                   </div>
                   
                   <div className="bg-[#151F26] rounded-2xl p-6 border border-white/5 relative overflow-hidden group hover:border-amber-500/20 transition-all">
@@ -242,56 +325,77 @@ const BusinessAnalytics = () => {
                     </div>
                     
                     {/* Simple Bar Chart */}
-                    <div className="h-64 flex items-end justify-between gap-4 px-4">
-                      {monthlyData.map((data, idx) => (
-                        <div key={idx} className="flex-1 flex flex-col items-center gap-2">
-                          <div className="w-full relative" style={{ height: '200px' }}>
-                            {/* Target line */}
-                            <div 
-                              className="absolute w-full border-t-2 border-dashed border-gray-600"
-                              style={{ bottom: `${(data.target / maxValue) * 100}%` }}
-                            ></div>
-                            {/* Bar */}
-                            <div 
-                              className="absolute bottom-0 w-full bg-gradient-to-t from-[#06b6d4] to-[#06b6d4]/50 rounded-t-lg transition-all hover:from-[#06b6d4] hover:to-[#06b6d4]/70"
-                              style={{ height: `${(data.disposed / maxValue) * 100}%` }}
-                            >
-                              <div className="absolute -top-6 left-1/2 -translate-x-1/2 text-xs font-bold text-white opacity-0 hover:opacity-100 transition-opacity">
-                                {data.disposed}
+                    {monthlyData.length > 0 ? (
+                      <div className="h-64 flex items-end justify-between gap-4 px-4">
+                        {monthlyData.map((data, idx) => (
+                          <div key={idx} className="flex-1 flex flex-col items-center gap-2">
+                            <div className="w-full relative" style={{ height: '200px' }}>
+                              {/* Target line */}
+                              <div 
+                                className="absolute w-full border-t-2 border-dashed border-gray-600"
+                                style={{ bottom: `${(data.target / maxValue) * 100}%` }}
+                              ></div>
+                              {/* Bar */}
+                              <div 
+                                className="absolute bottom-0 w-full bg-gradient-to-t from-[#06b6d4] to-[#06b6d4]/50 rounded-t-lg transition-all hover:from-[#06b6d4] hover:to-[#06b6d4]/70"
+                                style={{ height: `${(data.disposed / maxValue) * 100}%` }}
+                              >
+                                <div className="absolute -top-6 left-1/2 -translate-x-1/2 text-xs font-bold text-white opacity-0 hover:opacity-100 transition-opacity">
+                                  {data.disposed}
+                                </div>
                               </div>
                             </div>
+                            <span className="text-xs text-gray-500 font-medium">{data.month}</span>
                           </div>
-                          <span className="text-xs text-gray-500 font-medium">{data.month}</span>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="h-64 flex items-center justify-center">
+                        <div className="text-center">
+                          <span className="material-symbols-outlined text-4xl text-gray-600 mb-2">bar_chart</span>
+                          <p className="text-gray-500">No disposal data yet</p>
+                          <p className="text-gray-600 text-sm">Complete pickups to see trends</p>
                         </div>
-                      ))}
-                    </div>
+                      </div>
+                    )}
                   </div>
 
                   {/* Category Breakdown */}
                   <div className="bg-[#151F26] rounded-2xl p-6 border border-white/5">
                     <h3 className="text-lg font-bold text-white mb-6">By Category</h3>
-                    <div className="space-y-4">
-                      {categoryData.map((cat, idx) => (
-                        <div key={idx} className="group">
-                          <div className="flex items-center justify-between mb-2">
-                            <span className="text-sm text-gray-300 group-hover:text-white transition-colors">{cat.name}</span>
-                            <span className="text-sm font-bold text-white">{cat.value}%</span>
+                    {categoryData.length > 0 ? (
+                      <div className="space-y-4">
+                        {categoryData.map((cat, idx) => (
+                          <div key={idx} className="group">
+                            <div className="flex items-center justify-between mb-2">
+                              <span className="text-sm text-gray-300 group-hover:text-white transition-colors">{cat.name}</span>
+                              <span className="text-sm font-bold text-white">{cat.value}%</span>
+                            </div>
+                            <div className="h-2 bg-gray-800 rounded-full overflow-hidden">
+                              <div 
+                                className="h-full rounded-full transition-all group-hover:opacity-80"
+                                style={{ width: `${cat.value}%`, backgroundColor: cat.color }}
+                              ></div>
+                            </div>
                           </div>
-                          <div className="h-2 bg-gray-800 rounded-full overflow-hidden">
-                            <div 
-                              className="h-full rounded-full transition-all group-hover:opacity-80"
-                              style={{ width: `${cat.value}%`, backgroundColor: cat.color }}
-                            ></div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="text-center py-8">
+                        <span className="material-symbols-outlined text-3xl text-gray-600 mb-2">pie_chart</span>
+                        <p className="text-gray-500">No category data</p>
+                      </div>
+                    )}
                     
                     {/* Total */}
                     <div className="mt-6 pt-6 border-t border-white/5">
                       <div className="flex items-center justify-between">
-                        <span className="text-gray-400 text-sm">Total Items</span>
-                        <span className="text-2xl font-black text-white">1,430 <span className="text-sm font-medium text-gray-500">kg</span></span>
+                        <span className="text-gray-400 text-sm">Total Disposed</span>
+                        <span className="text-2xl font-black text-white">{totalDisposed.toLocaleString()} <span className="text-sm font-medium text-gray-500">kg</span></span>
+                      </div>
+                      <div className="flex items-center justify-between mt-2">
+                        <span className="text-gray-400 text-sm">Total Bookings</span>
+                        <span className="text-lg font-bold text-[#06b6d4]">{totalBookings}</span>
                       </div>
                     </div>
                   </div>
@@ -306,7 +410,7 @@ const BusinessAnalytics = () => {
                       Recent Activity
                     </h3>
                     <div className="space-y-4">
-                      {recentActivity.map((activity, idx) => (
+                      {displayActivity.map((activity, idx) => (
                         <div key={idx} className="flex items-start gap-4 p-3 rounded-xl hover:bg-white/5 transition-colors group">
                           <div className={`p-2 rounded-lg bg-white/5 ${activity.color} group-hover:scale-110 transition-transform`}>
                             <span className="material-symbols-outlined text-xl">{activity.icon}</span>
@@ -336,7 +440,7 @@ const BusinessAnalytics = () => {
                           <span className="material-symbols-outlined text-[#10b981] text-2xl">forest</span>
                         </div>
                         <div>
-                          <p className="text-3xl font-black text-white">178</p>
+                          <p className="text-3xl font-black text-white">{treesEquivalent.toLocaleString()}</p>
                           <p className="text-sm text-gray-400">Trees Equivalent Saved</p>
                         </div>
                       </div>
@@ -346,7 +450,7 @@ const BusinessAnalytics = () => {
                           <span className="material-symbols-outlined text-[#06b6d4] text-2xl">water_drop</span>
                         </div>
                         <div>
-                          <p className="text-3xl font-black text-white">12,500 <span className="text-lg font-medium text-gray-500">L</span></p>
+                          <p className="text-3xl font-black text-white">{waterConserved.toLocaleString()} <span className="text-lg font-medium text-gray-500">L</span></p>
                           <p className="text-sm text-gray-400">Water Conserved</p>
                         </div>
                       </div>
@@ -356,13 +460,15 @@ const BusinessAnalytics = () => {
                           <span className="material-symbols-outlined text-amber-400 text-2xl">bolt</span>
                         </div>
                         <div>
-                          <p className="text-3xl font-black text-white">8,200 <span className="text-lg font-medium text-gray-500">kWh</span></p>
+                          <p className="text-3xl font-black text-white">{energySaved.toLocaleString()} <span className="text-lg font-medium text-gray-500">kWh</span></p>
                           <p className="text-sm text-gray-400">Energy Saved</p>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
+                  </>
+                )}
               </div>
             </main>
           </div>

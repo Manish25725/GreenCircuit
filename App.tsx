@@ -69,13 +69,13 @@ const App = () => {
     }
 
     // User routes (dashboard, profile, rewards, etc.) - only regular users can access
-    const userOnlyRoutes = ['#/dashboard', '#/rewards', '#/certificate', '#/pickup-limit', '#/history', '#/profile', '#/notifications', '#/security', '#/settings'];
+    const userOnlyRoutes = ['#/dashboard', '#/rewards', '#/certificate', '#/history', '#/profile', '#/notifications', '#/security', '#/settings'];
     if (userOnlyRoutes.some(r => path.startsWith(r))) {
       return userRole === 'user';
     }
 
     // Shared routes - users and business can access
-    const sharedRoutes = ['#/search', '#/schedule', '#/pickup-confirmation'];
+    const sharedRoutes = ['#/search', '#/schedule', '#/pickup-confirmation', '#/pickup-limit'];
     if (sharedRoutes.some(r => path.startsWith(r))) {
       return userRole === 'user' || userRole === 'business';
     }
