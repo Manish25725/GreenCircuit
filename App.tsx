@@ -31,26 +31,9 @@ import BusinessAnalytics from './pages/BusinessAnalytics';
 
 const App = () => {
   const [route, setRoute] = useState(window.location.hash || '#/');
-  const [isLoading, setIsLoading] = useState(true);
-  const [progress, setProgress] = useState(0);
-
-  useEffect(() => {
-    // Initial Loading Simulation
-    const interval = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          setTimeout(() => setIsLoading(false), 500); // Slight delay at 100%
-          return 100;
-        }
-        // Random increment for realism
-        const increment = Math.floor(Math.random() * 5) + 1; 
-        return Math.min(prev + increment, 100);
-      });
-    }, 50); // Updates every 50ms
-
-    return () => clearInterval(interval);
-  }, []);
+  // Removed loading screen to fix dark green screen issue
+  const [isLoading, setIsLoading] = useState(false);
+  const [progress, setProgress] = useState(100);
 
   useEffect(() => {
     const handleHashChange = () => {
@@ -124,10 +107,7 @@ const App = () => {
     }
   };
 
-  if (isLoading) {
-    return <LoadingScreen progress={progress} />;
-  }
-
+  // Loading screen removed - go directly to content
   return (
     <>
       {renderRoute()}

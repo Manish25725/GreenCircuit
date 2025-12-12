@@ -1,7 +1,18 @@
 import mongoose from 'mongoose';
 
+export interface ISlot extends mongoose.Document {
+  agencyId?: mongoose.Types.ObjectId;
+  date: number;
+  startTime: string;
+  endTime: string;
+  status: 'Available' | 'Booked' | 'Unavailable';
+  bookedBy?: string | mongoose.Types.ObjectId;
+  bookingId?: mongoose.Types.ObjectId;
+}
+
 const slotSchema = new mongoose.Schema({
-  date: { type: Number, required: true }, // Keeping simple number day for demo (1-31)
+  agencyId: { type: mongoose.Schema.Types.ObjectId, ref: 'Agency' },
+  date: { type: Number, required: true }, // Day of month (1-31)
   startTime: { type: String, required: true },
   endTime: { type: String, required: true },
   status: { 
@@ -9,7 +20,8 @@ const slotSchema = new mongoose.Schema({
     enum: ['Available', 'Booked', 'Unavailable'], 
     default: 'Available' 
   },
-  bookedBy: { type: String, default: null }, // Could be a User ObjectId ref in future
+  bookedBy: { type: mongoose.Schema.Types.Mixed, default: null }, // String or ObjectId
+  bookingId: { type: mongoose.Schema.Types.ObjectId, ref: 'Booking' }
 }, {
   timestamps: true
 });
