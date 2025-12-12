@@ -1,17 +1,100 @@
 // Configuration
 const API_BASE_URL = 'http://localhost:3001/api';
-// Set this to false to force real API calls. 
-// Set to true to use internal mock data (useful for frontend preview without running server).
-const USE_MOCK_FALLBACK = true; 
+// Set this to false to use real API calls to the backend server
+// Set to true to use internal mock data (useful for frontend preview without running server)
+const USE_MOCK_FALLBACK = false; 
 
 // Types
+export interface User {
+  _id: string;
+  name: string;
+  email: string;
+  role: 'user' | 'agency' | 'business' | 'admin';
+  avatar?: string;
+  ecoPoints: number;
+  totalWasteRecycled: number;
+  totalPickups: number;
+  token?: string;
+}
+
 export interface Slot {
-  id: number;
+  id: string;
+  _id?: string;
   date: number;
   startTime: string;
   endTime: string;
   status: 'Available' | 'Booked' | 'Unavailable';
   bookedBy?: string | null;
+  agencyId?: string;
+}
+
+export interface Agency {
+  _id: string;
+  name: string;
+  description?: string;
+  logo?: string;
+  email: string;
+  phone: string;
+  address: {
+    street: string;
+    city: string;
+    state: string;
+    zipCode: string;
+  };
+  services: string[];
+  rating: number;
+  totalBookings: number;
+  isVerified: boolean;
+}
+
+export interface Booking {
+  _id: string;
+  bookingId: string;
+  userId: string;
+  agencyId: Agency;
+  slotId: string;
+  items: {
+    type: string;
+    quantity: number;
+    description: string;
+  }[];
+  status: 'pending' | 'confirmed' | 'in-progress' | 'completed' | 'cancelled';
+  scheduledDate: string;
+  scheduledTime: string;
+  pickupAddress: {
+    street: string;
+    city: string;
+    state: string;
+    zipCode: string;
+  };
+  ecoPointsEarned: number;
+  trackingHistory: {
+    status: string;
+    message: string;
+    timestamp: string;
+  }[];
+}
+
+export interface Reward {
+  _id: string;
+  title: string;
+  description: string;
+  icon: string;
+  color: string;
+  category: string;
+  pointsCost: number;
+  stock: number;
+  isActive: boolean;
+}
+
+export interface Notification {
+  _id: string;
+  type: string;
+  title: string;
+  message: string;
+  icon?: string;
+  isRead: boolean;
+  createdAt: string;
 }
 
 export interface AnalyticsData {
@@ -54,70 +137,316 @@ const MOCK_ANALYTICS: AnalyticsData = {
 
 const MOCK_SLOTS: Slot[] = [
   { id: 1, date: 4, startTime: '09:00 AM', endTime: '11:00 AM', status: 'Available', bookedBy: null },
-  { id: 2, date: 4, startTime: '11:00 AM', endTime: '01:00 PM', status: 'Booked', bookedBy: 'John Doe' },
-  { id: 3, date: 4, startTime: '02:00 PM', endTime: '04:00 PM', status: 'Available', bookedBy: null },
-  { id: 4, date: 4, startTime: '04:00 PM', endTime: '06:00 PM', status: 'Unavailable', bookedBy: null },
-  { id: 5, date: 1, startTime: '09:00 AM', endTime: '10:00 AM', status: 'Available', bookedBy: null },
-  { id: 6, date: 3, startTime: '09:00 AM', endTime: '10:00 AM', status: 'Booked', bookedBy: 'Jane Smith' },
-  { id: 10, date: 6, startTime: '09:00 AM', endTime: '10:00 AM', status: 'Available', bookedBy: null },
-  { id: 11, date: 8, startTime: '09:00 AM', endTime: '10:00 AM', status: 'Booked', bookedBy: null },
-  { id: 12, date: 10, startTime: '09:00 AM', endTime: '10:00 AM', status: 'Available', bookedBy: null },
-  { id: 13, date: 11, startTime: '09:00 AM', endTime: '10:00 AM', status: 'Booked', bookedBy: null },
-  { id: 14, date: 15, startTime: '09:00 AM', endTime: '10:00 AM', status: 'Available', bookedBy: null },
-  { id: 15, date: 18, startTime: '09:00 AM', endTime: '10:00 AM', status: 'Booked', bookedBy: null },
-  { id: 16, date: 22, startTime: '09:00 AM', endTime: '10:00 AM', status: 'Available', bookedBy: null },
-  { id: 17, date: 25, startTime: '09:00 AM', endTime: '10:00 AM', status: 'Booked', bookedBy: null },
+  { id: '2', date: 4, startTime: '11:00 AM', endTime: '01:00 PM', status: 'Booked', bookedBy: 'John Doe' },
+  { id: '3', date: 4, startTime: '02:00 PM', endTime: '04:00 PM', status: 'Available', bookedBy: null },
+  { id: '4', date: 4, startTime: '04:00 PM', endTime: '06:00 PM', status: 'Unavailable', bookedBy: null },
+  { id: '5', date: 1, startTime: '09:00 AM', endTime: '10:00 AM', status: 'Available', bookedBy: null },
+  { id: '6', date: 3, startTime: '09:00 AM', endTime: '10:00 AM', status: 'Booked', bookedBy: 'Jane Smith' },
+  { id: '10', date: 6, startTime: '09:00 AM', endTime: '10:00 AM', status: 'Available', bookedBy: null },
+  { id: '11', date: 8, startTime: '09:00 AM', endTime: '10:00 AM', status: 'Booked', bookedBy: null },
+  { id: '12', date: 10, startTime: '09:00 AM', endTime: '10:00 AM', status: 'Available', bookedBy: null },
+  { id: '13', date: 11, startTime: '09:00 AM', endTime: '10:00 AM', status: 'Booked', bookedBy: null },
+  { id: '14', date: 15, startTime: '09:00 AM', endTime: '10:00 AM', status: 'Available', bookedBy: null },
+  { id: '15', date: 18, startTime: '09:00 AM', endTime: '10:00 AM', status: 'Booked', bookedBy: null },
+  { id: '16', date: 22, startTime: '09:00 AM', endTime: '10:00 AM', status: 'Available', bookedBy: null },
+  { id: '17', date: 25, startTime: '09:00 AM', endTime: '10:00 AM', status: 'Booked', bookedBy: null },
 ];
 
-// --- HELPER ---
-async function fetchWithFallback<T>(endpoint: string, mockData: T): Promise<T> {
+// --- HELPER FUNCTIONS ---
+const getToken = () => localStorage.getItem('token');
+
+const getHeaders = (includeAuth = true) => {
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+  };
+  if (includeAuth) {
+    const token = getToken();
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+  }
+  return headers;
+};
+
+async function fetchWithFallback<T>(endpoint: string, mockData: T, options?: RequestInit): Promise<T> {
   if (USE_MOCK_FALLBACK) {
-    // Simulate network delay
     return new Promise((resolve) => setTimeout(() => resolve(mockData), 600));
   }
 
   try {
-    const res = await fetch(`${API_BASE_URL}${endpoint}`);
+    const res = await fetch(`${API_BASE_URL}${endpoint}`, {
+      headers: getHeaders(),
+      ...options,
+    });
     if (!res.ok) throw new Error('Network response was not ok');
-    return await res.json();
+    const data = await res.json();
+    return data.data || data;
   } catch (error) {
     console.warn(`API Error on ${endpoint}, falling back to mock data.`, error);
     return mockData;
   }
 }
 
-// --- API METHODS ---
+async function apiRequest<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
+  const res = await fetch(`${API_BASE_URL}${endpoint}`, {
+    headers: getHeaders(),
+    ...options,
+  });
+  
+  const data = await res.json();
+  
+  if (!res.ok) {
+    throw new Error(data.error || 'Request failed');
+  }
+  
+  return data.data || data;
+}
 
+// --- API METHODS ---
 export const api = {
+  // Analytics
   getAnalytics: () => fetchWithFallback<AnalyticsData>('/analytics', MOCK_ANALYTICS),
 
-  getSlots: async (date?: number) => {
+  // Slots
+  getSlots: async (date?: number, agencyId?: string) => {
     let mock = MOCK_SLOTS;
     if (date) {
-        mock = MOCK_SLOTS.filter(s => s.date === date);
+      mock = MOCK_SLOTS.filter(s => s.date === date);
     }
-    return fetchWithFallback<Slot[]>(`/slots${date ? `?date=${date}` : ''}`, mock);
+    let url = '/slots';
+    const params = new URLSearchParams();
+    if (date) params.append('date', date.toString());
+    if (agencyId) params.append('agencyId', agencyId);
+    if (params.toString()) url += `?${params.toString()}`;
+    return fetchWithFallback<Slot[]>(url, mock);
   },
 
-  getSlotIndicators: async () => {
+  getSlotIndicators: async (agencyId?: string) => {
     const indicators = MOCK_SLOTS.reduce((acc: any, slot) => {
-        if (!acc[slot.date]) acc[slot.date] = { hasAvailable: false, hasBooked: false };
-        if (slot.status === 'Available') acc[slot.date].hasAvailable = true;
-        if (slot.status === 'Booked') acc[slot.date].hasBooked = true;
-        return acc;
+      if (!acc[slot.date]) acc[slot.date] = { hasAvailable: false, hasBooked: false };
+      if (slot.status === 'Available') acc[slot.date].hasAvailable = true;
+      if (slot.status === 'Booked') acc[slot.date].hasBooked = true;
+      return acc;
     }, {});
-    return fetchWithFallback('/slots/indicators', indicators);
+    const url = agencyId ? `/slots/indicators?agencyId=${agencyId}` : '/slots/indicators';
+    return fetchWithFallback(url, indicators);
   },
 
-  deleteSlot: async (id: number) => {
-      // Mock deletion
+  createSlot: async (slotData: Partial<Slot>) => {
+    return apiRequest<Slot>('/slots', {
+      method: 'POST',
+      body: JSON.stringify(slotData),
+    });
+  },
+
+  deleteSlot: async (id: string) => {
+    if (USE_MOCK_FALLBACK) {
       const index = MOCK_SLOTS.findIndex(s => s.id === id);
       if (index > -1) MOCK_SLOTS.splice(index, 1);
-      
-      if(USE_MOCK_FALLBACK) return new Promise(resolve => setTimeout(resolve, 300));
+      return new Promise(resolve => setTimeout(resolve, 300));
+    }
+    return apiRequest(`/slots/${id}`, { method: 'DELETE' });
+  },
 
-      try {
-          await fetch(`${API_BASE_URL}/slots/${id}`, { method: 'DELETE' });
-      } catch (e) { console.error(e); }
-  }
+  bookSlot: async (id: string) => {
+    return apiRequest<Slot>(`/slots/${id}/book`, { method: 'POST' });
+  },
+
+  // Auth
+  login: async (email: string, password: string): Promise<User> => {
+    const data = await apiRequest<User>('/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ email, password }),
+    });
+    if (data.token) {
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data));
+    }
+    return data;
+  },
+
+  register: async (name: string, email: string, password: string, role: string): Promise<User> => {
+    const data = await apiRequest<User>('/auth/register', {
+      method: 'POST',
+      body: JSON.stringify({ name, email, password, role }),
+    });
+    if (data.token) {
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data));
+    }
+    return data;
+  },
+
+  logout: () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+  },
+
+  getMe: async (): Promise<User> => {
+    return apiRequest<User>('/auth/me');
+  },
+
+  updateProfile: async (data: Partial<User>): Promise<User> => {
+    return apiRequest<User>('/auth/profile', {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  },
+
+  // Agencies
+  getAgencies: async (params?: { city?: string; service?: string; page?: number }) => {
+    const searchParams = new URLSearchParams();
+    if (params?.city) searchParams.append('city', params.city);
+    if (params?.service) searchParams.append('service', params.service);
+    if (params?.page) searchParams.append('page', params.page.toString());
+    const url = `/agencies${searchParams.toString() ? `?${searchParams.toString()}` : ''}`;
+    return fetchWithFallback(url, { agencies: [], pagination: {} });
+  },
+
+  getAgencyById: async (id: string): Promise<Agency> => {
+    return apiRequest<Agency>(`/agencies/${id}`);
+  },
+
+  searchAgencies: async (location: string) => {
+    return fetchWithFallback(`/agencies/search?location=${location}`, []);
+  },
+
+  // Bookings
+  createBooking: async (bookingData: any): Promise<Booking> => {
+    return apiRequest<Booking>('/bookings', {
+      method: 'POST',
+      body: JSON.stringify(bookingData),
+    });
+  },
+
+  getUserBookings: async (status?: string) => {
+    const url = status ? `/bookings?status=${status}` : '/bookings';
+    return apiRequest(url);
+  },
+
+  getBookingById: async (id: string): Promise<Booking> => {
+    return apiRequest<Booking>(`/bookings/${id}`);
+  },
+
+  getActiveBooking: async (): Promise<Booking | null> => {
+    return apiRequest<Booking | null>('/bookings/active');
+  },
+
+  cancelBooking: async (id: string): Promise<Booking> => {
+    return apiRequest<Booking>(`/bookings/${id}`, { method: 'DELETE' });
+  },
+
+  // Rewards
+  getRewards: async (category?: string) => {
+    const url = category && category !== 'All Rewards' ? `/rewards?category=${category}` : '/rewards';
+    return fetchWithFallback(url, { rewards: [], pagination: {} });
+  },
+
+  getPointsBalance: async () => {
+    return apiRequest('/rewards/balance');
+  },
+
+  redeemReward: async (rewardId: string) => {
+    return apiRequest('/rewards/redeem', {
+      method: 'POST',
+      body: JSON.stringify({ rewardId }),
+    });
+  },
+
+  getRedemptionHistory: async () => {
+    return apiRequest('/rewards/history');
+  },
+
+  // Certificates
+  getUserCertificates: async () => {
+    return apiRequest('/certificates');
+  },
+
+  getCertificateById: async (id: string) => {
+    return apiRequest(`/certificates/${id}`);
+  },
+
+  verifyCertificate: async (code: string) => {
+    return fetchWithFallback(`/certificates/verify/${code}`, null);
+  },
+
+  // Notifications
+  getNotifications: async (unreadOnly = false) => {
+    const url = unreadOnly ? '/notifications?unreadOnly=true' : '/notifications';
+    return apiRequest(url);
+  },
+
+  markNotificationRead: async (id: string) => {
+    return apiRequest(`/notifications/${id}/read`, { method: 'PUT' });
+  },
+
+  markAllNotificationsRead: async () => {
+    return apiRequest('/notifications/read-all', { method: 'PUT' });
+  },
+
+  getUnreadCount: async () => {
+    return apiRequest('/notifications/unread-count');
+  },
+
+  // Admin
+  getAdminDashboard: async () => {
+    return apiRequest('/admin/dashboard');
+  },
+
+  getAdminUsers: async (params?: { role?: string; search?: string; page?: number }) => {
+    const searchParams = new URLSearchParams();
+    if (params?.role) searchParams.append('role', params.role);
+    if (params?.search) searchParams.append('search', params.search);
+    if (params?.page) searchParams.append('page', params.page.toString());
+    return apiRequest(`/admin/users?${searchParams.toString()}`);
+  },
+
+  getPendingAgencies: async () => {
+    return apiRequest('/admin/agencies/pending');
+  },
+
+  approveAgency: async (id: string) => {
+    return apiRequest(`/admin/agencies/${id}/verify`, {
+      method: 'PUT',
+      body: JSON.stringify({ status: 'approved' }),
+    });
+  },
+
+  rejectAgency: async (id: string, reason: string) => {
+    return apiRequest(`/admin/agencies/${id}/verify`, {
+      method: 'PUT',
+      body: JSON.stringify({ status: 'rejected', reason }),
+    });
+  },
+
+  getAdminReports: async (period = '30d') => {
+    return apiRequest(`/admin/reports?period=${period}`);
+  },
+
+  // Agency Dashboard
+  getAgencyDashboard: async () => {
+    return apiRequest('/agencies/dashboard/me');
+  },
+
+  getAgencyBookings: async (status?: string) => {
+    const url = status ? `/agencies/bookings/me?status=${status}` : '/agencies/bookings/me';
+    return apiRequest(url);
+  },
+
+  updateBookingStatus: async (bookingId: string, status: string, message?: string) => {
+    return apiRequest(`/bookings/${bookingId}/status`, {
+      method: 'PUT',
+      body: JSON.stringify({ status, message }),
+    });
+  },
+};
+
+// Export current user helper
+export const getCurrentUser = (): User | null => {
+  const userStr = localStorage.getItem('user');
+  return userStr ? JSON.parse(userStr) : null;
+};
+
+export const isAuthenticated = (): boolean => {
+  return !!getToken();
 };
