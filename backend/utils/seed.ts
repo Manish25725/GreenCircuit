@@ -5,8 +5,10 @@ import { User } from '../models/User';
 import { Agency } from '../models/Agency';
 import { Reward } from '../models/Reward';
 import { Slot } from '../models/Slot';
+import path from 'path';
 
-dotenv.config({ path: '../../.env' });
+// Load .env from project root
+dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
 const MONGO_URI = process.env.MONGODB_URI || process.env.MONGO_URI || 'mongodb://localhost:27017/ecocycle';
 

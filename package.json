@@ -5,34 +5,35 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "server": "tsx server.ts",
+    "server": "nodemon --exec tsx server.ts",
     "dev:all": "concurrently \"npm run dev\" \"npm run server\"",
     "seed": "tsx backend/utils/seed.ts",
     "build": "vite build",
     "preview": "vite preview"
   },
   "dependencies": {
-    "react": "^19.2.1",
-    "recharts": "^3.5.1",
-    "react-dom": "^19.2.1",
-    "gsap": "^3.14.1",
-    "cors": "^2.8.5",
-    "express": "^5.2.1",
-    "mongoose": "^9.0.1",
     "bcryptjs": "^3.0.3",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "gsap": "^3.14.1",
     "jsonwebtoken": "^9.0.3",
-    "dotenv": "^17.2.3"
+    "mongoose": "^9.0.1",
+    "react": "^19.2.1",
+    "react-dom": "^19.2.1",
+    "recharts": "^3.5.1"
   },
   "devDependencies": {
-    "@types/node": "^22.14.0",
-    "@types/express": "^5.0.0",
-    "@types/cors": "^2.8.17",
     "@types/bcryptjs": "^2.4.6",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0",
     "@types/jsonwebtoken": "^9.0.7",
+    "@types/node": "^22.14.0",
     "@vitejs/plugin-react": "^5.0.0",
-    "typescript": "~5.8.2",
-    "tsx": "^4.19.2",
     "concurrently": "^9.1.2",
+    "nodemon": "^3.1.11",
+    "tsx": "^4.19.2",
+    "typescript": "~5.8.2",
     "vite": "^6.2.0"
   }
 }

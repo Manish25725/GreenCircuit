@@ -1,7 +1,91 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
+import { api, getCurrentUser } from '../services/api';
+
+interface BookingDetails {
+  _id: string;
+  status: string;
+  date: string;
+  items: Array<{ type: string; quantity: number; description?: string }>;
+  agency?: { name: string };
+  pointsEarned?: number;
+  slot?: { startTime: string; endTime: string };
+}
 
 const PickupConfirmation = () => {
+  const [booking, setBooking] = useState<BookingDetails | null>(null);
+  const [loading, setLoading] = useState(true);
+  const user = getCurrentUser();
+
+  useEffect(() => {
+    loadBooking();
+  }, []);
+
+  const loadBooking = async () => {
+    try {
+      // Get booking ID from URL params
+      const hash = window.location.hash;
+      const params = new URLSearchParams(hash.split('?')[1] || '');
+      const bookingId = params.get('booking');
+
+      if (bookingId) {
+        const response = await api.getBookingById(bookingId);
+        setBooking(response);
+      } else {
+        // Try to get the active booking
+        const activeBooking = await api.getActiveBooking();
+        if (activeBooking) {
+          setBooking(activeBooking);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load booking:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getProgressPercentage = (status: string) => {
+    switch (status) {
+      case 'pending': return 25;
+      case 'confirmed': return 50;
+      case 'collected': return 75;
+      case 'completed': return 100;
+      default: return 25;
+    }
+  };
+
+  const formatDate = (dateStr: string) => {
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('en-US', { 
+      month: 'short', 
+      day: 'numeric', 
+      year: 'numeric' 
+    });
+  };
+
+  const formatTime = (time: string) => {
+    if (!time) return '';
+    const [hours, minutes] = time.split(':');
+    const hour = parseInt(hours);
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    const hour12 = hour % 12 || 12;
+    return `${hour12}:${minutes || '00'} ${ampm}`;
+  };
+
+  if (loading) {
+    return (
+      <Layout title="" role="User" fullWidth hideSidebar>
+        <div className="min-h-screen bg-[#102216] flex items-center justify-center">
+          <div className="text-center">
+            <div className="w-12 h-12 border-4 border-[#2bee6c] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-gray-400">Loading booking details...</p>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
+
   return (
     <Layout title="" role="User" fullWidth hideSidebar>
       <div className="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden bg-[#f6f8f6] dark:bg-[#102216] text-slate-900 dark:text-white font-sans">
@@ -48,9 +132,14 @@ const PickupConfirmation = () => {
                   <div className="absolute inset-0 rounded-full border border-[#2bee6c]/20 animate-ping opacity-20"></div>
                 </div>
                 <div className="flex flex-col items-center gap-3 max-w-[560px]">
-                  <h1 className="text-3xl sm:text-4xl font-extrabold leading-tight tracking-tight text-slate-900 dark:text-white">Great Job, Alex!</h1>
+                  <h1 className="text-3xl sm:text-4xl font-extrabold leading-tight tracking-tight text-slate-900 dark:text-white">
+                    {booking?.status === 'completed' ? 'Pickup Complete!' : 'Booking Confirmed!'}
+                  </h1>
                   <p className="text-slate-600 dark:text-[#9db9a6] text-base sm:text-lg font-normal leading-relaxed">
-                    GreenEarth Recyclers have successfully collected your e-waste. <br className="hidden sm:block"/>It is now on its way to responsible processing.
+                    {booking?.status === 'completed' 
+                      ? `${booking?.agency?.name || 'The agency'} has successfully collected your e-waste.`
+                      : `Your pickup has been scheduled with ${booking?.agency?.name || 'the agency'}.`
+                    }
                   </p>
                 </div>
               </section>
@@ -61,13 +150,21 @@ const PickupConfirmation = () => {
                   <div className="flex flex-col justify-center gap-2 flex-[2_2_0px]">
                     <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#2bee6c]/10 w-fit">
                       <span className="material-symbols-outlined text-[#2bee6c] text-[18px]">eco</span>
-                      <p className="text-[#2bee6c] text-sm font-bold leading-normal">+50 Eco-Points Earned</p>
+                      <p className="text-[#2bee6c] text-sm font-bold leading-normal">+{booking?.pointsEarned || 50} Eco-Points Earned</p>
                     </div>
-                    <h3 className="text-xl font-bold leading-tight mt-2 text-slate-900 dark:text-white">Pickup #EC-99281 Summary</h3>
-                    <p className="text-slate-500 dark:text-[#9db9a6] text-sm font-normal leading-normal">Collected by <span className="text-slate-900 dark:text-white font-medium">GreenEarth Recyclers</span> (Verified Partner)</p>
+                    <h3 className="text-xl font-bold leading-tight mt-2 text-slate-900 dark:text-white">
+                      Pickup #{booking?._id?.slice(-6).toUpperCase() || 'XXXXXX'} Summary
+                    </h3>
+                    <p className="text-slate-500 dark:text-[#9db9a6] text-sm font-normal leading-normal">
+                      {booking?.agency?.name ? (
+                        <>Handled by <span className="text-slate-900 dark:text-white font-medium">{booking.agency.name}</span> (Verified Partner)</>
+                      ) : (
+                        'Pickup scheduled successfully'
+                      )}
+                    </p>
                   </div>
-                  <div className="w-full md:w-48 h-32 md:h-auto bg-center bg-no-repeat bg-cover rounded-lg flex-none relative overflow-hidden group" style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuCBoEgxYFd6kPtD6X5bAo8nxGRIsKjadylfSDnZsoNpawgRxb0empn4m0jCxcR3gOeAeorY5Z5yiXvoJvNwmcyxkX3KXvTlWUao53yhtXXS3eRjWiaR5ClaS1BQDU7zgwJ9A7gAqYMjzsyY4IyS2zvZ0nNaPANcB3w2R2xmg76WXc0zHmy082zCA__bG2jIU-hc8Zo3-OZzIa_ebGf-Y1nfKaMoXSNTlY_ln48WZPOvSv_Z4m_5ee0qxbAucbSutB8ndDKsmGs3_DY")' }}>
-                    <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors"></div>
+                  <div className="w-full md:w-48 h-32 md:h-auto bg-center bg-no-repeat bg-cover rounded-lg flex-none relative overflow-hidden group bg-gradient-to-br from-[#2bee6c]/20 to-[#2bee6c]/5 flex items-center justify-center">
+                    <span className="material-symbols-outlined text-[#2bee6c] text-6xl">recycling</span>
                   </div>
                 </div>
               </section>
@@ -77,12 +174,12 @@ const PickupConfirmation = () => {
                 <div className="flex gap-6 justify-between items-end">
                   <div>
                     <p className="text-base font-bold leading-normal text-slate-900 dark:text-white">Recycling Process Status</p>
-                    <p className="text-slate-500 dark:text-[#9db9a6] text-xs">Updated 2 mins ago</p>
+                    <p className="text-slate-500 dark:text-[#9db9a6] text-xs">Status: {booking?.status || 'pending'}</p>
                   </div>
-                  <p className="text-[#2bee6c] text-sm font-bold leading-normal">75%</p>
+                  <p className="text-[#2bee6c] text-sm font-bold leading-normal">{getProgressPercentage(booking?.status || 'pending')}%</p>
                 </div>
                 <div className="relative w-full h-3 rounded-full bg-gray-200 dark:bg-[#28392e] overflow-hidden">
-                  <div className="absolute left-0 top-0 h-full rounded-full bg-[#2bee6c] shadow-[0_0_10px_rgba(43,238,108,0.5)]" style={{ width: '75%' }}></div>
+                  <div className="absolute left-0 top-0 h-full rounded-full bg-[#2bee6c] shadow-[0_0_10px_rgba(43,238,108,0.5)] transition-all duration-500" style={{ width: `${getProgressPercentage(booking?.status || 'pending')}%` }}></div>
                 </div>
                 <div className="flex justify-between text-xs font-medium text-slate-400 dark:text-[#9db9a6] mt-1">
                   <span>Booked</span>
@@ -99,25 +196,30 @@ const PickupConfirmation = () => {
                     <p className="text-slate-500 dark:text-[#9db9a6] text-sm font-normal leading-normal mb-1 flex items-center gap-2">
                       <span className="material-symbols-outlined text-[18px]">tag</span> Pickup ID
                     </p>
-                    <p className="text-base font-semibold text-slate-900 dark:text-white">#EC-99281</p>
+                    <p className="text-base font-semibold text-slate-900 dark:text-white">#{booking?._id?.slice(-6).toUpperCase() || 'XXXXXX'}</p>
                   </div>
                   <div className="flex flex-col gap-1 border-b border-solid border-gray-200 dark:border-[#28392e] p-5 hover:bg-white/5 transition-colors">
                     <p className="text-slate-500 dark:text-[#9db9a6] text-sm font-normal leading-normal mb-1 flex items-center gap-2">
                       <span className="material-symbols-outlined text-[18px]">event</span> Date & Time
                     </p>
-                    <p className="text-base font-semibold text-slate-900 dark:text-white">Oct 24, 2023 • 10:30 AM</p>
+                    <p className="text-base font-semibold text-slate-900 dark:text-white">
+                      {booking?.date ? formatDate(booking.date) : 'Pending'} 
+                      {booking?.slot ? ` • ${formatTime(booking.slot.startTime)}` : ''}
+                    </p>
                   </div>
                   <div className="flex flex-col gap-1 border-b sm:border-b-0 sm:border-r border-solid border-gray-200 dark:border-[#28392e] p-5 hover:bg-white/5 transition-colors">
                     <p className="text-slate-500 dark:text-[#9db9a6] text-sm font-normal leading-normal mb-1 flex items-center gap-2">
-                      <span className="material-symbols-outlined text-[18px]">inventory_2</span> Items Collected
+                      <span className="material-symbols-outlined text-[18px]">inventory_2</span> Items
                     </p>
-                    <p className="text-base font-semibold text-slate-900 dark:text-white">3 items: Laptop, Phone, Batteries</p>
+                    <p className="text-base font-semibold text-slate-900 dark:text-white">
+                      {booking?.items?.length || 0} item(s): {booking?.items?.map(i => i.type).join(', ') || 'N/A'}
+                    </p>
                   </div>
                   <div className="flex flex-col gap-1 p-5 hover:bg-white/5 transition-colors">
                     <p className="text-slate-500 dark:text-[#9db9a6] text-sm font-normal leading-normal mb-1 flex items-center gap-2">
-                      <span className="material-symbols-outlined text-[18px]">next_plan</span> Next Step
+                      <span className="material-symbols-outlined text-[18px]">next_plan</span> Status
                     </p>
-                    <p className="text-base font-semibold text-[#2bee6c]">Metal Extraction</p>
+                    <p className="text-base font-semibold text-[#2bee6c] capitalize">{booking?.status || 'Pending'}</p>
                   </div>
                 </div>
               </section>

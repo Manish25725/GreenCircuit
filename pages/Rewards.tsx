@@ -1,7 +1,71 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
+import { api, getCurrentUser, Reward } from '../services/api';
 
 const Rewards = () => {
+  const [rewards, setRewards] = useState<Reward[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedCategory, setSelectedCategory] = useState('All Rewards');
+  const [user, setUser] = useState(getCurrentUser());
+  const categories = ['All Rewards', 'Gift Cards', 'Donations', 'Lifestyle', 'Electronics'];
+
+  useEffect(() => {
+    loadRewards();
+    loadUserData();
+  }, [selectedCategory]);
+
+  const loadRewards = async () => {
+    setLoading(true);
+    try {
+      const result = await api.getRewards(selectedCategory === 'All Rewards' ? undefined : selectedCategory);
+      setRewards(result.rewards || []);
+    } catch (error) {
+      console.error('Failed to load rewards:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadUserData = async () => {
+    try {
+      const userData = await api.getMe();
+      setUser(userData);
+    } catch (error) {
+      console.error('Failed to load user data');
+    }
+  };
+
+  const handleRedeem = async (rewardId: string, pointsCost: number) => {
+    if ((user?.ecoPoints || 0) < pointsCost) {
+      alert('Not enough points!');
+      return;
+    }
+    try {
+      await api.redeemReward(rewardId);
+      alert('Reward redeemed successfully!');
+      loadUserData();
+      loadRewards();
+    } catch (error: any) {
+      alert(error.message || 'Failed to redeem reward');
+    }
+  };
+
+  const iconMap: Record<string, string> = {
+    'Gift Cards': 'card_giftcard',
+    'Donations': 'volunteer_activism',
+    'Lifestyle': 'spa',
+    'Electronics': 'devices',
+    'Other': 'redeem'
+  };
+
+  const colorMap: Record<string, string> = {
+    'Gift Cards': 'bg-orange-500',
+    'Donations': 'bg-green-600',
+    'Lifestyle': 'bg-purple-500',
+    'Electronics': 'bg-blue-500',
+    'Other': 'bg-gray-500'
+  };
+
   return (
     <Layout title="" role="User" fullWidth hideSidebar>
       <div className="bg-[#0B1116] font-sans text-gray-200 antialiased selection:bg-[#10b981] selection:text-white min-h-screen flex flex-col relative overflow-hidden">
@@ -31,8 +95,10 @@ const Rewards = () => {
                     onClick={() => window.location.hash = '#/profile'}
                     className="hidden sm:flex items-center gap-3 pl-1 pr-4 py-1 rounded-full bg-[#151F26] border border-white/5 hover:bg-white/5 transition-colors group cursor-pointer"
                 >
-                    <div className="size-8 rounded-full bg-cover bg-center ring-2 ring-white/10 group-hover:ring-[#10b981]/50 transition-all" style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuAreboopkKSy4YYDs4PFvd-l4xnboU1-dCb6q7kuogZsIpVK9icd7CNdE17iE4uQKdoqiJuI30CTaWxw7GK3QrR7H_FstEqPZBbUqkey_74QXoP8uhTfR9RY780_K4O8UAQpRMWJiKbRdh5-SdE7JAIX5lG3yPPg3Wisf3RGrXHACYJxJFU0vYynDCqaru_FI7DW3EV-buSFuzGK8Z7LP7p7c25u8kqkBUXlt5pQG5d-4WVmAzmNX9U0trABs1cC--zDVlgdRcgww")' }}></div>
-                    <span className="text-sm font-medium text-gray-200">Alex Morgan</span>
+                    <div className="size-8 rounded-full bg-[#10b981] flex items-center justify-center ring-2 ring-white/10 group-hover:ring-[#10b981]/50 transition-all text-white font-bold text-sm">
+                      {user?.name?.charAt(0) || 'U'}
+                    </div>
+                    <span className="text-sm font-medium text-gray-200">{user?.name || 'User'}</span>
                 </button>
                 <button className="relative p-2.5 rounded-full bg-[#151F26] border border-white/5 text-gray-400 hover:text-white hover:bg-white/10 transition-colors">
                     <span className="absolute top-2.5 right-3 size-2 bg-red-500 rounded-full border-2 border-[#151F26]"></span>
@@ -53,7 +119,7 @@ const Rewards = () => {
             <div>
               <h2 className="text-sm font-medium opacity-90 mb-1">Available Balance</h2>
               <div className="flex items-baseline gap-2">
-                <span className="text-5xl font-black tracking-tight">1,250</span>
+                <span className="text-5xl font-black tracking-tight">{(user?.ecoPoints || 0).toLocaleString()}</span>
                 <span className="text-xl font-medium">Points</span>
               </div>
             </div>
@@ -61,7 +127,7 @@ const Rewards = () => {
               <button className="bg-white/20 hover:bg-white/30 backdrop-blur-sm px-6 py-3 rounded-xl font-bold transition-all border border-white/10 cursor-pointer">
                  History
               </button>
-              <button className="bg-white text-green-800 px-6 py-3 rounded-xl font-bold shadow-lg hover:bg-gray-100 transition-all cursor-pointer">
+              <button onClick={() => window.location.hash = '#/search'} className="bg-white text-green-800 px-6 py-3 rounded-xl font-bold shadow-lg hover:bg-gray-100 transition-all cursor-pointer">
                  Earn More
               </button>
             </div>
@@ -69,12 +135,13 @@ const Rewards = () => {
 
           {/* Categories */}
           <div className="flex gap-4 mb-8 overflow-x-auto pb-2 scrollbar-hide">
-            {['All Rewards', 'Gift Cards', 'Donations', 'Lifestyle', 'Electronics'].map((cat, i) => (
+            {categories.map((cat) => (
               <button 
                 key={cat}
+                onClick={() => setSelectedCategory(cat)}
                 className={`px-5 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors cursor-pointer ${
-                  i === 0 
-                    ? 'bg-[#10b981] text-background-dark' 
+                  selectedCategory === cat 
+                    ? 'bg-[#10b981] text-white' 
                     : 'bg-[#151F26] border border-white/10 text-[#94a3b8] hover:text-white hover:border-white/20'
                 }`}
               >
@@ -85,62 +152,42 @@ const Rewards = () => {
 
           {/* Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-             {[
-               { title: '$10 Amazon Gift Card', cost: 1000, icon: 'shopping_cart', color: 'bg-orange-500' },
-               { title: 'Plant 5 Trees', cost: 500, icon: 'forest', color: 'bg-green-600' },
-               { title: '$25 Grocery Voucher', cost: 2400, icon: 'shopping_basket', color: 'bg-blue-500' },
-               { title: 'Cinema Tickets (x2)', cost: 1800, icon: 'movie', color: 'bg-purple-500' },
-               { title: 'Coffee Shop Credit', cost: 800, icon: 'coffee', color: 'bg-amber-700' },
-               { title: 'Donate to Ocean Clean', cost: 1200, icon: 'waves', color: 'bg-cyan-600' },
-               { title: 'EcoCycle Merch Kit', cost: 3000, icon: 'checkroom', color: 'bg-pink-600' },
-               { title: 'Premium App Features', cost: 5000, icon: 'diamond', color: 'bg-indigo-500' },
-             ].map((reward, i) => (
-               <div key={i} className="bg-[#151F26] border border-white/5 rounded-xl overflow-hidden hover:border-[#10b981]/50 transition-colors group flex flex-col">
-                  <div className={`h-32 ${reward.color} flex items-center justify-center text-white/90`}>
-                     <span className="material-symbols-outlined text-6xl group-hover:scale-110 transition-transform">{reward.icon}</span>
-                  </div>
-                  <div className="p-5 flex-1 flex flex-col">
-                     <h3 className="font-bold text-white text-lg mb-1">{reward.title}</h3>
-                     <p className="text-[#10b981] font-bold text-sm mb-4">{reward.cost} Points</p>
-                     <button className="w-full mt-auto py-2 rounded-lg bg-white/5 text-white font-medium hover:bg-[#10b981] hover:text-background-dark transition-colors border border-white/10 hover:border-transparent cursor-pointer">
-                        Redeem
-                     </button>
-                  </div>
+             {loading ? (
+               <div className="col-span-4 flex items-center justify-center py-12">
+                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#10b981]"></div>
                </div>
-             ))}
-          </div>
-
-          {/* History Table */}
-          <div className="bg-[#151F26] border border-white/5 rounded-xl overflow-hidden mb-10">
-            <div className="p-6 border-b border-white/5">
-              <h3 className="text-lg font-bold text-white">Recent Activity</h3>
-            </div>
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm">
-                <thead className="bg-white/5 text-[#94a3b8]">
-                  <tr>
-                    <th className="px-6 py-4 font-medium">Description</th>
-                    <th className="px-6 py-4 font-medium">Date</th>
-                    <th className="px-6 py-4 font-medium text-right">Points</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-white/5 text-white">
-                  {[
-                    { desc: 'Recycled Old Laptop', date: 'Oct 24, 2024', points: '+500', type: 'earn' },
-                    { desc: 'Redeemed Tree Planting', date: 'Oct 20, 2024', points: '-500', type: 'spend' },
-                    { desc: 'Recycled Mobile Phone', date: 'Oct 15, 2024', points: '+250', type: 'earn' },
-                  ].map((row, i) => (
-                    <tr key={i} className="hover:bg-white/5 transition-colors">
-                      <td className="px-6 py-4">{row.desc}</td>
-                      <td className="px-6 py-4 text-[#94a3b8]">{row.date}</td>
-                      <td className={`px-6 py-4 text-right font-bold ${row.type === 'earn' ? 'text-[#10b981]' : 'text-red-400'}`}>
-                        {row.points}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+             ) : rewards.length === 0 ? (
+               <div className="col-span-4 text-center py-12 text-gray-500">
+                 <span className="material-symbols-outlined text-4xl mb-2">redeem</span>
+                 <p>No rewards available</p>
+               </div>
+             ) : (
+               rewards.map((reward) => (
+                 <div key={reward._id} className="bg-[#151F26] border border-white/5 rounded-xl overflow-hidden hover:border-[#10b981]/50 transition-colors group flex flex-col">
+                    <div className={`h-32 ${reward.color || colorMap[reward.category] || 'bg-gray-500'} flex items-center justify-center text-white/90`}>
+                       <span className="material-symbols-outlined text-6xl group-hover:scale-110 transition-transform">
+                         {reward.icon || iconMap[reward.category] || 'redeem'}
+                       </span>
+                    </div>
+                    <div className="p-5 flex-1 flex flex-col">
+                       <h3 className="font-bold text-white text-lg mb-1">{reward.title}</h3>
+                       <p className="text-gray-400 text-sm mb-2 line-clamp-2">{reward.description}</p>
+                       <p className="text-[#10b981] font-bold text-sm mb-4">{reward.pointsCost.toLocaleString()} Points</p>
+                       <button 
+                         onClick={() => handleRedeem(reward._id, reward.pointsCost)}
+                         disabled={(user?.ecoPoints || 0) < reward.pointsCost}
+                         className={`w-full mt-auto py-2 rounded-lg font-medium transition-colors border cursor-pointer ${
+                           (user?.ecoPoints || 0) >= reward.pointsCost
+                             ? 'bg-white/5 text-white hover:bg-[#10b981] hover:text-white border-white/10 hover:border-transparent'
+                             : 'bg-gray-800 text-gray-500 border-gray-700 cursor-not-allowed'
+                         }`}
+                       >
+                          {(user?.ecoPoints || 0) >= reward.pointsCost ? 'Redeem' : 'Not enough points'}
+                       </button>
+                    </div>
+                 </div>
+               ))
+             )}
           </div>
         </main>
       </div>

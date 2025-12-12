@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
+import { api, getCurrentUser } from '../services/api';
 
 interface Item {
   id: string;
@@ -8,21 +9,101 @@ interface Item {
   description: string;
 }
 
+interface Slot {
+  _id: string;
+  startTime: string;
+  endTime: string;
+  available: boolean;
+}
+
 const SchedulePickup = () => {
-  const [items, setItems] = useState<Item[]>([
-    { id: '1', type: 'Large Appliances', quantity: 1, description: 'Old Samsung Refrigerator, broken compressor.' },
-    { id: '2', type: 'Consumer Electronics', quantity: 3, description: '2 broken HP laptops and 1 monitor.' }
-  ]);
+  const [items, setItems] = useState<Item[]>([]);
   const [newItem, setNewItem] = useState({ type: '', quantity: 1, description: '' });
-  const [selectedDate, setSelectedDate] = useState(26);
-  const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [selectedSlot, setSelectedSlot] = useState<Slot | null>(null);
   const [loadingSlots, setLoadingSlots] = useState(true);
+  const [slots, setSlots] = useState<Slot[]>([]);
+  const [agencyId, setAgencyId] = useState<string>('');
+  const [agencyName, setAgencyName] = useState<string>('');
+  const [submitting, setSubmitting] = useState(false);
+  const [currentMonth, setCurrentMonth] = useState(new Date());
+  const user = getCurrentUser();
 
   useEffect(() => {
-    // Simulate loading slots
-    const timer = setTimeout(() => setLoadingSlots(false), 1500);
-    return () => clearTimeout(timer);
+    // Get agency ID from URL params
+    const hash = window.location.hash;
+    const params = new URLSearchParams(hash.split('?')[1] || '');
+    const agency = params.get('agency');
+    const name = params.get('name');
+    
+    if (agency) {
+      setAgencyId(agency);
+      setAgencyName(name || 'Selected Agency');
+    } else {
+      // Fallback to localStorage
+      const storedAgency = localStorage.getItem('selectedAgency');
+      if (storedAgency) {
+        try {
+          const agencyData = JSON.parse(storedAgency);
+          setAgencyId(agencyData._id);
+          setAgencyName(agencyData.name || 'Selected Agency');
+        } catch (e) {
+          console.error('Failed to parse stored agency');
+        }
+      }
+    }
   }, []);
+
+  useEffect(() => {
+    if (agencyId) {
+      loadSlots();
+    }
+  }, [agencyId, selectedDate]);
+
+  const loadSlots = async () => {
+    try {
+      setLoadingSlots(true);
+      const dateNum = selectedDate.getDate();
+      const response = await api.getSlots(dateNum, agencyId);
+      if (response && Array.isArray(response)) {
+        // Transform to expected format
+        const formattedSlots = response.map((slot: any) => ({
+          _id: slot._id || slot.id || String(Math.random()),
+          startTime: slot.startTime || slot.time?.split(' - ')[0] || '09:00',
+          endTime: slot.endTime || slot.time?.split(' - ')[1] || '10:00',
+          available: slot.available !== false && slot.status !== 'booked'
+        }));
+        setSlots(formattedSlots);
+      } else {
+        // Generate default slots if API returns empty
+        const defaultSlots = [
+          { _id: '1', startTime: '09:00', endTime: '10:00', available: true },
+          { _id: '2', startTime: '10:00', endTime: '11:00', available: true },
+          { _id: '3', startTime: '11:00', endTime: '12:00', available: true },
+          { _id: '4', startTime: '13:00', endTime: '14:00', available: true },
+          { _id: '5', startTime: '14:00', endTime: '15:00', available: true },
+          { _id: '6', startTime: '15:00', endTime: '16:00', available: true },
+          { _id: '7', startTime: '16:00', endTime: '17:00', available: true },
+        ];
+        setSlots(defaultSlots);
+      }
+    } catch (error) {
+      console.error('Failed to load slots:', error);
+      // Generate default slots if API fails
+      const defaultSlots = [
+        { _id: '1', startTime: '09:00', endTime: '10:00', available: true },
+        { _id: '2', startTime: '10:00', endTime: '11:00', available: true },
+        { _id: '3', startTime: '11:00', endTime: '12:00', available: true },
+        { _id: '4', startTime: '13:00', endTime: '14:00', available: true },
+        { _id: '5', startTime: '14:00', endTime: '15:00', available: true },
+        { _id: '6', startTime: '15:00', endTime: '16:00', available: true },
+        { _id: '7', startTime: '16:00', endTime: '17:00', available: true },
+      ];
+      setSlots(defaultSlots);
+    } finally {
+      setLoadingSlots(false);
+    }
+  };
 
   const handleAddItem = () => {
     if (newItem.type && newItem.quantity > 0) {
@@ -41,15 +122,73 @@ const SchedulePickup = () => {
     setItems(items.filter(i => i.id !== id));
   };
 
-  const slots = [
-    "09:00 AM - 10:00 AM",
-    "10:00 AM - 11:00 AM",
-    "11:00 AM - 12:00 PM",
-    "01:00 PM - 02:00 PM",
-    "02:00 PM - 03:00 PM",
-    "03:00 PM - 04:00 PM",
-    "04:00 PM - 05:00 PM"
-  ];
+  const handleConfirmBooking = async () => {
+    if (!selectedSlot || items.length === 0) {
+      alert('Please add items and select a time slot');
+      return;
+    }
+
+    try {
+      setSubmitting(true);
+      const bookingData = {
+        agencyId,
+        slotId: selectedSlot._id,
+        date: selectedDate.toISOString(),
+        items: items.map(item => ({
+          type: item.type,
+          quantity: item.quantity,
+          description: item.description
+        })),
+        address: user?.address || '',
+        notes: ''
+      };
+
+      const response = await api.createBooking(bookingData);
+      if (response.data) {
+        // Navigate to confirmation page with booking ID
+        window.location.hash = `#/pickup-confirmation?booking=${response.data._id}`;
+      }
+    } catch (error) {
+      console.error('Failed to create booking:', error);
+      alert('Failed to create booking. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const formatSlotTime = (slot: Slot) => {
+    const formatTime = (time: string) => {
+      const [hours, minutes] = time.split(':');
+      const hour = parseInt(hours);
+      const ampm = hour >= 12 ? 'PM' : 'AM';
+      const hour12 = hour % 12 || 12;
+      return `${hour12}:${minutes || '00'} ${ampm}`;
+    };
+    return `${formatTime(slot.startTime)} - ${formatTime(slot.endTime)}`;
+  };
+
+  const getDaysInMonth = (date: Date) => {
+    return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+  };
+
+  const getFirstDayOfMonth = (date: Date) => {
+    return new Date(date.getFullYear(), date.getMonth(), 1).getDay();
+  };
+
+  const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 
+                      'July', 'August', 'September', 'October', 'November', 'December'];
+
+  const navigateMonth = (direction: number) => {
+    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + direction, 1));
+  };
+
+  const handleDateSelect = (day: number) => {
+    const newDate = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
+    if (newDate >= new Date(new Date().setHours(0, 0, 0, 0))) {
+      setSelectedDate(newDate);
+      setSelectedSlot(null);
+    }
+  };
 
   return (
     <Layout title="" role="User" fullWidth hideSidebar>
@@ -211,11 +350,19 @@ const SchedulePickup = () => {
                 <div className="p-4 sm:p-6 bg-[#151F26] rounded-2xl border border-white/5 shadow-lg">
                   <div className="flex flex-col">
                     <div className="flex items-center justify-between mb-4">
-                      <button className="flex items-center justify-center size-10 rounded-full hover:bg-white/5 transition-colors cursor-pointer text-[#94a3b8] hover:text-white">
+                      <button 
+                        onClick={() => navigateMonth(-1)}
+                        className="flex items-center justify-center size-10 rounded-full hover:bg-white/5 transition-colors cursor-pointer text-[#94a3b8] hover:text-white"
+                      >
                         <span className="material-symbols-outlined">chevron_left</span>
                       </button>
-                      <p className="text-lg font-bold leading-tight flex-1 text-center text-white">October 2024</p>
-                      <button className="flex items-center justify-center size-10 rounded-full hover:bg-white/5 transition-colors cursor-pointer text-[#94a3b8] hover:text-white">
+                      <p className="text-lg font-bold leading-tight flex-1 text-center text-white">
+                        {monthNames[currentMonth.getMonth()]} {currentMonth.getFullYear()}
+                      </p>
+                      <button 
+                        onClick={() => navigateMonth(1)}
+                        className="flex items-center justify-center size-10 rounded-full hover:bg-white/5 transition-colors cursor-pointer text-[#94a3b8] hover:text-white"
+                      >
                         <span className="material-symbols-outlined">chevron_right</span>
                       </button>
                     </div>
@@ -225,28 +372,33 @@ const SchedulePickup = () => {
                       ))}
                       
                       {/* Empty start days */}
-                      <div className="col-start-1"></div>
-                      <div></div>
-                      <div></div>
+                      {Array.from({ length: getFirstDayOfMonth(currentMonth) }, (_, i) => (
+                        <div key={`empty-${i}`}></div>
+                      ))}
 
                       {/* Days */}
-                      {Array.from({ length: 31 }, (_, i) => i + 1).map(day => {
-                        const isSelected = selectedDate === day;
-                        const hasSlots = [8, 21, 28].includes(day); // Mock data for indicator
+                      {Array.from({ length: getDaysInMonth(currentMonth) }, (_, i) => i + 1).map(day => {
+                        const dayDate = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
+                        const isSelected = selectedDate.toDateString() === dayDate.toDateString();
+                        const isPast = dayDate < new Date(new Date().setHours(0, 0, 0, 0));
+                        const isToday = dayDate.toDateString() === new Date().toDateString();
                         
                         return (
                           <button 
                             key={day}
-                            onClick={() => setSelectedDate(day)}
+                            onClick={() => handleDateSelect(day)}
+                            disabled={isPast}
                             className={`relative h-12 w-full text-sm font-medium leading-normal transition-all group rounded-lg
                                 ${isSelected 
                                     ? 'bg-[#10b981] text-[#0B1116] font-bold shadow-lg shadow-[#10b981]/20' 
-                                    : 'text-gray-300 hover:bg-white/5 hover:text-white'
+                                    : isPast
+                                    ? 'text-gray-600 cursor-not-allowed'
+                                    : 'text-gray-300 hover:bg-white/5 hover:text-white cursor-pointer'
                                 }
                             `}
                           >
                             <div className="flex size-full items-center justify-center">{day}</div>
-                            {hasSlots && !isSelected && (
+                            {isToday && !isSelected && (
                                 <div className="absolute bottom-2 left-1/2 -translate-x-1/2 size-1.5 rounded-full bg-[#10b981]"></div>
                             )}
                           </button>
@@ -273,7 +425,9 @@ const SchedulePickup = () => {
                     <h2 className="text-white text-lg sm:text-[22px] font-bold leading-tight tracking-[-0.015em]">
                         Available Slots
                     </h2>
-                    <p className="text-[#94a3b8] text-sm">For Oct {selectedDate}, 2024</p>
+                    <p className="text-[#94a3b8] text-sm">
+                      For {selectedDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                    </p>
                 </div>
                 
                 <div className="p-4 sm:p-6 bg-[#151F26] rounded-2xl border border-white/5 shadow-lg flex-1 flex flex-col">
@@ -283,14 +437,21 @@ const SchedulePickup = () => {
                                 <div key={i} className="h-14 w-full rounded-xl bg-white/5 animate-pulse"></div>
                             ))}
                         </div>
+                    ) : slots.length === 0 ? (
+                        <div className="flex-1 flex items-center justify-center text-center">
+                            <div>
+                                <span className="material-symbols-outlined text-4xl text-[#94a3b8] mb-2">event_busy</span>
+                                <p className="text-[#94a3b8]">No slots available for this date</p>
+                            </div>
+                        </div>
                     ) : (
                         <div className="grid grid-cols-1 gap-3">
-                            {slots.map((slot, idx) => (
+                            {slots.filter(slot => slot.available !== false).map((slot) => (
                                 <button
-                                    key={idx}
+                                    key={slot._id}
                                     onClick={() => setSelectedSlot(slot)}
                                     className={`h-14 w-full rounded-xl border text-sm font-medium transition-all cursor-pointer flex items-center px-4 justify-between group
-                                        ${selectedSlot === slot 
+                                        ${selectedSlot?._id === slot._id 
                                             ? 'bg-[#10b981]/20 border-[#10b981] text-[#10b981]' 
                                             : 'bg-[#0B1116] border-white/5 text-gray-300 hover:border-white/20 hover:bg-white/5'
                                         }
@@ -298,9 +459,9 @@ const SchedulePickup = () => {
                                 >
                                     <div className="flex items-center gap-3">
                                         <span className="material-symbols-outlined text-xl">schedule</span>
-                                        <span>{slot}</span>
+                                        <span>{formatSlotTime(slot)}</span>
                                     </div>
-                                    {selectedSlot === slot && (
+                                    {selectedSlot?._id === slot._id && (
                                         <span className="material-symbols-outlined text-xl">check_circle</span>
                                     )}
                                 </button>
@@ -311,18 +472,21 @@ const SchedulePickup = () => {
                 
                 <div className="w-full pt-4 sticky bottom-0 z-10">
                     <button 
-                        onClick={() => window.location.hash = '#/pickup-confirmation'}
-                        disabled={!selectedSlot}
+                        onClick={handleConfirmBooking}
+                        disabled={!selectedSlot || items.length === 0 || submitting}
                         className={`w-full flex min-w-[84px] items-center justify-center overflow-hidden rounded-xl h-14 px-8 text-[#0B1116] text-base font-bold leading-normal tracking-[0.015em] transition-all
-                            ${selectedSlot 
+                            ${selectedSlot && items.length > 0 && !submitting
                                 ? 'bg-[#10b981] hover:bg-[#059669] cursor-pointer shadow-lg shadow-[#10b981]/30 transform hover:-translate-y-1' 
                                 : 'bg-[#10b981]/50 opacity-50 cursor-not-allowed'
                             }
                         `}
                     >
-                        <span className="truncate">Confirm Pickup Slot</span>
-                        <span className="material-symbols-outlined ml-2">arrow_forward</span>
+                        <span className="truncate">{submitting ? 'Booking...' : 'Confirm Pickup Slot'}</span>
+                        {!submitting && <span className="material-symbols-outlined ml-2">arrow_forward</span>}
                     </button>
+                    {items.length === 0 && (
+                        <p className="text-center text-[#94a3b8] text-sm mt-2">Please add at least one item</p>
+                    )}
                 </div>
               </div>
             </div>

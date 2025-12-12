@@ -138,7 +138,7 @@ const SearchAgencies = () => {
                           className="bg-[#0B1116] border border-white/5 rounded-xl p-4 hover:border-[#10b981]/50 hover:bg-white/5 transition-all cursor-pointer group"
                           onClick={() => {
                             localStorage.setItem('selectedAgency', JSON.stringify(agency));
-                            window.location.hash = '#/schedule';
+                            window.location.hash = `#/schedule?agency=${agency._id}&name=${encodeURIComponent(agency.name)}`;
                           }}
                       >
                          <div className="flex gap-4">

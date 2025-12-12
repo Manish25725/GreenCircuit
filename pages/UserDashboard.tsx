@@ -1,7 +1,43 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
+import { api, getCurrentUser, User, Booking } from '../services/api';
 
 const UserDashboard = () => {
+  const [user, setUser] = useState<User | null>(getCurrentUser());
+  const [activeBooking, setActiveBooking] = useState<Booking | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadUserData();
+  }, []);
+
+  const loadUserData = async () => {
+    try {
+      // Try to get fresh user data from API
+      const userData = await api.getMe();
+      setUser(userData);
+      localStorage.setItem('user', JSON.stringify(userData));
+      
+      // Get active booking
+      const booking = await api.getActiveBooking();
+      setActiveBooking(booking);
+    } catch (error) {
+      console.error('Failed to load user data:', error);
+      // If API fails, use cached user data
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleLogout = () => {
+    api.logout();
+    window.location.hash = '#/login';
+  };
+
+  const formatDate = () => {
+    return new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+  };
+
   return (
     <Layout title="" role="User" fullWidth hideSidebar>
       <div className="bg-[#0B1116] font-sans text-gray-200 antialiased selection:bg-[#10b981] selection:text-white min-h-screen">
@@ -31,12 +67,17 @@ const UserDashboard = () => {
                     onClick={() => window.location.hash = '#/profile'}
                     className="hidden sm:flex items-center gap-3 pl-1 pr-4 py-1 rounded-full bg-[#151F26] border border-white/5 hover:bg-white/5 transition-colors group cursor-pointer"
                 >
-                  <div className="size-8 rounded-full bg-cover bg-center ring-2 ring-white/10 group-hover:ring-[#10b981]/50 transition-all" style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuAreboopkKSy4YYDs4PFvd-l4xnboU1-dCb6q7kuogZsIpVK9icd7CNdE17iE4uQKdoqiJuI30CTaWxw7GK3QrR7H_FstEqPZBbUqkey_74QXoP8uhTfR9RY780_K4O8UAQpRMWJiKbRdh5-SdE7JAIX5lG3yPPg3Wisf3RGrXHACYJxJFU0vYynDCqaru_FI7DW3EV-buSFuzGK8Z7LP7p7c25u8kqkBUXlt5pQG5d-4WVmAzmNX9U0trABs1cC--zDVlgdRcgww")' }}></div>
-                  <span className="text-sm font-medium text-gray-200">Alex Morgan</span>
+                  <div className="size-8 rounded-full bg-[#10b981] flex items-center justify-center ring-2 ring-white/10 group-hover:ring-[#10b981]/50 transition-all text-white font-bold text-sm">
+                    {user?.name?.charAt(0) || 'U'}
+                  </div>
+                  <span className="text-sm font-medium text-gray-200">{user?.name || 'User'}</span>
                 </button>
-                <button className="relative p-2.5 rounded-full bg-[#151F26] border border-white/5 text-gray-400 hover:text-white hover:bg-white/10 transition-colors">
-                  <span className="absolute top-2.5 right-3 size-2 bg-red-500 rounded-full border-2 border-[#151F26]"></span>
-                  <span className="material-symbols-outlined text-[20px]">notifications</span>
+                <button 
+                  onClick={handleLogout}
+                  className="p-2.5 rounded-full bg-[#151F26] border border-white/5 text-gray-400 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                  title="Logout"
+                >
+                  <span className="material-symbols-outlined text-[20px]">logout</span>
                 </button>
               </div>
             </header>
@@ -45,14 +86,14 @@ const UserDashboard = () => {
               <div className="layout-content-container flex flex-col w-full max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div className="flex flex-col md:flex-row justify-between items-end gap-6 py-8">
                   <div>
-                    <h1 className="text-white text-4xl sm:text-5xl font-black leading-tight tracking-tighter mb-2 bg-gradient-to-r from-white to-gray-500 bg-clip-text text-transparent">Hello, Alex!</h1>
+                    <h1 className="text-white text-4xl sm:text-5xl font-black leading-tight tracking-tighter mb-2 bg-gradient-to-r from-white to-gray-500 bg-clip-text text-transparent">Hello, {user?.name?.split(' ')[0] || 'User'}!</h1>
                     <p className="text-[#94a3b8] text-lg">Here's your environmental impact update.</p>
                   </div>
                   <div className="flex items-center gap-3 bg-[#151F26]/50 p-1.5 pr-4 rounded-full border border-white/10 backdrop-blur-sm">
                     <div className="bg-[#10b981]/20 p-2 rounded-full text-[#10b981]">
                       <span className="material-symbols-outlined text-lg">calendar_today</span>
                     </div>
-                    <span className="text-sm font-medium text-gray-300">June 12, 2024</span>
+                    <span className="text-sm font-medium text-gray-300">{formatDate()}</span>
                   </div>
                 </div>
 
@@ -195,15 +236,15 @@ const UserDashboard = () => {
                             <div className="flex items-center gap-2 text-[#94a3b8] mb-3">
                               <span className="text-sm font-semibold uppercase tracking-wider">Total Recycled</span>
                             </div>
-                            <p className="text-white text-5xl font-black leading-none tracking-tight">15.2 <span className="text-2xl font-medium text-gray-500">kg</span></p>
+                            <p className="text-white text-5xl font-black leading-none tracking-tight">{user?.totalWasteRecycled?.toFixed(1) || '0'} <span className="text-2xl font-medium text-gray-500">kg</span></p>
                           </div>
                           <div className="mt-8">
                             <div className="flex justify-between text-xs font-medium text-gray-400 mb-2">
                               <span>Progress</span>
-                              <span>65% to Goal</span>
+                              <span>{Math.min(Math.round((user?.totalWasteRecycled || 0) / 100 * 100), 100)}% to Goal</span>
                             </div>
                             <div className="w-full bg-gray-800 rounded-full h-3 overflow-hidden">
-                              <div className="bg-gradient-to-r from-[#10b981]/50 to-[#10b981] h-3 rounded-full relative" style={{ width: '65%' }}>
+                              <div className="bg-gradient-to-r from-[#10b981]/50 to-[#10b981] h-3 rounded-full relative" style={{ width: `${Math.min((user?.totalWasteRecycled || 0), 100)}%` }}>
                                 <div className="absolute inset-0 bg-white/20 animate-pulse"></div>
                               </div>
                             </div>
@@ -245,9 +286,13 @@ const UserDashboard = () => {
                         <svg className="h-16 w-16 text-[#10b981] drop-shadow-[0_0_15px_rgba(16,185,129,0.5)] group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                           <path d="M12 2L9.5 8.5H3L8 12.5L6 19L12 15L18 19L16 12.5L21 8.5H14.5L12 2Z" strokeLinecap="round" strokeLinejoin="round"></path>
                         </svg>
-                        <span className="text-7xl font-black text-white ml-2 drop-shadow-sm tracking-tighter">1,250</span>
+                        <span className="text-7xl font-black text-white ml-2 drop-shadow-sm tracking-tighter">{(user?.ecoPoints || 0).toLocaleString()}</span>
                       </div>
-                      <p className="text-sm text-gray-400 max-w-[200px] z-10">You're 250 points away from a tree planting reward!</p>
+                      <p className="text-sm text-gray-400 max-w-[200px] z-10">
+                        {(user?.ecoPoints || 0) >= 500 
+                          ? 'You have enough points for rewards!' 
+                          : `You're ${500 - (user?.ecoPoints || 0)} points away from your first reward!`}
+                      </p>
                       <button className="mt-8 w-full group relative overflow-hidden rounded-xl bg-[#10b981] text-white font-bold h-12 shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:shadow-[0_0_30px_rgba(16,185,129,0.5)] transition-all z-10 cursor-pointer" onClick={() => window.location.hash = '#/rewards'}>
                         <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out"></div>
                         <span className="relative flex items-center justify-center gap-2">

@@ -1,7 +1,91 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
+import { api, getCurrentUser } from '../services/api';
+
+interface UserProfile {
+  _id: string;
+  name: string;
+  email: string;
+  phone?: string;
+  address?: string;
+  avatar?: string;
+}
 
 const Profile = () => {
+  const [user, setUser] = useState<UserProfile | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    phone: '',
+    address: ''
+  });
+
+  useEffect(() => {
+    loadUserProfile();
+  }, []);
+
+  const loadUserProfile = async () => {
+    try {
+      setLoading(true);
+      const currentUser = getCurrentUser();
+      if (currentUser) {
+        setUser(currentUser);
+        setFormData({
+          name: currentUser.name || '',
+          phone: currentUser.phone || '',
+          address: currentUser.address || ''
+        });
+      }
+    } catch (error) {
+      console.error('Failed to load user profile:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      setSaving(true);
+      const response = await api.auth.updateProfile(formData);
+      if (response.data) {
+        setUser(response.data);
+        // Update localStorage
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+          const userData = JSON.parse(storedUser);
+          localStorage.setItem('user', JSON.stringify({ ...userData, ...response.data }));
+        }
+        alert('Profile updated successfully!');
+      }
+    } catch (error) {
+      console.error('Failed to update profile:', error);
+      alert('Failed to update profile');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    window.location.hash = '#/';
+  };
+
+  if (loading) {
+    return (
+      <Layout title="" role="User" fullWidth hideSidebar>
+        <div className="bg-[#0B1116] min-h-screen flex items-center justify-center">
+          <div className="text-center">
+            <div className="w-12 h-12 border-4 border-[#10b981] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-gray-400">Loading profile...</p>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
+
   return (
     <Layout title="" role="User" fullWidth hideSidebar>
       <div className="bg-[#0B1116] font-sans text-gray-200 antialiased selection:bg-[#10b981] selection:text-white min-h-screen flex flex-col relative overflow-hidden">
@@ -51,15 +135,15 @@ const Profile = () => {
                     <div className="relative">
                         <div 
                         className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-12" 
-                        style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuAreboopkKSy4YYDs4PFvd-l4xnboU1-dCb6q7kuogZsIpVK9icd7CNdE17iE4uQKdoqiJuI30CTaWxw7GK3QrR7H_FstEqPZBbUqkey_74QXoP8uhTfR9RY780_K4O8UAQpRMWJiKbRdh5-SdE7JAIX5lG3yPPg3Wisf3RGrXHACYJxJFU0vYynDCqaru_FI7DW3EV-buSFuzGK8Z7LP7p7c25u8kqkBUXlt5pQG5d-4WVmAzmNX9U0trABs1cC--zDVlgdRcgww")' }}
+                        style={{ backgroundImage: `url("${user?.avatar || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user?.name || 'User') + '&background=10b981&color=fff'}")` }}
                         ></div>
                         <button className="absolute -bottom-1 -right-1 flex items-center justify-center size-6 bg-[#10b981] rounded-full text-[#0B1116] hover:bg-opacity-90 cursor-pointer">
                         <span className="material-symbols-outlined text-base">edit</span>
                         </button>
                     </div>
                     <div className="flex flex-col">
-                        <h1 className="text-white text-base font-medium leading-normal">Alex Morgan</h1>
-                        <p className="text-[#94a3b8] text-sm font-normal leading-normal">alex.morgan@example.com</p>
+                        <h1 className="text-white text-base font-medium leading-normal">{user?.name || 'User'}</h1>
+                        <p className="text-[#94a3b8] text-sm font-normal leading-normal">{user?.email || ''}</p>
                     </div>
                     </div>
                     <div className="flex flex-col gap-1 pt-4">
@@ -92,7 +176,7 @@ const Profile = () => {
                 </div>
                 <div className="flex flex-col gap-4 mt-8 pt-4 border-t border-white/5">
                     <button 
-                    onClick={() => window.location.hash = '#/'}
+                    onClick={handleLogout}
                     className="flex w-full min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-[#0B1116] text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-white/5 transition-colors border border-white/10"
                     >
                     <span className="truncate">Log Out</span>
@@ -110,27 +194,42 @@ const Profile = () => {
                         <p className="text-[#94a3b8] text-base font-normal leading-normal">Manage your personal details and contact information.</p>
                         </div>
                     </div>
-                    <form className="flex flex-col gap-6" onSubmit={(e) => e.preventDefault()}>
+                    <form className="flex flex-col gap-6" onSubmit={handleSave}>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                         <label className="flex flex-col w-full">
                             <p className="text-white text-sm font-medium leading-normal pb-2">Full Name</p>
-                            <input className="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-[#10b981] border border-white/10 bg-[#0B1116] h-12 placeholder:text-[#94a3b8] p-3 text-base font-normal leading-normal transition-all" defaultValue="Alex Morgan" />
+                            <input 
+                              className="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-[#10b981] border border-white/10 bg-[#0B1116] h-12 placeholder:text-[#94a3b8] p-3 text-base font-normal leading-normal transition-all" 
+                              value={formData.name}
+                              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                            />
                         </label>
                         <label className="flex flex-col w-full">
                             <p className="text-white text-sm font-medium leading-normal pb-2">Email Address</p>
-                            <input className="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-[#94a3b8] focus:outline-none border border-white/10 bg-[#0B1116]/50 h-12 p-3 text-base font-normal leading-normal cursor-not-allowed" readOnly defaultValue="alex.morgan@example.com" />
+                            <input className="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-[#94a3b8] focus:outline-none border border-white/10 bg-[#0B1116]/50 h-12 p-3 text-base font-normal leading-normal cursor-not-allowed" readOnly value={user?.email || ''} />
                         </label>
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                         <label className="flex flex-col w-full">
                             <p className="text-white text-sm font-medium leading-normal pb-2">Phone Number</p>
-                            <input className="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-[#10b981] border border-white/10 bg-[#0B1116] h-12 placeholder:text-[#94a3b8] p-3 text-base font-normal leading-normal transition-all" defaultValue="+1 (555) 123-4567" />
+                            <input 
+                              className="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-[#10b981] border border-white/10 bg-[#0B1116] h-12 placeholder:text-[#94a3b8] p-3 text-base font-normal leading-normal transition-all" 
+                              value={formData.phone}
+                              onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                              placeholder="+1 (555) 123-4567"
+                            />
                         </label>
                         </div>
                         <div>
                         <label className="flex flex-col w-full">
                             <p className="text-white text-sm font-medium leading-normal pb-2">Primary Address</p>
-                            <textarea className="w-full resize-y rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-[#10b981] border border-white/10 bg-[#0B1116] placeholder:text-[#94a3b8] p-3 text-base font-normal leading-normal transition-all" rows={3} defaultValue="123 Green Way, Eco City, 10101"></textarea>
+                            <textarea 
+                              className="w-full resize-y rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-[#10b981] border border-white/10 bg-[#0B1116] placeholder:text-[#94a3b8] p-3 text-base font-normal leading-normal transition-all" 
+                              rows={3} 
+                              value={formData.address}
+                              onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                              placeholder="Enter your address"
+                            ></textarea>
                         </label>
                         </div>
                         <div className="flex justify-end gap-4 pt-4 border-t border-white/5">
@@ -141,8 +240,12 @@ const Profile = () => {
                         >
                             <span className="truncate">Cancel</span>
                         </button>
-                        <button className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-[#10b981] text-[#0B1116] text-sm font-bold leading-normal tracking-[0.015em] hover:bg-[#059669] transition-colors" type="submit">
-                            <span className="truncate">Save Changes</span>
+                        <button 
+                          className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-[#10b981] text-[#0B1116] text-sm font-bold leading-normal tracking-[0.015em] hover:bg-[#059669] transition-colors disabled:opacity-50" 
+                          type="submit"
+                          disabled={saving}
+                        >
+                            <span className="truncate">{saving ? 'Saving...' : 'Save Changes'}</span>
                         </button>
                         </div>
                     </form>
