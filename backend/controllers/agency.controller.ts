@@ -2,6 +2,9 @@ import { Request, Response } from 'express';
 import Agency from '../models/Agency';
 import User from '../models/User';
 import Booking from '../models/Booking';
+import Business from '../models/Business';
+import BusinessCertificate from '../models/BusinessCertificate';
+import Certificate from '../models/Certificate';
 import { sendSuccess, sendError } from '../utils/response';
 
 // Get all agencies (with filters)
@@ -281,6 +284,72 @@ export const updateBookingStatus = async (req: Request, res: Response) => {
           ecoPoints: Math.floor((booking.totalWeight || 0) * 10)
         }
       });
+
+      // Get user info for certificate
+      const user = await User.findById(booking.userId);
+      
+      // Check if this is a business user and generate BusinessCertificate
+      const business = await Business.findOne({ userId: booking.userId });
+      
+      if (business) {
+        // Generate Business Certificate
+        const items = booking.items?.map((item: any) => ({
+          name: item.description || item.type || 'E-Waste Item',
+          category: item.type || item.category || 'General',
+          quantity: item.quantity || 1,
+          weight: item.estimatedWeight || item.weight || 0
+        })) || [];
+
+        await BusinessCertificate.create({
+          businessId: business._id,
+          bookingId: booking._id,
+          agencyId: agency._id,
+          type: 'recycling',
+          title: 'E-Waste Disposal Certificate',
+          items,
+          totalWeight: booking.totalWeight || 0,
+          totalItems: items.reduce((sum: number, item: any) => sum + (item.quantity || 1), 0),
+          co2Saved: (booking.totalWeight || 0) * 0.67,
+          complianceStandards: ['EPA', 'E-Waste Guidelines'],
+          disposalMethod: 'Certified Recycling',
+          issuedBy: {
+            name: agency.name,
+            designation: 'Authorized Recycling Partner'
+          },
+          status: 'issued',
+          validUntil: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000), // 1 year validity
+          issuedAt: new Date()
+        });
+
+        // Update business stats
+        await Business.findByIdAndUpdate(business._id, {
+          $inc: {
+            totalWasteProcessed: booking.totalWeight || 0,
+            co2Saved: (booking.totalWeight || 0) * 0.67
+          }
+        });
+      } else {
+        // Generate regular user Certificate
+        const itemsRecycled = booking.items?.map((item: any) => ({
+          type: item.type || item.category || 'E-Waste',
+          quantity: item.quantity || 1,
+          weight: item.estimatedWeight || item.weight || 0
+        })) || [];
+
+        await Certificate.create({
+          userId: booking.userId,
+          bookingId: booking._id,
+          agencyId: agency._id,
+          issueDate: new Date(),
+          totalWeight: booking.totalWeight || 0,
+          itemsRecycled,
+          environmentalImpact: {
+            co2Saved: (booking.totalWeight || 0) * 0.67,
+            waterSaved: (booking.totalWeight || 0) * 1.2,
+            energySaved: (booking.totalWeight || 0) * 0.8
+          }
+        });
+      }
     }
 
     await booking.save();

@@ -7,6 +7,7 @@ import User from '../models/User';
 import Agency from '../models/Agency';
 import { sendSuccess, sendError } from '../utils/response';
 import mongoose from 'mongoose';
+import PDFDocument from 'pdfkit';
 
 // ==========================================
 // BUSINESS PROFILE MANAGEMENT
@@ -598,7 +599,7 @@ export const getCertificate = async (req: Request, res: Response) => {
   }
 };
 
-// Download certificate (returns URL)
+// Download certificate as PDF
 export const downloadCertificate = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).user._id || (req as any).user.id;
@@ -612,17 +613,172 @@ export const downloadCertificate = async (req: Request, res: Response) => {
     const certificate = await BusinessCertificate.findOne({ 
       $or: [{ _id: id }, { certificateId: id }],
       businessId: business._id 
-    });
+    }).populate('agencyId', 'name email phone');
 
     if (!certificate) {
       return sendError(res, 'Certificate not found', 404);
     }
 
-    // In production, generate actual PDF here
-    sendSuccess(res, { 
-      downloadUrl: certificate.documentUrl || `/api/business/certificates/${certificate._id}/pdf`,
-      certificate
+    const agencyName = (certificate.agencyId as any)?.name || certificate.issuedBy?.name || 'Authorized Agency';
+    const issueDate = new Date(certificate.issuedAt || certificate.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    const validUntil = certificate.validUntil ? new Date(certificate.validUntil).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'N/A';
+
+    // Create PDF document
+    const doc = new PDFDocument({ 
+      size: 'A4',
+      margin: 50,
+      info: {
+        Title: `E-Waste Certificate - ${certificate.certificateId}`,
+        Author: 'EcoCycle Platform'
+      }
     });
+
+    // Set response headers for PDF download
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="certificate-${certificate.certificateId}.pdf"`);
+
+    // Pipe PDF to response
+    doc.pipe(res);
+
+    // Colors
+    const primaryColor = '#10b981';
+    const secondaryColor = '#06b6d4';
+    const darkColor = '#111827';
+    const grayColor = '#6b7280';
+    const lightGray = '#f3f4f6';
+
+    // Header with gradient-like effect
+    doc.rect(0, 0, doc.page.width, 120).fill(primaryColor);
+    doc.rect(0, 0, doc.page.width / 2, 120).fill(primaryColor);
+    
+    // Title
+    doc.fontSize(24).fillColor('white').font('Helvetica-Bold')
+       .text('E-Waste Disposal Certificate', 50, 40, { align: 'center' });
+    doc.fontSize(12).fillColor('white').font('Helvetica')
+       .text('Certified Proper Disposal & Recycling', 50, 70, { align: 'center' });
+    
+    // Badge
+    doc.roundedRect(220, 90, 150, 25, 12).fillAndStroke('#ffffff30', '#ffffff30');
+    doc.fontSize(10).fillColor('white').font('Helvetica-Bold')
+       .text(`✓ ${(certificate.type || 'RECYCLING').toUpperCase()} VERIFIED`, 220, 97, { width: 150, align: 'center' });
+
+    // Certificate ID
+    doc.roundedRect(180, 140, 230, 35, 8).fill('#f0fdf4');
+    doc.fontSize(14).fillColor(primaryColor).font('Helvetica-Bold')
+       .text(certificate.certificateId, 180, 150, { width: 230, align: 'center' });
+
+    // Info boxes
+    const boxY = 200;
+    const boxWidth = 240;
+    const boxHeight = 50;
+
+    // Business Name
+    doc.roundedRect(50, boxY, boxWidth, boxHeight, 6).fill(lightGray);
+    doc.fontSize(8).fillColor(grayColor).font('Helvetica').text('BUSINESS NAME', 60, boxY + 10);
+    doc.fontSize(12).fillColor(darkColor).font('Helvetica-Bold').text(business.companyName, 60, boxY + 25);
+
+    // Agency
+    doc.roundedRect(305, boxY, boxWidth, boxHeight, 6).fill(lightGray);
+    doc.fontSize(8).fillColor(grayColor).font('Helvetica').text('RECYCLING AGENCY', 315, boxY + 10);
+    doc.fontSize(12).fillColor(darkColor).font('Helvetica-Bold').text(agencyName, 315, boxY + 25);
+
+    // Issue Date
+    doc.roundedRect(50, boxY + 60, boxWidth, boxHeight, 6).fill(lightGray);
+    doc.fontSize(8).fillColor(grayColor).font('Helvetica').text('ISSUE DATE', 60, boxY + 70);
+    doc.fontSize(12).fillColor(darkColor).font('Helvetica-Bold').text(issueDate, 60, boxY + 85);
+
+    // Valid Until
+    doc.roundedRect(305, boxY + 60, boxWidth, boxHeight, 6).fill(lightGray);
+    doc.fontSize(8).fillColor(grayColor).font('Helvetica').text('VALID UNTIL', 315, boxY + 70);
+    doc.fontSize(12).fillColor(darkColor).font('Helvetica-Bold').text(validUntil, 315, boxY + 85);
+
+    // Items Table
+    let tableY = boxY + 130;
+    if (certificate.items && certificate.items.length > 0) {
+      doc.fontSize(12).fillColor(darkColor).font('Helvetica-Bold').text('Items Recycled', 50, tableY);
+      tableY += 25;
+
+      // Table header
+      doc.roundedRect(50, tableY, 495, 25, 4).fill(lightGray);
+      doc.fontSize(9).fillColor(grayColor).font('Helvetica-Bold');
+      doc.text('Item', 60, tableY + 8);
+      doc.text('Category', 200, tableY + 8);
+      doc.text('Qty', 350, tableY + 8);
+      doc.text('Weight', 450, tableY + 8);
+      tableY += 25;
+
+      // Table rows
+      doc.font('Helvetica').fillColor(darkColor);
+      certificate.items.forEach((item: any, index: number) => {
+        if (index % 2 === 0) {
+          doc.rect(50, tableY, 495, 22).fill('#fafafa');
+        }
+        doc.fillColor(darkColor).fontSize(9);
+        doc.text(item.name || 'N/A', 60, tableY + 6, { width: 130 });
+        doc.text(item.category || 'N/A', 200, tableY + 6, { width: 140 });
+        doc.text(String(item.quantity || 0), 350, tableY + 6);
+        doc.text(`${item.weight || 0} kg`, 450, tableY + 6);
+        tableY += 22;
+      });
+      tableY += 10;
+    }
+
+    // Totals section
+    doc.roundedRect(50, tableY, 495, 70, 8).fill('#ecfdf5');
+    
+    const totalBoxWidth = 160;
+    // Total Weight
+    doc.fontSize(8).fillColor(grayColor).font('Helvetica').text('TOTAL WEIGHT', 60, tableY + 15, { width: totalBoxWidth, align: 'center' });
+    doc.fontSize(20).fillColor(darkColor).font('Helvetica-Bold').text(`${certificate.totalWeight || 0} kg`, 60, tableY + 30, { width: totalBoxWidth, align: 'center' });
+
+    // Items Count
+    doc.fontSize(8).fillColor(grayColor).font('Helvetica').text('ITEMS RECYCLED', 220, tableY + 15, { width: totalBoxWidth, align: 'center' });
+    doc.fontSize(20).fillColor(darkColor).font('Helvetica-Bold').text(`${certificate.totalItems || certificate.items?.length || 0}`, 220, tableY + 30, { width: totalBoxWidth, align: 'center' });
+
+    // CO2 Saved
+    doc.fontSize(8).fillColor(grayColor).font('Helvetica').text('CO₂ SAVED', 380, tableY + 15, { width: totalBoxWidth, align: 'center' });
+    doc.fontSize(20).fillColor(primaryColor).font('Helvetica-Bold').text(`${Math.round(certificate.co2Saved || 0)} kg`, 380, tableY + 30, { width: totalBoxWidth, align: 'center' });
+
+    tableY += 90;
+
+    // Compliance Standards
+    if (certificate.complianceStandards && certificate.complianceStandards.length > 0) {
+      doc.fontSize(10).fillColor(darkColor).font('Helvetica-Bold').text('Compliance Standards:', 50, tableY);
+      let tagX = 50;
+      tableY += 18;
+      certificate.complianceStandards.forEach((standard: string) => {
+        const tagWidth = doc.widthOfString(standard) + 20;
+        doc.roundedRect(tagX, tableY, tagWidth, 20, 4).fill('#dbeafe');
+        doc.fontSize(9).fillColor('#1d4ed8').font('Helvetica-Bold').text(standard, tagX + 10, tableY + 5);
+        tagX += tagWidth + 8;
+      });
+      tableY += 35;
+    }
+
+    // Footer line
+    doc.moveTo(50, tableY).lineTo(545, tableY).stroke('#e5e7eb');
+    tableY += 20;
+
+    // Signatures
+    doc.fontSize(10).fillColor(darkColor).font('Helvetica-Bold');
+    
+    // Left signature
+    doc.moveTo(80, tableY + 30).lineTo(200, tableY + 30).stroke(grayColor);
+    doc.fontSize(10).fillColor(darkColor).font('Helvetica-Bold').text(certificate.issuedBy?.name || agencyName, 80, tableY + 35, { width: 120, align: 'center' });
+    doc.fontSize(8).fillColor(grayColor).font('Helvetica').text(certificate.issuedBy?.designation || 'Authorized Partner', 80, tableY + 48, { width: 120, align: 'center' });
+
+    // Right signature
+    doc.moveTo(395, tableY + 30).lineTo(515, tableY + 30).stroke(grayColor);
+    doc.fontSize(10).fillColor(darkColor).font('Helvetica-Bold').text('Digital Signature', 395, tableY + 35, { width: 120, align: 'center' });
+    doc.fontSize(8).fillColor(grayColor).font('Helvetica').text('EcoCycle Platform', 395, tableY + 48, { width: 120, align: 'center' });
+
+    // Verification code
+    tableY += 80;
+    doc.fontSize(9).fillColor(grayColor).font('Helvetica').text('Verification Code: ', 200, tableY, { continued: true });
+    doc.font('Courier').fillColor(darkColor).text(certificate.certificateId);
+
+    // Finalize PDF
+    doc.end();
   } catch (error: any) {
     sendError(res, error.message);
   }
@@ -739,6 +895,48 @@ export const getBusinessAnalytics = async (req: Request, res: Response) => {
       }
     ]);
 
+    // Check if we have real data, otherwise provide sample data for demo
+    const hasRealData = completedBookings.length > 0 || wasteByCategory.length > 0;
+
+    if (!hasRealData) {
+      // Return sample/demo data when no real bookings exist
+      const sampleData = {
+        summary: {
+          totalWasteProcessed: 1250,
+          co2Saved: 837.5,
+          treesEquivalent: 42,
+          totalBookings: 15,
+          complianceScore: business.complianceScore || 85
+        },
+        wasteByCategory: [
+          { _id: 'IT Equipment', totalWeight: 450, count: 25 },
+          { _id: 'Batteries', totalWeight: 280, count: 120 },
+          { _id: 'Monitors', totalWeight: 220, count: 12 },
+          { _id: 'Mobile Devices', totalWeight: 150, count: 45 },
+          { _id: 'Cables & Wires', totalWeight: 100, count: 200 },
+          { _id: 'Other', totalWeight: 50, count: 30 }
+        ],
+        monthlyTrends: [
+          { _id: '2025-07', totalWeight: 180, bookings: 2, co2Saved: 120.6 },
+          { _id: '2025-08', totalWeight: 220, bookings: 3, co2Saved: 147.4 },
+          { _id: '2025-09', totalWeight: 150, bookings: 2, co2Saved: 100.5 },
+          { _id: '2025-10', totalWeight: 280, bookings: 3, co2Saved: 187.6 },
+          { _id: '2025-11', totalWeight: 200, bookings: 2, co2Saved: 134 },
+          { _id: '2025-12', totalWeight: 220, bookings: 3, co2Saved: 147.4 }
+        ],
+        topAgencies: [
+          { _id: '1', bookings: 5, totalWeight: 450, agency: { name: 'GreenTech Recyclers', rating: 4.8 } },
+          { _id: '2', bookings: 4, totalWeight: 380, agency: { name: 'EcoRecycle Hub', rating: 4.6 } },
+          { _id: '3', bookings: 3, totalWeight: 250, agency: { name: 'CleanE Disposal', rating: 4.5 } },
+          { _id: '4', bookings: 2, totalWeight: 120, agency: { name: 'TechWaste Solutions', rating: 4.3 } },
+          { _id: '5', bookings: 1, totalWeight: 50, agency: { name: 'Urban Recyclers', rating: 4.2 } }
+        ],
+        period,
+        isDemo: true // Flag to indicate this is sample data
+      };
+      return sendSuccess(res, sampleData);
+    }
+
     sendSuccess(res, {
       summary: {
         totalWasteProcessed: totalWeight,
@@ -750,7 +948,8 @@ export const getBusinessAnalytics = async (req: Request, res: Response) => {
       wasteByCategory,
       monthlyTrends,
       topAgencies,
-      period
+      period,
+      isDemo: false
     });
   } catch (error: any) {
     sendError(res, error.message);

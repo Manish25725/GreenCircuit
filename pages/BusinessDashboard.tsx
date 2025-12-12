@@ -488,6 +488,15 @@ const BusinessDashboard = () => {
                           </div>
                           <span className="material-symbols-outlined text-gray-500 group-hover:text-white transition-colors">chevron_right</span>
                         </button>
+                        <button onClick={() => window.location.hash = '#/business/certificates'} className="flex w-full group cursor-pointer items-center justify-between overflow-hidden rounded-xl h-14 px-4 bg-white/5 text-gray-200 border border-white/5 hover:bg-white/10 hover:border-white/10 transition-all">
+                          <div className="flex items-center gap-3">
+                            <div className="size-8 rounded-lg bg-[#10b981]/20 text-[#10b981] flex items-center justify-center">
+                              <span className="material-symbols-outlined text-xl">verified</span>
+                            </div>
+                            <span className="font-medium">Certifications</span>
+                          </div>
+                          <span className="material-symbols-outlined text-gray-500 group-hover:text-white transition-colors">chevron_right</span>
+                        </button>
                         <button onClick={() => window.location.hash = '#/contact'} className="flex w-full group cursor-pointer items-center justify-between overflow-hidden rounded-xl h-14 px-4 bg-white/5 text-gray-200 border border-white/5 hover:bg-white/10 hover:border-white/10 transition-all">
                           <div className="flex items-center gap-3">
                             <div className="size-8 rounded-lg bg-pink-500/20 text-pink-400 flex items-center justify-center">

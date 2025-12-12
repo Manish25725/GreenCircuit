@@ -14,6 +14,7 @@ interface AnalyticsData {
   monthlyTrends: Array<{ _id: string; totalWeight: number; bookings: number; co2Saved: number }>;
   topAgencies: Array<{ _id: string; bookings: number; totalWeight: number; agency: { name: string; logo?: string; rating?: number } }>;
   recentBookings?: Array<any>;
+  isDemo?: boolean;
 }
 
 const API_BASE = 'http://localhost:3001/api';
@@ -229,13 +230,6 @@ const BusinessAnalytics = () => {
                       <option value="90d">Last Quarter</option>
                       <option value="1y">This Year</option>
                     </select>
-                    <button 
-                      onClick={() => window.open(`${API_BASE}/business/reports/export?period=${timeRange}`, '_blank')}
-                      className="bg-[#06b6d4] text-white px-5 py-2.5 rounded-xl font-bold text-sm hover:bg-[#0891b2] transition-colors flex items-center gap-2"
-                    >
-                      <span className="material-symbols-outlined text-lg">download</span>
-                      Export
-                    </button>
                   </div>
                 </div>
 

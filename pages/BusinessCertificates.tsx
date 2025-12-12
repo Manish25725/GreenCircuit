@@ -1,15 +1,44 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
-import { getCurrentUser } from '../services/api';
+import { getCurrentUser, api } from '../services/api';
+
+interface CertificateItem {
+  name: string;
+  category: string;
+  quantity: number;
+  weight: number;
+}
 
 interface Certificate {
-  id: string;
-  certificateNumber: string;
-  date: string;
-  ewasteType: string;
-  weight: string;
-  agency: string;
-  status: 'verified' | 'pending' | 'expired';
+  _id: string;
+  certificateId: string;
+  type: string;
+  title: string;
+  items: CertificateItem[];
+  totalWeight: number;
+  totalItems: number;
+  co2Saved: number;
+  complianceStandards: string[];
+  disposalMethod: string;
+  issuedBy: {
+    name: string;
+    designation: string;
+  };
+  agencyId?: {
+    _id: string;
+    name: string;
+    logo?: string;
+  };
+  status: 'issued' | 'revoked' | 'expired';
+  validUntil: string;
+  issuedAt: string;
+  createdAt: string;
+}
+
+interface Stats {
+  totalCertificates: number;
+  totalWeight: number;
+  totalCo2Saved: number;
 }
 
 const BusinessCertificates = () => {
@@ -17,6 +46,28 @@ const BusinessCertificates = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const [selectedCertificate, setSelectedCertificate] = useState<Certificate | null>(null);
+  const [certificates, setCertificates] = useState<Certificate[]>([]);
+  const [stats, setStats] = useState<Stats>({ totalCertificates: 0, totalWeight: 0, totalCo2Saved: 0 });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchCertificates();
+  }, []);
+
+  const fetchCertificates = async () => {
+    try {
+      setLoading(true);
+      const response: any = await api.getBusinessCertificates();
+      if (response) {
+        setCertificates(response.certificates || []);
+        setStats(response.stats || { totalCertificates: 0, totalWeight: 0, totalCo2Saved: 0 });
+      }
+    } catch (error) {
+      console.error('Failed to fetch certificates:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -24,47 +75,95 @@ const BusinessCertificates = () => {
     window.location.hash = '#/login';
   };
 
-  // Mock certificates data
-  const certificates: Certificate[] = [
-    { id: '1', certificateNumber: 'CRT-2025-142', date: '2025-01-10', ewasteType: 'IT Equipment', weight: '450 kg', agency: 'GreenTech Solutions', status: 'verified' },
-    { id: '2', certificateNumber: 'CRT-2025-138', date: '2025-01-05', ewasteType: 'Batteries', weight: '120 kg', agency: 'EcoRecycle Hub', status: 'verified' },
-    { id: '3', certificateNumber: 'CRT-2024-289', date: '2024-12-28', ewasteType: 'Monitors', weight: '280 kg', agency: 'GreenTech Solutions', status: 'verified' },
-    { id: '4', certificateNumber: 'CRT-2024-275', date: '2024-12-15', ewasteType: 'Mixed Electronics', weight: '350 kg', agency: 'CleanE Disposal', status: 'verified' },
-    { id: '5', certificateNumber: 'CRT-2025-145', date: '2025-01-12', ewasteType: 'Server Equipment', weight: '180 kg', agency: 'GreenTech Solutions', status: 'pending' },
-    { id: '6', certificateNumber: 'CRT-2024-156', date: '2024-06-20', ewasteType: 'Printers', weight: '95 kg', agency: 'EcoRecycle Hub', status: 'expired' },
-  ];
+  const handleDownloadCertificate = async (certId: string, certNumber: string) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`http://localhost:3001/api/business/certificates/${certId}/download`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to download certificate');
+      }
+      
+      // Get the PDF blob
+      const blob = await response.blob();
+      
+      // Create download link
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `certificate-${certNumber}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      
+      // Cleanup
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Failed to download certificate:', error);
+      alert('Failed to download certificate. Please try again.');
+    }
+  };
 
   const filteredCertificates = certificates.filter(cert => {
-    const matchesSearch = cert.certificateNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         cert.ewasteType.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         cert.agency.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch = cert.certificateId?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         cert.type?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         cert.agencyId?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         cert.title?.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesStatus = filterStatus === 'all' || cert.status === filterStatus;
     return matchesSearch && matchesStatus;
   });
 
-  const stats = {
-    total: certificates.length,
-    verified: certificates.filter(c => c.status === 'verified').length,
-    pending: certificates.filter(c => c.status === 'pending').length,
-    totalWeight: certificates.filter(c => c.status === 'verified').reduce((acc, c) => acc + parseInt(c.weight), 0)
+  const getDisplayStatus = (cert: Certificate): 'verified' | 'expired' | 'revoked' => {
+    // Check if certificate is expired
+    if (cert.validUntil && new Date(cert.validUntil) < new Date()) {
+      return 'expired';
+    }
+    if (cert.status === 'issued') return 'verified';
+    if (cert.status === 'revoked') return 'revoked';
+    return 'expired';
+  };
+
+  const displayStats = {
+    total: stats.totalCertificates,
+    verified: certificates.filter(c => c.status === 'issued' && (!c.validUntil || new Date(c.validUntil) >= new Date())).length,
+    pending: 0, // No pending status in BusinessCertificate model
+    totalWeight: Math.round(stats.totalWeight || 0)
   };
 
   const getStatusStyle = (status: string) => {
     switch(status) {
-      case 'verified': return 'bg-[#10b981]/10 text-[#10b981]';
+      case 'verified': 
+      case 'issued': return 'bg-[#10b981]/10 text-[#10b981]';
       case 'pending': return 'bg-amber-500/10 text-amber-400';
-      case 'expired': return 'bg-red-500/10 text-red-400';
+      case 'expired':
+      case 'revoked': return 'bg-red-500/10 text-red-400';
       default: return 'bg-gray-500/10 text-gray-400';
     }
   };
 
   const getStatusIcon = (status: string) => {
     switch(status) {
-      case 'verified': return 'verified';
+      case 'verified':
+      case 'issued': return 'verified';
       case 'pending': return 'hourglass_empty';
-      case 'expired': return 'error';
+      case 'expired':
+      case 'revoked': return 'error';
       default: return 'help';
     }
+  };
+
+  const getTypeDisplay = (type: string) => {
+    const types: Record<string, string> = {
+      'recycling': 'Recycling',
+      'destruction': 'Data Destruction',
+      'donation': 'Donation',
+      'refurbishment': 'Refurbishment'
+    };
+    return types[type] || type;
   };
 
   return (
@@ -129,7 +228,7 @@ const BusinessCertificates = () => {
                         <span className="material-symbols-outlined">description</span>
                       </div>
                     </div>
-                    <h3 className="text-3xl font-black text-white relative z-10">{stats.total}</h3>
+                    <h3 className="text-3xl font-black text-white relative z-10">{displayStats.total}</h3>
                     <p className="text-sm text-[#94a3b8] relative z-10">Total Certificates</p>
                   </div>
                   
@@ -140,29 +239,29 @@ const BusinessCertificates = () => {
                         <span className="material-symbols-outlined">verified</span>
                       </div>
                     </div>
-                    <h3 className="text-3xl font-black text-white relative z-10">{stats.verified}</h3>
+                    <h3 className="text-3xl font-black text-white relative z-10">{displayStats.verified}</h3>
                     <p className="text-sm text-[#94a3b8] relative z-10">Verified</p>
-                  </div>
-                  
-                  <div className="bg-[#151F26] rounded-2xl p-6 border border-white/5 relative overflow-hidden group hover:border-amber-500/20 transition-all">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/10 rounded-full blur-[60px] -translate-y-1/2 translate-x-1/2"></div>
-                    <div className="flex items-center justify-between mb-4 relative z-10">
-                      <div className="p-3 bg-amber-500/10 rounded-xl text-amber-400">
-                        <span className="material-symbols-outlined">pending</span>
-                      </div>
-                    </div>
-                    <h3 className="text-3xl font-black text-white relative z-10">{stats.pending}</h3>
-                    <p className="text-sm text-[#94a3b8] relative z-10">Pending</p>
                   </div>
                   
                   <div className="bg-[#151F26] rounded-2xl p-6 border border-white/5 relative overflow-hidden group hover:border-[#8b5cf6]/20 transition-all">
                     <div className="absolute top-0 right-0 w-32 h-32 bg-[#8b5cf6]/10 rounded-full blur-[60px] -translate-y-1/2 translate-x-1/2"></div>
                     <div className="flex items-center justify-between mb-4 relative z-10">
                       <div className="p-3 bg-[#8b5cf6]/10 rounded-xl text-[#8b5cf6]">
+                        <span className="material-symbols-outlined">eco</span>
+                      </div>
+                    </div>
+                    <h3 className="text-3xl font-black text-white relative z-10">{Math.round(stats.totalCo2Saved || 0)} <span className="text-lg font-medium text-gray-500">kg</span></h3>
+                    <p className="text-sm text-[#94a3b8] relative z-10">CO₂ Saved</p>
+                  </div>
+                  
+                  <div className="bg-[#151F26] rounded-2xl p-6 border border-white/5 relative overflow-hidden group hover:border-[#06b6d4]/20 transition-all">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-[#06b6d4]/10 rounded-full blur-[60px] -translate-y-1/2 translate-x-1/2"></div>
+                    <div className="flex items-center justify-between mb-4 relative z-10">
+                      <div className="p-3 bg-[#06b6d4]/10 rounded-xl text-[#06b6d4]">
                         <span className="material-symbols-outlined">scale</span>
                       </div>
                     </div>
-                    <h3 className="text-3xl font-black text-white relative z-10">{stats.totalWeight} <span className="text-lg font-medium text-gray-500">kg</span></h3>
+                    <h3 className="text-3xl font-black text-white relative z-10">{displayStats.totalWeight} <span className="text-lg font-medium text-gray-500">kg</span></h3>
                     <p className="text-sm text-[#94a3b8] relative z-10">Certified Weight</p>
                   </div>
                 </div>
@@ -185,9 +284,9 @@ const BusinessCertificates = () => {
                     className="bg-[#151F26] border border-white/10 text-white rounded-xl px-4 py-3 focus:ring-2 focus:ring-[#06b6d4]/50 focus:border-[#06b6d4] outline-none cursor-pointer"
                   >
                     <option value="all">All Status</option>
-                    <option value="verified">Verified</option>
-                    <option value="pending">Pending</option>
+                    <option value="issued">Verified</option>
                     <option value="expired">Expired</option>
+                    <option value="revoked">Revoked</option>
                   </select>
                 </div>
 
@@ -197,68 +296,81 @@ const BusinessCertificates = () => {
                   <div className="hidden md:grid grid-cols-6 gap-4 p-4 border-b border-white/5 text-sm font-medium text-gray-500">
                     <div>Certificate #</div>
                     <div>Date</div>
-                    <div>E-Waste Type</div>
+                    <div>Type</div>
                     <div>Weight</div>
                     <div>Agency</div>
                     <div className="text-center">Actions</div>
                   </div>
                   
-                  {/* Certificates */}
-                  {filteredCertificates.length === 0 ? (
+                  {/* Loading State */}
+                  {loading ? (
+                    <div className="p-12 text-center">
+                      <div className="animate-spin w-8 h-8 border-2 border-[#06b6d4] border-t-transparent rounded-full mx-auto mb-4"></div>
+                      <p className="text-gray-400">Loading certificates...</p>
+                    </div>
+                  ) : filteredCertificates.length === 0 ? (
                     <div className="p-12 text-center">
                       <span className="material-symbols-outlined text-5xl text-gray-600 mb-4">description</span>
                       <p className="text-gray-400 text-lg">No certificates found</p>
-                      <p className="text-gray-600 text-sm mt-1">Try adjusting your search or filters</p>
+                      <p className="text-gray-600 text-sm mt-1">
+                        {certificates.length === 0 
+                          ? "Certificates are issued when your pickups are completed" 
+                          : "Try adjusting your search or filters"}
+                      </p>
                     </div>
                   ) : (
-                    filteredCertificates.map((cert) => (
-                      <div key={cert.id} className="grid grid-cols-1 md:grid-cols-6 gap-4 p-4 border-b border-white/5 last:border-b-0 hover:bg-white/5 transition-colors items-center">
-                        <div className="flex items-center gap-3">
-                          <div className={`p-2 rounded-lg ${getStatusStyle(cert.status)}`}>
-                            <span className="material-symbols-outlined text-lg">{getStatusIcon(cert.status)}</span>
+                    filteredCertificates.map((cert) => {
+                      const displayStatus = getDisplayStatus(cert);
+                      return (
+                        <div key={cert._id} className="grid grid-cols-1 md:grid-cols-6 gap-4 p-4 border-b border-white/5 last:border-b-0 hover:bg-white/5 transition-colors items-center">
+                          <div className="flex items-center gap-3">
+                            <div className={`p-2 rounded-lg ${getStatusStyle(displayStatus)}`}>
+                              <span className="material-symbols-outlined text-lg">{getStatusIcon(displayStatus)}</span>
+                            </div>
+                            <div>
+                              <p className="text-white font-semibold">{cert.certificateId}</p>
+                              <span className={`inline-block md:hidden text-xs px-2 py-0.5 rounded-full ${getStatusStyle(displayStatus)} mt-1`}>
+                                {displayStatus === 'verified' ? 'Verified' : displayStatus.charAt(0).toUpperCase() + displayStatus.slice(1)}
+                              </span>
+                            </div>
                           </div>
-                          <div>
-                            <p className="text-white font-semibold">{cert.certificateNumber}</p>
-                            <span className={`inline-block md:hidden text-xs px-2 py-0.5 rounded-full ${getStatusStyle(cert.status)} mt-1`}>
-                              {cert.status.charAt(0).toUpperCase() + cert.status.slice(1)}
-                            </span>
+                          <div className="text-gray-400">
+                            <span className="md:hidden text-gray-600 text-sm mr-2">Date:</span>
+                            {new Date(cert.issuedAt || cert.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
                           </div>
-                        </div>
-                        <div className="text-gray-400">
-                          <span className="md:hidden text-gray-600 text-sm mr-2">Date:</span>
-                          {new Date(cert.date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
-                        </div>
-                        <div className="text-white">
-                          <span className="md:hidden text-gray-600 text-sm mr-2">Type:</span>
-                          {cert.ewasteType}
-                        </div>
-                        <div className="text-white font-medium">
-                          <span className="md:hidden text-gray-600 text-sm mr-2">Weight:</span>
-                          {cert.weight}
-                        </div>
-                        <div className="text-gray-400">
-                          <span className="md:hidden text-gray-600 text-sm mr-2">Agency:</span>
-                          {cert.agency}
-                        </div>
-                        <div className="flex items-center justify-center gap-2">
-                          <button 
-                            onClick={() => setSelectedCertificate(cert)}
-                            className="p-2 rounded-lg bg-[#06b6d4]/10 text-[#06b6d4] hover:bg-[#06b6d4]/20 transition-colors"
-                            title="View Certificate"
-                          >
-                            <span className="material-symbols-outlined text-lg">visibility</span>
-                          </button>
-                          {cert.status === 'verified' && (
+                          <div className="text-white">
+                            <span className="md:hidden text-gray-600 text-sm mr-2">Type:</span>
+                            {getTypeDisplay(cert.type)}
+                          </div>
+                          <div className="text-white font-medium">
+                            <span className="md:hidden text-gray-600 text-sm mr-2">Weight:</span>
+                            {cert.totalWeight} kg
+                          </div>
+                          <div className="text-gray-400">
+                            <span className="md:hidden text-gray-600 text-sm mr-2">Agency:</span>
+                            {cert.agencyId?.name || cert.issuedBy?.name || 'N/A'}
+                          </div>
+                          <div className="flex items-center justify-center gap-2">
                             <button 
-                              className="p-2 rounded-lg bg-[#10b981]/10 text-[#10b981] hover:bg-[#10b981]/20 transition-colors"
-                              title="Download PDF"
+                              onClick={() => setSelectedCertificate(cert)}
+                              className="p-2 rounded-lg bg-[#06b6d4]/10 text-[#06b6d4] hover:bg-[#06b6d4]/20 transition-colors"
+                              title="View Certificate"
                             >
-                              <span className="material-symbols-outlined text-lg">download</span>
+                              <span className="material-symbols-outlined text-lg">visibility</span>
                             </button>
-                          )}
+                            {displayStatus === 'verified' && (
+                              <button 
+                                onClick={() => handleDownloadCertificate(cert._id, cert.certificateId)}
+                                className="p-2 rounded-lg bg-[#10b981]/10 text-[#10b981] hover:bg-[#10b981]/20 transition-colors"
+                                title="Download PDF"
+                              >
+                                <span className="material-symbols-outlined text-lg">download</span>
+                              </button>
+                            )}
+                          </div>
                         </div>
-                      </div>
-                    ))
+                      );
+                    })
                   )}
                 </div>
 
@@ -282,17 +394,17 @@ const BusinessCertificates = () => {
         {/* Certificate Preview Modal */}
         {selectedCertificate && (
           <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setSelectedCertificate(null)}>
-            <div className="bg-[#151F26] rounded-3xl w-full max-w-2xl border border-white/10 overflow-hidden" onClick={(e) => e.stopPropagation()}>
+            <div className="bg-[#151F26] rounded-3xl w-full max-w-2xl border border-white/10 overflow-hidden max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
               {/* Modal Header */}
-              <div className="flex items-center justify-between p-6 border-b border-white/10">
+              <div className="flex items-center justify-between p-6 border-b border-white/10 sticky top-0 bg-[#151F26]">
                 <div className="flex items-center gap-3">
-                  <div className={`p-2 rounded-lg ${getStatusStyle(selectedCertificate.status)}`}>
-                    <span className="material-symbols-outlined">{getStatusIcon(selectedCertificate.status)}</span>
+                  <div className={`p-2 rounded-lg ${getStatusStyle(getDisplayStatus(selectedCertificate))}`}>
+                    <span className="material-symbols-outlined">{getStatusIcon(getDisplayStatus(selectedCertificate))}</span>
                   </div>
                   <div>
-                    <h3 className="text-white font-bold text-lg">{selectedCertificate.certificateNumber}</h3>
-                    <span className={`text-xs px-2 py-0.5 rounded-full ${getStatusStyle(selectedCertificate.status)}`}>
-                      {selectedCertificate.status.charAt(0).toUpperCase() + selectedCertificate.status.slice(1)}
+                    <h3 className="text-white font-bold text-lg">{selectedCertificate.certificateId}</h3>
+                    <span className={`text-xs px-2 py-0.5 rounded-full ${getStatusStyle(getDisplayStatus(selectedCertificate))}`}>
+                      {getDisplayStatus(selectedCertificate) === 'verified' ? 'Verified' : getDisplayStatus(selectedCertificate).charAt(0).toUpperCase() + getDisplayStatus(selectedCertificate).slice(1)}
                     </span>
                   </div>
                 </div>
@@ -307,34 +419,93 @@ const BusinessCertificates = () => {
                   <div className="inline-block p-4 bg-[#10b981]/10 rounded-full mb-4">
                     <span className="material-symbols-outlined text-[#10b981] text-5xl">workspace_premium</span>
                   </div>
-                  <h2 className="text-2xl font-black text-white mb-2">E-Waste Disposal Certificate</h2>
-                  <p className="text-gray-500">Proper Disposal Verification</p>
+                  <h2 className="text-2xl font-black text-white mb-2">{selectedCertificate.title}</h2>
+                  <p className="text-gray-500">{getTypeDisplay(selectedCertificate.type)} Certificate</p>
                 </div>
                 
-                <div className="grid grid-cols-2 gap-6 mb-8">
+                <div className="grid grid-cols-2 gap-6 mb-6">
                   <div className="bg-white/5 rounded-xl p-4">
-                    <p className="text-gray-500 text-sm mb-1">Date of Disposal</p>
+                    <p className="text-gray-500 text-sm mb-1">Date Issued</p>
                     <p className="text-white font-semibold">
-                      {new Date(selectedCertificate.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+                      {new Date(selectedCertificate.issuedAt || selectedCertificate.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
                     </p>
                   </div>
                   <div className="bg-white/5 rounded-xl p-4">
-                    <p className="text-gray-500 text-sm mb-1">E-Waste Type</p>
-                    <p className="text-white font-semibold">{selectedCertificate.ewasteType}</p>
+                    <p className="text-gray-500 text-sm mb-1">Valid Until</p>
+                    <p className="text-white font-semibold">
+                      {selectedCertificate.validUntil 
+                        ? new Date(selectedCertificate.validUntil).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+                        : 'N/A'}
+                    </p>
                   </div>
                   <div className="bg-white/5 rounded-xl p-4">
-                    <p className="text-gray-500 text-sm mb-1">Weight Disposed</p>
-                    <p className="text-white font-semibold">{selectedCertificate.weight}</p>
+                    <p className="text-gray-500 text-sm mb-1">Total Weight</p>
+                    <p className="text-white font-semibold">{selectedCertificate.totalWeight} kg</p>
                   </div>
                   <div className="bg-white/5 rounded-xl p-4">
-                    <p className="text-gray-500 text-sm mb-1">Recycling Agency</p>
-                    <p className="text-white font-semibold">{selectedCertificate.agency}</p>
+                    <p className="text-gray-500 text-sm mb-1">CO₂ Saved</p>
+                    <p className="text-[#10b981] font-semibold">{Math.round(selectedCertificate.co2Saved || 0)} kg</p>
+                  </div>
+                  <div className="bg-white/5 rounded-xl p-4">
+                    <p className="text-gray-500 text-sm mb-1">Disposal Method</p>
+                    <p className="text-white font-semibold">{selectedCertificate.disposalMethod || 'Certified Recycling'}</p>
+                  </div>
+                  <div className="bg-white/5 rounded-xl p-4">
+                    <p className="text-gray-500 text-sm mb-1">Issued By</p>
+                    <p className="text-white font-semibold">{selectedCertificate.agencyId?.name || selectedCertificate.issuedBy?.name}</p>
+                    {selectedCertificate.issuedBy?.designation && (
+                      <p className="text-gray-500 text-xs">{selectedCertificate.issuedBy.designation}</p>
+                    )}
                   </div>
                 </div>
+
+                {/* Items List */}
+                {selectedCertificate.items && selectedCertificate.items.length > 0 && (
+                  <div className="mb-6">
+                    <h4 className="text-white font-bold mb-3">Items Recycled</h4>
+                    <div className="bg-white/5 rounded-xl overflow-hidden">
+                      <table className="w-full">
+                        <thead className="bg-white/5">
+                          <tr className="text-gray-500 text-sm">
+                            <th className="text-left p-3">Item</th>
+                            <th className="text-left p-3">Category</th>
+                            <th className="text-right p-3">Qty</th>
+                            <th className="text-right p-3">Weight</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {selectedCertificate.items.map((item, idx) => (
+                            <tr key={idx} className="border-t border-white/5">
+                              <td className="p-3 text-white">{item.name}</td>
+                              <td className="p-3 text-gray-400">{item.category}</td>
+                              <td className="p-3 text-white text-right">{item.quantity}</td>
+                              <td className="p-3 text-white text-right">{item.weight} kg</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
+
+                {/* Compliance Standards */}
+                {selectedCertificate.complianceStandards && selectedCertificate.complianceStandards.length > 0 && (
+                  <div className="mb-6">
+                    <h4 className="text-white font-bold mb-3">Compliance Standards</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedCertificate.complianceStandards.map((standard, idx) => (
+                        <span key={idx} className="px-3 py-1 bg-[#06b6d4]/10 text-[#06b6d4] rounded-full text-sm">{standard}</span>
+                      ))}
+                    </div>
+                  </div>
+                )}
                 
                 <div className="flex gap-4">
-                  {selectedCertificate.status === 'verified' && (
-                    <button className="flex-1 bg-[#10b981] text-white px-6 py-3 rounded-xl font-bold hover:bg-[#059669] transition-colors flex items-center justify-center gap-2">
+                  {getDisplayStatus(selectedCertificate) === 'verified' && (
+                    <button 
+                      onClick={() => handleDownloadCertificate(selectedCertificate._id, selectedCertificate.certificateId)}
+                      className="flex-1 bg-[#10b981] text-white px-6 py-3 rounded-xl font-bold hover:bg-[#059669] transition-colors flex items-center justify-center gap-2"
+                    >
                       <span className="material-symbols-outlined">download</span>
                       Download PDF
                     </button>
