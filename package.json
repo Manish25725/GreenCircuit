@@ -8,6 +8,7 @@
     "server": "nodemon --exec tsx server.ts",
     "dev:all": "concurrently \"npm run dev\" \"npm run server\"",
     "seed": "tsx backend/utils/seed.ts",
+    "seed:admin": "tsx backend/seeds/seedAdminBusiness.ts",
     "build": "vite build",
     "preview": "vite preview"
   },

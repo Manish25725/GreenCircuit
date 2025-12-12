@@ -136,14 +136,13 @@ BusinessCertificateSchema.index({ certificateId: 1 });
 BusinessCertificateSchema.index({ type: 1, status: 1 });
 
 // Generate unique certificate ID before saving
-BusinessCertificateSchema.pre('save', async function(next) {
+BusinessCertificateSchema.pre('save', function() {
   if (this.isNew && !this.certificateId) {
     const typePrefix = this.type.substring(0, 3).toUpperCase();
     const year = new Date().getFullYear();
     const random = Math.random().toString(36).substring(2, 8).toUpperCase();
     this.certificateId = `CERT-${typePrefix}-${year}-${random}`;
   }
-  next();
 });
 
 const BusinessCertificate = mongoose.model<IBusinessCertificate>('BusinessCertificate', BusinessCertificateSchema);

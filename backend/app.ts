@@ -11,6 +11,7 @@ import rewardRoutes from './routes/reward.routes';
 import certificateRoutes from './routes/certificate.routes';
 import notificationRoutes from './routes/notification.routes';
 import adminRoutes from './routes/admin.routes';
+import businessRoutes from './routes/business.routes';
 
 const app = express();
 
@@ -29,6 +30,7 @@ app.use('/api/rewards', rewardRoutes);
 app.use('/api/certificates', certificateRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/business', businessRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

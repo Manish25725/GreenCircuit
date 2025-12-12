@@ -35,7 +35,7 @@ const Login = () => {
       if (user.role === 'agency') {
         window.location.hash = '#/agency';
       } else if (user.role === 'business') {
-        window.location.hash = '#/business/inventory';
+        window.location.hash = '#/business';
       } else if (user.role === 'admin') {
         window.location.hash = '#/admin';
       } else {

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { api } from './services/api';
+import { api, getCurrentUser } from './services/api';
 import AgencyAnalytics from './pages/AgencyAnalytics';
 import ManageSlots from './pages/ManageSlots';
 import AgencyBookings from './pages/AgencyBookings';
@@ -38,6 +38,62 @@ const App = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [progress, setProgress] = useState(100);
 
+  // Get current user role
+  const getCurrentUserRole = (): string | null => {
+    const user = getCurrentUser();
+    return user?.role || null;
+  };
+
+  // Check if user can access a route based on their role
+  const canAccessRoute = (path: string, userRole: string | null): boolean => {
+    // Public routes - anyone can access
+    const publicRoutes = ['#/', '#/login', '#/contact', '#/how-it-works', '#/about'];
+    if (publicRoutes.includes(path)) return true;
+
+    // If no user is logged in, they can only access public routes
+    if (!userRole) return false;
+
+    // Admin routes - only admin can access
+    if (path.startsWith('#/admin')) {
+      return userRole === 'admin';
+    }
+
+    // Agency/Partner routes - only agency can access
+    if (path.startsWith('#/agency')) {
+      return userRole === 'agency';
+    }
+
+    // Business routes - only business can access
+    if (path.startsWith('#/business')) {
+      return userRole === 'business';
+    }
+
+    // User routes (dashboard, profile, rewards, etc.) - only regular users can access
+    const userOnlyRoutes = ['#/dashboard', '#/rewards', '#/certificate', '#/pickup-limit', '#/history', '#/profile', '#/notifications', '#/security', '#/settings'];
+    if (userOnlyRoutes.some(r => path.startsWith(r))) {
+      return userRole === 'user';
+    }
+
+    // Shared routes - users and business can access
+    const sharedRoutes = ['#/search', '#/schedule', '#/pickup-confirmation'];
+    if (sharedRoutes.some(r => path.startsWith(r))) {
+      return userRole === 'user' || userRole === 'business';
+    }
+
+    return false;
+  };
+
+  // Get the correct dashboard route for a user role
+  const getDashboardForRole = (role: string | null): string => {
+    switch (role) {
+      case 'admin': return '#/admin';
+      case 'agency': return '#/agency';
+      case 'business': return '#/business';
+      case 'user': return '#/dashboard';
+      default: return '#/login';
+    }
+  };
+
   // Validate token on app start
   useEffect(() => {
     const validateSession = async () => {
@@ -72,6 +128,26 @@ const App = () => {
   const renderRoute = () => {
     // Extract base path without query params
     const basePath = route.split('?')[0];
+    const userRole = getCurrentUserRole();
+
+    // Check route access
+    if (!canAccessRoute(basePath, userRole)) {
+      // If logged in but trying to access wrong dashboard, redirect to correct one
+      if (userRole) {
+        const correctDashboard = getDashboardForRole(userRole);
+        if (basePath !== correctDashboard) {
+          window.location.hash = correctDashboard;
+          return null;
+        }
+      } else {
+        // Not logged in, redirect to login for protected routes
+        const publicRoutes = ['#/', '#/login', '#/contact', '#/how-it-works', '#/about'];
+        if (!publicRoutes.includes(basePath)) {
+          window.location.hash = '#/login';
+          return null;
+        }
+      }
+    }
     
     switch (basePath) {
       case '#/agency':

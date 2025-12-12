@@ -4,7 +4,7 @@ export interface IInventoryItem extends Document {
   _id: mongoose.Types.ObjectId;
   businessId: mongoose.Types.ObjectId;
   // Item Details
-  name: string;
+  itemName: string;
   description?: string;
   category: 'IT Equipment' | 'Cables & Wiring' | 'Batteries' | 'Monitors' | 'Appliances' | 'Mobile Devices' | 'Other';
   subcategory?: string;
@@ -12,7 +12,7 @@ export interface IInventoryItem extends Document {
   assetId: string;
   serialNumber?: string;
   manufacturer?: string;
-  model?: string;
+  itemModel?: string;
   // Physical
   quantity: number;
   weight: number; // in kg
@@ -44,7 +44,7 @@ const InventorySchema = new Schema<IInventoryItem>({
     ref: 'Business',
     required: true
   },
-  name: {
+  itemName: {
     type: String,
     required: [true, 'Item name is required'],
     trim: true
@@ -62,7 +62,7 @@ const InventorySchema = new Schema<IInventoryItem>({
   },
   serialNumber: String,
   manufacturer: String,
-  model: String,
+  itemModel: String,
   quantity: {
     type: Number,
     default: 1,
@@ -112,16 +112,15 @@ const InventorySchema = new Schema<IInventoryItem>({
 InventorySchema.index({ businessId: 1, status: 1 });
 InventorySchema.index({ assetId: 1 });
 InventorySchema.index({ category: 1 });
-InventorySchema.index({ name: 'text', description: 'text' });
+InventorySchema.index({ itemName: 'text', description: 'text' });
 
 // Generate unique asset ID before saving
-InventorySchema.pre('save', async function(next) {
+InventorySchema.pre('save', function() {
   if (this.isNew && !this.assetId) {
     const prefix = this.category.substring(0, 3).toUpperCase();
     const random = Math.random().toString(36).substring(2, 8).toUpperCase();
     this.assetId = `${prefix}-${Date.now().toString().slice(-6)}-${random}`;
   }
-  next();
 });
 
 const Inventory = mongoose.model<IInventoryItem>('Inventory', InventorySchema);

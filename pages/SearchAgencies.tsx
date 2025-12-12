@@ -5,6 +5,31 @@ import { api, Agency, getCurrentUser, isAuthenticated } from '../services/api';
 // Declare Leaflet types
 declare const L: any;
 
+// Helper to get user role
+const getUserRole = (): 'User' | 'Business' | 'Agency' | 'Admin' => {
+  try {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      const user = JSON.parse(storedUser);
+      const role = user.role?.toLowerCase();
+      if (role === 'business') return 'Business';
+      if (role === 'agency' || role === 'partner') return 'Agency';
+      if (role === 'admin') return 'Admin';
+    }
+  } catch (e) {}
+  return 'User';
+};
+
+// Helper to get dashboard path based on role
+const getDashboardPath = (role: string): string => {
+  switch (role) {
+    case 'Business': return '#/business';
+    case 'Agency': return '#/agency';
+    case 'Admin': return '#/admin';
+    default: return '#/dashboard';
+  }
+};
+
 // Worldwide city coordinates
 const worldCities: Record<string, { coords: [number, number]; country: string }> = {
   // India
@@ -64,6 +89,8 @@ const SearchAgencies = () => {
   const mapInstanceRef = useRef<any>(null);
   const markersRef = useRef<any[]>([]);
   const user = getCurrentUser();
+  const userRole = getUserRole();
+  const dashboardPath = getDashboardPath(userRole);
 
   useEffect(() => {
     loadAgencies();
@@ -351,7 +378,7 @@ const SearchAgencies = () => {
   };
 
   return (
-    <Layout title="" role="User" fullWidth hideSidebar>
+    <Layout title="" role={userRole} fullWidth hideSidebar>
       <div className="flex flex-col h-screen bg-[#0B1116] text-white font-sans overflow-hidden">
         
         {/* Header */}
@@ -365,10 +392,6 @@ const SearchAgencies = () => {
                 <h2 className="text-xl font-bold tracking-tight text-white">EcoCycle</h2>
             </div>
             <nav className="hidden md:flex flex-1 justify-center gap-1">
-                <a className="text-sm font-medium px-5 py-2.5 rounded-full text-[#94a3b8] hover:text-white hover:bg-white/5 transition-all cursor-pointer" onClick={() => window.location.hash = '#/dashboard'}>Dashboard</a>
-                <a className="text-sm font-semibold px-5 py-2.5 rounded-full text-white bg-white/10 shadow-inner border border-white/5 cursor-pointer" onClick={() => window.location.hash = '#/search'}>New Request</a>
-                <a className="text-sm font-medium px-5 py-2.5 rounded-full text-[#94a3b8] hover:text-white hover:bg-white/5 transition-all cursor-pointer" onClick={() => window.location.hash = '#/rewards'}>Rewards</a>
-                <a className="text-sm font-medium px-5 py-2.5 rounded-full text-[#94a3b8] hover:text-white hover:bg-white/5 transition-all cursor-pointer" onClick={() => window.location.hash = '#/certificate'}>Certificate</a>
             </nav>
             <div className="flex items-center gap-4">
                 <button 

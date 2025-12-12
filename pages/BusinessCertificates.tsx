@@ -1,441 +1,357 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import Layout from '../components/Layout';
+import { getCurrentUser } from '../services/api';
+
+interface Certificate {
+  id: string;
+  certificateNumber: string;
+  date: string;
+  ewasteType: string;
+  weight: string;
+  agency: string;
+  status: 'verified' | 'pending' | 'expired';
+}
 
 const BusinessCertificates = () => {
+  const user = getCurrentUser();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterStatus, setFilterStatus] = useState('all');
+  const [selectedCertificate, setSelectedCertificate] = useState<Certificate | null>(null);
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    window.location.hash = '#/login';
+  };
+
+  // Mock certificates data
+  const certificates: Certificate[] = [
+    { id: '1', certificateNumber: 'CRT-2025-142', date: '2025-01-10', ewasteType: 'IT Equipment', weight: '450 kg', agency: 'GreenTech Solutions', status: 'verified' },
+    { id: '2', certificateNumber: 'CRT-2025-138', date: '2025-01-05', ewasteType: 'Batteries', weight: '120 kg', agency: 'EcoRecycle Hub', status: 'verified' },
+    { id: '3', certificateNumber: 'CRT-2024-289', date: '2024-12-28', ewasteType: 'Monitors', weight: '280 kg', agency: 'GreenTech Solutions', status: 'verified' },
+    { id: '4', certificateNumber: 'CRT-2024-275', date: '2024-12-15', ewasteType: 'Mixed Electronics', weight: '350 kg', agency: 'CleanE Disposal', status: 'verified' },
+    { id: '5', certificateNumber: 'CRT-2025-145', date: '2025-01-12', ewasteType: 'Server Equipment', weight: '180 kg', agency: 'GreenTech Solutions', status: 'pending' },
+    { id: '6', certificateNumber: 'CRT-2024-156', date: '2024-06-20', ewasteType: 'Printers', weight: '95 kg', agency: 'EcoRecycle Hub', status: 'expired' },
+  ];
+
+  const filteredCertificates = certificates.filter(cert => {
+    const matchesSearch = cert.certificateNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         cert.ewasteType.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         cert.agency.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesStatus = filterStatus === 'all' || cert.status === filterStatus;
+    return matchesSearch && matchesStatus;
+  });
+
+  const stats = {
+    total: certificates.length,
+    verified: certificates.filter(c => c.status === 'verified').length,
+    pending: certificates.filter(c => c.status === 'pending').length,
+    totalWeight: certificates.filter(c => c.status === 'verified').reduce((acc, c) => acc + parseInt(c.weight), 0)
+  };
+
+  const getStatusStyle = (status: string) => {
+    switch(status) {
+      case 'verified': return 'bg-[#10b981]/10 text-[#10b981]';
+      case 'pending': return 'bg-amber-500/10 text-amber-400';
+      case 'expired': return 'bg-red-500/10 text-red-400';
+      default: return 'bg-gray-500/10 text-gray-400';
+    }
+  };
+
+  const getStatusIcon = (status: string) => {
+    switch(status) {
+      case 'verified': return 'verified';
+      case 'pending': return 'hourglass_empty';
+      case 'expired': return 'error';
+      default: return 'help';
+    }
+  };
+
   return (
-    <div className="flex h-screen overflow-hidden bg-[#0f172a] font-sans text-[#f8fafc] selection:bg-[#4ade80] selection:text-slate-900">
-      {/* Sidebar */}
-      <aside className="hidden w-20 flex-col items-center border-r border-slate-800 bg-[#0f172a] py-6 lg:flex z-50 transition-all hover:w-64 group fixed inset-y-0 left-0">
-        <div className="flex h-full w-full flex-col justify-between px-4">
-          <div className="flex flex-col gap-8 w-full">
-            <div className="flex items-center gap-4 px-2 overflow-hidden whitespace-nowrap cursor-pointer" onClick={() => window.location.hash = '#/'}>
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#4ade80] to-[#22c55e] text-slate-900 shadow-[0_0_20px_rgba(74,222,128,0.15)]">
-                <span className="material-symbols-outlined !text-[24px] font-bold">recycling</span>
+    <Layout title="" role="Business" fullWidth hideSidebar>
+      <div className="bg-[#0B1116] font-sans text-gray-200 antialiased selection:bg-[#06b6d4] selection:text-white min-h-screen">
+        <div className="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden">
+          <div className="fixed top-0 left-0 w-full h-[500px] bg-[#10b981]/5 rounded-full blur-[120px] -translate-y-1/2 pointer-events-none"></div>
+          <div className="fixed bottom-0 right-0 w-full h-[500px] bg-[#06b6d4]/5 rounded-full blur-[120px] translate-y-1/2 pointer-events-none"></div>
+          
+          <div className="layout-container flex h-full grow flex-col relative z-10">
+            {/* Header */}
+            <header className="flex items-center justify-between whitespace-nowrap border-b border-white/5 px-4 sm:px-6 lg:px-10 py-4 bg-[#0B1116]/80 backdrop-blur-md fixed top-0 left-0 right-0 z-50">
+              <div className="flex items-center gap-3 text-white cursor-pointer" onClick={() => window.location.hash = '#/'}>
+                <div className="p-2 bg-[#06b6d4]/10 rounded-lg">
+                  <svg className="h-6 w-6 text-[#06b6d4]" fill="currentColor" viewBox="0 0 48 48">
+                    <path d="M42.4379 44C42.4379 44 36.0744 33.9038 41.1692 24C46.8624 12.9336 42.2078 4 42.2078 4L7.01134 4C7.01134 4 11.6577 12.932 5.96912 23.9969C0.876273 33.9029 7.27094 44 7.27094 44L42.4379 44Z"></path>
+                  </svg>
+                </div>
+                <h2 className="text-xl font-bold tracking-tight text-white">EcoCycle <span className="text-[#06b6d4]">Business</span></h2>
               </div>
-              <div className="flex flex-col opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                <h1 className="text-lg font-bold tracking-tight">EcoCycle</h1>
-                <p className="text-xs text-[#94a3b8] font-medium">Business</p>
+              <nav className="hidden md:flex flex-1 justify-center gap-1">
+              </nav>
+              <div className="flex items-center gap-4">
+                <button 
+                  onClick={() => window.location.hash = '#/profile'}
+                  className="hidden sm:flex items-center gap-3 pl-1 pr-4 py-1 rounded-full bg-[#151F26] border border-white/5 hover:bg-white/5 transition-colors group cursor-pointer"
+                >
+                  <div className="size-8 rounded-full bg-[#06b6d4] flex items-center justify-center ring-2 ring-white/10 group-hover:ring-[#06b6d4]/50 transition-all text-white font-bold text-sm">
+                    {user?.name?.charAt(0) || 'B'}
+                  </div>
+                  <span className="text-sm font-medium text-gray-200">{user?.name || 'Business'}</span>
+                </button>
+                <button onClick={handleLogout} className="p-2.5 rounded-full bg-[#151F26] border border-white/5 text-gray-400 hover:text-red-400 hover:bg-red-500/10 transition-colors" title="Logout">
+                  <span className="material-symbols-outlined text-[20px]">logout</span>
+                </button>
               </div>
-            </div>
-            <nav className="flex flex-col gap-2 w-full">
-              <a onClick={() => window.location.hash = '#/business'} className="flex items-center gap-4 rounded-xl px-3 py-3 text-[#94a3b8] hover:bg-slate-800 hover:text-white transition-colors cursor-pointer">
-                <span className="material-symbols-outlined shrink-0">dashboard</span>
-                <span className="text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">Dashboard</span>
-              </a>
-              <a onClick={() => window.location.hash = '#/business/inventory'} className="flex items-center gap-4 rounded-xl px-3 py-3 text-[#94a3b8] hover:bg-slate-800 hover:text-white transition-colors cursor-pointer">
-                <span className="material-symbols-outlined shrink-0">inventory_2</span>
-                <span className="text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">Inventory</span>
-              </a>
-              <a onClick={() => window.location.hash = '#/business/certificates'} className="flex items-center gap-4 rounded-xl bg-[#4ade80]/10 px-3 py-3 text-[#4ade80] transition-all group-hover:bg-[#4ade80]/20 cursor-pointer">
-                <span className="material-symbols-outlined shrink-0 fill">verified</span>
-                <span className="text-sm font-semibold opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">Certificates</span>
-              </a>
-              <a className="flex items-center gap-4 rounded-xl px-3 py-3 text-[#94a3b8] hover:bg-slate-800 hover:text-white transition-colors cursor-pointer">
-                <span className="material-symbols-outlined shrink-0">local_shipping</span>
-                <span className="text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">Logistics</span>
-              </a>
-              <a onClick={() => window.location.hash = '#/business/analytics'} className="flex items-center gap-4 rounded-xl px-3 py-3 text-[#94a3b8] hover:bg-slate-800 hover:text-white transition-colors cursor-pointer">
-                <span className="material-symbols-outlined shrink-0">analytics</span>
-                <span className="text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">Analytics</span>
-              </a>
-            </nav>
-          </div>
-          <div className="flex items-center gap-4 rounded-xl border border-slate-800 bg-slate-900/50 p-2 overflow-hidden whitespace-nowrap mt-auto">
-            <div className="h-8 w-8 shrink-0 overflow-hidden rounded-full bg-slate-700 bg-center bg-cover border border-slate-600" style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuBLrR2QWFrZdhqlqnql_lDYbtkDCvQ32yk6hvVJTlee4Tx6Uh5Iw5cR16GiYtu3xQ9yK7tqguuIvnhVDy9ONcnQtHZJbvop2WX6V2aW6YfTHzR_k-HTTOql1kt6uYcgYi_Es2Tc4xGWRzePR50VKumirJYQgVVCecYOYE7QOjWFnEANpFSY14v-gw9mefiqPUaoKbO_mSmHt2v3p4NTP-DeUr2DjUUJwQTJCiR22EH42tLk2N7SoQ8k0RyQ0dzHycBltvqpZQOGWMY')" }}></div>
-            <div className="flex flex-col opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-              <p className="text-sm font-bold text-white">James W.</p>
-              <p className="text-[10px] text-[#94a3b8]">TechCorp HQ</p>
-            </div>
+            </header>
+
+            <main className="flex flex-1 justify-center py-5 mt-24">
+              <div className="layout-content-container flex flex-col w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+                
+                {/* Page Header */}
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 py-8">
+                  <div>
+                    <div className="flex items-center gap-2 mb-2">
+                      <button onClick={() => window.location.hash = '#/business'} className="text-[#94a3b8] hover:text-white transition-colors">
+                        <span className="material-symbols-outlined text-lg">arrow_back</span>
+                      </button>
+                      <p className="text-[#10b981] text-sm font-bold uppercase tracking-widest">Compliance & Documentation</p>
+                    </div>
+                    <h1 className="text-white text-3xl sm:text-4xl font-black leading-tight tracking-tighter mb-2">Disposal Certificates</h1>
+                    <p className="text-[#94a3b8] text-base">View and download your verified disposal certificates.</p>
+                  </div>
+                </div>
+
+                {/* Stats Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                  <div className="bg-[#151F26] rounded-2xl p-6 border border-white/5 relative overflow-hidden group hover:border-[#06b6d4]/20 transition-all">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-[#06b6d4]/10 rounded-full blur-[60px] -translate-y-1/2 translate-x-1/2"></div>
+                    <div className="flex items-center justify-between mb-4 relative z-10">
+                      <div className="p-3 bg-[#06b6d4]/10 rounded-xl text-[#06b6d4]">
+                        <span className="material-symbols-outlined">description</span>
+                      </div>
+                    </div>
+                    <h3 className="text-3xl font-black text-white relative z-10">{stats.total}</h3>
+                    <p className="text-sm text-[#94a3b8] relative z-10">Total Certificates</p>
+                  </div>
+                  
+                  <div className="bg-[#151F26] rounded-2xl p-6 border border-white/5 relative overflow-hidden group hover:border-[#10b981]/20 transition-all">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-[#10b981]/10 rounded-full blur-[60px] -translate-y-1/2 translate-x-1/2"></div>
+                    <div className="flex items-center justify-between mb-4 relative z-10">
+                      <div className="p-3 bg-[#10b981]/10 rounded-xl text-[#10b981]">
+                        <span className="material-symbols-outlined">verified</span>
+                      </div>
+                    </div>
+                    <h3 className="text-3xl font-black text-white relative z-10">{stats.verified}</h3>
+                    <p className="text-sm text-[#94a3b8] relative z-10">Verified</p>
+                  </div>
+                  
+                  <div className="bg-[#151F26] rounded-2xl p-6 border border-white/5 relative overflow-hidden group hover:border-amber-500/20 transition-all">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/10 rounded-full blur-[60px] -translate-y-1/2 translate-x-1/2"></div>
+                    <div className="flex items-center justify-between mb-4 relative z-10">
+                      <div className="p-3 bg-amber-500/10 rounded-xl text-amber-400">
+                        <span className="material-symbols-outlined">pending</span>
+                      </div>
+                    </div>
+                    <h3 className="text-3xl font-black text-white relative z-10">{stats.pending}</h3>
+                    <p className="text-sm text-[#94a3b8] relative z-10">Pending</p>
+                  </div>
+                  
+                  <div className="bg-[#151F26] rounded-2xl p-6 border border-white/5 relative overflow-hidden group hover:border-[#8b5cf6]/20 transition-all">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-[#8b5cf6]/10 rounded-full blur-[60px] -translate-y-1/2 translate-x-1/2"></div>
+                    <div className="flex items-center justify-between mb-4 relative z-10">
+                      <div className="p-3 bg-[#8b5cf6]/10 rounded-xl text-[#8b5cf6]">
+                        <span className="material-symbols-outlined">scale</span>
+                      </div>
+                    </div>
+                    <h3 className="text-3xl font-black text-white relative z-10">{stats.totalWeight} <span className="text-lg font-medium text-gray-500">kg</span></h3>
+                    <p className="text-sm text-[#94a3b8] relative z-10">Certified Weight</p>
+                  </div>
+                </div>
+
+                {/* Search and Filter */}
+                <div className="flex flex-col md:flex-row gap-4 mb-8">
+                  <div className="flex-1 relative">
+                    <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">search</span>
+                    <input
+                      type="text"
+                      placeholder="Search by certificate number, type, or agency..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="w-full bg-[#151F26] border border-white/10 rounded-xl pl-12 pr-4 py-3 text-white placeholder-gray-500 focus:ring-2 focus:ring-[#06b6d4]/50 focus:border-[#06b6d4] outline-none transition-all"
+                    />
+                  </div>
+                  <select
+                    value={filterStatus}
+                    onChange={(e) => setFilterStatus(e.target.value)}
+                    className="bg-[#151F26] border border-white/10 text-white rounded-xl px-4 py-3 focus:ring-2 focus:ring-[#06b6d4]/50 focus:border-[#06b6d4] outline-none cursor-pointer"
+                  >
+                    <option value="all">All Status</option>
+                    <option value="verified">Verified</option>
+                    <option value="pending">Pending</option>
+                    <option value="expired">Expired</option>
+                  </select>
+                </div>
+
+                {/* Certificates List */}
+                <div className="bg-[#151F26] rounded-2xl border border-white/5 overflow-hidden">
+                  {/* Table Header */}
+                  <div className="hidden md:grid grid-cols-6 gap-4 p-4 border-b border-white/5 text-sm font-medium text-gray-500">
+                    <div>Certificate #</div>
+                    <div>Date</div>
+                    <div>E-Waste Type</div>
+                    <div>Weight</div>
+                    <div>Agency</div>
+                    <div className="text-center">Actions</div>
+                  </div>
+                  
+                  {/* Certificates */}
+                  {filteredCertificates.length === 0 ? (
+                    <div className="p-12 text-center">
+                      <span className="material-symbols-outlined text-5xl text-gray-600 mb-4">description</span>
+                      <p className="text-gray-400 text-lg">No certificates found</p>
+                      <p className="text-gray-600 text-sm mt-1">Try adjusting your search or filters</p>
+                    </div>
+                  ) : (
+                    filteredCertificates.map((cert) => (
+                      <div key={cert.id} className="grid grid-cols-1 md:grid-cols-6 gap-4 p-4 border-b border-white/5 last:border-b-0 hover:bg-white/5 transition-colors items-center">
+                        <div className="flex items-center gap-3">
+                          <div className={`p-2 rounded-lg ${getStatusStyle(cert.status)}`}>
+                            <span className="material-symbols-outlined text-lg">{getStatusIcon(cert.status)}</span>
+                          </div>
+                          <div>
+                            <p className="text-white font-semibold">{cert.certificateNumber}</p>
+                            <span className={`inline-block md:hidden text-xs px-2 py-0.5 rounded-full ${getStatusStyle(cert.status)} mt-1`}>
+                              {cert.status.charAt(0).toUpperCase() + cert.status.slice(1)}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="text-gray-400">
+                          <span className="md:hidden text-gray-600 text-sm mr-2">Date:</span>
+                          {new Date(cert.date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
+                        </div>
+                        <div className="text-white">
+                          <span className="md:hidden text-gray-600 text-sm mr-2">Type:</span>
+                          {cert.ewasteType}
+                        </div>
+                        <div className="text-white font-medium">
+                          <span className="md:hidden text-gray-600 text-sm mr-2">Weight:</span>
+                          {cert.weight}
+                        </div>
+                        <div className="text-gray-400">
+                          <span className="md:hidden text-gray-600 text-sm mr-2">Agency:</span>
+                          {cert.agency}
+                        </div>
+                        <div className="flex items-center justify-center gap-2">
+                          <button 
+                            onClick={() => setSelectedCertificate(cert)}
+                            className="p-2 rounded-lg bg-[#06b6d4]/10 text-[#06b6d4] hover:bg-[#06b6d4]/20 transition-colors"
+                            title="View Certificate"
+                          >
+                            <span className="material-symbols-outlined text-lg">visibility</span>
+                          </button>
+                          {cert.status === 'verified' && (
+                            <button 
+                              className="p-2 rounded-lg bg-[#10b981]/10 text-[#10b981] hover:bg-[#10b981]/20 transition-colors"
+                              title="Download PDF"
+                            >
+                              <span className="material-symbols-outlined text-lg">download</span>
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+
+                {/* Compliance Note */}
+                <div className="mt-8 p-6 bg-gradient-to-r from-[#10b981]/10 to-[#06b6d4]/10 rounded-2xl border border-[#10b981]/20">
+                  <div className="flex items-start gap-4">
+                    <div className="p-3 bg-[#10b981]/20 rounded-xl">
+                      <span className="material-symbols-outlined text-[#10b981] text-2xl">security</span>
+                    </div>
+                    <div>
+                      <h4 className="text-white font-bold text-lg mb-1">Compliance Verified</h4>
+                      <p className="text-gray-400 text-sm">All your verified certificates are digitally signed and meet regulatory compliance standards. These certificates can be used for environmental audits and sustainability reporting.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </main>
           </div>
         </div>
-      </aside>
 
-      <div className="flex flex-1 flex-col h-full overflow-hidden relative ml-0 lg:ml-20 transition-all">
-        {/* Header */}
-        <header className="flex h-16 w-full items-center justify-between bg-[#0f172a]/80 backdrop-blur-md px-6 lg:px-8 z-40 sticky top-0 border-b border-slate-800">
-          <div className="flex items-center gap-4 lg:hidden">
-            <button className="text-[#94a3b8] hover:text-white">
-              <span className="material-symbols-outlined">menu</span>
-            </button>
-            <span className="text-lg font-bold text-white">EcoCycle</span>
-          </div>
-          <div className="hidden lg:flex flex-col">
-            <h2 className="text-lg font-bold text-white leading-tight">Certificates Management</h2>
-            <p className="text-xs text-[#94a3b8]">Access compliance reports and e-waste certificates</p>
-          </div>
-          <div className="flex items-center gap-4">
-            <div className="hidden md:flex items-center gap-2 rounded-full bg-slate-800/50 px-4 py-1.5 border border-slate-700">
-              <span className="material-symbols-outlined text-[#94a3b8] text-[18px]">search</span>
-              <input className="bg-transparent border-none text-xs focus:ring-0 placeholder-[#94a3b8] w-48 text-white p-0 focus:outline-none" placeholder="Search by Certificate ID..." type="text"/>
-            </div>
-            <button className="relative flex h-9 w-9 items-center justify-center rounded-full bg-slate-800 text-[#94a3b8] hover:bg-slate-700 hover:text-white transition-colors border border-slate-700">
-              <span className="material-symbols-outlined text-[20px]">notifications</span>
-              <span className="absolute top-0 right-0 h-2.5 w-2.5 rounded-full bg-[#4ade80] border-2 border-[#0f172a]"></span>
-            </button>
-            <button className="flex items-center gap-2 rounded-lg bg-slate-800 text-white px-4 py-2 text-xs font-bold hover:bg-slate-700 transition-all border border-slate-700">
-              <span className="material-symbols-outlined text-[16px]">file_upload</span>
-              Upload Report
-            </button>
-          </div>
-        </header>
-
-        {/* Main Content */}
-        <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
-          <div className="mx-auto max-w-7xl flex flex-col gap-6">
-            
-            {/* Stats Grid */}
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-              <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900 to-[#1e293b] p-5 border border-slate-800">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="rounded-lg bg-[#4ade80]/10 p-2 text-[#4ade80] border border-[#4ade80]/20">
-                    <span className="material-symbols-outlined">workspace_premium</span>
+        {/* Certificate Preview Modal */}
+        {selectedCertificate && (
+          <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setSelectedCertificate(null)}>
+            <div className="bg-[#151F26] rounded-3xl w-full max-w-2xl border border-white/10 overflow-hidden" onClick={(e) => e.stopPropagation()}>
+              {/* Modal Header */}
+              <div className="flex items-center justify-between p-6 border-b border-white/10">
+                <div className="flex items-center gap-3">
+                  <div className={`p-2 rounded-lg ${getStatusStyle(selectedCertificate.status)}`}>
+                    <span className="material-symbols-outlined">{getStatusIcon(selectedCertificate.status)}</span>
                   </div>
-                  <span className="text-xs font-semibold text-[#4ade80] bg-[#4ade80]/5 px-2 py-1 rounded-full">+12 new</span>
-                </div>
-                <h3 className="text-2xl font-bold text-white">142</h3>
-                <p className="text-sm text-[#94a3b8]">Total Certificates Issued</p>
-              </div>
-              <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900 to-[#1e293b] p-5 border border-slate-800">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="rounded-lg bg-[#38bdf8]/10 p-2 text-[#38bdf8] border border-[#38bdf8]/20">
-                    <span className="material-symbols-outlined">scale</span>
-                  </div>
-                  <span className="text-xs font-semibold text-[#38bdf8] bg-[#38bdf8]/5 px-2 py-1 rounded-full">YTD</span>
-                </div>
-                <h3 className="text-2xl font-bold text-white">12,450 <span className="text-sm font-normal text-[#94a3b8]">kg</span></h3>
-                <p className="text-sm text-[#94a3b8]">Certified Recycled Volume</p>
-              </div>
-              <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900 to-[#1e293b] p-5 border border-slate-800">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="rounded-lg bg-purple-500/10 p-2 text-purple-400 border border-purple-500/20">
-                    <span className="material-symbols-outlined">shield_moon</span>
-                  </div>
-                  <span className="text-xs font-semibold text-purple-400 bg-purple-500/5 px-2 py-1 rounded-full">Compliant</span>
-                </div>
-                <h3 className="text-2xl font-bold text-white">100%</h3>
-                <p className="text-sm text-[#94a3b8]">Current Compliance Score</p>
-              </div>
-            </div>
-
-            {/* Split View: Table and Sidebar */}
-            <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-              
-              {/* Table Section */}
-              <div className="xl:col-span-2 rounded-2xl bg-[#1e293b] border border-slate-800 flex flex-col overflow-hidden h-[600px] xl:h-[calc(100vh-280px)]">
-                <div className="p-5 border-b border-slate-800 bg-slate-900/30 flex flex-col sm:flex-row gap-4 justify-between items-center z-10">
                   <div>
-                    <h3 className="text-base font-bold text-white">Certificate Registry</h3>
-                    <p className="text-xs text-[#94a3b8]">Manage your digital e-waste records</p>
-                  </div>
-                  <div className="flex items-center gap-2 w-full sm:w-auto">
-                    <div className="relative flex-1 sm:w-48">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-[#94a3b8] text-[18px]">filter_list</span>
-                      <select className="w-full bg-slate-900 border border-slate-700 text-white text-xs rounded-lg py-2 pl-9 pr-8 focus:ring-1 focus:ring-[#4ade80] focus:border-[#4ade80] outline-none cursor-pointer">
-                        <option>All Types</option>
-                        <option>Recycling</option>
-                        <option>Destruction</option>
-                        <option>Donation</option>
-                      </select>
-                    </div>
-                    <div className="relative flex-1 sm:w-40">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-[#94a3b8] text-[18px]">calendar_month</span>
-                      <select className="w-full bg-slate-900 border border-slate-700 text-white text-xs rounded-lg py-2 pl-9 pr-8 focus:ring-1 focus:ring-[#4ade80] focus:border-[#4ade80] outline-none cursor-pointer">
-                        <option>Last 30 Days</option>
-                        <option>2024</option>
-                        <option>2023</option>
-                      </select>
-                    </div>
-                    <button className="bg-slate-800 hover:bg-slate-700 text-white p-2 rounded-lg border border-slate-700 transition-colors" title="Export CSV">
-                      <span className="material-symbols-outlined text-[20px]">download</span>
-                    </button>
+                    <h3 className="text-white font-bold text-lg">{selectedCertificate.certificateNumber}</h3>
+                    <span className={`text-xs px-2 py-0.5 rounded-full ${getStatusStyle(selectedCertificate.status)}`}>
+                      {selectedCertificate.status.charAt(0).toUpperCase() + selectedCertificate.status.slice(1)}
+                    </span>
                   </div>
                 </div>
-                
-                <div className="flex-1 overflow-auto scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
-                  <table className="w-full text-left border-collapse">
-                    <thead className="bg-slate-900/80 sticky top-0 z-10 backdrop-blur-sm">
-                      <tr>
-                        <th className="px-6 py-3 text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider">Certificate ID</th>
-                        <th className="px-6 py-3 text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider">Date Issued</th>
-                        <th className="px-6 py-3 text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider">Weight / Unit</th>
-                        <th className="px-6 py-3 text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider">Status</th>
-                        <th className="px-6 py-3 text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider text-right">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-800">
-                      <tr className="group hover:bg-slate-800/40 transition-colors">
-                        <td className="px-6 py-4">
-                          <div className="flex items-center gap-3">
-                            <div className="h-8 w-8 rounded-lg bg-[#4ade80]/10 flex items-center justify-center text-[#4ade80]">
-                              <span className="material-symbols-outlined text-[18px]">recycling</span>
-                            </div>
-                            <div>
-                              <p className="text-sm font-semibold text-white">Batch Recycling</p>
-                              <p className="text-[10px] text-[#94a3b8] font-mono">CRT-2024-05A</p>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 text-xs text-[#94a3b8]">May 20, 2024</td>
-                        <td className="px-6 py-4 text-xs font-medium text-white">450 kg</td>
-                        <td className="px-6 py-4">
-                          <span className="inline-flex items-center gap-1.5 rounded-full bg-[#4ade80]/10 px-2 py-0.5 text-[10px] font-bold text-[#4ade80] border border-[#4ade80]/20">
-                            <span className="h-1.5 w-1.5 rounded-full bg-[#4ade80]"></span>
-                            Verified
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 text-right">
-                          <button className="text-[#94a3b8] hover:text-white transition-colors p-1">
-                            <span className="material-symbols-outlined text-[20px]">visibility</span>
-                          </button>
-                          <button className="text-[#94a3b8] hover:text-[#4ade80] transition-colors p-1 ml-2">
-                            <span className="material-symbols-outlined text-[20px]">download</span>
-                          </button>
-                        </td>
-                      </tr>
-                      <tr className="group hover:bg-slate-800/40 transition-colors">
-                        <td className="px-6 py-4">
-                          <div className="flex items-center gap-3">
-                            <div className="h-8 w-8 rounded-lg bg-red-500/10 flex items-center justify-center text-red-400">
-                              <span className="material-symbols-outlined text-[18px]">delete_forever</span>
-                            </div>
-                            <div>
-                              <p className="text-sm font-semibold text-white">Data Destruction</p>
-                              <p className="text-[10px] text-[#94a3b8] font-mono">DDC-2024-089</p>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 text-xs text-[#94a3b8]">May 18, 2024</td>
-                        <td className="px-6 py-4 text-xs font-medium text-white">120 Units</td>
-                        <td className="px-6 py-4">
-                          <span className="inline-flex items-center gap-1.5 rounded-full bg-[#4ade80]/10 px-2 py-0.5 text-[10px] font-bold text-[#4ade80] border border-[#4ade80]/20">
-                            <span className="h-1.5 w-1.5 rounded-full bg-[#4ade80]"></span>
-                            Verified
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 text-right">
-                          <button className="text-[#94a3b8] hover:text-white transition-colors p-1">
-                            <span className="material-symbols-outlined text-[20px]">visibility</span>
-                          </button>
-                          <button className="text-[#94a3b8] hover:text-[#4ade80] transition-colors p-1 ml-2">
-                            <span className="material-symbols-outlined text-[20px]">download</span>
-                          </button>
-                        </td>
-                      </tr>
-                      <tr className="group hover:bg-slate-800/40 transition-colors">
-                        <td className="px-6 py-4">
-                          <div className="flex items-center gap-3">
-                            <div className="h-8 w-8 rounded-lg bg-orange-500/10 flex items-center justify-center text-orange-400">
-                              <span className="material-symbols-outlined text-[18px]">battery_charging_full</span>
-                            </div>
-                            <div>
-                              <p className="text-sm font-semibold text-white">Battery Disposal</p>
-                              <p className="text-[10px] text-[#94a3b8] font-mono">BDC-2024-012</p>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 text-xs text-[#94a3b8]">May 15, 2024</td>
-                        <td className="px-6 py-4 text-xs font-medium text-white">85 kg</td>
-                        <td className="px-6 py-4">
-                          <span className="inline-flex items-center gap-1.5 rounded-full bg-yellow-500/10 px-2 py-0.5 text-[10px] font-bold text-yellow-500 border border-yellow-500/20">
-                            <span className="h-1.5 w-1.5 rounded-full bg-yellow-500 animate-pulse"></span>
-                            Processing
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 text-right">
-                          <button className="text-slate-600 cursor-not-allowed p-1">
-                            <span className="material-symbols-outlined text-[20px]">visibility_off</span>
-                          </button>
-                          <button className="text-slate-600 cursor-not-allowed p-1 ml-2">
-                            <span className="material-symbols-outlined text-[20px]">download</span>
-                          </button>
-                        </td>
-                      </tr>
-                      <tr className="group hover:bg-slate-800/40 transition-colors">
-                        <td className="px-6 py-4">
-                          <div className="flex items-center gap-3">
-                            <div className="h-8 w-8 rounded-lg bg-[#4ade80]/10 flex items-center justify-center text-[#4ade80]">
-                              <span className="material-symbols-outlined text-[18px]">recycling</span>
-                            </div>
-                            <div>
-                              <p className="text-sm font-semibold text-white">Batch Recycling</p>
-                              <p className="text-[10px] text-[#94a3b8] font-mono">CRT-2024-002</p>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 text-xs text-[#94a3b8]">Apr 30, 2024</td>
-                        <td className="px-6 py-4 text-xs font-medium text-white">1,200 kg</td>
-                        <td className="px-6 py-4">
-                          <span className="inline-flex items-center gap-1.5 rounded-full bg-[#4ade80]/10 px-2 py-0.5 text-[10px] font-bold text-[#4ade80] border border-[#4ade80]/20">
-                            <span className="h-1.5 w-1.5 rounded-full bg-[#4ade80]"></span>
-                            Verified
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 text-right">
-                          <button className="text-[#94a3b8] hover:text-white transition-colors p-1">
-                            <span className="material-symbols-outlined text-[20px]">visibility</span>
-                          </button>
-                          <button className="text-[#94a3b8] hover:text-[#4ade80] transition-colors p-1 ml-2">
-                            <span className="material-symbols-outlined text-[20px]">download</span>
-                          </button>
-                        </td>
-                      </tr>
-                      <tr className="group hover:bg-slate-800/40 transition-colors">
-                        <td className="px-6 py-4">
-                          <div className="flex items-center gap-3">
-                            <div className="h-8 w-8 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-400">
-                              <span className="material-symbols-outlined text-[18px]">devices_other</span>
-                            </div>
-                            <div>
-                              <p className="text-sm font-semibold text-white">IT Asset Disposition</p>
-                              <p className="text-[10px] text-[#94a3b8] font-mono">ITAD-2024-041</p>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 text-xs text-[#94a3b8]">Apr 22, 2024</td>
-                        <td className="px-6 py-4 text-xs font-medium text-white">65 Units</td>
-                        <td className="px-6 py-4">
-                          <span className="inline-flex items-center gap-1.5 rounded-full bg-[#4ade80]/10 px-2 py-0.5 text-[10px] font-bold text-[#4ade80] border border-[#4ade80]/20">
-                            <span className="h-1.5 w-1.5 rounded-full bg-[#4ade80]"></span>
-                            Verified
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 text-right">
-                          <button className="text-[#94a3b8] hover:text-white transition-colors p-1">
-                            <span className="material-symbols-outlined text-[20px]">visibility</span>
-                          </button>
-                          <button className="text-[#94a3b8] hover:text-[#4ade80] transition-colors p-1 ml-2">
-                            <span className="material-symbols-outlined text-[20px]">download</span>
-                          </button>
-                        </td>
-                      </tr>
-                      <tr className="group hover:bg-slate-800/40 transition-colors">
-                        <td className="px-6 py-4">
-                          <div className="flex items-center gap-3">
-                            <div className="h-8 w-8 rounded-lg bg-slate-700/50 flex items-center justify-center text-slate-400">
-                              <span className="material-symbols-outlined text-[18px]">archive</span>
-                            </div>
-                            <div>
-                              <p className="text-sm font-semibold text-slate-400">Logistics Manifest</p>
-                              <p className="text-[10px] text-slate-500 font-mono">LOG-2023-998</p>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 text-xs text-slate-500">Dec 12, 2023</td>
-                        <td className="px-6 py-4 text-xs font-medium text-slate-500">--</td>
-                        <td className="px-6 py-4">
-                          <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-700/20 px-2 py-0.5 text-[10px] font-bold text-slate-500 border border-slate-600/20">
-                            Archived
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 text-right">
-                          <button className="text-[#94a3b8] hover:text-white transition-colors p-1">
-                            <span className="material-symbols-outlined text-[20px]">visibility</span>
-                          </button>
-                          <button className="text-[#94a3b8] hover:text-[#4ade80] transition-colors p-1 ml-2">
-                            <span className="material-symbols-outlined text-[20px]">download</span>
-                          </button>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-                <div className="p-4 border-t border-slate-800 bg-slate-900/30 flex justify-between items-center text-xs text-[#94a3b8]">
-                  <span>Showing 1-6 of 142 records</span>
-                  <div className="flex gap-2">
-                    <button className="px-3 py-1 rounded bg-slate-800 border border-slate-700 hover:text-white disabled:opacity-50">Prev</button>
-                    <button className="px-3 py-1 rounded bg-slate-800 border border-slate-700 hover:text-white">Next</button>
-                  </div>
-                </div>
+                <button onClick={() => setSelectedCertificate(null)} className="p-2 rounded-lg hover:bg-white/10 transition-colors text-gray-400 hover:text-white">
+                  <span className="material-symbols-outlined">close</span>
+                </button>
               </div>
-
-              {/* Sidebar Section */}
-              <div className="flex flex-col gap-6">
-                <div className="rounded-2xl bg-[#1e293b] border border-slate-800 p-6">
-                  <h3 className="text-base font-bold text-white mb-4">Compliance Documents</h3>
-                  <div className="space-y-4">
-                    <div className="flex items-start gap-3 p-3 rounded-xl bg-slate-900 border border-slate-800 hover:border-slate-700 transition-colors">
-                      <div className="h-10 w-10 shrink-0 bg-white rounded flex items-center justify-center p-1">
-                        <span className="text-[10px] font-black text-slate-900 leading-none text-center">ISO<br/>14001</span>
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-white">ISO 14001:2015</p>
-                        <p className="text-[10px] text-[#94a3b8]">Environmental Management</p>
-                        <p className="text-[10px] text-[#4ade80] mt-1">Valid until: Dec 2025</p>
-                      </div>
-                      <button className="text-[#94a3b8] hover:text-[#4ade80]">
-                        <span className="material-symbols-outlined text-[20px]">download</span>
-                      </button>
-                    </div>
-                    <div className="flex items-start gap-3 p-3 rounded-xl bg-slate-900 border border-slate-800 hover:border-slate-700 transition-colors">
-                      <div className="h-10 w-10 shrink-0 bg-white rounded flex items-center justify-center p-1">
-                        <span className="text-[10px] font-black text-slate-900 leading-none text-center">R2<br/>v3</span>
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-white">R2v3 Standard</p>
-                        <p className="text-[10px] text-[#94a3b8]">Responsible Recycling</p>
-                        <p className="text-[10px] text-[#4ade80] mt-1">Valid until: Mar 2026</p>
-                      </div>
-                      <button className="text-[#94a3b8] hover:text-[#4ade80]">
-                        <span className="material-symbols-outlined text-[20px]">download</span>
-                      </button>
-                    </div>
-                    <div className="flex items-start gap-3 p-3 rounded-xl bg-slate-900 border border-slate-800 hover:border-slate-700 transition-colors">
-                      <div className="h-10 w-10 shrink-0 bg-slate-800 rounded flex items-center justify-center text-white">
-                        <span className="material-symbols-outlined">policy</span>
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-white">EHS Policy</p>
-                        <p className="text-[10px] text-[#94a3b8]">Internal Safety Standards</p>
-                        <p className="text-[10px] text-[#94a3b8] mt-1">Updated: Jan 2024</p>
-                      </div>
-                      <button className="text-[#94a3b8] hover:text-[#4ade80]">
-                        <span className="material-symbols-outlined text-[20px]">download</span>
-                      </button>
-                    </div>
+              
+              {/* Certificate Content */}
+              <div className="p-8">
+                <div className="text-center mb-8">
+                  <div className="inline-block p-4 bg-[#10b981]/10 rounded-full mb-4">
+                    <span className="material-symbols-outlined text-[#10b981] text-5xl">workspace_premium</span>
+                  </div>
+                  <h2 className="text-2xl font-black text-white mb-2">E-Waste Disposal Certificate</h2>
+                  <p className="text-gray-500">Proper Disposal Verification</p>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-6 mb-8">
+                  <div className="bg-white/5 rounded-xl p-4">
+                    <p className="text-gray-500 text-sm mb-1">Date of Disposal</p>
+                    <p className="text-white font-semibold">
+                      {new Date(selectedCertificate.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+                    </p>
+                  </div>
+                  <div className="bg-white/5 rounded-xl p-4">
+                    <p className="text-gray-500 text-sm mb-1">E-Waste Type</p>
+                    <p className="text-white font-semibold">{selectedCertificate.ewasteType}</p>
+                  </div>
+                  <div className="bg-white/5 rounded-xl p-4">
+                    <p className="text-gray-500 text-sm mb-1">Weight Disposed</p>
+                    <p className="text-white font-semibold">{selectedCertificate.weight}</p>
+                  </div>
+                  <div className="bg-white/5 rounded-xl p-4">
+                    <p className="text-gray-500 text-sm mb-1">Recycling Agency</p>
+                    <p className="text-white font-semibold">{selectedCertificate.agency}</p>
                   </div>
                 </div>
                 
-                <div className="rounded-2xl bg-gradient-to-b from-[#1e293b] to-slate-900 border border-slate-800 p-6 flex-1">
-                  <div className="flex justify-between items-center mb-4">
-                    <h3 className="text-base font-bold text-white">Annual Reports</h3>
-                    <button className="text-xs text-[#4ade80] hover:underline">View Archive</button>
-                  </div>
-                  <div className="space-y-3">
-                    <div className="group flex items-center justify-between p-3 rounded-xl border border-dashed border-slate-700 hover:border-[#4ade80]/50 hover:bg-slate-800/50 transition-all cursor-pointer">
-                      <div className="flex items-center gap-3">
-                        <span className="material-symbols-outlined text-[#94a3b8] group-hover:text-[#4ade80] transition-colors">folder_zip</span>
-                        <div>
-                          <p className="text-sm font-medium text-white">2023 Sustainability</p>
-                          <p className="text-[10px] text-[#94a3b8]">Full Audit Report • PDF</p>
-                        </div>
-                      </div>
-                      <span className="material-symbols-outlined text-[#94a3b8] text-[18px]">arrow_forward</span>
-                    </div>
-                    <div className="group flex items-center justify-between p-3 rounded-xl border border-dashed border-slate-700 hover:border-[#4ade80]/50 hover:bg-slate-800/50 transition-all cursor-pointer">
-                      <div className="flex items-center gap-3">
-                        <span className="material-symbols-outlined text-[#94a3b8] group-hover:text-[#4ade80] transition-colors">folder_zip</span>
-                        <div>
-                          <p className="text-sm font-medium text-white">2022 Sustainability</p>
-                          <p className="text-[10px] text-[#94a3b8]">Full Audit Report • PDF</p>
-                        </div>
-                      </div>
-                      <span className="material-symbols-outlined text-[#94a3b8] text-[18px]">arrow_forward</span>
-                    </div>
-                  </div>
-                  <div className="mt-6 pt-6 border-t border-slate-800">
-                    <h4 className="text-xs font-bold text-[#94a3b8] uppercase mb-3">Verification Tool</h4>
-                    <div className="flex gap-2">
-                      <input className="flex-1 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white px-3 py-2 focus:ring-1 focus:ring-[#4ade80] focus:border-[#4ade80]" placeholder="Enter Code" type="text"/>
-                      <button className="bg-[#4ade80] text-slate-900 text-xs font-bold px-3 py-2 rounded-lg hover:bg-[#4ade80]/90 transition-colors">Check</button>
-                    </div>
-                    <p className="text-[10px] text-[#94a3b8] mt-2">Instantly verify the authenticity of a physical certificate.</p>
-                  </div>
+                <div className="flex gap-4">
+                  {selectedCertificate.status === 'verified' && (
+                    <button className="flex-1 bg-[#10b981] text-white px-6 py-3 rounded-xl font-bold hover:bg-[#059669] transition-colors flex items-center justify-center gap-2">
+                      <span className="material-symbols-outlined">download</span>
+                      Download PDF
+                    </button>
+                  )}
+                  <button 
+                    onClick={() => setSelectedCertificate(null)}
+                    className="flex-1 bg-white/10 text-white px-6 py-3 rounded-xl font-bold hover:bg-white/20 transition-colors"
+                  >
+                    Close
+                  </button>
                 </div>
               </div>
             </div>
           </div>
-        </main>
+        )}
       </div>
-    </div>
+    </Layout>
   );
 };
 

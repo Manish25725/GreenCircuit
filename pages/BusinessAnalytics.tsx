@@ -1,407 +1,374 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import Layout from '../components/Layout';
+import { getCurrentUser } from '../services/api';
+
+interface AnalyticsData {
+  summary: {
+    totalWasteProcessed: number;
+    co2Saved: number;
+    treesEquivalent: number;
+    totalBookings: number;
+    complianceScore: number;
+  };
+  wasteByCategory: Array<{ _id: string; totalWeight: number; count: number }>;
+  monthlyTrends: Array<{ _id: string; totalWeight: number; bookings: number; co2Saved: number }>;
+}
 
 const BusinessAnalytics = () => {
+  const user = getCurrentUser();
+  const [timeRange, setTimeRange] = useState('30d');
+  const [loading, setLoading] = useState(true);
+  const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    window.location.hash = '#/login';
+  };
+
+  useEffect(() => {
+    fetchAnalytics();
+  }, [timeRange]);
+
+  const fetchAnalytics = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`http://localhost:3001/api/business/analytics?period=${timeRange}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json();
+      if (data.success) {
+        setAnalytics(data.data);
+      }
+    } catch (error) {
+      console.error('Error fetching analytics:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Mock/fallback data for charts
+  const monthlyData = analytics?.monthlyTrends?.length ? analytics.monthlyTrends.map(t => ({
+    month: t._id.split('-')[1],
+    disposed: t.totalWeight,
+    target: 200
+  })) : [
+    { month: 'Jul', disposed: 180, target: 200 },
+    { month: 'Aug', disposed: 220, target: 200 },
+    { month: 'Sep', disposed: 195, target: 200 },
+    { month: 'Oct', disposed: 280, target: 200 },
+    { month: 'Nov', disposed: 310, target: 200 },
+    { month: 'Dec', disposed: 245, target: 200 },
+  ];
+
+  const categoryColors: Record<string, string> = {
+    'IT Equipment': '#06b6d4',
+    'Batteries': '#f59e0b',
+    'Monitors': '#8b5cf6',
+    'Cables': '#10b981',
+    'Mobile Devices': '#ec4899',
+    'Other': '#64748b'
+  };
+
+  const totalCategoryWeight = analytics?.wasteByCategory?.reduce((sum, c) => sum + c.totalWeight, 0) || 100;
+  const categoryData = analytics?.wasteByCategory?.length ? analytics.wasteByCategory.map(c => ({
+    name: c._id || 'Other',
+    value: Math.round((c.totalWeight / totalCategoryWeight) * 100),
+    color: categoryColors[c._id] || '#64748b'
+  })) : [
+    { name: 'IT Equipment', value: 45, color: '#06b6d4' },
+    { name: 'Batteries', value: 20, color: '#f59e0b' },
+    { name: 'Monitors', value: 15, color: '#8b5cf6' },
+    { name: 'Cables', value: 12, color: '#10b981' },
+    { name: 'Other', value: 8, color: '#64748b' },
+  ];
+
+  const recentActivity = [
+    { action: 'Disposal Completed', detail: '450 kg IT Equipment', time: '2 hours ago', icon: 'check_circle', color: 'text-[#06b6d4]' },
+    { action: 'Certificate Issued', detail: 'CRT-2025-142', time: '5 hours ago', icon: 'verified', color: 'text-[#10b981]' },
+    { action: 'New Pickup Scheduled', detail: 'Server Room B', time: 'Yesterday', icon: 'local_shipping', color: 'text-[#8b5cf6]' },
+    { action: 'Inventory Updated', detail: '+25 Laptops added', time: '2 days ago', icon: 'inventory_2', color: 'text-amber-400' },
+  ];
+
+  const maxValue = Math.max(...monthlyData.map(d => d.disposed), 1);
+  
+  // Use API data or defaults
+  const totalDisposed = analytics?.summary?.totalWasteProcessed || 1430;
+  const co2Saved = analytics?.summary?.co2Saved || 3575;
+  const recyclingRate = analytics?.summary?.complianceScore || 94.2;
+  const costSavings = Math.round(totalDisposed * 15); // ₹15 per kg estimate
+
   return (
-    <div className="flex h-screen overflow-hidden bg-[#0f172a] font-sans text-[#f8fafc] selection:bg-[#4ade80] selection:text-slate-900">
-      {/* Sidebar */}
-      <aside className="hidden w-20 flex-col items-center border-r border-slate-800 bg-[#0f172a] py-6 lg:flex z-50 transition-all hover:w-64 group fixed inset-y-0 left-0">
-        <div className="flex h-full w-full flex-col justify-between px-4">
-          <div className="flex flex-col gap-8 w-full">
-            <div className="flex items-center gap-4 px-2 overflow-hidden whitespace-nowrap cursor-pointer" onClick={() => window.location.hash = '#/'}>
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#4ade80] to-[#22c55e] text-slate-900 shadow-[0_0_20px_rgba(74,222,128,0.15)]">
-                <span className="material-symbols-outlined !text-[24px] font-bold">recycling</span>
-              </div>
-              <div className="flex flex-col opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                <h1 className="text-lg font-bold tracking-tight">EcoCycle</h1>
-                <p className="text-xs text-[#94a3b8] font-medium">Business</p>
-              </div>
-            </div>
-            <nav className="flex flex-col gap-2 w-full">
-              <a onClick={() => window.location.hash = '#/business'} className="flex items-center gap-4 rounded-xl px-3 py-3 text-[#94a3b8] hover:bg-slate-800 hover:text-white transition-colors cursor-pointer">
-                <span className="material-symbols-outlined shrink-0">dashboard</span>
-                <span className="text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">Dashboard</span>
-              </a>
-              <a onClick={() => window.location.hash = '#/business/inventory'} className="flex items-center gap-4 rounded-xl px-3 py-3 text-[#94a3b8] hover:bg-slate-800 hover:text-white transition-colors cursor-pointer">
-                <span className="material-symbols-outlined shrink-0">inventory_2</span>
-                <span className="text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">Inventory</span>
-              </a>
-              <a onClick={() => window.location.hash = '#/business/certificates'} className="flex items-center gap-4 rounded-xl px-3 py-3 text-[#94a3b8] hover:bg-slate-800 hover:text-white transition-colors cursor-pointer">
-                <span className="material-symbols-outlined shrink-0">verified</span>
-                <span className="text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">Certificates</span>
-              </a>
-              <a className="flex items-center gap-4 rounded-xl px-3 py-3 text-[#94a3b8] hover:bg-slate-800 hover:text-white transition-colors cursor-pointer">
-                <span className="material-symbols-outlined shrink-0">local_shipping</span>
-                <span className="text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">Logistics</span>
-              </a>
-              <a onClick={() => window.location.hash = '#/business/analytics'} className="flex items-center gap-4 rounded-xl bg-[#4ade80]/10 px-3 py-3 text-[#4ade80] transition-all group-hover:bg-[#4ade80]/20 cursor-pointer">
-                <span className="material-symbols-outlined shrink-0 fill">analytics</span>
-                <span className="text-sm font-semibold opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">Analytics</span>
-              </a>
-            </nav>
-          </div>
-          <div className="flex items-center gap-4 rounded-xl border border-slate-800 bg-slate-900/50 p-2 overflow-hidden whitespace-nowrap mt-auto">
-            <div className="h-8 w-8 shrink-0 overflow-hidden rounded-full bg-slate-700 bg-center bg-cover border border-slate-600" style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuBLrR2QWFrZdhqlqnql_lDYbtkDCvQ32yk6hvVJTlee4Tx6Uh5Iw5cR16GiYtu3xQ9yK7tqguuIvnhVDy9ONcnQtHZJbvop2WX6V2aW6YfTHzR_k-HTTOql1kt6uYcgYi_Es2Tc4xGWRzePR50VKumirJYQgVVCecYOYE7QOjWFnEANpFSY14v-gw9mefiqPUaoKbO_mSmHt2v3p4NTP-DeUr2DjUUJwQTJCiR22EH42tLk2N7SoQ8k0RyQ0dzHycBltvqpZQOGWMY')" }}></div>
-            <div className="flex flex-col opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-              <p className="text-sm font-bold text-white">James W.</p>
-              <p className="text-[10px] text-[#94a3b8]">TechCorp HQ</p>
-            </div>
-          </div>
-        </div>
-      </aside>
-
-      <div className="flex flex-1 flex-col h-full overflow-hidden relative ml-0 lg:ml-20 transition-all">
-        {/* Header */}
-        <header className="flex h-16 w-full items-center justify-between bg-[#0f172a]/80 backdrop-blur-md px-6 lg:px-8 z-40 sticky top-0 border-b border-slate-800">
-          <div className="flex items-center gap-4 lg:hidden">
-            <button className="text-[#94a3b8] hover:text-white">
-              <span className="material-symbols-outlined">menu</span>
-            </button>
-            <span className="text-lg font-bold text-white">EcoCycle</span>
-          </div>
-          <div className="hidden lg:flex flex-col">
-            <h2 className="text-lg font-bold text-white leading-tight">Analytics & Reports</h2>
-            <p className="text-xs text-[#94a3b8]">Sustainability insights for TechCorp Solutions</p>
-          </div>
-          <div className="flex items-center gap-4">
-            <div className="hidden md:flex items-center gap-2 rounded-full bg-slate-800/50 px-4 py-1.5 border border-slate-700">
-              <span className="material-symbols-outlined text-[#94a3b8] text-[18px]">search</span>
-              <input className="bg-transparent border-none text-xs focus:ring-0 placeholder-[#94a3b8] w-48 text-white p-0 focus:outline-none" placeholder="Search reports, metrics..." type="text"/>
-            </div>
-            <button className="relative flex h-9 w-9 items-center justify-center rounded-full bg-slate-800 text-[#94a3b8] hover:bg-slate-700 hover:text-white transition-colors border border-slate-700">
-              <span className="material-symbols-outlined text-[20px]">notifications</span>
-              <span className="absolute top-0 right-0 h-2.5 w-2.5 rounded-full bg-[#4ade80] border-2 border-[#0f172a]"></span>
-            </button>
-            <div className="h-9 w-9 overflow-hidden rounded-full bg-slate-700 bg-center bg-cover border border-slate-600 lg:hidden" style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuBLrR2QWFrZdhqlqnql_lDYbtkDCvQ32yk6hvVJTlee4Tx6Uh5Iw5cR16GiYtu3xQ9yK7tqguuIvnhVDy9ONcnQtHZJbvop2WX6V2aW6YfTHzR_k-HTTOql1kt6uYcgYi_Es2Tc4xGWRzePR50VKumirJYQgVVCecYOYE7QOjWFnEANpFSY14v-gw9mefiqPUaoKbO_mSmHt2v3p4NTP-DeUr2DjUUJwQTJCiR22EH42tLk2N7SoQ8k0RyQ0dzHycBltvqpZQOGWMY')" }}></div>
-          </div>
-        </header>
-
-        {/* Main Content */}
-        <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
-          <div className="mx-auto max-w-7xl flex flex-col gap-6">
-            
-            {/* Top Bar */}
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-              <div>
-                <h3 className="text-xl font-bold text-white">Performance Overview</h3>
-                <p className="text-sm text-[#94a3b8]">Track your environmental impact and operational efficiency.</p>
-              </div>
-              <div className="flex flex-wrap items-center gap-3">
-                <div className="relative group">
-                  <select className="appearance-none bg-slate-900 border border-slate-700 text-white text-xs rounded-xl px-4 py-2.5 pr-8 focus:ring-1 focus:ring-[#4ade80] focus:border-[#4ade80] cursor-pointer hover:border-slate-600 transition-colors outline-none">
-                    <option>Last 30 Days</option>
-                    <option>Last Quarter</option>
-                    <option>Year to Date</option>
-                    <option>Custom Range</option>
-                  </select>
-                  <span className="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-[#94a3b8] text-[16px] pointer-events-none">calendar_today</span>
+    <Layout title="" role="Business" fullWidth hideSidebar>
+      <div className="bg-[#0B1116] font-sans text-gray-200 antialiased selection:bg-[#06b6d4] selection:text-white min-h-screen">
+        <div className="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden">
+          <div className="fixed top-0 left-0 w-full h-[500px] bg-amber-500/5 rounded-full blur-[120px] -translate-y-1/2 pointer-events-none"></div>
+          <div className="fixed bottom-0 right-0 w-full h-[500px] bg-[#06b6d4]/5 rounded-full blur-[120px] translate-y-1/2 pointer-events-none"></div>
+          
+          <div className="layout-container flex h-full grow flex-col relative z-10">
+            {/* Header */}
+            <header className="flex items-center justify-between whitespace-nowrap border-b border-white/5 px-4 sm:px-6 lg:px-10 py-4 bg-[#0B1116]/80 backdrop-blur-md fixed top-0 left-0 right-0 z-50">
+              <div className="flex items-center gap-3 text-white cursor-pointer" onClick={() => window.location.hash = '#/'}>
+                <div className="p-2 bg-[#06b6d4]/10 rounded-lg">
+                  <svg className="h-6 w-6 text-[#06b6d4]" fill="currentColor" viewBox="0 0 48 48">
+                    <path d="M42.4379 44C42.4379 44 36.0744 33.9038 41.1692 24C46.8624 12.9336 42.2078 4 42.2078 4L7.01134 4C7.01134 4 11.6577 12.932 5.96912 23.9969C0.876273 33.9029 7.27094 44 7.27094 44L42.4379 44Z"></path>
+                  </svg>
                 </div>
-                <div className="relative group">
-                  <select className="appearance-none bg-slate-900 border border-slate-700 text-white text-xs rounded-xl px-4 py-2.5 pr-8 focus:ring-1 focus:ring-[#4ade80] focus:border-[#4ade80] cursor-pointer hover:border-slate-600 transition-colors outline-none">
-                    <option>All Categories</option>
-                    <option>IT Equipment</option>
-                    <option>Batteries</option>
-                    <option>Cables & Wiring</option>
-                  </select>
-                  <span className="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-[#94a3b8] text-[16px] pointer-events-none">filter_list</span>
-                </div>
-                <button className="flex items-center gap-2 bg-[#4ade80] text-slate-900 px-4 py-2.5 rounded-xl text-xs font-bold hover:bg-[#4ade80]/90 transition-all shadow-[0_0_20px_rgba(74,222,128,0.15)]">
-                  <span className="material-symbols-outlined text-[16px]">download</span>
-                  Export Report
+                <h2 className="text-xl font-bold tracking-tight text-white">EcoCycle <span className="text-[#06b6d4]">Business</span></h2>
+              </div>
+              <nav className="hidden md:flex flex-1 justify-center gap-1">
+              </nav>
+              <div className="flex items-center gap-4">
+                <button 
+                  onClick={() => window.location.hash = '#/profile'}
+                  className="hidden sm:flex items-center gap-3 pl-1 pr-4 py-1 rounded-full bg-[#151F26] border border-white/5 hover:bg-white/5 transition-colors group cursor-pointer"
+                >
+                  <div className="size-8 rounded-full bg-[#06b6d4] flex items-center justify-center ring-2 ring-white/10 group-hover:ring-[#06b6d4]/50 transition-all text-white font-bold text-sm">
+                    {user?.name?.charAt(0) || 'B'}
+                  </div>
+                  <span className="text-sm font-medium text-gray-200">{user?.name || 'Business'}</span>
+                </button>
+                <button onClick={handleLogout} className="p-2.5 rounded-full bg-[#151F26] border border-white/5 text-gray-400 hover:text-red-400 hover:bg-red-500/10 transition-colors" title="Logout">
+                  <span className="material-symbols-outlined text-[20px]">logout</span>
                 </button>
               </div>
-            </div>
+            </header>
 
-            {/* Stats Grid */}
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
-              <div className="rounded-2xl bg-[#1e293b] border border-slate-800 p-5 relative overflow-hidden group">
-                <div className="flex justify-between items-start z-10 relative">
+            <main className="flex flex-1 justify-center py-5 mt-24">
+              <div className="layout-content-container flex flex-col w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+                
+                {/* Page Header */}
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 py-8">
                   <div>
-                    <p className="text-xs font-medium text-[#94a3b8] mb-1">Total E-Waste Collected</p>
-                    <h3 className="text-2xl font-bold text-white">12,450 <span className="text-sm font-normal text-[#94a3b8]">kg</span></h3>
+                    <div className="flex items-center gap-2 mb-2">
+                      <button onClick={() => window.location.hash = '#/business'} className="text-[#94a3b8] hover:text-white transition-colors">
+                        <span className="material-symbols-outlined text-lg">arrow_back</span>
+                      </button>
+                      <p className="text-amber-400 text-sm font-bold uppercase tracking-widest">Analytics & Reports</p>
+                    </div>
+                    <h1 className="text-white text-3xl sm:text-4xl font-black leading-tight tracking-tighter mb-2">Business Analytics</h1>
+                    <p className="text-[#94a3b8] text-base">Track your environmental impact and disposal metrics.</p>
                   </div>
-                  <div className="h-8 w-8 rounded-lg bg-[#4ade80]/10 flex items-center justify-center text-[#4ade80]">
-                    <span className="material-symbols-outlined text-[20px]">scale</span>
+                  <div className="flex items-center gap-3">
+                    <select 
+                      value={timeRange}
+                      onChange={(e) => setTimeRange(e.target.value)}
+                      className="bg-[#151F26] border border-white/10 text-white text-sm rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-[#06b6d4]/50 focus:border-[#06b6d4] outline-none cursor-pointer"
+                    >
+                      <option value="7d">Last 7 Days</option>
+                      <option value="30d">Last 30 Days</option>
+                      <option value="90d">Last Quarter</option>
+                      <option value="1y">This Year</option>
+                    </select>
+                    <button className="bg-[#06b6d4] text-white px-5 py-2.5 rounded-xl font-bold text-sm hover:bg-[#0891b2] transition-colors flex items-center gap-2">
+                      <span className="material-symbols-outlined text-lg">download</span>
+                      Export
+                    </button>
                   </div>
                 </div>
-                <div className="mt-4 flex items-center gap-2 text-xs font-medium z-10 relative">
-                  <span className="text-[#4ade80] flex items-center gap-1 bg-[#4ade80]/10 px-1.5 py-0.5 rounded">
-                    <span className="material-symbols-outlined text-[12px]">trending_up</span>
-                    12%
-                  </span>
-                  <span className="text-[#94a3b8]">vs last period</span>
-                </div>
-                <div className="absolute -right-4 -bottom-4 h-24 w-24 rounded-full bg-[#4ade80]/5 blur-2xl group-hover:bg-[#4ade80]/10 transition-all"></div>
-              </div>
-              
-              <div className="rounded-2xl bg-[#1e293b] border border-slate-800 p-5 relative overflow-hidden group">
-                <div className="flex justify-between items-start z-10 relative">
-                  <div>
-                    <p className="text-xs font-medium text-[#94a3b8] mb-1">CO₂ Emissions Saved</p>
-                    <h3 className="text-2xl font-bold text-white">8,320 <span className="text-sm font-normal text-[#94a3b8]">kg</span></h3>
-                  </div>
-                  <div className="h-8 w-8 rounded-lg bg-[#38bdf8]/10 flex items-center justify-center text-[#38bdf8]">
-                    <span className="material-symbols-outlined text-[20px]">co2</span>
-                  </div>
-                </div>
-                <div className="mt-4 flex items-center gap-2 text-xs font-medium z-10 relative">
-                  <span className="text-[#38bdf8] flex items-center gap-1 bg-[#38bdf8]/10 px-1.5 py-0.5 rounded">
-                    <span className="material-symbols-outlined text-[12px]">forest</span>
-                    Equiv. 412 Trees
-                  </span>
-                </div>
-                <div className="absolute -right-4 -bottom-4 h-24 w-24 rounded-full bg-[#38bdf8]/5 blur-2xl group-hover:bg-[#38bdf8]/10 transition-all"></div>
-              </div>
 
-              <div className="rounded-2xl bg-[#1e293b] border border-slate-800 p-5 relative overflow-hidden group">
-                <div className="flex justify-between items-start z-10 relative">
-                  <div>
-                    <p className="text-xs font-medium text-[#94a3b8] mb-1">Recycling Rate</p>
-                    <h3 className="text-2xl font-bold text-white">94.2 <span className="text-sm font-normal text-[#94a3b8]">%</span></h3>
+                {/* Key Metrics */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                  <div className="bg-[#151F26] rounded-2xl p-6 border border-white/5 relative overflow-hidden group hover:border-[#06b6d4]/20 transition-all">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-[#06b6d4]/10 rounded-full blur-[60px] -translate-y-1/2 translate-x-1/2"></div>
+                    <div className="flex items-center justify-between mb-4 relative z-10">
+                      <div className="p-3 bg-[#06b6d4]/10 rounded-xl text-[#06b6d4]">
+                        <span className="material-symbols-outlined">scale</span>
+                      </div>
+                      <span className="text-xs font-bold text-[#06b6d4] bg-[#06b6d4]/10 px-2 py-1 rounded-full flex items-center gap-1">
+                        <span className="material-symbols-outlined text-xs">trending_up</span>
+                        +12%
+                      </span>
+                    </div>
+                    <h3 className="text-3xl font-black text-white relative z-10">{totalDisposed.toLocaleString()} <span className="text-lg font-medium text-gray-500">kg</span></h3>
+                    <p className="text-sm text-[#94a3b8] relative z-10">Total Disposed</p>
                   </div>
-                  <div className="h-8 w-8 rounded-lg bg-[#a855f7]/10 flex items-center justify-center text-[#a855f7]">
-                    <span className="material-symbols-outlined text-[20px]">recycling</span>
+                  
+                  <div className="bg-[#151F26] rounded-2xl p-6 border border-white/5 relative overflow-hidden group hover:border-[#10b981]/20 transition-all">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-[#10b981]/10 rounded-full blur-[60px] -translate-y-1/2 translate-x-1/2"></div>
+                    <div className="flex items-center justify-between mb-4 relative z-10">
+                      <div className="p-3 bg-[#10b981]/10 rounded-xl text-[#10b981]">
+                        <span className="material-symbols-outlined">forest</span>
+                      </div>
+                      <span className="text-xs font-bold text-[#10b981] bg-[#10b981]/10 px-2 py-1 rounded-full">Offset</span>
+                    </div>
+                    <h3 className="text-3xl font-black text-white relative z-10">{Math.round(co2Saved).toLocaleString()} <span className="text-lg font-medium text-gray-500">kg</span></h3>
+                    <p className="text-sm text-[#94a3b8] relative z-10">CO₂ Saved</p>
+                  </div>
+                  
+                  <div className="bg-[#151F26] rounded-2xl p-6 border border-white/5 relative overflow-hidden group hover:border-[#8b5cf6]/20 transition-all">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-[#8b5cf6]/10 rounded-full blur-[60px] -translate-y-1/2 translate-x-1/2"></div>
+                    <div className="flex items-center justify-between mb-4 relative z-10">
+                      <div className="p-3 bg-[#8b5cf6]/10 rounded-xl text-[#8b5cf6]">
+                        <span className="material-symbols-outlined">recycling</span>
+                      </div>
+                      <span className="text-xs font-bold text-[#8b5cf6] bg-[#8b5cf6]/10 px-2 py-1 rounded-full">Rate</span>
+                    </div>
+                    <h3 className="text-3xl font-black text-white relative z-10">{recyclingRate.toFixed(1)} <span className="text-lg font-medium text-gray-500">%</span></h3>
+                    <p className="text-sm text-[#94a3b8] relative z-10">Recycling Rate</p>
+                  </div>
+                  
+                  <div className="bg-[#151F26] rounded-2xl p-6 border border-white/5 relative overflow-hidden group hover:border-amber-500/20 transition-all">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/10 rounded-full blur-[60px] -translate-y-1/2 translate-x-1/2"></div>
+                    <div className="flex items-center justify-between mb-4 relative z-10">
+                      <div className="p-3 bg-amber-500/10 rounded-xl text-amber-400">
+                        <span className="material-symbols-outlined">savings</span>
+                      </div>
+                      <span className="text-xs font-bold text-amber-400 bg-amber-500/10 px-2 py-1 rounded-full">Savings</span>
+                    </div>
+                    <h3 className="text-3xl font-black text-white relative z-10">₹{costSavings.toLocaleString()}</h3>
+                    <p className="text-sm text-[#94a3b8] relative z-10">Cost Savings</p>
                   </div>
                 </div>
-                <div className="mt-4 flex items-center gap-2 text-xs font-medium z-10 relative">
-                  <span className="text-[#a855f7] flex items-center gap-1 bg-[#a855f7]/10 px-1.5 py-0.5 rounded">
-                    <span className="material-symbols-outlined text-[12px]">verified</span>
-                    Certified
-                  </span>
-                  <span className="text-[#94a3b8]">Zero Landfill Goal</span>
-                </div>
-                <div className="absolute -right-4 -bottom-4 h-24 w-24 rounded-full bg-[#a855f7]/5 blur-2xl group-hover:bg-[#a855f7]/10 transition-all"></div>
-              </div>
 
-              <div className="rounded-2xl bg-[#1e293b] border border-slate-800 p-5 relative overflow-hidden group">
-                <div className="flex justify-between items-start z-10 relative">
-                  <div>
-                    <p className="text-xs font-medium text-[#94a3b8] mb-1">Sustainability Score</p>
-                    <h3 className="text-2xl font-bold text-white">A+ <span className="text-sm font-normal text-[#94a3b8]">Rank</span></h3>
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+                  {/* Disposal Trends Chart */}
+                  <div className="lg:col-span-2 bg-[#151F26] rounded-2xl p-6 border border-white/5">
+                    <div className="flex items-center justify-between mb-6">
+                      <div>
+                        <h3 className="text-lg font-bold text-white">Disposal Trends</h3>
+                        <p className="text-sm text-gray-500">Monthly e-waste disposal vs target</p>
+                      </div>
+                      <div className="flex items-center gap-4 text-xs">
+                        <div className="flex items-center gap-2">
+                          <div className="w-3 h-3 rounded-full bg-[#06b6d4]"></div>
+                          <span className="text-gray-400">Disposed</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div className="w-3 h-3 rounded-full bg-gray-600 border-2 border-dashed border-gray-400"></div>
+                          <span className="text-gray-400">Target</span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Simple Bar Chart */}
+                    <div className="h-64 flex items-end justify-between gap-4 px-4">
+                      {monthlyData.map((data, idx) => (
+                        <div key={idx} className="flex-1 flex flex-col items-center gap-2">
+                          <div className="w-full relative" style={{ height: '200px' }}>
+                            {/* Target line */}
+                            <div 
+                              className="absolute w-full border-t-2 border-dashed border-gray-600"
+                              style={{ bottom: `${(data.target / maxValue) * 100}%` }}
+                            ></div>
+                            {/* Bar */}
+                            <div 
+                              className="absolute bottom-0 w-full bg-gradient-to-t from-[#06b6d4] to-[#06b6d4]/50 rounded-t-lg transition-all hover:from-[#06b6d4] hover:to-[#06b6d4]/70"
+                              style={{ height: `${(data.disposed / maxValue) * 100}%` }}
+                            >
+                              <div className="absolute -top-6 left-1/2 -translate-x-1/2 text-xs font-bold text-white opacity-0 hover:opacity-100 transition-opacity">
+                                {data.disposed}
+                              </div>
+                            </div>
+                          </div>
+                          <span className="text-xs text-gray-500 font-medium">{data.month}</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                  <div className="h-8 w-8 rounded-lg bg-[#fb923c]/10 flex items-center justify-center text-[#fb923c]">
-                    <span className="material-symbols-outlined text-[20px]">trophy</span>
-                  </div>
-                </div>
-                <div className="mt-4 flex items-center gap-2 text-xs font-medium z-10 relative">
-                  <span className="text-[#fb923c] flex items-center gap-1 bg-[#fb923c]/10 px-1.5 py-0.5 rounded">
-                    Top 5% Industry
-                  </span>
-                </div>
-                <div className="absolute -right-4 -bottom-4 h-24 w-24 rounded-full bg-[#fb923c]/5 blur-2xl group-hover:bg-[#fb923c]/10 transition-all"></div>
-              </div>
-            </div>
 
-            {/* Volume Trends Chart */}
-            <div className="rounded-2xl bg-[#1e293b] border border-slate-800 p-6">
-              <div className="flex items-center justify-between mb-8">
-                <div>
-                  <h3 className="text-lg font-bold text-white">Volume Trends</h3>
-                  <p className="text-xs text-[#94a3b8]">Monthly E-Waste Collection (kg)</p>
-                </div>
-                <div className="flex gap-2">
-                  <span className="flex items-center gap-1.5 text-xs text-[#94a3b8]">
-                    <span className="w-2.5 h-2.5 rounded-full bg-[#4ade80]"></span> Collected
-                  </span>
-                  <span className="flex items-center gap-1.5 text-xs text-[#94a3b8]">
-                    <span className="w-2.5 h-2.5 rounded-full bg-slate-700"></span> Projected
-                  </span>
-                </div>
-              </div>
-              <div className="relative h-64 w-full">
-                <div className="absolute inset-0 flex flex-col justify-between pointer-events-none">
-                  <div className="border-t border-dashed border-slate-800 w-full h-px"><span className="absolute -left-8 -top-2 text-[10px] text-slate-600">2000</span></div>
-                  <div className="border-t border-dashed border-slate-800 w-full h-px"><span className="absolute -left-8 -top-2 text-[10px] text-slate-600">1500</span></div>
-                  <div className="border-t border-dashed border-slate-800 w-full h-px"><span className="absolute -left-8 -top-2 text-[10px] text-slate-600">1000</span></div>
-                  <div className="border-t border-dashed border-slate-800 w-full h-px"><span className="absolute -left-8 -top-2 text-[10px] text-slate-600">500</span></div>
-                  <div className="border-t border-dashed border-slate-800 w-full h-px"><span className="absolute -left-8 -top-2 text-[10px] text-slate-600">0</span></div>
-                </div>
-                <div className="flex items-end justify-between h-full pl-2 pr-2 gap-2 relative z-10">
-                  <div className="flex flex-col items-center gap-2 group flex-1">
-                    <div className="w-full max-w-[40px] bg-slate-700 rounded-t-sm h-[30%] group-hover:bg-[#4ade80]/40 transition-all relative">
-                      <div className="absolute opacity-0 group-hover:opacity-100 bottom-full mb-2 left-1/2 -translate-x-1/2 bg-slate-900 border border-slate-700 text-white text-[10px] py-1 px-2 rounded whitespace-nowrap z-20">600kg</div>
+                  {/* Category Breakdown */}
+                  <div className="bg-[#151F26] rounded-2xl p-6 border border-white/5">
+                    <h3 className="text-lg font-bold text-white mb-6">By Category</h3>
+                    <div className="space-y-4">
+                      {categoryData.map((cat, idx) => (
+                        <div key={idx} className="group">
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="text-sm text-gray-300 group-hover:text-white transition-colors">{cat.name}</span>
+                            <span className="text-sm font-bold text-white">{cat.value}%</span>
+                          </div>
+                          <div className="h-2 bg-gray-800 rounded-full overflow-hidden">
+                            <div 
+                              className="h-full rounded-full transition-all group-hover:opacity-80"
+                              style={{ width: `${cat.value}%`, backgroundColor: cat.color }}
+                            ></div>
+                          </div>
+                        </div>
+                      ))}
                     </div>
-                    <span className="text-[10px] text-[#94a3b8]">Jan</span>
-                  </div>
-                  <div className="flex flex-col items-center gap-2 group flex-1">
-                    <div className="w-full max-w-[40px] bg-slate-700 rounded-t-sm h-[45%] group-hover:bg-[#4ade80]/40 transition-all relative">
-                      <div className="absolute opacity-0 group-hover:opacity-100 bottom-full mb-2 left-1/2 -translate-x-1/2 bg-slate-900 border border-slate-700 text-white text-[10px] py-1 px-2 rounded whitespace-nowrap z-20">900kg</div>
+                    
+                    {/* Total */}
+                    <div className="mt-6 pt-6 border-t border-white/5">
+                      <div className="flex items-center justify-between">
+                        <span className="text-gray-400 text-sm">Total Items</span>
+                        <span className="text-2xl font-black text-white">1,430 <span className="text-sm font-medium text-gray-500">kg</span></span>
+                      </div>
                     </div>
-                    <span className="text-[10px] text-[#94a3b8]">Feb</span>
-                  </div>
-                  <div className="flex flex-col items-center gap-2 group flex-1">
-                    <div className="w-full max-w-[40px] bg-[#4ade80]/80 rounded-t-sm h-[55%] group-hover:bg-[#4ade80] transition-all relative shadow-[0_0_10px_rgba(74,222,128,0.2)]">
-                      <div className="absolute opacity-0 group-hover:opacity-100 bottom-full mb-2 left-1/2 -translate-x-1/2 bg-slate-900 border border-slate-700 text-white text-[10px] py-1 px-2 rounded whitespace-nowrap z-20">1100kg</div>
-                    </div>
-                    <span className="text-[10px] text-[#94a3b8] font-bold text-white">Mar</span>
-                  </div>
-                  <div className="flex flex-col items-center gap-2 group flex-1">
-                    <div className="w-full max-w-[40px] bg-[#4ade80]/80 rounded-t-sm h-[40%] group-hover:bg-[#4ade80] transition-all relative">
-                      <div className="absolute opacity-0 group-hover:opacity-100 bottom-full mb-2 left-1/2 -translate-x-1/2 bg-slate-900 border border-slate-700 text-white text-[10px] py-1 px-2 rounded whitespace-nowrap z-20">800kg</div>
-                    </div>
-                    <span className="text-[10px] text-[#94a3b8]">Apr</span>
-                  </div>
-                  <div className="flex flex-col items-center gap-2 group flex-1">
-                    <div className="w-full max-w-[40px] bg-[#4ade80]/80 rounded-t-sm h-[75%] group-hover:bg-[#4ade80] transition-all relative">
-                      <div className="absolute opacity-0 group-hover:opacity-100 bottom-full mb-2 left-1/2 -translate-x-1/2 bg-slate-900 border border-slate-700 text-white text-[10px] py-1 px-2 rounded whitespace-nowrap z-20">1500kg</div>
-                    </div>
-                    <span className="text-[10px] text-[#94a3b8]">May</span>
-                  </div>
-                  <div className="flex flex-col items-center gap-2 group flex-1">
-                    <div className="w-full max-w-[40px] bg-[#4ade80]/80 rounded-t-sm h-[60%] group-hover:bg-[#4ade80] transition-all relative">
-                      <div className="absolute opacity-0 group-hover:opacity-100 bottom-full mb-2 left-1/2 -translate-x-1/2 bg-slate-900 border border-slate-700 text-white text-[10px] py-1 px-2 rounded whitespace-nowrap z-20">1200kg</div>
-                    </div>
-                    <span className="text-[10px] text-[#94a3b8]">Jun</span>
-                  </div>
-                  <div className="flex flex-col items-center gap-2 group flex-1">
-                    <div className="w-full max-w-[40px] bg-[#4ade80] rounded-t-sm h-[90%] group-hover:bg-green-400 transition-all relative shadow-[0_0_20px_rgba(74,222,128,0.15)]">
-                      <div className="absolute opacity-0 group-hover:opacity-100 bottom-full mb-2 left-1/2 -translate-x-1/2 bg-slate-900 border border-slate-700 text-white text-[10px] py-1 px-2 rounded whitespace-nowrap z-20">1800kg</div>
-                    </div>
-                    <span className="text-[10px] text-[#94a3b8]">Jul</span>
-                  </div>
-                  <div className="flex flex-col items-center gap-2 group flex-1">
-                    <div className="w-full max-w-[40px] bg-slate-800 border border-dashed border-slate-600 rounded-t-sm h-[95%] opacity-50 relative"></div>
-                    <span className="text-[10px] text-[#94a3b8]">Aug</span>
                   </div>
                 </div>
-              </div>
-            </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 pb-6">
-              {/* Material Breakdown */}
-              <div className="lg:col-span-1 rounded-2xl bg-[#1e293b] border border-slate-800 p-6 flex flex-col">
-                <h3 className="text-lg font-bold text-white mb-6">Material Breakdown</h3>
-                <div className="relative flex items-center justify-center py-4">
-                  <div className="w-48 h-48 rounded-full relative" style={{ background: 'conic-gradient(#4ade80 0deg 162deg, #38bdf8 162deg 270deg, #a855f7 270deg 324deg, #fb923c 324deg 360deg)' }}>
-                    <div className="absolute inset-4 bg-[#1e293b] rounded-full flex flex-col items-center justify-center z-10">
-                      <span className="text-3xl font-bold text-white">100%</span>
-                      <span className="text-xs text-[#94a3b8]">Total</span>
+                {/* Recent Activity & Environmental Impact */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                  {/* Recent Activity */}
+                  <div className="bg-[#151F26] rounded-2xl p-6 border border-white/5">
+                    <h3 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
+                      <span className="material-symbols-outlined text-gray-500">history</span>
+                      Recent Activity
+                    </h3>
+                    <div className="space-y-4">
+                      {recentActivity.map((activity, idx) => (
+                        <div key={idx} className="flex items-start gap-4 p-3 rounded-xl hover:bg-white/5 transition-colors group">
+                          <div className={`p-2 rounded-lg bg-white/5 ${activity.color} group-hover:scale-110 transition-transform`}>
+                            <span className="material-symbols-outlined text-xl">{activity.icon}</span>
+                          </div>
+                          <div className="flex-1">
+                            <p className="text-white font-medium">{activity.action}</p>
+                            <p className="text-gray-500 text-sm">{activity.detail}</p>
+                          </div>
+                          <span className="text-gray-600 text-xs">{activity.time}</span>
+                        </div>
+                      ))}
                     </div>
                   </div>
-                </div>
-                <div className="mt-6 flex flex-col gap-3">
-                  <div className="flex items-center justify-between text-sm">
-                    <div className="flex items-center gap-2">
-                      <span className="w-3 h-3 rounded-full bg-[#4ade80]"></span>
-                      <span className="text-[#f8fafc]">IT Equipment</span>
-                    </div>
-                    <span className="font-semibold text-white">45%</span>
-                  </div>
-                  <div className="flex items-center justify-between text-sm">
-                    <div className="flex items-center gap-2">
-                      <span className="w-3 h-3 rounded-full bg-[#38bdf8]"></span>
-                      <span className="text-[#f8fafc]">Large Appliances</span>
-                    </div>
-                    <span className="font-semibold text-white">30%</span>
-                  </div>
-                  <div className="flex items-center justify-between text-sm">
-                    <div className="flex items-center gap-2">
-                      <span className="w-3 h-3 rounded-full bg-[#a855f7]"></span>
-                      <span className="text-[#f8fafc]">Batteries</span>
-                    </div>
-                    <span className="font-semibold text-white">15%</span>
-                  </div>
-                  <div className="flex items-center justify-between text-sm">
-                    <div className="flex items-center gap-2">
-                      <span className="w-3 h-3 rounded-full bg-[#fb923c]"></span>
-                      <span className="text-[#f8fafc]">Cables & Misc</span>
-                    </div>
-                    <span className="font-semibold text-white">10%</span>
-                  </div>
-                </div>
-              </div>
 
-              {/* Reports Table */}
-              <div className="lg:col-span-2 rounded-2xl bg-[#1e293b] border border-slate-800 flex flex-col overflow-hidden">
-                <div className="p-6 border-b border-slate-800 flex justify-between items-center">
-                  <h3 className="text-lg font-bold text-white">Recent Sustainability Reports</h3>
-                  <button className="text-[#4ade80] text-xs font-semibold hover:underline">View Archive</button>
-                </div>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left text-sm text-[#94a3b8]">
-                    <thead className="bg-slate-900/50 text-xs uppercase font-semibold text-[#f8fafc]">
-                      <tr>
-                        <th className="px-6 py-4">Report ID</th>
-                        <th className="px-6 py-4">Date Generated</th>
-                        <th className="px-6 py-4">Category</th>
-                        <th className="px-6 py-4">Impact (CO₂)</th>
-                        <th className="px-6 py-4">Status</th>
-                        <th className="px-6 py-4 text-right">Action</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-800">
-                      <tr className="hover:bg-slate-800/50 transition-colors">
-                        <td className="px-6 py-4 font-medium text-white">#RPT-2024-001</td>
-                        <td className="px-6 py-4">July 31, 2024</td>
-                        <td className="px-6 py-4">Monthly Overview</td>
-                        <td className="px-6 py-4 text-[#4ade80] font-medium">-240 kg</td>
-                        <td className="px-6 py-4">
-                          <span className="inline-flex items-center rounded-full bg-green-900/30 px-2.5 py-0.5 text-xs font-medium text-green-400 border border-green-900/50">
-                            Verified
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 text-right">
-                          <button className="text-[#94a3b8] hover:text-white transition-colors">
-                            <span className="material-symbols-outlined text-[20px]">download</span>
-                          </button>
-                        </td>
-                      </tr>
-                      <tr className="hover:bg-slate-800/50 transition-colors">
-                        <td className="px-6 py-4 font-medium text-white">#RPT-2024-002</td>
-                        <td className="px-6 py-4">July 15, 2024</td>
-                        <td className="px-6 py-4">Batch Analysis (IT)</td>
-                        <td className="px-6 py-4 text-[#4ade80] font-medium">-120 kg</td>
-                        <td className="px-6 py-4">
-                          <span className="inline-flex items-center rounded-full bg-green-900/30 px-2.5 py-0.5 text-xs font-medium text-green-400 border border-green-900/50">
-                            Verified
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 text-right">
-                          <button className="text-[#94a3b8] hover:text-white transition-colors">
-                            <span className="material-symbols-outlined text-[20px]">download</span>
-                          </button>
-                        </td>
-                      </tr>
-                      <tr className="hover:bg-slate-800/50 transition-colors">
-                        <td className="px-6 py-4 font-medium text-white">#RPT-2024-003</td>
-                        <td className="px-6 py-4">June 30, 2024</td>
-                        <td className="px-6 py-4">Quarterly ESG</td>
-                        <td className="px-6 py-4 text-[#4ade80] font-medium">-850 kg</td>
-                        <td className="px-6 py-4">
-                          <span className="inline-flex items-center rounded-full bg-green-900/30 px-2.5 py-0.5 text-xs font-medium text-green-400 border border-green-900/50">
-                            Verified
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 text-right">
-                          <button className="text-[#94a3b8] hover:text-white transition-colors">
-                            <span className="material-symbols-outlined text-[20px]">download</span>
-                          </button>
-                        </td>
-                      </tr>
-                      <tr className="hover:bg-slate-800/50 transition-colors">
-                        <td className="px-6 py-4 font-medium text-white">#RPT-2024-004</td>
-                        <td className="px-6 py-4">June 12, 2024</td>
-                        <td className="px-6 py-4">HazMat Disposal</td>
-                        <td className="px-6 py-4 text-[#4ade80] font-medium">N/A</td>
-                        <td className="px-6 py-4">
-                          <span className="inline-flex items-center rounded-full bg-yellow-900/30 px-2.5 py-0.5 text-xs font-medium text-yellow-400 border border-yellow-900/50">
-                            Processing
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 text-right">
-                          <button className="text-[#94a3b8] hover:text-white transition-colors">
-                            <span className="material-symbols-outlined text-[20px]">download</span>
-                          </button>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
+                  {/* Environmental Impact Card */}
+                  <div className="bg-gradient-to-br from-[#151F26] to-[#0B1116] rounded-2xl p-6 border border-white/5 relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-[#10b981]/10 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2"></div>
+                    
+                    <h3 className="text-lg font-bold text-white mb-6 flex items-center gap-2 relative z-10">
+                      <span className="material-symbols-outlined text-[#10b981]">eco</span>
+                      Environmental Impact
+                    </h3>
+                    
+                    <div className="space-y-6 relative z-10">
+                      <div className="flex items-center gap-4 p-4 bg-white/5 rounded-xl">
+                        <div className="p-3 bg-[#10b981]/10 rounded-xl">
+                          <span className="material-symbols-outlined text-[#10b981] text-2xl">forest</span>
+                        </div>
+                        <div>
+                          <p className="text-3xl font-black text-white">178</p>
+                          <p className="text-sm text-gray-400">Trees Equivalent Saved</p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center gap-4 p-4 bg-white/5 rounded-xl">
+                        <div className="p-3 bg-[#06b6d4]/10 rounded-xl">
+                          <span className="material-symbols-outlined text-[#06b6d4] text-2xl">water_drop</span>
+                        </div>
+                        <div>
+                          <p className="text-3xl font-black text-white">12,500 <span className="text-lg font-medium text-gray-500">L</span></p>
+                          <p className="text-sm text-gray-400">Water Conserved</p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center gap-4 p-4 bg-white/5 rounded-xl">
+                        <div className="p-3 bg-amber-500/10 rounded-xl">
+                          <span className="material-symbols-outlined text-amber-400 text-2xl">bolt</span>
+                        </div>
+                        <div>
+                          <p className="text-3xl font-black text-white">8,200 <span className="text-lg font-medium text-gray-500">kWh</span></p>
+                          <p className="text-sm text-gray-400">Energy Saved</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
+            </main>
           </div>
-        </main>
+        </div>
       </div>
-    </div>
+    </Layout>
   );
 };
 

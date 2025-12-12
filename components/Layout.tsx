@@ -5,12 +5,27 @@ interface LayoutProps {
   children: React.ReactNode;
   title: string;
   subtitle?: string;
-  role: 'Admin' | 'Agency' | 'User';
+  role: 'Admin' | 'Agency' | 'User' | 'Business';
   fullWidth?: boolean;
   hideSidebar?: boolean;
 }
 
+// Get current user from localStorage
+const getStoredUser = () => {
+  try {
+    const userStr = localStorage.getItem('user');
+    if (userStr) {
+      return JSON.parse(userStr);
+    }
+  } catch (e) {
+    console.error('Failed to parse user from localStorage');
+  }
+  return null;
+};
+
 const Layout: React.FC<LayoutProps> = ({ children, title, subtitle, role, fullWidth = false, hideSidebar = false }) => {
+  const storedUser = getStoredUser();
+  
   const agencyNav: NavItem[] = [
     { label: 'Dashboard', icon: 'dashboard', path: '#/agency' },
     { label: 'Manage Slots', icon: 'calendar_month', path: '#/agency/slots', active: title === 'Manage Slots' },
@@ -36,9 +51,25 @@ const Layout: React.FC<LayoutProps> = ({ children, title, subtitle, role, fullWi
     { label: 'Reports', icon: 'assessment', path: '#/admin/reports' },
   ];
 
-  const currentNav = role === 'Agency' ? agencyNav : role === 'Admin' ? adminNav : userNav;
-  const userEmail = role === 'Agency' ? 'admin@ecocycle.com' : role === 'Admin' ? 'super@ecocycle.com' : 'alex@example.com';
-  const userName = role === 'Agency' ? 'EcoCycle Inc.' : role === 'Admin' ? 'Admin Panel' : 'Alex Morgan';
+  const businessNav: NavItem[] = [
+    { label: 'Dashboard', icon: 'dashboard', path: '#/business' },
+    { label: 'Inventory', icon: 'inventory_2', path: '#/business/inventory' },
+    { label: 'Certificates', icon: 'verified', path: '#/business/certificates' },
+    { label: 'Analytics', icon: 'analytics', path: '#/business/analytics' },
+    { label: 'Book Pickup', icon: 'local_shipping', path: '#/search' },
+  ];
+
+  const currentNav = role === 'Agency' ? agencyNav : role === 'Admin' ? adminNav : role === 'Business' ? businessNav : userNav;
+  
+  // Use stored user info or fallback to defaults
+  const userName = storedUser?.name || (role === 'Agency' ? 'EcoCycle Inc.' : role === 'Admin' ? 'Admin Panel' : role === 'Business' ? 'Business User' : 'User');
+  const userEmail = storedUser?.email || (role === 'Agency' ? 'agency@ecocycle.com' : role === 'Admin' ? 'admin@ecocycle.com' : role === 'Business' ? 'business@company.com' : 'user@example.com');
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    window.location.hash = '#/';
+  };
 
   return (
     <div className="flex min-h-screen w-full bg-[#0B1120] text-slate-300 font-sans selection:bg-[#34D399] selection:text-[#0B1120]">
@@ -79,7 +110,7 @@ const Layout: React.FC<LayoutProps> = ({ children, title, subtitle, role, fullWi
 
           <div className="mt-auto p-6 border-t border-white/5">
             <button 
-              onClick={() => window.location.hash = '#/'}
+              onClick={handleLogout}
               className="flex w-full items-center gap-3 px-3 py-2 text-sm font-medium text-slate-400 hover:text-white transition-colors"
             >
               <span className="material-symbols-outlined">logout</span>

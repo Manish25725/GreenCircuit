@@ -439,6 +439,107 @@ export const api = {
     return apiRequest(`/admin/reports?period=${period}`);
   },
 
+  // Business Dashboard
+  getBusinessDashboard: async () => {
+    return apiRequest('/business/dashboard');
+  },
+
+  getBusinessProfile: async () => {
+    return apiRequest('/business/profile');
+  },
+
+  updateBusinessProfile: async (data: any) => {
+    return apiRequest('/business/profile', {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  },
+
+  // Business Inventory
+  getBusinessInventory: async (params?: { category?: string; status?: string; search?: string; page?: number }) => {
+    const searchParams = new URLSearchParams();
+    if (params?.category) searchParams.append('category', params.category);
+    if (params?.status) searchParams.append('status', params.status);
+    if (params?.search) searchParams.append('search', params.search);
+    if (params?.page) searchParams.append('page', params.page.toString());
+    return apiRequest(`/business/inventory?${searchParams.toString()}`);
+  },
+
+  getBusinessInventoryItem: async (id: string) => {
+    return apiRequest(`/business/inventory/${id}`);
+  },
+
+  addBusinessInventoryItem: async (data: any) => {
+    return apiRequest('/business/inventory', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  updateBusinessInventoryItem: async (id: string, data: any) => {
+    return apiRequest(`/business/inventory/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  },
+
+  deleteBusinessInventoryItem: async (id: string) => {
+    return apiRequest(`/business/inventory/${id}`, { method: 'DELETE' });
+  },
+
+  bulkUpdateInventoryStatus: async (itemIds: string[], status: string) => {
+    return apiRequest('/business/inventory/bulk-update', {
+      method: 'POST',
+      body: JSON.stringify({ itemIds, status }),
+    });
+  },
+
+  markItemsForPickup: async (itemIds: string[]) => {
+    return apiRequest('/business/inventory/mark-pickup', {
+      method: 'POST',
+      body: JSON.stringify({ itemIds }),
+    });
+  },
+
+  // Business Certificates
+  getBusinessCertificates: async (params?: { status?: string; search?: string; page?: number }) => {
+    const searchParams = new URLSearchParams();
+    if (params?.status) searchParams.append('status', params.status);
+    if (params?.search) searchParams.append('search', params.search);
+    if (params?.page) searchParams.append('page', params.page.toString());
+    return apiRequest(`/business/certificates?${searchParams.toString()}`);
+  },
+
+  getBusinessCertificate: async (id: string) => {
+    return apiRequest(`/business/certificates/${id}`);
+  },
+
+  downloadBusinessCertificate: async (id: string) => {
+    return apiRequest(`/business/certificates/${id}/download`);
+  },
+
+  // Business Analytics
+  getBusinessAnalytics: async (period = '30d') => {
+    return apiRequest(`/business/analytics?period=${period}`);
+  },
+
+  exportBusinessReport: async (format: 'pdf' | 'csv' = 'pdf') => {
+    return apiRequest(`/business/reports/export?format=${format}`);
+  },
+
+  // Business Bookings
+  getBusinessBookings: async (status?: string) => {
+    const url = status ? `/business/bookings?status=${status}` : '/business/bookings';
+    return apiRequest(url);
+  },
+
+  createBusinessBooking: async (data: any) => {
+    return apiRequest('/business/bookings', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
   // Agency Dashboard
   getAgencyDashboard: async () => {
     return apiRequest('/agencies/dashboard/me');

@@ -1,341 +1,563 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import Layout from '../components/Layout';
+import { api, getCurrentUser, User, Booking } from '../services/api';
 
 const BusinessDashboard = () => {
+  const [user, setUser] = useState<User | null>(getCurrentUser()); 
+  const [activeBookings, setActiveBookings] = useState<Booking[]>([]);
+  const [allBookings, setAllBookings] = useState<Booking[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [showAllBookings, setShowAllBookings] = useState(false);
+  const [cancelling, setCancelling] = useState<string | null>(null);
+  const [showCancelModal, setShowCancelModal] = useState<string | null>(null);
+  const [stats, setStats] = useState({
+    totalRecycled: 0,
+    co2Offset: 0,
+    costSavings: 0,
+    totalBookings: 0
+  });
+
+  useEffect(() => {
+    loadBusinessData();
+  }, []);
+
+  const loadBusinessData = async () => {
+    try {
+      // Try to get fresh user data from API
+      const userData = await api.getMe();
+      setUser(userData);
+      localStorage.setItem('user', JSON.stringify(userData));
+      
+      setStats({
+        totalRecycled: userData.totalWasteRecycled || 0,
+        co2Offset: (userData.totalWasteRecycled || 0) * 2.5,
+        costSavings: (userData.totalWasteRecycled || 0) * 15, // Estimated cost savings
+        totalBookings: userData.totalBookings || 0
+      });
+      
+      // Get user bookings
+      try {
+        const bookingsData = await api.getUserBookings();
+        const bookings = bookingsData.bookings || bookingsData || [];
+        setAllBookings(bookings);
+        
+        // Find ALL active/in-progress bookings
+        const active = bookings.filter((b: Booking) => 
+          b.status === 'pending' || b.status === 'confirmed' || b.status === 'in-progress'
+        );
+        setActiveBookings(active || []);
+      } catch (e) {
+        console.log('No bookings found');
+      }
+    } catch (error) {
+      console.error('Failed to load business data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCancelBooking = async (bookingId: string) => {
+    setCancelling(bookingId);
+    try {
+      await api.cancelBooking(bookingId);
+      await loadBusinessData();
+      setShowCancelModal(null);
+    } catch (error) {
+      console.error('Failed to cancel booking:', error);
+      alert('Failed to cancel booking. Please try again.');
+    } finally {
+      setCancelling(null);
+    }
+  };
+
+  const handleLogout = () => {
+    api.logout();
+    window.location.hash = '#/login';
+  };
+
+  const formatDate = (date?: string) => {
+    if (date) {
+      return new Date(date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+    }
+    return new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+  };
+
+  const formatTime = (time?: string) => {
+    if (!time) return 'TBD';
+    return time;
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'completed': return 'text-[#06b6d4] bg-[#06b6d4]/10 border-[#06b6d4]/20';
+      case 'in-progress': return 'text-[#8b5cf6] bg-[#8b5cf6]/10 border-[#8b5cf6]/20';
+      case 'confirmed': return 'text-[#f59e0b] bg-[#f59e0b]/10 border-[#f59e0b]/20';
+      case 'pending': return 'text-[#94a3b8] bg-[#94a3b8]/10 border-[#94a3b8]/20';
+      case 'cancelled': return 'text-red-400 bg-red-500/10 border-red-500/20';
+      default: return 'text-[#94a3b8] bg-[#94a3b8]/10 border-[#94a3b8]/20';
+    }
+  };
+
+  const getTrackingSteps = (booking: Booking) => {
+    if (!booking) return [];
+    
+    const steps = [
+      { key: 'pending', label: 'Request Submitted', icon: 'check', message: `Disposal request ${booking.bookingId || '#REQ'} was submitted.` },
+      { key: 'confirmed', label: 'Agency Assigned', icon: 'verified', message: `${typeof booking.agencyId === 'object' ? booking.agencyId.name : 'Agency'} will handle your pickup.` },
+      { key: 'in-progress', label: 'Collection Scheduled', icon: 'local_shipping', message: 'Collection vehicle dispatched to your facility.' },
+      { key: 'completed', label: 'Disposal Completed', icon: 'task_alt', message: 'E-waste disposed with compliance certificate issued.' },
+    ];
+    
+    const statusOrder = ['pending', 'confirmed', 'in-progress', 'completed'];
+    const currentIndex = statusOrder.indexOf(booking.status);
+    
+    return steps.map((step, index) => ({
+      ...step,
+      completed: index < currentIndex,
+      current: index === currentIndex,
+      pending: index > currentIndex
+    }));
+  };
+
   return (
-    <div className="flex h-screen overflow-hidden bg-[#0f172a] font-sans text-[#f8fafc] selection:bg-[#4ade80] selection:text-slate-900">
-      {/* Sidebar */}
-      <aside className="hidden w-20 flex-col items-center border-r border-slate-800 bg-[#0f172a] py-6 lg:flex z-50 transition-all hover:w-64 group fixed inset-y-0 left-0">
-        <div className="flex h-full w-full flex-col justify-between px-4">
-          <div className="flex flex-col gap-8 w-full">
-            <div className="flex items-center gap-4 px-2 overflow-hidden whitespace-nowrap cursor-pointer" onClick={() => window.location.hash = '#/'}>
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#4ade80] to-[#22c55e] text-slate-900 shadow-[0_0_20px_rgba(74,222,128,0.15)]">
-                <span className="material-symbols-outlined !text-[24px] font-bold">recycling</span>
+    <Layout title="" role="Business" fullWidth hideSidebar>
+      <div className="bg-[#0B1116] font-sans text-gray-200 antialiased selection:bg-[#06b6d4] selection:text-white min-h-screen">
+        <div className="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden">
+          <div className="fixed top-0 left-0 w-full h-[500px] bg-[#06b6d4]/5 rounded-full blur-[120px] -translate-y-1/2 pointer-events-none"></div>
+          <div className="fixed bottom-0 right-0 w-full h-[500px] bg-[#8b5cf6]/5 rounded-full blur-[120px] translate-y-1/2 pointer-events-none"></div>
+          
+          <div className="layout-container flex h-full grow flex-col relative z-10">
+            {/* Header */}
+            <header className="flex items-center justify-between whitespace-nowrap border-b border-white/5 px-4 sm:px-6 lg:px-10 py-4 bg-[#0B1116]/80 backdrop-blur-md fixed top-0 left-0 right-0 z-50 transition-all duration-300">
+              <div className="flex items-center gap-3 text-white cursor-pointer" onClick={() => window.location.hash = '#/'}>
+                <div className="p-2 bg-[#06b6d4]/10 rounded-lg">
+                  <svg className="h-6 w-6 text-[#06b6d4]" fill="currentColor" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M42.4379 44C42.4379 44 36.0744 33.9038 41.1692 24C46.8624 12.9336 42.2078 4 42.2078 4L7.01134 4C7.01134 4 11.6577 12.932 5.96912 23.9969C0.876273 33.9029 7.27094 44 7.27094 44L42.4379 44Z"></path>
+                  </svg>
+                </div>
+                <h2 className="text-xl font-bold tracking-tight text-white">EcoCycle <span className="text-[#06b6d4]">Business</span></h2>
               </div>
-              <div className="flex flex-col opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                <h1 className="text-lg font-bold tracking-tight">EcoCycle</h1>
-                <p className="text-xs text-[#94a3b8] font-medium">Business</p>
+              <nav className="hidden md:flex flex-1 justify-center gap-1">
+              </nav>
+              <div className="flex items-center gap-4">
+                <button 
+                    onClick={() => window.location.hash = '#/profile'}
+                    className="hidden sm:flex items-center gap-3 pl-1 pr-4 py-1 rounded-full bg-[#151F26] border border-white/5 hover:bg-white/5 transition-colors group cursor-pointer"
+                >
+                  <div className="size-8 rounded-full bg-[#06b6d4] flex items-center justify-center ring-2 ring-white/10 group-hover:ring-[#06b6d4]/50 transition-all text-white font-bold text-sm">
+                    {user?.name?.charAt(0) || 'B'}
+                  </div>
+                  <span className="text-sm font-medium text-gray-200">{user?.name || 'Business'}</span>
+                </button>
+                <button 
+                  onClick={handleLogout}
+                  className="p-2.5 rounded-full bg-[#151F26] border border-white/5 text-gray-400 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                  title="Logout"
+                >
+                  <span className="material-symbols-outlined text-[20px]">logout</span>
+                </button>
               </div>
-            </div>
-            <nav className="flex flex-col gap-2 w-full">
-              <a onClick={() => window.location.hash = '#/business'} className="flex items-center gap-4 rounded-xl bg-[#4ade80]/10 px-3 py-3 text-[#4ade80] transition-all group-hover:bg-[#4ade80]/20 cursor-pointer">
-                <span className="material-symbols-outlined shrink-0 fill">dashboard</span>
-                <span className="text-sm font-semibold opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">Dashboard</span>
-              </a>
-              <a onClick={() => window.location.hash = '#/business/inventory'} className="flex items-center gap-4 rounded-xl px-3 py-3 text-[#94a3b8] hover:bg-slate-800 hover:text-white transition-colors cursor-pointer">
-                <span className="material-symbols-outlined shrink-0">inventory_2</span>
-                <span className="text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">Inventory</span>
-              </a>
-              <a onClick={() => window.location.hash = '#/business/certificates'} className="flex items-center gap-4 rounded-xl px-3 py-3 text-[#94a3b8] hover:bg-slate-800 hover:text-white transition-colors cursor-pointer">
-                <span className="material-symbols-outlined shrink-0">verified</span>
-                <span className="text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">Certificates</span>
-              </a>
-              <a className="flex items-center gap-4 rounded-xl px-3 py-3 text-[#94a3b8] hover:bg-slate-800 hover:text-white transition-colors cursor-pointer">
-                <span className="material-symbols-outlined shrink-0">local_shipping</span>
-                <span className="text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">Logistics</span>
-              </a>
-              <a onClick={() => window.location.hash = '#/business/analytics'} className="flex items-center gap-4 rounded-xl px-3 py-3 text-[#94a3b8] hover:bg-slate-800 hover:text-white transition-colors cursor-pointer">
-                <span className="material-symbols-outlined shrink-0">analytics</span>
-                <span className="text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">Analytics</span>
-              </a>
-            </nav>
+            </header>
+
+            <main className="flex flex-1 justify-center py-5 mt-24">
+              <div className="layout-content-container flex flex-col w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+                <div className="flex flex-col md:flex-row justify-between items-end gap-6 py-8">
+                  <div>
+                    <p className="text-[#06b6d4] text-sm font-bold uppercase tracking-widest mb-2">Business Portal</p>
+                    <h1 className="text-white text-4xl sm:text-5xl font-black leading-tight tracking-tighter mb-2 bg-gradient-to-r from-white to-gray-500 bg-clip-text text-transparent">Welcome, {user?.name?.split(' ')[0] || 'Business'}!</h1>
+                    <p className="text-[#94a3b8] text-lg">Manage your corporate e-waste disposal efficiently.</p>
+                  </div>
+                  <div className="flex items-center gap-3 bg-[#151F26]/50 p-1.5 pr-4 rounded-full border border-white/10 backdrop-blur-sm">
+                    <div className="bg-[#06b6d4]/20 p-2 rounded-full text-[#06b6d4]">
+                      <span className="material-symbols-outlined text-lg">calendar_today</span>
+                    </div>
+                    <span className="text-sm font-medium text-gray-300">{formatDate()}</span>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                  {/* Left Column (Tracking & Impact) */}
+                  <div className="lg:col-span-8 flex flex-col gap-8">
+                    
+                    {/* Live Tracking Section */}
+                    <section className="flex flex-col gap-5">
+                      <div className="flex items-center justify-between">
+                        <h2 className="text-white text-2xl font-bold tracking-tight flex items-center gap-3">
+                          <span className="p-2 bg-[#8b5cf6]/10 rounded-lg text-[#8b5cf6]">
+                            <span className="material-symbols-outlined">local_shipping</span>
+                          </span>
+                          {activeBookings.length > 0 ? `Active Disposals (${activeBookings.length})` : 'Disposal Status'}
+                        </h2>
+                        {activeBookings.length > 0 && (
+                          <span className="px-3 py-1 rounded-full bg-[#8b5cf6]/10 text-[#8b5cf6] text-xs font-bold uppercase tracking-wider border border-[#8b5cf6]/20 animate-pulse">Live</span>
+                        )}
+                      </div>
+
+                      <div className="bg-[#151F26] rounded-2xl p-6 sm:p-10 shadow-[0_10px_15px_-3px_rgba(0,0,0,0.3),0_4px_6px_-4px_rgba(0,0,0,0.2),inset_0_1px_0_0_rgba(255,255,255,0.05)] border border-white/5 relative overflow-hidden group">
+                        <div className="absolute top-0 right-0 w-64 h-64 bg-[#8b5cf6]/5 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
+                        
+                        {loading ? (
+                          <div className="flex items-center justify-center py-12">
+                            <div className="animate-spin rounded-full h-10 w-10 border-2 border-[#06b6d4] border-t-transparent"></div>
+                          </div>
+                        ) : activeBookings.length > 0 ? (
+                          <div className="space-y-6">
+                            {activeBookings.map((booking, bookingIndex) => (
+                              <div key={booking._id} className={`${bookingIndex > 0 ? 'pt-6 border-t border-white/10' : ''}`}>
+                                {/* Booking Header */}
+                                <div className="flex items-center justify-between mb-4">
+                                  <div className="flex items-center gap-3">
+                                    <div className="p-2 rounded-lg bg-[#8b5cf6]/10">
+                                      <span className="material-symbols-outlined text-[#8b5cf6]">inventory_2</span>
+                                    </div>
+                                    <div>
+                                      <p className="text-white font-bold">{booking.bookingId || `#DSP-${booking._id?.slice(-6).toUpperCase()}`}</p>
+                                      <p className="text-gray-400 text-sm">{formatDate(booking.scheduledDate)} • {formatTime(booking.scheduledTime)}</p>
+                                    </div>
+                                  </div>
+                                  <span className={`text-[10px] font-bold uppercase px-3 py-1.5 rounded-full border ${getStatusColor(booking.status)}`}>
+                                    {booking.status}
+                                  </span>
+                                </div>
+                                
+                                {/* Tracking Steps */}
+                                <div className="relative flex flex-col">
+                                  <div className="absolute left-[23px] top-6 bottom-12 w-0.5 bg-gray-800 rounded-full"></div>
+                                  <div 
+                                    className="absolute left-[23px] top-6 w-0.5 bg-gradient-to-b from-[#06b6d4] via-[#06b6d4] to-[#8b5cf6] rounded-full shadow-[0_0_10px_rgba(6,182,212,0.5)]"
+                                    style={{ height: `${Math.min(getTrackingSteps(booking).filter(s => s.completed || s.current).length / getTrackingSteps(booking).length * 100, 75)}%` }}
+                                  ></div>
+                                  
+                                  {getTrackingSteps(booking).map((step, index) => (
+                                    <div key={step.key} className={`relative flex gap-6 ${index < 3 ? 'pb-8' : ''} group/step ${step.pending ? 'opacity-50 hover:opacity-100 transition-opacity duration-300' : ''}`}>
+                                      <div className={`z-10 shrink-0 ${step.current ? 'relative' : ''}`}>
+                                        {step.current && (
+                                          <div className="absolute inset-0 -m-2 rounded-full border-2 border-[#8b5cf6]/30 animate-pulse"></div>
+                                        )}
+                                        <div className={`flex size-10 items-center justify-center rounded-full text-white ring-4 ring-[#151F26] transition-transform duration-500 group-hover/step:scale-110 ${
+                                          step.completed ? 'bg-[#06b6d4] shadow-[0_0_15px_rgba(6,182,212,0.4)]' :
+                                          step.current ? 'bg-[#8b5cf6] shadow-[0_0_25px_rgba(139,92,246,0.6)]' :
+                                          'bg-[#151F26] border-2 border-dashed border-gray-600 text-gray-500'
+                                        }`}>
+                                          <span className={`material-symbols-outlined text-lg ${step.current ? 'animate-bounce' : ''}`}>{step.icon}</span>
+                                        </div>
+                                      </div>
+                                      
+                                      <div className="flex-1 pt-1">
+                                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-1">
+                                          <h3 className={`text-base font-bold group-hover/step:text-[#06b6d4] transition-colors ${step.completed || step.current ? 'text-white' : 'text-gray-500'}`}>{step.label}</h3>
+                                          <span className={`w-fit text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded border ${
+                                            step.completed ? 'text-[#06b6d4] bg-[#06b6d4]/10 border-[#06b6d4]/20' : 
+                                            step.current ? 'text-[#8b5cf6] bg-[#8b5cf6]/10 border-[#8b5cf6]/20' :
+                                            'text-gray-500 bg-gray-800 border-gray-700'
+                                          }`}>{step.completed ? 'Completed' : step.current ? 'In Progress' : 'Pending'}</span>
+                                        </div>
+                                        <p className={`text-sm ${step.completed || step.current ? 'text-[#94a3b8]' : 'text-gray-600'}`}>{step.message}</p>
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                                
+                                {/* Agency Info */}
+                                <div className="mt-4 p-3 bg-white/5 rounded-lg border border-white/5 flex items-center gap-3">
+                                  <div className="size-10 rounded-full bg-gray-800 flex items-center justify-center shrink-0 border border-white/5">
+                                    <span className="material-symbols-outlined text-gray-400 text-sm">business</span>
+                                  </div>
+                                  <div className="overflow-hidden">
+                                    <p className="text-xs text-gray-400 truncate">Disposal Partner</p>
+                                    <p className="text-sm font-semibold text-white truncate">
+                                      {typeof booking.agencyId === 'object' ? booking.agencyId.name : 'Partner Assigned'}
+                                    </p>
+                                  </div>
+                                </div>
+
+                                {/* Cancel Button */}
+                                {(booking.status === 'pending' || booking.status === 'confirmed') && (
+                                  <button
+                                    onClick={() => setShowCancelModal(booking._id)}
+                                    className="mt-4 w-full py-3 px-4 rounded-xl bg-red-500/10 text-red-400 font-medium border border-red-500/20 hover:bg-red-500/20 hover:border-red-500/30 transition-all flex items-center justify-center gap-2"
+                                  >
+                                    <span className="material-symbols-outlined text-lg">cancel</span>
+                                    Cancel Request
+                                  </button>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          /* No Active Booking - Show call to action */
+                          <div className="text-center py-8">
+                            <div className="p-4 bg-[#06b6d4]/10 rounded-full w-fit mx-auto mb-4">
+                              <span className="material-symbols-outlined text-4xl text-[#06b6d4]">delete_sweep</span>
+                            </div>
+                            <h3 className="text-xl font-bold text-white mb-2">No Active Disposals</h3>
+                            <p className="text-[#94a3b8] mb-6 max-w-md mx-auto">
+                              Schedule a pickup to dispose of your corporate e-waste compliantly and get certificates.
+                            </p>
+                            <button 
+                              onClick={() => window.location.hash = '#/search'}
+                              className="bg-[#06b6d4] text-white px-6 py-3 rounded-xl font-bold hover:bg-[#0891b2] transition-colors inline-flex items-center gap-2"
+                            >
+                              <span className="material-symbols-outlined">add</span>
+                              Schedule Disposal
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </section>
+
+                    {/* All Bookings Section */}
+                    {allBookings.length > 0 && (
+                      <section className="flex flex-col gap-5">
+                        <div className="flex items-center justify-between">
+                          <h2 className="text-white text-2xl font-bold tracking-tight flex items-center gap-3">
+                            <span className="p-2 bg-amber-500/10 rounded-lg text-amber-400">
+                              <span className="material-symbols-outlined">history</span>
+                            </span>
+                            Disposal History ({allBookings.length})
+                          </h2>
+                          <button 
+                            onClick={() => setShowAllBookings(!showAllBookings)}
+                            className="text-sm text-[#94a3b8] hover:text-white transition-colors flex items-center gap-1"
+                          >
+                            {showAllBookings ? 'Show Less' : 'View All'}
+                            <span className="material-symbols-outlined text-lg">{showAllBookings ? 'expand_less' : 'expand_more'}</span>
+                          </button>
+                        </div>
+                        
+                        <div className="bg-[#151F26] rounded-2xl p-6 shadow-[0_10px_15px_-3px_rgba(0,0,0,0.3)] border border-white/5">
+                          <div className="space-y-3">
+                            {(showAllBookings ? allBookings : allBookings.slice(0, 5)).map(booking => (
+                              <div key={booking._id} className="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/5 hover:bg-white/10 hover:border-white/10 transition-all group">
+                                <div className="flex items-center gap-4">
+                                  <div className={`p-3 rounded-xl ${getStatusColor(booking.status)}`}>
+                                    <span className="material-symbols-outlined">
+                                      {booking.status === 'completed' ? 'check_circle' : 
+                                       booking.status === 'cancelled' ? 'cancel' : 
+                                       booking.status === 'in-progress' ? 'local_shipping' :
+                                       booking.status === 'confirmed' ? 'verified' : 'pending'}
+                                    </span>
+                                  </div>
+                                  <div>
+                                    <p className="text-white font-bold">
+                                      {booking.bookingId || `#DSP-${booking._id?.slice(-6).toUpperCase()}`}
+                                    </p>
+                                    <div className="flex items-center gap-2 text-[#94a3b8] text-sm">
+                                      <span>{formatDate(booking.scheduledDate)}</span>
+                                      <span>•</span>
+                                      <span>{formatTime(booking.scheduledTime)}</span>
+                                    </div>
+                                    <p className="text-gray-500 text-xs mt-1">
+                                      {typeof booking.agencyId === 'object' ? booking.agencyId.name : 'Partner Assigned'}
+                                    </p>
+                                  </div>
+                                </div>
+                                <div className="flex items-center gap-3">
+                                  <span className={`text-xs font-bold uppercase px-3 py-1.5 rounded-full border ${getStatusColor(booking.status)}`}>
+                                    {booking.status}
+                                  </span>
+                                  <span className="material-symbols-outlined text-gray-500 group-hover:text-white transition-colors">chevron_right</span>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                          
+                          {!showAllBookings && allBookings.length > 5 && (
+                            <button 
+                              onClick={() => setShowAllBookings(true)}
+                              className="w-full mt-4 py-3 text-center text-[#94a3b8] hover:text-white text-sm font-medium border border-white/5 rounded-xl hover:bg-white/5 transition-all"
+                            >
+                              Show {allBookings.length - 5} more records
+                            </button>
+                          )}
+                        </div>
+                      </section>
+                    )}
+
+                    {/* Impact Section */}
+                    <section className="flex flex-col gap-5">
+                      <h2 className="text-white text-2xl font-bold tracking-tight flex items-center gap-3">
+                        <span className="p-2 bg-[#06b6d4]/10 rounded-lg text-[#06b6d4]">
+                          <span className="material-symbols-outlined">analytics</span>
+                        </span>
+                        Business Impact
+                      </h2>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="bg-[#151F26] rounded-2xl p-6 shadow-[0_4px_12px_0_rgba(0,0,0,0.07)] flex flex-col justify-between border border-white/5 hover:border-white/10 transition-colors relative overflow-hidden group">
+                          <div className="absolute right-0 top-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+                            <span className="material-symbols-outlined text-8xl text-white">scale</span>
+                          </div>
+                          <div>
+                            <div className="flex items-center gap-2 text-[#94a3b8] mb-3">
+                              <span className="text-sm font-semibold uppercase tracking-wider">Total Disposed</span>
+                            </div>
+                            <p className="text-white text-5xl font-black leading-none tracking-tight">{user?.totalWasteRecycled?.toFixed(1) || '0'} <span className="text-2xl font-medium text-gray-500">kg</span></p>
+                          </div>
+                          <div className="mt-8">
+                            <div className="flex justify-between text-xs font-medium text-gray-400 mb-2">
+                              <span>Quarterly Target</span>
+                              <span>{Math.min(Math.round((user?.totalWasteRecycled || 0) / 500 * 100), 100)}% Complete</span>
+                            </div>
+                            <div className="w-full bg-gray-800 rounded-full h-3 overflow-hidden">
+                              <div className="bg-gradient-to-r from-[#06b6d4]/50 to-[#06b6d4] h-3 rounded-full relative" style={{ width: `${Math.min((user?.totalWasteRecycled || 0) / 5, 100)}%` }}>
+                                <div className="absolute inset-0 bg-white/20 animate-pulse"></div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="bg-[#151F26] rounded-2xl p-6 shadow-[0_4px_12px_0_rgba(0,0,0,0.07)] flex flex-col justify-between border border-white/5 hover:border-white/10 transition-colors relative overflow-hidden group">
+                          <div className="absolute right-0 top-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+                            <span className="material-symbols-outlined text-8xl text-white">savings</span>
+                          </div>
+                          <div>
+                            <div className="flex items-center gap-2 text-[#94a3b8] mb-3">
+                              <span className="text-sm font-semibold uppercase tracking-wider">Cost Savings</span>
+                            </div>
+                            <p className="text-white text-5xl font-black leading-none tracking-tight">₹{stats.costSavings.toLocaleString()} <span className="text-2xl font-medium text-gray-500"></span></p>
+                          </div>
+                          <div className="mt-8">
+                            <div className="flex justify-between text-xs font-medium text-gray-400 mb-2">
+                              <span>vs Traditional Disposal</span>
+                              <span className="text-[#06b6d4]">+32% Saved</span>
+                            </div>
+                            <div className="w-full bg-gray-800 rounded-full h-3 overflow-hidden">
+                              <div className="bg-gradient-to-r from-[#8b5cf6]/50 to-[#8b5cf6] h-3 rounded-full relative" style={{ width: '68%' }}>
+                                <div className="absolute inset-0 bg-white/20 animate-pulse"></div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+
+                  {/* Right Column (Stats & Actions) */}
+                  <div className="lg:col-span-4 flex flex-col gap-8">
+                    <div className="bg-gradient-to-b from-[#151F26] to-[#0B1116] rounded-2xl p-8 shadow-[0_10px_15px_-3px_rgba(0,0,0,0.3)] flex flex-col items-center text-center border border-white/5 relative overflow-hidden">
+                      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#06b6d4] via-[#8b5cf6] to-[#06b6d4]"></div>
+                      <div className="absolute top-1/2 left-1/2 w-32 h-32 bg-[#06b6d4]/20 rounded-full blur-[60px] -translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
+                      <p className="text-sm font-bold uppercase tracking-widest text-[#94a3b8] z-10">Compliance Score</p>
+                      <div className="my-8 flex items-center justify-center relative z-10 group cursor-default">
+                        <svg className="h-16 w-16 text-[#06b6d4] drop-shadow-[0_0_15px_rgba(6,182,212,0.5)] group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" strokeLinecap="round" strokeLinejoin="round"></path>
+                        </svg>
+                        <span className="text-7xl font-black text-white ml-2 drop-shadow-sm tracking-tighter">98%</span>
+                      </div>
+                      <p className="text-sm text-gray-400 max-w-[200px] z-10">
+                        Excellent! Your e-waste disposal meets all regulatory requirements.
+                      </p>
+                      <button className="mt-8 w-full group relative overflow-hidden rounded-xl bg-[#06b6d4] text-white font-bold h-12 shadow-[0_0_20px_rgba(6,182,212,0.3)] hover:shadow-[0_0_30px_rgba(6,182,212,0.5)] transition-all z-10 cursor-pointer" onClick={() => window.location.hash = '#/business/certificates'}>
+                        <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out"></div>
+                        <span className="relative flex items-center justify-center gap-2">
+                          View Certificates
+                          <span className="material-symbols-outlined text-lg">arrow_forward</span>
+                        </span>
+                      </button>
+                    </div>
+
+                    <div className="bg-[#151F26] rounded-2xl p-6 shadow-[0_10px_15px_-3px_rgba(0,0,0,0.3)] border border-white/5">
+                      <h2 className="text-white text-lg font-bold tracking-tight pb-4 flex items-center gap-2">
+                        <span className="material-symbols-outlined text-gray-400">bolt</span>
+                        Quick Actions
+                      </h2>
+                      <div className="flex flex-col gap-3">
+                        <button onClick={() => window.location.hash = '#/search'} className="flex w-full group cursor-pointer items-center justify-between overflow-hidden rounded-xl h-14 px-4 bg-white/5 text-gray-200 border border-white/5 hover:bg-white/10 hover:border-white/10 transition-all">
+                          <div className="flex items-center gap-3">
+                            <div className="size-8 rounded-lg bg-[#06b6d4]/20 text-[#06b6d4] flex items-center justify-center">
+                              <span className="material-symbols-outlined text-xl">add</span>
+                            </div>
+                            <span className="font-medium">New Disposal Request</span>
+                          </div>
+                          <span className="material-symbols-outlined text-gray-500 group-hover:text-white transition-colors">chevron_right</span>
+                        </button>
+                        <button onClick={() => window.location.hash = '#/business/inventory'} className="flex w-full group cursor-pointer items-center justify-between overflow-hidden rounded-xl h-14 px-4 bg-white/5 text-gray-200 border border-white/5 hover:bg-white/10 hover:border-white/10 transition-all">
+                          <div className="flex items-center gap-3">
+                            <div className="size-8 rounded-lg bg-[#8b5cf6]/20 text-[#8b5cf6] flex items-center justify-center">
+                              <span className="material-symbols-outlined text-xl">inventory_2</span>
+                            </div>
+                            <span className="font-medium">Manage Inventory</span>
+                          </div>
+                          <span className="material-symbols-outlined text-gray-500 group-hover:text-white transition-colors">chevron_right</span>
+                        </button>
+                        <button onClick={() => window.location.hash = '#/business/analytics'} className="flex w-full group cursor-pointer items-center justify-between overflow-hidden rounded-xl h-14 px-4 bg-white/5 text-gray-200 border border-white/5 hover:bg-white/10 hover:border-white/10 transition-all">
+                          <div className="flex items-center gap-3">
+                            <div className="size-8 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center">
+                              <span className="material-symbols-outlined text-xl">bar_chart</span>
+                            </div>
+                            <span className="font-medium">View Analytics</span>
+                          </div>
+                          <span className="material-symbols-outlined text-gray-500 group-hover:text-white transition-colors">chevron_right</span>
+                        </button>
+                        <button onClick={() => window.location.hash = '#/contact'} className="flex w-full group cursor-pointer items-center justify-between overflow-hidden rounded-xl h-14 px-4 bg-white/5 text-gray-200 border border-white/5 hover:bg-white/10 hover:border-white/10 transition-all">
+                          <div className="flex items-center gap-3">
+                            <div className="size-8 rounded-lg bg-pink-500/20 text-pink-400 flex items-center justify-center">
+                              <span className="material-symbols-outlined text-xl">support_agent</span>
+                            </div>
+                            <span className="font-medium">Contact Support</span>
+                          </div>
+                          <span className="material-symbols-outlined text-gray-500 group-hover:text-white transition-colors">chevron_right</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </main>
           </div>
-          <div className="flex items-center gap-4 rounded-xl border border-slate-800 bg-slate-900/50 p-2 overflow-hidden whitespace-nowrap mt-auto">
-            <div className="h-8 w-8 shrink-0 overflow-hidden rounded-full bg-slate-700 bg-center bg-cover border border-slate-600" style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuBLrR2QWFrZdhqlqnql_lDYbtkDCvQ32yk6hvVJTlee4Tx6Uh5Iw5cR16GiYtu3xQ9yK7tqguuIvnhVDy9ONcnQtHZJbvop2WX6V2aW6YfTHzR_k-HTTOql1kt6uYcgYi_Es2Tc4xGWRzePR50VKumirJYQgVVCecYOYE7QOjWFnEANpFSY14v-gw9mefiqPUaoKbO_mSmHt2v3p4NTP-DeUr2DjUUJwQTJCiR22EH42tLk2N7SoQ8k0RyQ0dzHycBltvqpZQOGWMY')" }}></div>
-            <div className="flex flex-col opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-              <p className="text-sm font-bold text-white">James W.</p>
-              <p className="text-[10px] text-[#94a3b8]">TechCorp HQ</p>
+        </div>
+      </div>
+
+      {/* Cancel Confirmation Modal */}
+      {showCancelModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          {/* Backdrop */}
+          <div 
+            className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+            onClick={() => !cancelling && setShowCancelModal(null)}
+          ></div>
+          
+          {/* Modal */}
+          <div className="relative bg-[#151F26] rounded-2xl p-6 sm:p-8 max-w-md w-full border border-white/10 shadow-2xl">
+            {/* Warning Icon */}
+            <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-red-500/10 flex items-center justify-center">
+              <span className="material-symbols-outlined text-4xl text-red-400">warning</span>
+            </div>
+            
+            <h3 className="text-2xl font-bold text-white text-center mb-2">Cancel Request?</h3>
+            <p className="text-gray-400 text-center mb-8">
+              Are you sure you want to cancel this disposal request? This action cannot be undone.
+            </p>
+            
+            <div className="flex flex-col sm:flex-row gap-3">
+              <button
+                onClick={() => setShowCancelModal(null)}
+                disabled={cancelling !== null}
+                className="flex-1 py-3 px-6 rounded-xl bg-white/5 text-white font-medium border border-white/10 hover:bg-white/10 transition-all disabled:opacity-50"
+              >
+                Keep Request
+              </button>
+              <button
+                onClick={() => handleCancelBooking(showCancelModal)}
+                disabled={cancelling !== null}
+                className="flex-1 py-3 px-6 rounded-xl bg-red-500 text-white font-bold hover:bg-red-600 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+              >
+                {cancelling === showCancelModal ? (
+                  <>
+                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                    Cancelling...
+                  </>
+                ) : (
+                  <>
+                    <span className="material-symbols-outlined text-lg">delete</span>
+                    Yes, Cancel
+                  </>
+                )}
+              </button>
             </div>
           </div>
         </div>
-      </aside>
-
-      <div className="flex flex-1 flex-col h-full overflow-hidden relative ml-0 lg:ml-20 transition-all">
-        {/* Header */}
-        <header className="flex h-16 w-full items-center justify-between bg-[#0f172a]/80 backdrop-blur-md px-6 lg:px-8 z-40 sticky top-0 border-b border-slate-800">
-          <div className="flex items-center gap-4 lg:hidden">
-            <button className="text-[#94a3b8] hover:text-white">
-              <span className="material-symbols-outlined">menu</span>
-            </button>
-            <span className="text-lg font-bold text-white">EcoCycle</span>
-          </div>
-          <div className="hidden lg:flex flex-col">
-            <h2 className="text-lg font-bold text-white leading-tight">Overview</h2>
-            <p className="text-xs text-[#94a3b8]">Welcome back, TechCorp Solutions</p>
-          </div>
-          <div className="flex items-center gap-4">
-            <div className="hidden md:flex items-center gap-2 rounded-full bg-slate-800/50 px-4 py-1.5 border border-slate-700">
-              <span className="material-symbols-outlined text-[#94a3b8] text-[18px]">search</span>
-              <input className="bg-transparent border-none text-xs focus:ring-0 placeholder-[#94a3b8] w-48 text-white p-0 focus:outline-none" placeholder="Search shipments, reports..." type="text"/>
-            </div>
-            <button className="relative flex h-9 w-9 items-center justify-center rounded-full bg-slate-800 text-[#94a3b8] hover:bg-slate-700 hover:text-white transition-colors border border-slate-700">
-              <span className="material-symbols-outlined text-[20px]">notifications</span>
-              <span className="absolute top-0 right-0 h-2.5 w-2.5 rounded-full bg-[#4ade80] border-2 border-[#0f172a]"></span>
-            </button>
-            <button className="flex items-center gap-2 rounded-lg bg-[#4ade80] text-slate-900 px-4 py-2 text-xs font-bold hover:bg-[#4ade80]/90 transition-all shadow-[0_0_20px_rgba(74,222,128,0.15)]">
-              <span className="material-symbols-outlined text-[16px]">add_circle</span>
-              New Pickup
-            </button>
-          </div>
-        </header>
-
-        {/* Main Content */}
-        <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
-          <div className="mx-auto max-w-7xl flex flex-col gap-6">
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
-              <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#1e293b] to-slate-900 p-5 border border-slate-800 group hover:border-slate-700 transition-all">
-                <div className="absolute right-0 top-0 h-24 w-24 translate-x-6 -translate-y-6 rounded-full bg-[#4ade80]/10 blur-2xl group-hover:bg-[#4ade80]/20 transition-all"></div>
-                <div className="flex justify-between items-start mb-4">
-                  <div className="rounded-lg bg-slate-800 p-2 text-[#4ade80] shadow-sm border border-slate-700">
-                    <span className="material-symbols-outlined">recycling</span>
-                  </div>
-                  <span className="flex items-center text-xs font-bold text-[#4ade80] bg-[#4ade80]/10 px-2 py-1 rounded-full">+12.5%</span>
-                </div>
-                <div className="relative">
-                  <h3 className="text-2xl font-bold text-white tracking-tight">1,250 <span className="text-sm font-normal text-[#94a3b8]">kg</span></h3>
-                  <p className="text-xs font-medium text-[#94a3b8] mt-1">Total E-Waste Processed</p>
-                </div>
-              </div>
-              <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#1e293b] to-slate-900 p-5 border border-slate-800 group hover:border-slate-700 transition-all">
-                <div className="absolute right-0 top-0 h-24 w-24 translate-x-6 -translate-y-6 rounded-full bg-[#38bdf8]/10 blur-2xl group-hover:bg-[#38bdf8]/20 transition-all"></div>
-                <div className="flex justify-between items-start mb-4">
-                  <div className="rounded-lg bg-slate-800 p-2 text-[#38bdf8] shadow-sm border border-slate-700">
-                    <span className="material-symbols-outlined">co2</span>
-                  </div>
-                  <span className="flex items-center text-xs font-bold text-[#38bdf8] bg-[#38bdf8]/10 px-2 py-1 rounded-full">offset</span>
-                </div>
-                <div className="relative">
-                  <h3 className="text-2xl font-bold text-white tracking-tight">850 <span className="text-sm font-normal text-[#94a3b8]">kg</span></h3>
-                  <p className="text-xs font-medium text-[#94a3b8] mt-1">CO₂ Emissions Saved</p>
-                </div>
-              </div>
-              <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#1e293b] to-slate-900 p-5 border border-slate-800 group hover:border-slate-700 transition-all">
-                <div className="absolute right-0 top-0 h-24 w-24 translate-x-6 -translate-y-6 rounded-full bg-orange-500/10 blur-2xl group-hover:bg-orange-500/20 transition-all"></div>
-                <div className="flex justify-between items-start mb-4">
-                  <div className="rounded-lg bg-slate-800 p-2 text-orange-400 shadow-sm border border-slate-700">
-                    <span className="material-symbols-outlined">local_shipping</span>
-                  </div>
-                  <span className="flex items-center text-xs font-bold text-orange-400 bg-orange-400/10 px-2 py-1 rounded-full">2 active</span>
-                </div>
-                <div className="relative">
-                  <h3 className="text-2xl font-bold text-white tracking-tight">Pending</h3>
-                  <p className="text-xs font-medium text-[#94a3b8] mt-1">Scheduled Pickups</p>
-                </div>
-              </div>
-              <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#1e293b] to-slate-900 p-5 border border-slate-800 group hover:border-slate-700 transition-all">
-                <div className="absolute right-0 top-0 h-24 w-24 translate-x-6 -translate-y-6 rounded-full bg-purple-500/10 blur-2xl group-hover:bg-purple-500/20 transition-all"></div>
-                <div className="flex justify-between items-start mb-4">
-                  <div className="rounded-lg bg-slate-800 p-2 text-purple-400 shadow-sm border border-slate-700">
-                    <span className="material-symbols-outlined">verified</span>
-                  </div>
-                  <span className="flex items-center text-xs font-bold text-purple-400 bg-purple-400/10 px-2 py-1 rounded-full">Latest</span>
-                </div>
-                <div className="relative">
-                  <h3 className="text-2xl font-bold text-white tracking-tight">24</h3>
-                  <p className="text-xs font-medium text-[#94a3b8] mt-1">Digital Certificates</p>
-                </div>
-              </div>
-            </div>
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <div className="lg:col-span-2 rounded-2xl bg-[#1e293b] border border-slate-800 p-6 flex flex-col relative overflow-hidden">
-                <div className="flex items-center justify-between mb-6 z-10">
-                  <div>
-                    <h3 className="text-base font-bold text-white">Organizational Eco-Footprint</h3>
-                    <p className="text-xs text-[#94a3b8]">Monthly breakdown by category</p>
-                  </div>
-                  <div className="flex bg-slate-900 rounded-lg p-1 border border-slate-800">
-                    <button className="px-3 py-1 text-xs font-medium rounded-md bg-slate-800 text-white shadow-sm border border-slate-700">Volume</button>
-                    <button className="px-3 py-1 text-xs font-medium rounded-md text-[#94a3b8] hover:text-white">Impact</button>
-                  </div>
-                </div>
-                <div className="relative flex-1 h-[300px] w-full mt-4 flex items-end justify-between gap-2 px-2 z-10">
-                  <div className="absolute inset-0 flex flex-col justify-between pointer-events-none z-0 px-2 opacity-20">
-                    <div className="border-t border-dashed border-slate-400 w-full h-px"></div>
-                    <div className="border-t border-dashed border-slate-400 w-full h-px"></div>
-                    <div className="border-t border-dashed border-slate-400 w-full h-px"></div>
-                    <div className="border-t border-dashed border-slate-400 w-full h-px"></div>
-                    <div className="border-t border-dashed border-slate-400 w-full h-px"></div>
-                  </div>
-                  <div className="flex flex-col items-center justify-end h-full w-full gap-2 group">
-                    <div className="w-full max-w-[40px] bg-slate-700 rounded-t-sm h-[30%] group-hover:bg-slate-600 transition-all relative overflow-hidden">
-                      <div className="absolute bottom-0 left-0 right-0 h-1 bg-[#4ade80]/50"></div>
-                    </div>
-                    <span className="text-[10px] text-[#94a3b8] uppercase">Jan</span>
-                  </div>
-                  <div className="flex flex-col items-center justify-end h-full w-full gap-2 group">
-                    <div className="w-full max-w-[40px] bg-slate-700 rounded-t-sm h-[45%] group-hover:bg-slate-600 transition-all relative overflow-hidden">
-                      <div className="absolute bottom-0 left-0 right-0 h-1 bg-[#4ade80]/50"></div>
-                    </div>
-                    <span className="text-[10px] text-[#94a3b8] uppercase">Feb</span>
-                  </div>
-                  <div className="flex flex-col items-center justify-end h-full w-full gap-2 group">
-                    <div className="w-full max-w-[40px] bg-slate-700 rounded-t-sm h-[25%] group-hover:bg-slate-600 transition-all relative overflow-hidden">
-                      <div className="absolute bottom-0 left-0 right-0 h-1 bg-[#4ade80]/50"></div>
-                    </div>
-                    <span className="text-[10px] text-[#94a3b8] uppercase">Mar</span>
-                  </div>
-                  <div className="flex flex-col items-center justify-end h-full w-full gap-2 group">
-                    <div className="w-full max-w-[40px] bg-slate-700 rounded-t-sm h-[60%] group-hover:bg-slate-600 transition-all relative overflow-hidden">
-                      <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-white text-slate-900 text-xs font-bold px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-20 shadow-lg">
-                        620 kg
-                        <div className="absolute bottom-[-4px] left-1/2 -translate-x-1/2 w-2 h-2 bg-white rotate-45"></div>
-                      </div>
-                      <div className="absolute bottom-0 left-0 right-0 h-1 bg-[#4ade80]/50"></div>
-                    </div>
-                    <span className="text-[10px] text-[#94a3b8] uppercase">Apr</span>
-                  </div>
-                  <div className="flex flex-col items-center justify-end h-full w-full gap-2 group">
-                    <div className="w-full max-w-[40px] bg-gradient-to-t from-[#4ade80]/80 to-[#4ade80] rounded-t-sm h-[85%] shadow-[0_0_20px_rgba(74,222,128,0.3)] relative transition-all hover:scale-105">
-                      <div className="absolute top-2 left-1/2 -translate-x-1/2 w-1 h-1 bg-white rounded-full animate-ping"></div>
-                    </div>
-                    <span className="text-[10px] font-bold text-white uppercase">May</span>
-                  </div>
-                  <div className="flex flex-col items-center justify-end h-full w-full gap-2 group">
-                    <div className="w-full max-w-[40px] bg-slate-800/50 rounded-t-sm h-[10%] border-t border-dashed border-slate-600"></div>
-                    <span className="text-[10px] text-[#94a3b8] uppercase">Jun</span>
-                  </div>
-                </div>
-              </div>
-              <div className="rounded-2xl bg-[#1e293b] border border-slate-800 p-0 overflow-hidden flex flex-col h-full">
-                <div className="p-5 border-b border-slate-800 flex justify-between items-center bg-slate-900/50">
-                  <h3 className="text-base font-bold text-white">Recent Certificates</h3>
-                  <button className="text-[#4ade80] text-xs font-semibold hover:underline">View All</button>
-                </div>
-                <div className="flex-1 overflow-y-auto p-4 space-y-3 scrollbar-thin scrollbar-thumb-slate-700">
-                  <div className="group flex items-center gap-3 p-3 rounded-xl bg-slate-900/50 border border-slate-800 hover:border-[#4ade80]/40 transition-all cursor-pointer hover:bg-slate-800">
-                    <div className="h-10 w-10 shrink-0 rounded-lg bg-[#4ade80]/10 flex items-center justify-center text-[#4ade80] group-hover:bg-[#4ade80] group-hover:text-slate-900 transition-colors">
-                      <span className="material-symbols-outlined text-[20px]">description</span>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-white truncate">Batch #2024-05A</p>
-                      <p className="text-xs text-[#94a3b8] truncate">Processed May 12 • 450kg</p>
-                    </div>
-                    <button className="h-8 w-8 flex items-center justify-center rounded-full text-[#94a3b8] hover:bg-slate-700 hover:text-white transition-colors">
-                      <span className="material-symbols-outlined text-[18px]">download</span>
-                    </button>
-                  </div>
-                  <div className="group flex items-center gap-3 p-3 rounded-xl bg-slate-900/50 border border-slate-800 hover:border-[#4ade80]/40 transition-all cursor-pointer hover:bg-slate-800">
-                    <div className="h-10 w-10 shrink-0 rounded-lg bg-[#4ade80]/10 flex items-center justify-center text-[#4ade80] group-hover:bg-[#4ade80] group-hover:text-slate-900 transition-colors">
-                      <span className="material-symbols-outlined text-[20px]">description</span>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-white truncate">ISO Compliance Report</p>
-                      <p className="text-xs text-[#94a3b8] truncate">Generated Apr 30 • Annual</p>
-                    </div>
-                    <button className="h-8 w-8 flex items-center justify-center rounded-full text-[#94a3b8] hover:bg-slate-700 hover:text-white transition-colors">
-                      <span className="material-symbols-outlined text-[18px]">download</span>
-                    </button>
-                  </div>
-                  <div className="group flex items-center gap-3 p-3 rounded-xl bg-slate-900/50 border border-slate-800 hover:border-[#4ade80]/40 transition-all cursor-pointer hover:bg-slate-800">
-                    <div className="h-10 w-10 shrink-0 rounded-lg bg-[#4ade80]/10 flex items-center justify-center text-[#4ade80] group-hover:bg-[#4ade80] group-hover:text-slate-900 transition-colors">
-                      <span className="material-symbols-outlined text-[20px]">description</span>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-white truncate">Batch #2024-04B</p>
-                      <p className="text-xs text-[#94a3b8] truncate">Processed Apr 15 • 320kg</p>
-                    </div>
-                    <button className="h-8 w-8 flex items-center justify-center rounded-full text-[#94a3b8] hover:bg-slate-700 hover:text-white transition-colors">
-                      <span className="material-symbols-outlined text-[18px]">download</span>
-                    </button>
-                  </div>
-                  <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-900/20 border border-slate-800/50 opacity-75">
-                    <div className="h-10 w-10 shrink-0 rounded-lg bg-slate-800 flex items-center justify-center text-[#94a3b8] animate-pulse">
-                      <span className="material-symbols-outlined text-[20px]">hourglass_empty</span>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-[#94a3b8] truncate">Batch #2024-05B</p>
-                      <p className="text-xs text-slate-500 truncate">Verification Pending...</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-6">
-              <div className="rounded-2xl bg-[#1e293b] border border-slate-800 overflow-hidden flex flex-col h-[350px] relative group">
-                <div className="absolute top-4 left-4 z-20 flex flex-col gap-1 pointer-events-none">
-                  <div className="bg-black/80 backdrop-blur-md px-3 py-1.5 rounded-lg border border-slate-700 flex items-center gap-2 w-fit">
-                    <span className="relative flex h-2.5 w-2.5">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
-                    </span>
-                    <span className="text-xs font-bold text-white uppercase tracking-wider">Live Tracking</span>
-                  </div>
-                  <div className="bg-black/60 backdrop-blur-sm px-3 py-1 rounded-md border border-slate-800 w-fit">
-                    <span className="text-[10px] text-[#94a3b8] font-mono">ID: TRK-8821 • ETA: 14:30</span>
-                  </div>
-                </div>
-                <div className="absolute inset-0 z-0 bg-slate-900">
-                  <img className="h-full w-full object-cover opacity-30 grayscale mix-blend-screen" alt="Dark stylized map interface showing city streets" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBbeTWGDGpaDD0ptERwuPXrpfBUrdzuqApgxfxYSDLuMZt4yW9wba9wFo8-wkgP5snmEzbReXIq1a7j11oL30N6hPly7FHxcWDr9LxnnWYt9XrLjGOh0eKzrm3m1JUjYaKXI-_LE-gNQ_wOXdop1VqYjtOIiNTauyL6s26HOUofVDOhhqg6vUL1kBRjvtsewCt7vNBGzxFkHn2cn5MZrVfH2ys4D0zwMl1El3PIOeXb0UeuXwzMBDzcHSK59wylYo5StE6Hmkq5UY0"/>
-                  <div className="absolute inset-0 bg-[linear-gradient(rgba(15,23,42,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(15,23,42,0.1)_1px,transparent_1px)] bg-[size:20px_20px] opacity-20"></div>
-                </div>
-                <div className="absolute inset-0 z-10 pointer-events-none">
-                  <svg className="absolute inset-0 h-full w-full">
-                    <path className="opacity-60" d="M 100 300 Q 250 200 400 150 T 600 100" fill="none" stroke="#4ade80" strokeDasharray="8 4" strokeWidth="3"></path>
-                  </svg>
-                  <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-                    <div className="relative">
-                      <div className="absolute -inset-4 rounded-full bg-[#4ade80]/20 animate-ping"></div>
-                      <div className="absolute -inset-8 rounded-full bg-[#4ade80]/10 animate-pulse delay-75"></div>
-                      <div className="relative h-10 w-10 bg-slate-900 rounded-full border-2 border-[#4ade80] flex items-center justify-center shadow-[0_0_20px_rgba(74,222,128,0.4)] z-20">
-                        <span className="material-symbols-outlined text-[#4ade80] text-sm">local_shipping</span>
-                      </div>
-                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 w-48 bg-slate-900/90 backdrop-blur-xl border border-slate-700 p-3 rounded-xl shadow-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-auto">
-                        <div className="flex justify-between items-center mb-2">
-                          <span className="text-xs font-bold text-white">Truck #42</span>
-                          <span className="text-[10px] bg-[#4ade80]/20 text-[#4ade80] px-1.5 py-0.5 rounded">On Time</span>
-                        </div>
-                        <div className="w-full bg-slate-700 h-1.5 rounded-full overflow-hidden mb-1">
-                          <div className="bg-[#4ade80] h-full w-[70%]"></div>
-                        </div>
-                        <div className="flex justify-between text-[10px] text-[#94a3b8]">
-                          <span>Depot</span>
-                          <span>Dest</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="rounded-2xl bg-[#1e293b] border border-slate-800 p-6 flex flex-col justify-between">
-                <div>
-                  <h3 className="text-lg font-bold text-white mb-2 flex items-center gap-2">
-                    <span className="material-symbols-outlined text-[#4ade80]">calendar_add_on</span>
-                    Schedule Pickup
-                  </h3>
-                  <p className="text-xs text-[#94a3b8] mb-6">Arrange collection for bulk corporate e-waste.</p>
-                  <div className="grid grid-cols-2 gap-4 mb-4">
-                    <div className="group relative rounded-xl bg-slate-900 border border-slate-700 p-3 hover:border-[#4ade80]/50 transition-colors cursor-pointer">
-                      <label className="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider block mb-1">Date</label>
-                      <div className="flex items-center justify-between text-white text-sm font-medium">
-                        <span>Select Date</span>
-                        <span className="material-symbols-outlined text-slate-500 group-hover:text-[#4ade80] text-[18px]">calendar_month</span>
-                      </div>
-                    </div>
-                    <div className="group relative rounded-xl bg-slate-900 border border-slate-700 p-3 hover:border-[#4ade80]/50 transition-colors cursor-pointer">
-                      <label className="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider block mb-1">Est. Weight</label>
-                      <div className="flex items-center justify-between text-white text-sm font-medium">
-                        <span>-- kg</span>
-                        <span className="material-symbols-outlined text-slate-500 group-hover:text-[#4ade80] text-[18px]">scale</span>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="mb-6">
-                    <label className="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider block mb-2">Primary Waste Type</label>
-                    <div className="flex flex-wrap gap-2">
-                      <button className="rounded-lg bg-[#4ade80]/20 px-3 py-2 text-xs font-bold text-[#4ade80] border border-[#4ade80]/20 hover:bg-[#4ade80]/30 transition-colors">IT Equipment</button>
-                      <button className="rounded-lg bg-slate-800 px-3 py-2 text-xs font-medium text-[#94a3b8] border border-slate-700 hover:text-white hover:border-slate-500 transition-colors">Batteries</button>
-                      <button className="rounded-lg bg-slate-800 px-3 py-2 text-xs font-medium text-[#94a3b8] border border-slate-700 hover:text-white hover:border-slate-500 transition-colors">Mixed Load</button>
-                    </div>
-                  </div>
-                </div>
-                <button className="w-full rounded-xl bg-gradient-to-r from-[#4ade80] to-[#22c55e] py-3.5 text-center text-sm font-bold text-slate-900 shadow-[0_0_20px_rgba(74,222,128,0.15)] transition-transform hover:scale-[1.02] active:scale-[0.98]">
-                  Confirm Pickup Request
-                </button>
-              </div>
-            </div>
-          </div>
-        </main>
-      </div>
-    </div>
+      )}
+    </Layout>
   );
 };
 

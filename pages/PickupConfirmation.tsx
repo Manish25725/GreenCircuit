@@ -3,6 +3,31 @@ import Layout from '../components/Layout';
 import { api, getCurrentUser } from '../services/api';
 import gsap from 'gsap';
 
+// Helper to get user role
+const getUserRole = (): 'User' | 'Business' | 'Agency' | 'Admin' => {
+  try {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      const user = JSON.parse(storedUser);
+      const role = user.role?.toLowerCase();
+      if (role === 'business') return 'Business';
+      if (role === 'agency' || role === 'partner') return 'Agency';
+      if (role === 'admin') return 'Admin';
+    }
+  } catch (e) {}
+  return 'User';
+};
+
+// Helper to get dashboard path based on role
+const getDashboardPath = (role: string): string => {
+  switch (role) {
+    case 'Business': return '#/business';
+    case 'Agency': return '#/agency';
+    case 'Admin': return '#/admin';
+    default: return '#/dashboard';
+  }
+};
+
 interface BookingDetails {
   _id: string;
   status: string;
@@ -17,6 +42,8 @@ const PickupConfirmation = () => {
   const [booking, setBooking] = useState<BookingDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const user = getCurrentUser();
+  const userRole = getUserRole();
+  const dashboardPath = getDashboardPath(userRole);
   const heroRef = useRef<HTMLDivElement>(null);
   const cardsRef = useRef<HTMLDivElement>(null);
 
@@ -125,7 +152,7 @@ const PickupConfirmation = () => {
 
   if (loading) {
     return (
-      <Layout title="" role="User" fullWidth hideSidebar>
+      <Layout title="" role={userRole} fullWidth hideSidebar>
         <div className="min-h-screen bg-[#0B1120] flex items-center justify-center">
           <div className="relative flex items-center justify-center">
             <div className="w-16 h-16 rounded-full border-4 border-[#34D399]/20 border-t-[#34D399] animate-spin"></div>
@@ -137,7 +164,7 @@ const PickupConfirmation = () => {
   }
 
   return (
-    <Layout title="" role="User" fullWidth hideSidebar>
+    <Layout title="" role={userRole} fullWidth hideSidebar>
       <div className="relative flex min-h-screen w-full flex-col font-display bg-[#0B1120] text-slate-300 selection:bg-[#34D399] selection:text-slate-900 overflow-x-hidden">
         
         {/* Background Effects */}
@@ -330,19 +357,19 @@ const PickupConfirmation = () => {
             <div className="animate-card flex flex-col sm:flex-row gap-4 pt-4">
               {(booking?.status === 'completed' || booking?.status === 'collected') ? (
                 <button 
-                  onClick={() => window.location.hash = '#/certificate'}
+                  onClick={() => window.location.hash = userRole === 'User' ? '#/certificate' : dashboardPath}
                   className="relative group flex-1 h-14 rounded-full overflow-hidden cursor-pointer"
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-[#34D399] to-[#6EE7B7] transition-transform duration-300 group-hover:scale-105"></div>
                   <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-r from-[#6EE7B7] to-[#34D399]"></div>
                   <div className="relative z-10 flex items-center justify-center gap-2 h-full text-slate-900 font-bold">
-                    <span className="material-symbols-outlined text-xl">verified</span>
-                    View Digital Certificate
+                    <span className="material-symbols-outlined text-xl">{userRole === 'User' ? 'verified' : 'dashboard'}</span>
+                    {userRole === 'User' ? 'View Digital Certificate' : 'Go to Dashboard'}
                   </div>
                 </button>
               ) : (
                 <button 
-                  onClick={() => window.location.hash = '#/dashboard'}
+                  onClick={() => window.location.hash = dashboardPath}
                   className="relative group flex-1 h-14 rounded-full overflow-hidden cursor-pointer"
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-[#34D399] to-[#6EE7B7] transition-transform duration-300 group-hover:scale-105"></div>

@@ -142,9 +142,8 @@ VettingRequestSchema.index({ agencyId: 1 });
 VettingRequestSchema.index({ type: 1, status: 1 });
 
 // Update lastUpdatedAt on every save
-VettingRequestSchema.pre('save', function(next) {
+VettingRequestSchema.pre('save', function() {
   this.lastUpdatedAt = new Date();
-  next();
 });
 
 const VettingRequest = mongoose.model<IVettingRequest>('VettingRequest', VettingRequestSchema);

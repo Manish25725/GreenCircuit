@@ -183,7 +183,7 @@ const Landing = () => {
                     </div>
                     <nav className="hidden md:flex items-center gap-8">
                         <button className="text-slate-400 hover:text-[#34D399] text-sm font-medium transition-colors bg-transparent border-none cursor-pointer" onClick={() => window.location.hash = '#/how-it-works'}>How It Works</button>
-                        <button className="text-slate-400 hover:text-[#34D399] text-sm font-medium transition-colors bg-transparent border-none cursor-pointer" onClick={() => window.location.hash = '#/search'}>Services</button>
+                        <button className="text-slate-400 hover:text-[#34D399] text-sm font-medium transition-colors bg-transparent border-none cursor-pointer" onClick={() => window.location.hash = '#/login'}>Dashboard</button>
                         <button className="text-slate-400 hover:text-[#34D399] text-sm font-medium transition-colors bg-transparent border-none cursor-pointer" onClick={() => window.location.hash = '#/about'}>About Us</button>
                         <button className="text-slate-400 hover:text-[#34D399] text-sm font-medium transition-colors bg-transparent border-none cursor-pointer" onClick={() => window.location.hash = '#/contact'}>Contact</button>
                     </nav>

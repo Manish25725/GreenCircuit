@@ -205,20 +205,38 @@ export const updateBusinessProfile = async (req: Request, res: Response) => {
 export const getInventory = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).user.id;
-    const { category, status, search, page = 1, limit = 20 } = req.query;
+    const { category, status, search, page = 1, limit = 50 } = req.query;
 
-    const business = await Business.findOne({ userId });
+    // Find or create business profile
+    let business = await Business.findOne({ userId });
     if (!business) {
-      return sendError(res, 'Business profile not found', 404);
+      const user = await User.findById(userId);
+      if (!user) {
+        return sendError(res, 'User not found', 404);
+      }
+      business = await Business.create({
+        userId,
+        companyName: user.name + "'s Business",
+        email: user.email,
+        phone: user.phone || '',
+        industry: 'Technology',
+        address: user.address || {
+          street: '',
+          city: '',
+          state: '',
+          country: 'India',
+          zipCode: ''
+        }
+      });
     }
 
     const query: any = { businessId: business._id };
     
-    if (category) query.category = category;
-    if (status) query.status = status;
+    if (category && category !== 'all') query.category = category;
+    if (status && status !== 'all') query.status = status;
     if (search) {
       query.$or = [
-        { name: new RegExp(search as string, 'i') },
+        { itemName: new RegExp(search as string, 'i') },
         { assetId: new RegExp(search as string, 'i') },
         { serialNumber: new RegExp(search as string, 'i') }
       ];
@@ -288,18 +306,51 @@ export const addInventoryItem = async (req: Request, res: Response) => {
     const userId = (req as any).user.id;
     const itemData = req.body;
 
-    const business = await Business.findOne({ userId });
+    // Find or create business profile
+    let business = await Business.findOne({ userId });
     if (!business) {
-      return sendError(res, 'Business profile not found', 404);
+      const user = await User.findById(userId);
+      if (!user) {
+        return sendError(res, 'User not found', 404);
+      }
+      business = await Business.create({
+        userId,
+        companyName: user.name + "'s Business",
+        email: user.email,
+        phone: user.phone || '',
+        industry: 'Technology',
+        address: user.address || {
+          street: '',
+          city: '',
+          state: '',
+          country: 'India',
+          zipCode: ''
+        }
+      });
     }
 
-    const item = await Inventory.create({
-      ...itemData,
-      businessId: business._id
-    });
+    // Map frontend fields to backend model fields
+    const inventoryData = {
+      businessId: business._id,
+      itemName: itemData.name || itemData.itemName,
+      category: itemData.category || 'Other',
+      quantity: itemData.quantity || 1,
+      weight: itemData.weight || 0,
+      status: itemData.status || 'in-storage',
+      condition: itemData.condition || 'unknown',
+      location: itemData.location || 'Main Storage',
+      description: itemData.description || '',
+      hazardous: itemData.hazardous || false,
+      recyclable: itemData.recyclable !== false,
+      tags: itemData.tags || [],
+      notes: itemData.notes || ''
+    };
+
+    const item = await Inventory.create(inventoryData);
 
     sendSuccess(res, item, 201);
   } catch (error: any) {
+    console.error('Add inventory error:', error);
     sendError(res, error.message);
   }
 };
@@ -311,14 +362,39 @@ export const updateInventoryItem = async (req: Request, res: Response) => {
     const { id } = req.params;
     const updates = req.body;
 
-    const business = await Business.findOne({ userId });
+    // Find or create business profile
+    let business = await Business.findOne({ userId });
     if (!business) {
-      return sendError(res, 'Business profile not found', 404);
+      const user = await User.findById(userId);
+      if (!user) {
+        return sendError(res, 'User not found', 404);
+      }
+      business = await Business.create({
+        userId,
+        companyName: user.name + "'s Business",
+        email: user.email,
+        phone: user.phone || '',
+        industry: 'Technology',
+        address: user.address || {
+          street: '',
+          city: '',
+          state: '',
+          country: 'India',
+          zipCode: ''
+        }
+      });
+    }
+
+    // Map frontend fields to backend model fields if needed
+    const updateData: any = { ...updates };
+    if (updates.name) {
+      updateData.itemName = updates.name;
+      delete updateData.name;
     }
 
     const item = await Inventory.findOneAndUpdate(
       { _id: id, businessId: business._id },
-      updates,
+      updateData,
       { new: true, runValidators: true }
     );
 
@@ -328,6 +404,7 @@ export const updateInventoryItem = async (req: Request, res: Response) => {
 
     sendSuccess(res, item);
   } catch (error: any) {
+    console.error('Update inventory error:', error);
     sendError(res, error.message);
   }
 };
@@ -723,7 +800,7 @@ export const exportReport = async (req: Request, res: Response) => {
 export const scheduleBusinessPickup = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).user.id;
-    const { agencyId, slotId, items, pickupAddress, notes, inventoryItemIds } = req.body;
+    const { agencyId, slotId, items, pickupAddress, notes, inventoryItemIds, scheduledDate, scheduledTime } = req.body;
 
     const business = await Business.findOne({ userId });
     if (!business) {
@@ -731,23 +808,30 @@ export const scheduleBusinessPickup = async (req: Request, res: Response) => {
     }
 
     // Calculate total weight
-    const totalWeight = items.reduce((sum: number, item: any) => sum + (item.weight * item.quantity), 0);
+    const totalWeight = items.reduce((sum: number, item: any) => sum + ((item.weight || 0) * (item.quantity || 1)), 0);
 
     // Create booking
     const booking = await Booking.create({
       userId,
       agencyId,
       slotId,
-      items,
+      items: items.map((item: any) => ({
+        type: item.type || item.category,
+        quantity: item.quantity || 1,
+        description: item.description || item.name,
+        estimatedWeight: item.weight
+      })),
       totalWeight,
       pickupAddress: pickupAddress || business.address,
       notes,
       status: 'pending',
-      businessId: business._id
+      businessId: business._id,
+      scheduledDate: scheduledDate || new Date(),
+      scheduledTime: scheduledTime || '09:00 AM'
     });
 
     // Update inventory items if provided
-    if (inventoryItemIds && inventoryItemIds.length > 0) {
+    if (booking && inventoryItemIds && inventoryItemIds.length > 0) {
       await Inventory.updateMany(
         { _id: { $in: inventoryItemIds }, businessId: business._id },
         { status: 'scheduled', bookingId: booking._id }

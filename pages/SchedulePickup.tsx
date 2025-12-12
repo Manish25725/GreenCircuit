@@ -3,6 +3,31 @@ import Layout from '../components/Layout';
 import { api, getCurrentUser, isAuthenticated } from '../services/api';
 import gsap from 'gsap';
 
+// Helper to get user role
+const getUserRole = (): 'User' | 'Business' | 'Agency' | 'Admin' => {
+  try {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      const user = JSON.parse(storedUser);
+      const role = user.role?.toLowerCase();
+      if (role === 'business') return 'Business';
+      if (role === 'agency' || role === 'partner') return 'Agency';
+      if (role === 'admin') return 'Admin';
+    }
+  } catch (e) {}
+  return 'User';
+};
+
+// Helper to get dashboard path based on role
+const getDashboardPath = (role: string): string => {
+  switch (role) {
+    case 'Business': return '#/business';
+    case 'Agency': return '#/agency';
+    case 'Admin': return '#/admin';
+    default: return '#/dashboard';
+  }
+};
+
 interface Item {
   id: string;
   type: string;
@@ -35,6 +60,8 @@ const SchedulePickup = () => {
   const [activeBooking, setActiveBooking] = useState<any>(null);
   const limitPageRef = useRef<HTMLDivElement>(null);
   const user = getCurrentUser();
+  const userRole = getUserRole();
+  const dashboardPath = getDashboardPath(userRole);
 
   useEffect(() => {
     // Check if user is logged in
@@ -313,7 +340,7 @@ const SchedulePickup = () => {
   };
 
   return (
-    <Layout title="" role="User" fullWidth hideSidebar>
+    <Layout title="" role={userRole} fullWidth hideSidebar>
       {/* Limit Exceeded UI */}
       {limitExceeded ? (
         <div ref={limitPageRef} className="relative flex min-h-screen w-full flex-col font-display bg-[#0B1120] text-slate-300 selection:bg-[#f59e0b] selection:text-slate-900 overflow-x-hidden">
@@ -429,7 +456,7 @@ const SchedulePickup = () => {
               {/* Action Buttons */}
               <div className="flex flex-col sm:flex-row gap-4 justify-center limit-card">
                 <button 
-                  onClick={() => window.location.hash = '#/dashboard'}
+                  onClick={() => window.location.hash = dashboardPath}
                   className="group relative overflow-hidden px-8 py-4 rounded-xl bg-gradient-to-r from-[#f59e0b] to-[#ef4444] text-white font-bold shadow-[0_0_30px_rgba(245,158,11,0.3)] hover:shadow-[0_0_50px_rgba(245,158,11,0.5)] transition-all"
                 >
                   <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-500"></div>
@@ -492,10 +519,6 @@ const SchedulePickup = () => {
                 <h2 className="text-xl font-bold tracking-tight text-white">EcoCycle</h2>
             </div>
             <nav className="hidden md:flex flex-1 justify-center gap-1">
-                <a className="text-sm font-medium px-5 py-2.5 rounded-full text-[#94a3b8] hover:text-white hover:bg-white/5 transition-all cursor-pointer" onClick={() => window.location.hash = '#/dashboard'}>Dashboard</a>
-                <a className="text-sm font-semibold px-5 py-2.5 rounded-full text-white bg-white/10 shadow-inner border border-white/5 cursor-pointer" onClick={() => window.location.hash = '#/search'}>New Request</a>
-                <a className="text-sm font-medium px-5 py-2.5 rounded-full text-[#94a3b8] hover:text-white hover:bg-white/5 transition-all cursor-pointer" onClick={() => window.location.hash = '#/rewards'}>Rewards</a>
-                <a className="text-sm font-medium px-5 py-2.5 rounded-full text-[#94a3b8] hover:text-white hover:bg-white/5 transition-all cursor-pointer" onClick={() => window.location.hash = '#/certificate'}>Certificate</a>
             </nav>
             <div className="flex items-center gap-4">
                 <button 
@@ -503,7 +526,7 @@ const SchedulePickup = () => {
                     className="hidden sm:flex items-center gap-3 pl-1 pr-4 py-1 rounded-full bg-[#151F26] border border-white/5 hover:bg-white/5 transition-colors group cursor-pointer"
                 >
                     <div className="size-8 rounded-full bg-cover bg-center ring-2 ring-white/10 group-hover:ring-[#10b981]/50 transition-all" style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuAreboopkKSy4YYDs4PFvd-l4xnboU1-dCb6q7kuogZsIpVK9icd7CNdE17iE4uQKdoqiJuI30CTaWxw7GK3QrR7H_FstEqPZBbUqkey_74QXoP8uhTfR9RY780_K4O8UAQpRMWJiKbRdh5-SdE7JAIX5lG3yPPg3Wisf3RGrXHACYJxJFU0vYynDCqaru_FI7DW3EV-buSFuzGK8Z7LP7p7c25u8kqkBUXlt5pQG5d-4WVmAzmNX9U0trABs1cC--zDVlgdRcgww")' }}></div>
-                    <span className="text-sm font-medium text-gray-200">Alex Morgan</span>
+                    <span className="text-sm font-medium text-gray-200">{user?.name || 'User'}</span>
                 </button>
                 <button className="relative p-2.5 rounded-full bg-[#151F26] border border-white/5 text-gray-400 hover:text-white hover:bg-white/10 transition-colors">
                     <span className="absolute top-2.5 right-3 size-2 bg-red-500 rounded-full border-2 border-[#151F26]"></span>

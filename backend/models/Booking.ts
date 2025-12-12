@@ -13,6 +13,7 @@ export interface IBooking extends Document {
   userId: mongoose.Types.ObjectId;
   agencyId: mongoose.Types.ObjectId;
   slotId: mongoose.Types.ObjectId;
+  businessId?: mongoose.Types.ObjectId;
   items: IBookingItem[];
   status: 'pending' | 'confirmed' | 'in-progress' | 'completed' | 'cancelled';
   scheduledDate: Date;
@@ -28,6 +29,7 @@ export interface IBooking extends Document {
   certificateIssued: boolean;
   certificateId?: string;
   notes?: string;
+  completedAt?: Date;
   trackingHistory: {
     status: string;
     message: string;
@@ -56,6 +58,10 @@ const BookingSchema = new Schema<IBooking>({
     type: Schema.Types.ObjectId,
     ref: 'Slot',
     required: false
+  },
+  businessId: {
+    type: Schema.Types.ObjectId,
+    ref: 'Business'
   },
   items: [{
     type: {
@@ -100,6 +106,7 @@ const BookingSchema = new Schema<IBooking>({
   },
   certificateId: String,
   notes: String,
+  completedAt: Date,
   trackingHistory: [{
     status: String,
     message: String,
