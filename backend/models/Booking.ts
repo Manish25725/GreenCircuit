@@ -55,13 +55,12 @@ const BookingSchema = new Schema<IBooking>({
   slotId: {
     type: Schema.Types.ObjectId,
     ref: 'Slot',
-    required: true
+    required: false
   },
   items: [{
     type: {
       type: String,
-      required: true,
-      enum: ['Large Appliances', 'Small Appliances', 'Consumer Electronics', 'Batteries & Power Supplies', 'Cables & Accessories', 'Other']
+      required: true
     },
     quantity: {
       type: Number,

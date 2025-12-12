@@ -25,34 +25,44 @@ const SchedulePickup = () => {
   const [slots, setSlots] = useState<Slot[]>([]);
   const [agencyId, setAgencyId] = useState<string>('');
   const [agencyName, setAgencyName] = useState<string>('');
+  const [agencyDetails, setAgencyDetails] = useState<any>(null);
+  const [loadingAgency, setLoadingAgency] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const user = getCurrentUser();
 
   useEffect(() => {
-    // Get agency ID from URL params
+    // Get agency ID from URL params and fetch from MongoDB
     const hash = window.location.hash;
     const params = new URLSearchParams(hash.split('?')[1] || '');
     const agency = params.get('agency');
-    const name = params.get('name');
     
     if (agency) {
       setAgencyId(agency);
-      setAgencyName(name || 'Selected Agency');
+      fetchAgencyDetails(agency);
     } else {
-      // Fallback to localStorage
-      const storedAgency = localStorage.getItem('selectedAgency');
-      if (storedAgency) {
-        try {
-          const agencyData = JSON.parse(storedAgency);
-          setAgencyId(agencyData._id);
-          setAgencyName(agencyData.name || 'Selected Agency');
-        } catch (e) {
-          console.error('Failed to parse stored agency');
-        }
-      }
+      setLoadingAgency(false);
+      // Redirect back to search if no agency selected
+      window.location.hash = '#/search';
     }
   }, []);
+
+  const fetchAgencyDetails = async (id: string) => {
+    try {
+      setLoadingAgency(true);
+      const agency = await api.getAgencyById(id);
+      if (agency) {
+        setAgencyDetails(agency);
+        setAgencyName(agency.name || 'Selected Agency');
+      }
+    } catch (error) {
+      console.error('Failed to fetch agency details:', error);
+      // Redirect back to search if agency not found
+      window.location.hash = '#/search';
+    } finally {
+      setLoadingAgency(false);
+    }
+  };
 
   useEffect(() => {
     if (agencyId) {
@@ -201,6 +211,14 @@ const SchedulePickup = () => {
 
   return (
     <Layout title="" role="User" fullWidth hideSidebar>
+      {loadingAgency ? (
+        <div className="bg-[#0B1116] min-h-screen flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-2 border-[#10b981] border-t-transparent mx-auto mb-4"></div>
+            <p className="text-[#94a3b8]">Loading agency details...</p>
+          </div>
+        </div>
+      ) : (
       <div className="bg-[#0B1116] font-sans text-gray-200 min-h-screen flex flex-col relative overflow-x-hidden selection:bg-[#10b981] selection:text-white">
         
         {/* Background Ambient Blobs */}
@@ -502,6 +520,7 @@ const SchedulePickup = () => {
           </div>
         </main>
       </div>
+      )}
     </Layout>
   );
 };

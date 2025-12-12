@@ -46,7 +46,10 @@ const App = () => {
   }, []);
 
   const renderRoute = () => {
-    switch (route) {
+    // Extract base path without query params
+    const basePath = route.split('?')[0];
+    
+    switch (basePath) {
       case '#/agency':
         return <AgencyAnalytics />;
       case '#/agency/slots':

@@ -304,7 +304,7 @@ export const api = {
   },
 
   getAgencyById: async (id: string): Promise<Agency> => {
-    return apiRequest<Agency>(`/agencies/${id}`);
+    return fetchWithFallback<Agency>(`/agencies/${id}`, {} as Agency);
   },
 
   searchAgencies: async (location: string) => {

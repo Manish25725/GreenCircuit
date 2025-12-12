@@ -12,23 +12,48 @@ export const createBooking = async (req: Request, res: Response) => {
     const { agencyId, slotId, items, scheduledDate, scheduledTime, pickupAddress, notes } = req.body;
     const userId = (req as any).user.id;
 
-    // Check if slot is available
-    const slot = await Slot.findById(slotId);
-    if (!slot || slot.status !== 'Available') {
-      return sendError(res, 'Slot is not available', 400);
+    // Validate required fields
+    if (!agencyId || !items || items.length === 0) {
+      return sendError(res, 'Agency and items are required', 400);
     }
+
+    // Check if agency exists
+    const agency = await Agency.findById(agencyId);
+    if (!agency) {
+      return sendError(res, 'Agency not found', 404);
+    }
+
+    // Try to find and validate slot (optional - allow booking without slot)
+    let validSlotId = null;
+    if (slotId && slotId.length === 24) { // Check if it's a valid MongoDB ObjectId format
+      const slot = await Slot.findById(slotId);
+      if (slot && slot.status === 'Available') {
+        validSlotId = slotId;
+        // Update slot status
+        await Slot.findByIdAndUpdate(slotId, {
+          status: 'Booked',
+          bookedBy: userId
+        });
+      }
+    }
+
+    // Generate booking ID
+    const bookingCount = await Booking.countDocuments();
+    const bookingId = `ECO-${String(bookingCount + 1).padStart(6, '0')}`;
 
     // Create booking
     const booking = await Booking.create({
       userId,
       agencyId,
-      slotId,
+      slotId: validSlotId,
+      bookingId,
       items,
-      scheduledDate: new Date(scheduledDate),
-      scheduledTime,
-      pickupAddress,
+      scheduledDate: new Date(scheduledDate || Date.now()),
+      scheduledTime: scheduledTime || 'TBD',
+      pickupAddress: pickupAddress || {},
       notes,
       status: 'pending',
+      pointsEarned: items.reduce((acc: number, item: any) => acc + (item.quantity * 10), 0),
       trackingHistory: [{
         status: 'pending',
         message: 'Booking request placed',
@@ -36,27 +61,37 @@ export const createBooking = async (req: Request, res: Response) => {
       }]
     });
 
-    // Update slot status
-    await Slot.findByIdAndUpdate(slotId, {
-      status: 'Booked',
-      bookedBy: userId,
-      bookingId: booking._id
-    });
+    // Update slot with booking ID if we have a valid slot
+    if (validSlotId) {
+      await Slot.findByIdAndUpdate(validSlotId, { bookingId: booking._id });
+    }
 
-    // Update user's total pickups
-    await User.findByIdAndUpdate(userId, { $inc: { totalPickups: 1 } });
+    // Update user's total pickups and eco points
+    const pointsEarned = items.reduce((acc: number, item: any) => acc + (item.quantity * 10), 0);
+    await User.findByIdAndUpdate(userId, { 
+      $inc: { 
+        totalPickups: 1,
+        totalBookings: 1,
+        ecoPoints: pointsEarned
+      } 
+    });
 
     // Create notification
     await Notification.create({
       userId,
       type: 'booking',
       title: 'Booking Confirmed',
-      message: `Your booking ${booking.bookingId} has been placed successfully.`,
+      message: `Your booking ${bookingId} has been placed successfully.`,
       icon: 'check_circle'
     });
 
-    sendSuccess(res, booking, 201);
+    // Populate agency info before returning
+    const populatedBooking = await Booking.findById(booking._id)
+      .populate('agencyId', 'name logo rating');
+
+    sendSuccess(res, populatedBooking, 201);
   } catch (error: any) {
+    console.error('Booking creation error:', error);
     sendError(res, error.message);
   }
 };

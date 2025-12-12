@@ -71,27 +71,46 @@ const SearchAgencies = () => {
 
   // Initialize map
   useEffect(() => {
-    if (mapRef.current && !mapInstanceRef.current && typeof L !== 'undefined') {
-      // Create map centered on world view
-      mapInstanceRef.current = L.map(mapRef.current, {
-        center: [20, 0],
-        zoom: 2,
-        zoomControl: false,
-        attributionControl: false,
-      });
+    // Wait for DOM to be ready
+    const initMap = () => {
+      if (mapRef.current && !mapInstanceRef.current && typeof L !== 'undefined') {
+        try {
+          // Create map centered on India
+          mapInstanceRef.current = L.map(mapRef.current, {
+            center: [22.5937, 78.9629], // Center of India
+            zoom: 5,
+            zoomControl: false,
+            attributionControl: false,
+          });
 
-      // Add dark-themed tile layer (CartoDB Dark Matter)
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-        maxZoom: 19,
-      }).addTo(mapInstanceRef.current);
+          // Use Stadia Maps dark theme (shows correct boundaries)
+          L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png', {
+            maxZoom: 20,
+            attribution: ''
+          }).addTo(mapInstanceRef.current);
 
-      // Add custom zoom control
-      L.control.zoom({ position: 'bottomright' }).addTo(mapInstanceRef.current);
-      
-      setMapReady(true);
-    }
+          // Add custom zoom control
+          L.control.zoom({ position: 'bottomright' }).addTo(mapInstanceRef.current);
+          
+          // Force map to recalculate size
+          setTimeout(() => {
+            if (mapInstanceRef.current) {
+              mapInstanceRef.current.invalidateSize();
+            }
+          }, 100);
+          
+          setMapReady(true);
+        } catch (error) {
+          console.error('Error initializing map:', error);
+        }
+      }
+    };
+
+    // Small delay to ensure DOM is ready
+    const timer = setTimeout(initMap, 100);
 
     return () => {
+      clearTimeout(timer);
       if (mapInstanceRef.current) {
         mapInstanceRef.current.remove();
         mapInstanceRef.current = null;
@@ -115,51 +134,87 @@ const SearchAgencies = () => {
       );
 
       if (cityData) {
-        const [, { coords }] = cityData;
+        const [, { coords, country }] = cityData;
+        const isSelected = selectedAgency?._id === agency._id;
         
-        // Custom marker icon
+        // Beautiful animated marker with pulse effect
         const customIcon = L.divIcon({
-          className: 'custom-marker',
+          className: 'custom-marker-wrapper',
           html: `
-            <div class="marker-pin ${selectedAgency?._id === agency._id ? 'selected' : ''}">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-              </svg>
+            <div class="marker-container ${isSelected ? 'selected' : ''}">
+              <div class="marker-pulse"></div>
+              <div class="marker-pin">
+                <div class="marker-icon">
+                  <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                  </svg>
+                </div>
+              </div>
+              <div class="marker-shadow"></div>
             </div>
           `,
-          iconSize: [36, 42],
-          iconAnchor: [18, 42],
-          popupAnchor: [0, -42],
+          iconSize: [48, 56],
+          iconAnchor: [24, 56],
+          popupAnchor: [0, -56],
         });
 
         const marker = L.marker(coords, { icon: customIcon })
           .addTo(mapInstanceRef.current)
           .on('click', () => {
             setSelectedAgency(agency);
-            mapInstanceRef.current.flyTo(coords, 12, { duration: 1 });
+            mapInstanceRef.current.flyTo(coords, 12, { 
+              duration: 1.5,
+              easeLinearity: 0.25
+            });
           });
 
-        // Add popup
+        // Beautiful popup with gradient
         marker.bindPopup(`
-          <div class="popup-content">
-            <h3>${agency.name}</h3>
-            <p>${agency.address?.city}, ${agency.address?.country || agency.address?.state}</p>
-            <div class="rating">
-              <span>★</span> ${agency.rating?.toFixed(1) || '4.5'}
+          <div class="agency-popup">
+            <div class="popup-header">
+              <div class="popup-icon">♻️</div>
+              <div class="popup-title">
+                <h3>${agency.name}</h3>
+                <span class="popup-location">${agency.address?.city || ''}, ${country || ''}</span>
+              </div>
+            </div>
+            <div class="popup-stats">
+              <div class="stat">
+                <span class="stat-icon">⭐</span>
+                <span class="stat-value">${agency.rating?.toFixed(1) || '4.5'}</span>
+              </div>
+              <div class="stat">
+                <span class="stat-icon">📦</span>
+                <span class="stat-value">${agency.totalBookings || '100'}+ pickups</span>
+              </div>
+            </div>
+            <div class="popup-services">
+              ${(agency.services || ['Electronics', 'Batteries']).slice(0, 3).map(s => 
+                `<span class="service-tag">${s}</span>`
+              ).join('')}
             </div>
           </div>
-        `, { className: 'dark-popup' });
+        `, { 
+          className: 'custom-popup',
+          closeButton: true,
+          maxWidth: 280,
+          minWidth: 240
+        });
 
         markersRef.current.push(marker);
       }
     });
 
-    // Fit bounds if we have markers
-    if (markersRef.current.length > 0) {
+    // Fit bounds with animation
+    if (markersRef.current.length > 0 && !selectedAgency) {
       const group = L.featureGroup(markersRef.current);
-      mapInstanceRef.current.fitBounds(group.getBounds().pad(0.2));
+      mapInstanceRef.current.fitBounds(group.getBounds().pad(0.2), { 
+        maxZoom: 6,
+        animate: true,
+        duration: 1
+      });
     }
-  }, [agencies, mapReady]);
+  }, [agencies, mapReady, selectedAgency]);
 
   const loadAgencies = async () => {
     setLoading(true);
@@ -262,8 +317,8 @@ const SearchAgencies = () => {
   };
 
   const handleBookPickup = (agency: Agency) => {
-    localStorage.setItem('selectedAgency', JSON.stringify(agency));
-    window.location.hash = `#/schedule?agency=${agency._id}&name=${encodeURIComponent(agency.name)}`;
+    // Navigate to schedule page with agency ID - data will be fetched from MongoDB
+    window.location.hash = `#/schedule?agency=${agency._id}`;
   };
 
   const getCountryFlag = (country: string) => {
@@ -485,30 +540,69 @@ const SearchAgencies = () => {
             </div>
 
             {/* Map Area - Leaflet Map */}
-            <div className="flex-1 relative hidden md:flex flex-col bg-[#0B1116]">
+            <div className="flex-1 relative hidden md:flex flex-col bg-[#0B1116] overflow-hidden">
                {/* Leaflet Map Container */}
                <div 
                  ref={mapRef} 
-                 className="flex-1 z-0"
+                 className="absolute inset-0 z-0"
                  style={{ background: '#0B1116' }}
                />
                
-               {/* Map Overlay - Legend */}
-               <div className="absolute top-4 left-4 bg-[#151F26]/95 backdrop-blur-sm px-4 py-3 rounded-xl border border-white/10 z-[1000]">
-                 <div className="flex items-center gap-2 text-white text-sm font-bold mb-2">
-                   <span className="material-symbols-outlined text-[#10b981]">public</span>
-                   Global E-Waste Network
-                 </div>
-                 <div className="flex items-center gap-4 text-xs text-[#94a3b8]">
-                   <span className="flex items-center gap-1">
-                     <span className="w-3 h-3 rounded-full bg-[#10b981]"></span>
-                     Active ({agencies.length})
-                   </span>
-                 </div>
-                 <p className="text-[10px] text-[#94a3b8] mt-2">Click markers or agencies in list</p>
+               {/* Gradient overlays for depth */}
+               <div className="absolute inset-0 pointer-events-none z-[500]">
+                 <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-[#0B1116]/80 to-transparent" />
+                 <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#0B1116]/80 to-transparent" />
+                 <div className="absolute top-0 left-0 bottom-0 w-16 bg-gradient-to-r from-[#0B1116]/50 to-transparent" />
                </div>
                
-               {/* Selected Agency Panel */}
+               {/* Map Header with Stats */}
+               <div className="absolute top-4 left-4 right-4 flex items-start justify-between z-[1000]">
+                 <div className="bg-[#151F26]/90 backdrop-blur-xl px-5 py-4 rounded-2xl border border-white/10 shadow-2xl">
+                   <div className="flex items-center gap-3 mb-3">
+                     <div className="p-2 bg-[#10b981]/20 rounded-xl">
+                       <span className="material-symbols-outlined text-[#10b981] text-xl">public</span>
+                     </div>
+                     <div>
+                       <h3 className="text-white font-bold text-sm">Global Recycling Network</h3>
+                       <p className="text-[#94a3b8] text-xs">Real-time agency locations</p>
+                     </div>
+                   </div>
+                   <div className="flex items-center gap-4">
+                     <div className="flex items-center gap-2">
+                       <span className="relative flex h-3 w-3">
+                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#10b981] opacity-75"></span>
+                         <span className="relative inline-flex rounded-full h-3 w-3 bg-[#10b981]"></span>
+                       </span>
+                       <span className="text-white text-xs font-medium">{agencies.length} Active</span>
+                     </div>
+                     <div className="h-4 w-px bg-white/10" />
+                     <span className="text-[#94a3b8] text-xs">Click markers to explore</span>
+                   </div>
+                 </div>
+                 
+                 {/* Quick Region Buttons */}
+                 <div className="flex flex-col gap-2">
+                   {[
+                     { name: 'India', coords: [22.5937, 78.9629], zoom: 5, flag: '🇮🇳' },
+                     { name: 'World', coords: [20, 0], zoom: 2, flag: '🌍' },
+                   ].map(region => (
+                     <button
+                       key={region.name}
+                       onClick={() => {
+                         if (mapInstanceRef.current) {
+                           mapInstanceRef.current.flyTo(region.coords, region.zoom, { duration: 1.5 });
+                         }
+                       }}
+                       className="bg-[#151F26]/90 backdrop-blur-xl px-4 py-2.5 rounded-xl border border-white/10 hover:border-[#10b981]/50 transition-all flex items-center gap-2 group"
+                     >
+                       <span className="text-base">{region.flag}</span>
+                       <span className="text-white text-xs font-medium group-hover:text-[#10b981] transition-colors">{region.name}</span>
+                     </button>
+                   ))}
+                 </div>
+               </div>
+               
+               {/* Selected Agency Panel - Improved */}
                {selectedAgency && (
                  <div className="absolute bottom-6 left-6 right-6 md:left-auto md:right-6 md:w-96 bg-[#151F26]/95 backdrop-blur-xl rounded-2xl border border-white/10 shadow-2xl overflow-hidden z-[1000] animate-slideUp">
                    <div className="p-4">
@@ -571,103 +665,228 @@ const SearchAgencies = () => {
           from { opacity: 0; transform: translateY(20px); }
           to { opacity: 1; transform: translateY(0); }
         }
+        @keyframes pulse-ring {
+          0% { transform: scale(0.5); opacity: 1; }
+          100% { transform: scale(2); opacity: 0; }
+        }
+        @keyframes bounce-marker {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-8px); }
+        }
         .animate-fadeIn { animation: fadeIn 0.2s ease-out; }
         .animate-slideUp { animation: slideUp 0.3s ease-out; }
         
-        /* Leaflet custom styles */
+        /* Leaflet container */
         .leaflet-container {
           background: #0B1116 !important;
           font-family: 'Inter', sans-serif;
         }
         
-        /* Custom marker */
-        .custom-marker {
+        /* Custom marker wrapper */
+        .custom-marker-wrapper {
           background: transparent !important;
           border: none !important;
         }
+        
+        /* Marker container */
+        .marker-container {
+          position: relative;
+          cursor: pointer;
+          transition: all 0.3s ease;
+        }
+        .marker-container:hover {
+          transform: scale(1.1);
+        }
+        .marker-container.selected {
+          animation: bounce-marker 1s ease-in-out infinite;
+        }
+        
+        /* Pulse effect */
+        .marker-pulse {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          width: 40px;
+          height: 40px;
+          background: rgba(16, 185, 129, 0.3);
+          border-radius: 50%;
+          animation: pulse-ring 2s ease-out infinite;
+        }
+        .marker-container.selected .marker-pulse {
+          background: rgba(16, 185, 129, 0.5);
+          animation: pulse-ring 1.5s ease-out infinite;
+        }
+        
+        /* Main marker pin */
         .marker-pin {
-          width: 36px;
-          height: 36px;
+          position: relative;
+          width: 40px;
+          height: 40px;
+          background: linear-gradient(135deg, #10b981 0%, #059669 100%);
           border-radius: 50% 50% 50% 0;
-          background: #10b981;
           transform: rotate(-45deg);
           display: flex;
           align-items: center;
           justify-content: center;
-          box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
-          border: 3px solid white;
-          transition: all 0.2s ease;
+          box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4), 0 0 0 3px rgba(255,255,255,0.2);
+          transition: all 0.3s ease;
         }
-        .marker-pin:hover {
-          transform: rotate(-45deg) scale(1.1);
-          box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5);
+        .marker-container:hover .marker-pin {
+          box-shadow: 0 6px 25px rgba(16, 185, 129, 0.6), 0 0 0 4px rgba(255,255,255,0.3);
         }
-        .marker-pin.selected {
-          transform: rotate(-45deg) scale(1.2);
-          box-shadow: 0 6px 24px rgba(16, 185, 129, 0.6);
-          background: #059669;
-        }
-        .marker-pin svg {
-          transform: rotate(45deg);
-          width: 18px;
-          height: 18px;
+        .marker-container.selected .marker-pin {
+          background: linear-gradient(135deg, #059669 0%, #047857 100%);
+          box-shadow: 0 8px 30px rgba(16, 185, 129, 0.7), 0 0 0 4px rgba(16, 185, 129, 0.4);
         }
         
-        /* Popup styles */
-        .dark-popup .leaflet-popup-content-wrapper {
-          background: #151F26;
+        /* Marker icon */
+        .marker-icon {
+          transform: rotate(45deg);
           color: white;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        
+        /* Marker shadow */
+        .marker-shadow {
+          position: absolute;
+          bottom: -8px;
+          left: 50%;
+          transform: translateX(-50%);
+          width: 20px;
+          height: 6px;
+          background: rgba(0,0,0,0.3);
+          border-radius: 50%;
+          filter: blur(3px);
+        }
+        
+        /* Custom popup styles */
+        .custom-popup .leaflet-popup-content-wrapper {
+          background: linear-gradient(180deg, #1a2730 0%, #151F26 100%);
+          color: white;
+          border-radius: 16px;
+          border: 1px solid rgba(255,255,255,0.1);
+          box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(16, 185, 129, 0.1);
+          padding: 0;
+          overflow: hidden;
+        }
+        .custom-popup .leaflet-popup-content {
+          margin: 0;
+          min-width: 220px;
+        }
+        .custom-popup .leaflet-popup-tip-container {
+          display: none;
+        }
+        .custom-popup .leaflet-popup-close-button {
+          color: #94a3b8 !important;
+          font-size: 20px !important;
+          padding: 8px !important;
+          right: 4px !important;
+          top: 4px !important;
+        }
+        .custom-popup .leaflet-popup-close-button:hover {
+          color: white !important;
+        }
+        
+        /* Popup content */
+        .agency-popup {
+          padding: 16px;
+        }
+        .popup-header {
+          display: flex;
+          align-items: flex-start;
+          gap: 12px;
+          margin-bottom: 12px;
+        }
+        .popup-icon {
+          font-size: 24px;
+          background: rgba(16, 185, 129, 0.15);
+          padding: 8px;
           border-radius: 12px;
-          border: 1px solid rgba(255,255,255,0.1);
-          box-shadow: 0 10px 40px rgba(0,0,0,0.5);
         }
-        .dark-popup .leaflet-popup-tip {
-          background: #151F26;
-          border: 1px solid rgba(255,255,255,0.1);
-        }
-        .popup-content {
-          padding: 4px;
-        }
-        .popup-content h3 {
+        .popup-title h3 {
           color: white;
-          font-weight: 600;
-          font-size: 14px;
-          margin-bottom: 4px;
+          font-weight: 700;
+          font-size: 15px;
+          margin: 0 0 4px 0;
+          line-height: 1.2;
         }
-        .popup-content p {
+        .popup-location {
           color: #94a3b8;
           font-size: 12px;
-          margin-bottom: 6px;
         }
-        .popup-content .rating {
-          color: #eab308;
+        .popup-stats {
+          display: flex;
+          gap: 16px;
+          padding: 10px 0;
+          border-top: 1px solid rgba(255,255,255,0.05);
+          border-bottom: 1px solid rgba(255,255,255,0.05);
+          margin-bottom: 12px;
+        }
+        .stat {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+        }
+        .stat-icon {
+          font-size: 14px;
+        }
+        .stat-value {
+          color: white;
           font-size: 12px;
-          font-weight: 500;
+          font-weight: 600;
+        }
+        .popup-services {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 6px;
+        }
+        .service-tag {
+          background: rgba(16, 185, 129, 0.1);
+          color: #10b981;
+          font-size: 10px;
+          font-weight: 600;
+          padding: 4px 10px;
+          border-radius: 20px;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
         }
         
         /* Zoom controls */
         .leaflet-control-zoom {
           border: none !important;
-          box-shadow: 0 4px 12px rgba(0,0,0,0.3) !important;
+          box-shadow: 0 4px 20px rgba(0,0,0,0.4) !important;
+          border-radius: 12px !important;
+          overflow: hidden;
         }
         .leaflet-control-zoom a {
           background: #151F26 !important;
           color: white !important;
-          border: 1px solid rgba(255,255,255,0.1) !important;
-          width: 36px !important;
-          height: 36px !important;
-          line-height: 36px !important;
+          border: none !important;
+          border-bottom: 1px solid rgba(255,255,255,0.05) !important;
+          width: 40px !important;
+          height: 40px !important;
+          line-height: 40px !important;
           font-size: 18px !important;
+          transition: all 0.2s ease !important;
         }
         .leaflet-control-zoom a:hover {
           background: #10b981 !important;
           color: white !important;
         }
         .leaflet-control-zoom-in {
-          border-radius: 8px 8px 0 0 !important;
+          border-radius: 12px 12px 0 0 !important;
         }
         .leaflet-control-zoom-out {
-          border-radius: 0 0 8px 8px !important;
+          border-radius: 0 0 12px 12px !important;
+          border-bottom: none !important;
+        }
+        
+        /* Hide attribution */
+        .leaflet-control-attribution {
+          display: none !important;
         }
       `}</style>
     </Layout>
