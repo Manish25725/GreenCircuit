@@ -30,11 +30,12 @@ const slotSchema = new mongoose.Schema({
 slotSchema.set('toJSON', {
   virtuals: true,
   versionKey: false,
-  transform: function (doc, ret) {
+  transform: function (doc, ret: Record<string, any>) {
     ret.id = ret._id;
     delete ret._id;
   }
 });
 
-const Slot = mongoose.model('Slot', slotSchema);
+const Slot = mongoose.model<ISlot>('Slot', slotSchema);
+export { Slot };
 export default Slot;

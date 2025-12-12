@@ -79,7 +79,6 @@ const AgencySchema = new Schema<IAgency>({
   },
   services: [{
     type: String,
-    enum: ['Data Destruction', 'Battery Recycling', 'Corporate Pickups', 'Residential', 'Certified Recycling', 'Large Appliances', 'Small Electronics']
   }],
   certifications: [String],
   rating: {
@@ -125,7 +124,9 @@ const AgencySchema = new Schema<IAgency>({
 });
 
 // Index for location-based queries
-AgencySchema.index({ 'address.coordinates': '2dsphere' });
 AgencySchema.index({ 'address.city': 1 });
+AgencySchema.index({ name: 'text', description: 'text' });
 
-export default mongoose.model<IAgency>('Agency', AgencySchema);
+const Agency = mongoose.model<IAgency>('Agency', AgencySchema);
+export { Agency };
+export default Agency;

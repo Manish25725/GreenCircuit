@@ -1,18 +1,50 @@
 import React, { useState } from 'react';
+import { api } from '../services/api';
 
 const Login = () => {
   const [mode, setMode] = useState<'Login' | 'Sign Up'>('Login');
   const [role, setRole] = useState('resident');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Simulate routing based on role
-    if (role === 'partner') {
+    setLoading(true);
+    setError('');
+
+    try {
+      // Map frontend role to backend role
+      const roleMap: Record<string, string> = {
+        'resident': 'user',
+        'business': 'business', 
+        'partner': 'agency'
+      };
+      const backendRole = roleMap[role] || 'user';
+
+      let user;
+      if (mode === 'Login') {
+        user = await api.login(email, password);
+      } else {
+        user = await api.register(name, email, password, backendRole);
+      }
+
+      // Navigate based on user role from response
+      if (user.role === 'agency') {
         window.location.hash = '#/agency';
-    } else if (role === 'business') {
+      } else if (user.role === 'business') {
         window.location.hash = '#/business/inventory';
-    } else {
+      } else if (user.role === 'admin') {
+        window.location.hash = '#/admin';
+      } else {
         window.location.hash = '#/dashboard';
+      }
+    } catch (err: any) {
+      setError(err.message || 'Authentication failed. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -97,11 +129,29 @@ const Login = () => {
                             <input 
                                 type="email" 
                                 required
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
                                 className="w-full bg-[#0B1120] border border-white/10 rounded-xl py-3 pl-10 pr-4 text-white placeholder-slate-600 focus:outline-none focus:border-[#34D399] focus:ring-1 focus:ring-[#34D399] transition-all"
                                 placeholder="name@example.com"
                             />
                         </div>
                     </div>
+                    {mode === 'Sign Up' && (
+                    <div className="space-y-1.5">
+                        <label className="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">Full Name</label>
+                        <div className="relative group">
+                            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-[#34D399] transition-colors text-[20px]">person</span>
+                            <input 
+                                type="text" 
+                                required
+                                value={name}
+                                onChange={(e) => setName(e.target.value)}
+                                className="w-full bg-[#0B1120] border border-white/10 rounded-xl py-3 pl-10 pr-4 text-white placeholder-slate-600 focus:outline-none focus:border-[#34D399] focus:ring-1 focus:ring-[#34D399] transition-all"
+                                placeholder="John Doe"
+                            />
+                        </div>
+                    </div>
+                    )}
                     <div className="space-y-1.5">
                         <label className="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">Password</label>
                         <div className="relative group">
@@ -109,12 +159,20 @@ const Login = () => {
                             <input 
                                 type="password" 
                                 required
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
                                 className="w-full bg-[#0B1120] border border-white/10 rounded-xl py-3 pl-10 pr-4 text-white placeholder-slate-600 focus:outline-none focus:border-[#34D399] focus:ring-1 focus:ring-[#34D399] transition-all"
                                 placeholder="••••••••"
                             />
                         </div>
                     </div>
                 </div>
+
+                {error && (
+                  <div className="bg-red-500/10 border border-red-500/30 text-red-400 px-4 py-2 rounded-lg text-sm">
+                    {error}
+                  </div>
+                )}
 
                 {/* Actions */}
                 <div className="flex items-center justify-between text-xs">
@@ -127,9 +185,10 @@ const Login = () => {
 
                 <button 
                     type="submit"
-                    className="w-full py-3.5 rounded-xl bg-[#34D399] text-[#0B1120] font-bold text-base shadow-[0_0_20px_rgba(52,211,153,0.3)] hover:shadow-[0_0_25px_rgba(52,211,153,0.5)] hover:bg-[#6EE7B7] hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer border-none"
+                    disabled={loading}
+                    className="w-full py-3.5 rounded-xl bg-[#34D399] text-[#0B1120] font-bold text-base shadow-[0_0_20px_rgba(52,211,153,0.3)] hover:shadow-[0_0_25px_rgba(52,211,153,0.5)] hover:bg-[#6EE7B7] hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer border-none disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                    {mode === 'Login' ? 'Sign In' : 'Create Account'}
+                    {loading ? 'Please wait...' : (mode === 'Login' ? 'Sign In' : 'Create Account')}
                 </button>
 
                 {mode === 'Login' && (

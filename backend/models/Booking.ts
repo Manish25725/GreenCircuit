@@ -111,17 +111,18 @@ const BookingSchema = new Schema<IBooking>({
 });
 
 // Generate booking ID before saving
-BookingSchema.pre('save', async function(next) {
+BookingSchema.pre('save', async function() {
   if (!this.bookingId) {
     const year = new Date().getFullYear();
     const count = await mongoose.model('Booking').countDocuments();
     this.bookingId = `REQ-${year}-${String(count + 1).padStart(4, '0')}`;
   }
-  next();
 });
 
 // Index for efficient queries
 BookingSchema.index({ userId: 1, status: 1 });
 BookingSchema.index({ agencyId: 1, scheduledDate: 1 });
 
-export default mongoose.model<IBooking>('Booking', BookingSchema);
+const Booking = mongoose.model<IBooking>('Booking', BookingSchema);
+export { Booking };
+export default Booking;

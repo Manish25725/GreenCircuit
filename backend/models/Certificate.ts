@@ -70,7 +70,7 @@ const CertificateSchema = new Schema<ICertificate>({
 });
 
 // Generate certificate ID and verification code
-CertificateSchema.pre('save', async function(next) {
+CertificateSchema.pre('save', async function() {
   if (!this.certificateId) {
     const year = new Date().getFullYear();
     const count = await mongoose.model('Certificate').countDocuments();
@@ -79,9 +79,10 @@ CertificateSchema.pre('save', async function(next) {
   if (!this.verificationCode) {
     this.verificationCode = Math.random().toString(36).substring(2, 10).toUpperCase();
   }
-  next();
 });
 
 CertificateSchema.index({ userId: 1, issueDate: -1 });
 
-export default mongoose.model<ICertificate>('Certificate', CertificateSchema);
+const Certificate = mongoose.model<ICertificate>('Certificate', CertificateSchema);
+export { Certificate };
+export default Certificate;
