@@ -1,6 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Layout from '../components/Layout';
 import { getCurrentUser } from '../services/api';
+
+// Declare Leaflet types
+declare const L: any;
 
 interface InventoryItem {
   _id: string;
@@ -21,8 +24,86 @@ interface Agency {
   name: string;
   logo?: string;
   rating: number;
-  address: { city: string; state: string };
+  address: { 
+    street?: string;
+    city: string; 
+    state: string;
+    country?: string;
+  };
+  location?: {
+    coordinates: [number, number];
+  };
 }
+
+// City coordinates for map (worldwide)
+const cityCoordinates: Record<string, [number, number]> = {
+  // India
+  'Delhi': [28.6139, 77.2090],
+  'New Delhi': [28.6139, 77.2090],
+  'Mumbai': [19.0760, 72.8777],
+  'Bangalore': [12.9716, 77.5946],
+  'Bengaluru': [12.9716, 77.5946],
+  'Chennai': [13.0827, 80.2707],
+  'Hyderabad': [17.3850, 78.4867],
+  'Kolkata': [22.5726, 88.3639],
+  'Pune': [18.5204, 73.8567],
+  'Noida': [28.5355, 77.3910],
+  'Gurgaon': [28.4595, 77.0266],
+  'Gurugram': [28.4595, 77.0266],
+  'Ahmedabad': [23.0225, 72.5714],
+  'Jaipur': [26.9124, 75.7873],
+  'Lucknow': [26.8467, 80.9462],
+  'Chandigarh': [30.7333, 76.7794],
+  'Indore': [22.7196, 75.8577],
+  // USA
+  'New York': [40.7128, -74.0060],
+  'Los Angeles': [34.0522, -118.2437],
+  'Chicago': [41.8781, -87.6298],
+  'Houston': [29.7604, -95.3698],
+  'San Francisco': [37.7749, -122.4194],
+  'Seattle': [47.6062, -122.3321],
+  'Miami': [25.7617, -80.1918],
+  'Boston': [42.3601, -71.0589],
+  'Austin': [30.2672, -97.7431],
+  'Denver': [39.7392, -104.9903],
+  // Europe
+  'London': [51.5074, -0.1278],
+  'Paris': [48.8566, 2.3522],
+  'Berlin': [52.5200, 13.4050],
+  'Amsterdam': [52.3676, 4.9041],
+  'Madrid': [40.4168, -3.7038],
+  'Rome': [41.9028, 12.4964],
+  'Barcelona': [41.3851, 2.1734],
+  'Munich': [48.1351, 11.5820],
+  'Vienna': [48.2082, 16.3738],
+  'Dublin': [53.3498, -6.2603],
+  'Stockholm': [59.3293, 18.0686],
+  'Zurich': [47.3769, 8.5417],
+  // Asia Pacific
+  'Singapore': [1.3521, 103.8198],
+  'Tokyo': [35.6762, 139.6503],
+  'Sydney': [-33.8688, 151.2093],
+  'Melbourne': [-37.8136, 144.9631],
+  'Dubai': [25.2048, 55.2708],
+  'Hong Kong': [22.3193, 114.1694],
+  'Shanghai': [31.2304, 121.4737],
+  'Beijing': [39.9042, 116.4074],
+  'Seoul': [37.5665, 126.9780],
+  'Bangkok': [13.7563, 100.5018],
+  'Kuala Lumpur': [3.1390, 101.6869],
+  'Jakarta': [-6.2088, 106.8456],
+  // Others
+  'Toronto': [43.6532, -79.3832],
+  'Vancouver': [49.2827, -123.1207],
+  'São Paulo': [-23.5505, -46.6333],
+  'Rio de Janeiro': [-22.9068, -43.1729],
+  'Cape Town': [-33.9249, 18.4241],
+  'Johannesburg': [-26.2041, 28.0473],
+  'Lagos': [6.5244, 3.3792],
+  'Cairo': [30.0444, 31.2357],
+  'Tel Aviv': [32.0853, 34.7818],
+  'Moscow': [55.7558, 37.6173],
+};
 
 const API_BASE = 'http://localhost:3001/api';
 
@@ -52,6 +133,11 @@ const BusinessInventory = () => {
     notes: ''
   });
   
+  // Map ref for pickup modal
+  const pickupMapRef = useRef<HTMLDivElement>(null);
+  const pickupMapInstance = useRef<any>(null);
+  const markersRef = useRef<any[]>([]);
+  
   const [newItem, setNewItem] = useState({
     name: '',
     category: 'IT Equipment',
@@ -71,6 +157,146 @@ const BusinessInventory = () => {
   useEffect(() => {
     fetchInventory();
   }, []);
+
+  // Initialize map when pickup modal opens
+  useEffect(() => {
+    if (showPickupModal && !loadingAgencies && agencies.length > 0 && pickupMapRef.current && !pickupMapInstance.current) {
+      // Small delay to ensure DOM is ready
+      setTimeout(() => {
+        if (!pickupMapRef.current || pickupMapInstance.current) return;
+        
+        // Initialize map centered on India with dark theme
+        const map = L.map(pickupMapRef.current, {
+          center: [20.5937, 78.9629],
+          zoom: 5,
+          zoomControl: false,
+          attributionControl: false,
+          scrollWheelZoom: true
+        });
+        
+        // Use Stadia Maps dark theme (same as SearchAgencies)
+        L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png', {
+          maxZoom: 20,
+          attribution: ''
+        }).addTo(map);
+
+        // Add custom zoom control
+        L.control.zoom({ position: 'bottomright' }).addTo(map);
+        
+        pickupMapInstance.current = map;
+        
+        // Add beautiful custom markers for each agency
+        agencies.forEach(agency => {
+          const city = agency.address?.city || '';
+          const coords = cityCoordinates[city] || [20.5937, 78.9629];
+          const isSelected = pickupData.agencyId === agency._id;
+          
+          // Beautiful animated marker with pulse effect (cyan/purple for Business theme)
+          const customIcon = L.divIcon({
+            className: 'pickup-marker-wrapper',
+            html: `
+              <div class="pickup-marker ${isSelected ? 'selected' : ''}" data-agency="${agency._id}">
+                <div class="pickup-marker-pulse"></div>
+                <div class="pickup-marker-pin">
+                  <div class="pickup-marker-icon">
+                    <svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14">
+                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            `,
+            iconSize: [36, 44],
+            iconAnchor: [18, 44],
+            popupAnchor: [0, -44],
+          });
+
+          const marker = L.marker(coords, { icon: customIcon }).addTo(map);
+          
+          // Beautiful popup matching SearchAgencies style
+          marker.bindPopup(`
+            <div class="pickup-popup">
+              <div class="pickup-popup-header">
+                <div class="pickup-popup-icon">♻️</div>
+                <div class="pickup-popup-title">
+                  <h3>${agency.name}</h3>
+                  <span class="pickup-popup-location">${city}, ${agency.address?.state || ''}</span>
+                </div>
+              </div>
+              <div class="pickup-popup-stats">
+                <div class="pickup-stat">
+                  <span class="pickup-stat-icon">⭐</span>
+                  <span class="pickup-stat-value">${agency.rating?.toFixed(1) || '4.5'}</span>
+                </div>
+              </div>
+            </div>
+          `, { 
+            className: 'pickup-custom-popup',
+            closeButton: true,
+            maxWidth: 220,
+            minWidth: 180
+          });
+          
+          marker.agencyId = agency._id;
+          marker.on('click', () => {
+            setPickupData(prev => ({...prev, agencyId: agency._id}));
+          });
+          markersRef.current.push(marker);
+        });
+        
+        // Fit bounds to show all markers
+        if (markersRef.current.length > 0) {
+          const group = L.featureGroup(markersRef.current);
+          map.fitBounds(group.getBounds().pad(0.3), { maxZoom: 8 });
+        }
+
+        // Force map to recalculate size
+        setTimeout(() => {
+          if (pickupMapInstance.current) {
+            pickupMapInstance.current.invalidateSize();
+          }
+        }, 200);
+      }, 150);
+    }
+  }, [showPickupModal, loadingAgencies, agencies]);
+
+  // Cleanup map when modal closes
+  useEffect(() => {
+    if (!showPickupModal && pickupMapInstance.current) {
+      pickupMapInstance.current.remove();
+      pickupMapInstance.current = null;
+      markersRef.current = [];
+    }
+  }, [showPickupModal]);
+
+  // Highlight selected agency on map
+  useEffect(() => {
+    if (pickupMapInstance.current && markersRef.current.length > 0 && pickupData.agencyId) {
+      // Update marker styles and fly to selected
+      markersRef.current.forEach(marker => {
+        const markerEl = marker.getElement();
+        if (markerEl) {
+          const markerDiv = markerEl.querySelector('.pickup-marker');
+          if (markerDiv) {
+            if (marker.agencyId === pickupData.agencyId) {
+              markerDiv.classList.add('selected');
+            } else {
+              markerDiv.classList.remove('selected');
+            }
+          }
+        }
+        
+        if (marker.agencyId === pickupData.agencyId) {
+          marker.openPopup();
+          const latLng = marker.getLatLng();
+          pickupMapInstance.current.flyTo(latLng, 10, { 
+            duration: 0.8,
+            easeLinearity: 0.25
+          });
+        }
+      });
+    }
+  }, [pickupData.agencyId]);
 
   const getAuthHeaders = () => {
     const token = localStorage.getItem('token');
@@ -920,7 +1146,7 @@ const BusinessInventory = () => {
         {/* Schedule Pickup Modal */}
         {showPickupModal && (
           <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => !bookingPickup && setShowPickupModal(false)}>
-            <div className="bg-[#151F26] rounded-3xl w-full max-w-2xl border border-white/10 overflow-hidden max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="bg-[#151F26] rounded-3xl w-full max-w-3xl border border-white/10 overflow-hidden max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
               <div className="flex items-center justify-between p-6 border-b border-white/10 sticky top-0 bg-[#151F26]">
                 <div>
                   <h3 className="text-white font-bold text-lg">Schedule Pickup</h3>
@@ -945,22 +1171,25 @@ const BusinessInventory = () => {
                   </div>
                 </div>
 
-                {/* Select Agency */}
+                {/* Select Agency with Map */}
                 <div>
                   <label className="block text-sm font-medium text-gray-400 mb-2">Select Recycling Agency *</label>
                   {loadingAgencies ? (
                     <div className="bg-white/5 border border-white/10 rounded-xl p-4 text-center">
                       <div className="animate-spin w-6 h-6 border-2 border-[#06b6d4] border-t-transparent rounded-full mx-auto"></div>
+                      <p className="text-gray-500 text-sm mt-2">Loading agencies...</p>
                     </div>
+                  ) : agencies.length === 0 ? (
+                    <p className="text-gray-500 text-sm text-center py-4 bg-white/5 rounded-xl">No verified agencies available</p>
                   ) : (
-                    <div className="space-y-2 max-h-48 overflow-y-auto">
-                      {agencies.length === 0 ? (
-                        <p className="text-gray-500 text-sm text-center py-4">No verified agencies available</p>
-                      ) : (
-                        agencies.map(agency => (
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                      {/* Agency List */}
+                      <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
+                        {agencies.map(agency => (
                           <label
                             key={agency._id}
-                            className={`flex items-center gap-4 p-4 rounded-xl border cursor-pointer transition-all ${
+                            data-agency-select={agency._id}
+                            className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all ${
                               pickupData.agencyId === agency._id 
                                 ? 'border-[#06b6d4] bg-[#06b6d4]/10' 
                                 : 'border-white/10 bg-white/5 hover:border-white/20'
@@ -974,20 +1203,29 @@ const BusinessInventory = () => {
                               onChange={(e) => setPickupData({...pickupData, agencyId: e.target.value})}
                               className="hidden"
                             />
-                            <div className="w-10 h-10 rounded-lg bg-[#8b5cf6]/20 flex items-center justify-center text-[#8b5cf6] font-bold">
+                            <div className="w-9 h-9 rounded-lg bg-[#8b5cf6]/20 flex items-center justify-center text-[#8b5cf6] font-bold text-sm">
                               {agency.name.charAt(0)}
                             </div>
-                            <div className="flex-1">
-                              <p className="text-white font-medium">{agency.name}</p>
-                              <p className="text-gray-500 text-sm">{agency.address?.city}, {agency.address?.state}</p>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-white font-medium text-sm truncate">{agency.name}</p>
+                              <p className="text-gray-500 text-xs truncate">{agency.address?.city}, {agency.address?.state}</p>
                             </div>
-                            <div className="flex items-center gap-1 text-amber-400">
-                              <span className="material-symbols-outlined text-sm">star</span>
-                              <span className="text-sm font-medium">{agency.rating?.toFixed(1) || '4.5'}</span>
+                            <div className="flex items-center gap-1 text-amber-400 shrink-0">
+                              <span className="material-symbols-outlined text-xs">star</span>
+                              <span className="text-xs font-medium">{agency.rating?.toFixed(1) || '4.5'}</span>
                             </div>
                           </label>
-                        ))
-                      )}
+                        ))}
+                      </div>
+                      
+                      {/* Map Container */}
+                      <div className="relative">
+                        <div 
+                          ref={pickupMapRef} 
+                          className="h-64 rounded-xl overflow-hidden border border-white/10"
+                          style={{ background: '#1a2634' }}
+                        />
+                      </div>
                     </div>
                   )}
                 </div>
@@ -1065,6 +1303,229 @@ const BusinessInventory = () => {
             </div>
           </div>
         )}
+
+        {/* Map Styles for Pickup Modal */}
+        <style>{`
+          /* Leaflet container dark background */
+          .leaflet-container {
+            background: #0B1116 !important;
+            font-family: 'Inter', sans-serif;
+          }
+          
+          /* Custom marker wrapper */
+          .pickup-marker-wrapper {
+            background: transparent !important;
+            border: none !important;
+          }
+          
+          /* Marker container */
+          .pickup-marker {
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+          }
+          .pickup-marker:hover {
+            transform: scale(1.15);
+          }
+          .pickup-marker.selected {
+            animation: pickup-bounce 1s ease-in-out infinite;
+          }
+          
+          /* Pulse effect - cyan for Business theme */
+          .pickup-marker-pulse {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 32px;
+            height: 32px;
+            background: rgba(6, 182, 212, 0.3);
+            border-radius: 50%;
+            animation: pickup-pulse 2s ease-out infinite;
+          }
+          .pickup-marker.selected .pickup-marker-pulse {
+            background: rgba(139, 92, 246, 0.5);
+            animation: pickup-pulse 1.2s ease-out infinite;
+          }
+          
+          /* Main marker pin - cyan gradient */
+          .pickup-marker-pin {
+            position: relative;
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+            border-radius: 50% 50% 50% 0;
+            transform: rotate(-45deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(6, 182, 212, 0.4), 0 0 0 2px rgba(255,255,255,0.2);
+            transition: all 0.3s ease;
+          }
+          .pickup-marker:hover .pickup-marker-pin {
+            box-shadow: 0 6px 20px rgba(6, 182, 212, 0.6), 0 0 0 3px rgba(255,255,255,0.3);
+          }
+          .pickup-marker.selected .pickup-marker-pin {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            box-shadow: 0 6px 25px rgba(139, 92, 246, 0.6), 0 0 0 3px rgba(139, 92, 246, 0.4);
+          }
+          
+          /* Marker icon */
+          .pickup-marker-icon {
+            transform: rotate(45deg);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          }
+          
+          /* Custom popup styles */
+          .pickup-custom-popup .leaflet-popup-content-wrapper {
+            background: linear-gradient(180deg, #1a2730 0%, #151F26 100%);
+            color: white;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+            padding: 0;
+            overflow: hidden;
+          }
+          .pickup-custom-popup .leaflet-popup-content {
+            margin: 0;
+            min-width: 160px;
+          }
+          .pickup-custom-popup .leaflet-popup-tip-container {
+            display: none;
+          }
+          .pickup-custom-popup .leaflet-popup-close-button {
+            color: #94a3b8 !important;
+            font-size: 18px !important;
+            padding: 6px !important;
+            right: 2px !important;
+            top: 2px !important;
+          }
+          .pickup-custom-popup .leaflet-popup-close-button:hover {
+            color: white !important;
+          }
+          
+          /* Popup content */
+          .pickup-popup {
+            padding: 12px;
+          }
+          .pickup-popup-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 10px;
+          }
+          .pickup-popup-icon {
+            font-size: 20px;
+            background: rgba(6, 182, 212, 0.15);
+            padding: 6px;
+            border-radius: 8px;
+          }
+          .pickup-popup-title h3 {
+            color: white;
+            font-weight: 700;
+            font-size: 13px;
+            margin: 0 0 3px 0;
+            line-height: 1.2;
+          }
+          .pickup-popup-location {
+            color: #94a3b8;
+            font-size: 11px;
+          }
+          .pickup-popup-stats {
+            display: flex;
+            gap: 12px;
+            padding: 8px 0;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            margin-bottom: 10px;
+          }
+          .pickup-stat {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+          }
+          .pickup-stat-icon {
+            font-size: 12px;
+          }
+          .pickup-stat-value {
+            color: white;
+            font-size: 11px;
+            font-weight: 600;
+          }
+          .pickup-select-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #06b6d4 0%, #8b5cf6 100%);
+            color: white;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+          }
+          .pickup-select-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 15px rgba(6, 182, 212, 0.4);
+          }
+          
+          /* Zoom controls */
+          .leaflet-control-zoom {
+            border: none !important;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4) !important;
+            border-radius: 10px !important;
+            overflow: hidden;
+          }
+          .leaflet-control-zoom a {
+            background: #151F26 !important;
+            color: white !important;
+            border: none !important;
+            border-bottom: 1px solid rgba(255,255,255,0.05) !important;
+            width: 32px !important;
+            height: 32px !important;
+            line-height: 32px !important;
+            font-size: 16px !important;
+            transition: all 0.2s ease !important;
+          }
+          .leaflet-control-zoom a:hover {
+            background: #06b6d4 !important;
+            color: white !important;
+          }
+          .leaflet-control-zoom-in {
+            border-radius: 10px 10px 0 0 !important;
+          }
+          .leaflet-control-zoom-out {
+            border-radius: 0 0 10px 10px !important;
+            border-bottom: none !important;
+          }
+          
+          /* Hide attribution */
+          .leaflet-control-attribution {
+            display: none !important;
+          }
+          
+          /* Animations */
+          @keyframes pickup-pulse {
+            0% {
+              transform: translate(-50%, -50%) scale(1);
+              opacity: 1;
+            }
+            100% {
+              transform: translate(-50%, -50%) scale(2);
+              opacity: 0;
+            }
+          }
+          @keyframes pickup-bounce {
+            0%, 100% {
+              transform: translateY(0);
+            }
+            50% {
+              transform: translateY(-8px);
+            }
+          }
+        `}</style>
       </div>
     </Layout>
   );
