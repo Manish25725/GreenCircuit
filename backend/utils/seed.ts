@@ -5,10 +5,15 @@ import { User } from '../models/User';
 import { Agency } from '../models/Agency';
 import { Reward } from '../models/Reward';
 import { Slot } from '../models/Slot';
-import path from 'path';
+import { fileURLToPath } from 'url';
+import { dirname, resolve } from 'path';
+
+// ES Module fix for __dirname
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 // Load .env from project root
-dotenv.config({ path: path.resolve(__dirname, '../../.env') });
+dotenv.config({ path: resolve(__dirname, '../../.env') });
 
 const MONGO_URI = process.env.MONGODB_URI || process.env.MONGO_URI || 'mongodb://localhost:27017/ecocycle';
 
@@ -97,6 +102,104 @@ const seedDatabase = async () => {
       ecoPoints: 0,
     });
 
+    // Indian Agency Users
+    const agencyUser4 = await User.create({
+      name: 'E-Waste Recyclers India',
+      email: 'ewaste@india.com',
+      password: agencyPassword,
+      role: 'agency',
+      ecoPoints: 0,
+    });
+
+    const agencyUser5 = await User.create({
+      name: 'Green Delhi Recycling',
+      email: 'greendelhi@agency.com',
+      password: agencyPassword,
+      role: 'agency',
+      ecoPoints: 0,
+    });
+
+    const agencyUser6 = await User.create({
+      name: 'Mumbai E-Cycle Hub',
+      email: 'mumbai@ecycle.com',
+      password: agencyPassword,
+      role: 'agency',
+      ecoPoints: 0,
+    });
+
+    const agencyUser7 = await User.create({
+      name: 'Bangalore Tech Recyclers',
+      email: 'bangalore@techrecycle.com',
+      password: agencyPassword,
+      role: 'agency',
+      ecoPoints: 0,
+    });
+
+    // International Agency Users
+    const agencyUser8 = await User.create({
+      name: 'London E-Cycle',
+      email: 'london@ecycle.com',
+      password: agencyPassword,
+      role: 'agency',
+      ecoPoints: 0,
+    });
+
+    const agencyUser9 = await User.create({
+      name: 'Tokyo Green Tech',
+      email: 'tokyo@greentech.jp',
+      password: agencyPassword,
+      role: 'agency',
+      ecoPoints: 0,
+    });
+
+    const agencyUser10 = await User.create({
+      name: 'Sydney EcoRecycle',
+      email: 'sydney@ecorecycle.au',
+      password: agencyPassword,
+      role: 'agency',
+      ecoPoints: 0,
+    });
+
+    const agencyUser11 = await User.create({
+      name: 'Dubai E-Waste Solutions',
+      email: 'dubai@ewaste.ae',
+      password: agencyPassword,
+      role: 'agency',
+      ecoPoints: 0,
+    });
+
+    const agencyUser12 = await User.create({
+      name: 'Singapore Green Hub',
+      email: 'singapore@greenhub.sg',
+      password: agencyPassword,
+      role: 'agency',
+      ecoPoints: 0,
+    });
+
+    const agencyUser13 = await User.create({
+      name: 'Berlin Recycling Center',
+      email: 'berlin@recycling.de',
+      password: agencyPassword,
+      role: 'agency',
+      ecoPoints: 0,
+    });
+
+    const agencyUser14 = await User.create({
+      name: 'Paris Eco Services',
+      email: 'paris@ecoservices.fr',
+      password: agencyPassword,
+      role: 'agency',
+      ecoPoints: 0,
+    });
+
+    const agencyUser15 = await User.create({
+      name: 'Toronto Green Recyclers',
+      email: 'toronto@greenrecycle.ca',
+      password: agencyPassword,
+      role: 'agency',
+      ecoPoints: 0,
+    });
+
     const agencies = await Agency.insertMany([
       {
         userId: agencyUser1._id,
@@ -179,6 +282,402 @@ const seedDatabase = async () => {
         totalPickups: 450,
         isVerified: false,
         verificationStatus: 'pending',
+      },
+      // Indian Agencies
+      {
+        userId: agencyUser4._id,
+        name: 'E-Waste Recyclers India',
+        email: 'ewaste@india.com',
+        phone: '+91-9876543210',
+        description: 'India\'s premier e-waste recycling company. Government certified and EPA compliant. Serving all major cities.',
+        services: ['E-Waste Pickup', 'Mobile Recycling', 'Computer Disposal', 'Data Destruction'],
+        address: {
+          street: '123 MG Road',
+          city: 'Delhi',
+          state: 'Delhi',
+          zipCode: '110001',
+        },
+        location: {
+          type: 'Point',
+          coordinates: [77.2090, 28.6139]
+        },
+        operatingHours: [
+          { day: 'monday', open: '09:00', close: '18:00', isOpen: true },
+          { day: 'tuesday', open: '09:00', close: '18:00', isOpen: true },
+          { day: 'wednesday', open: '09:00', close: '18:00', isOpen: true },
+          { day: 'thursday', open: '09:00', close: '18:00', isOpen: true },
+          { day: 'friday', open: '09:00', close: '18:00', isOpen: true },
+          { day: 'saturday', open: '10:00', close: '16:00', isOpen: true },
+          { day: 'sunday', open: '', close: '', isOpen: false },
+        ],
+        rating: 4.7,
+        totalReviews: 234,
+        totalPickups: 1200,
+        isVerified: true,
+        verificationStatus: 'approved',
+      },
+      {
+        userId: agencyUser5._id,
+        name: 'Green Delhi Recycling',
+        email: 'greendelhi@agency.com',
+        phone: '+91-9898989898',
+        description: 'Eco-friendly e-waste disposal in Delhi NCR. Free pickup for bulk orders. Certified recycling process.',
+        services: ['Free Pickup', 'Bulk Collection', 'Corporate Services', 'Certificate Issuance'],
+        address: {
+          street: '456 Connaught Place',
+          city: 'Delhi',
+          state: 'Delhi',
+          zipCode: '110001',
+        },
+        location: {
+          type: 'Point',
+          coordinates: [77.2195, 28.6328]
+        },
+        operatingHours: [
+          { day: 'monday', open: '08:00', close: '20:00', isOpen: true },
+          { day: 'tuesday', open: '08:00', close: '20:00', isOpen: true },
+          { day: 'wednesday', open: '08:00', close: '20:00', isOpen: true },
+          { day: 'thursday', open: '08:00', close: '20:00', isOpen: true },
+          { day: 'friday', open: '08:00', close: '20:00', isOpen: true },
+          { day: 'saturday', open: '09:00', close: '18:00', isOpen: true },
+          { day: 'sunday', open: '10:00', close: '14:00', isOpen: true },
+        ],
+        rating: 4.5,
+        totalReviews: 156,
+        totalPickups: 890,
+        isVerified: true,
+        verificationStatus: 'approved',
+      },
+      {
+        userId: agencyUser6._id,
+        name: 'Mumbai E-Cycle Hub',
+        email: 'mumbai@ecycle.com',
+        phone: '+91-9123456789',
+        description: 'Mumbai\'s trusted e-waste recycling partner. ISO certified. Serving Mumbai, Thane, and Navi Mumbai.',
+        services: ['Residential Pickup', 'Office Clearance', 'IT Equipment Disposal', 'Appliance Recycling'],
+        address: {
+          street: '789 Andheri East',
+          city: 'Mumbai',
+          state: 'Maharashtra',
+          zipCode: '400069',
+        },
+        location: {
+          type: 'Point',
+          coordinates: [72.8777, 19.0760]
+        },
+        operatingHours: [
+          { day: 'monday', open: '09:00', close: '19:00', isOpen: true },
+          { day: 'tuesday', open: '09:00', close: '19:00', isOpen: true },
+          { day: 'wednesday', open: '09:00', close: '19:00', isOpen: true },
+          { day: 'thursday', open: '09:00', close: '19:00', isOpen: true },
+          { day: 'friday', open: '09:00', close: '19:00', isOpen: true },
+          { day: 'saturday', open: '10:00', close: '17:00', isOpen: true },
+          { day: 'sunday', open: '', close: '', isOpen: false },
+        ],
+        rating: 4.8,
+        totalReviews: 312,
+        totalPickups: 1500,
+        isVerified: true,
+        verificationStatus: 'approved',
+      },
+      {
+        userId: agencyUser7._id,
+        name: 'Bangalore Tech Recyclers',
+        email: 'bangalore@techrecycle.com',
+        phone: '+91-9876012345',
+        description: 'Tech capital\'s leading e-waste solution. Specialized in IT hardware recycling. Partnered with major tech companies.',
+        services: ['Tech Waste Collection', 'Server Disposal', 'Hard Drive Shredding', 'Green Certificate'],
+        address: {
+          street: '321 Electronic City',
+          city: 'Bangalore',
+          state: 'Karnataka',
+          zipCode: '560100',
+        },
+        location: {
+          type: 'Point',
+          coordinates: [77.5946, 12.9716]
+        },
+        operatingHours: [
+          { day: 'monday', open: '08:00', close: '18:00', isOpen: true },
+          { day: 'tuesday', open: '08:00', close: '18:00', isOpen: true },
+          { day: 'wednesday', open: '08:00', close: '18:00', isOpen: true },
+          { day: 'thursday', open: '08:00', close: '18:00', isOpen: true },
+          { day: 'friday', open: '08:00', close: '18:00', isOpen: true },
+          { day: 'saturday', open: '09:00', close: '15:00', isOpen: true },
+          { day: 'sunday', open: '', close: '', isOpen: false },
+        ],
+        rating: 4.9,
+        totalReviews: 445,
+        totalPickups: 2100,
+        isVerified: true,
+        verificationStatus: 'approved',
+      },
+      // International Agencies - Europe
+      {
+        userId: agencyUser8._id,
+        name: 'London E-Cycle',
+        email: 'london@ecycle.com',
+        phone: '+44-20-7946-0958',
+        description: 'UK\'s leading WEEE compliant e-waste recycling service. Serving Greater London and surrounding areas with eco-friendly disposal.',
+        services: ['WEEE Recycling', 'Data Destruction', 'Corporate Services', 'Free Collection'],
+        address: {
+          street: '45 Canary Wharf',
+          city: 'London',
+          state: 'England',
+          country: 'UK',
+          zipCode: 'E14 5AB',
+        },
+        location: {
+          type: 'Point',
+          coordinates: [-0.1278, 51.5074]
+        },
+        operatingHours: [
+          { day: 'monday', open: '08:00', close: '18:00', isOpen: true },
+          { day: 'tuesday', open: '08:00', close: '18:00', isOpen: true },
+          { day: 'wednesday', open: '08:00', close: '18:00', isOpen: true },
+          { day: 'thursday', open: '08:00', close: '18:00', isOpen: true },
+          { day: 'friday', open: '08:00', close: '18:00', isOpen: true },
+          { day: 'saturday', open: '09:00', close: '14:00', isOpen: true },
+          { day: 'sunday', open: '', close: '', isOpen: false },
+        ],
+        rating: 4.7,
+        totalReviews: 289,
+        totalPickups: 1800,
+        isVerified: true,
+        verificationStatus: 'approved',
+      },
+      {
+        userId: agencyUser13._id,
+        name: 'Berlin Recycling Center',
+        email: 'berlin@recycling.de',
+        phone: '+49-30-1234567',
+        description: 'Germany\'s premier e-waste facility. TÜV certified with highest environmental standards. Serving Berlin and Brandenburg.',
+        services: ['ElektroG Compliant', 'Battery Recycling', 'IT Disposal', 'Certificate Issuance'],
+        address: {
+          street: '78 Alexanderplatz',
+          city: 'Berlin',
+          state: 'Berlin',
+          country: 'Germany',
+          zipCode: '10178',
+        },
+        location: {
+          type: 'Point',
+          coordinates: [13.4050, 52.5200]
+        },
+        operatingHours: [
+          { day: 'monday', open: '07:00', close: '17:00', isOpen: true },
+          { day: 'tuesday', open: '07:00', close: '17:00', isOpen: true },
+          { day: 'wednesday', open: '07:00', close: '17:00', isOpen: true },
+          { day: 'thursday', open: '07:00', close: '17:00', isOpen: true },
+          { day: 'friday', open: '07:00', close: '16:00', isOpen: true },
+          { day: 'saturday', open: '', close: '', isOpen: false },
+          { day: 'sunday', open: '', close: '', isOpen: false },
+        ],
+        rating: 4.8,
+        totalReviews: 178,
+        totalPickups: 950,
+        isVerified: true,
+        verificationStatus: 'approved',
+      },
+      {
+        userId: agencyUser14._id,
+        name: 'Paris Eco Services',
+        email: 'paris@ecoservices.fr',
+        phone: '+33-1-4567-8900',
+        description: 'Service de recyclage électronique certifié. Respectueux de l\'environnement. Serving Paris and Île-de-France region.',
+        services: ['DEEE Collection', 'Appliance Recycling', 'Professional Services', 'Green Certificate'],
+        address: {
+          street: '23 Champs-Élysées',
+          city: 'Paris',
+          state: 'Île-de-France',
+          country: 'France',
+          zipCode: '75008',
+        },
+        location: {
+          type: 'Point',
+          coordinates: [2.3522, 48.8566]
+        },
+        operatingHours: [
+          { day: 'monday', open: '09:00', close: '18:00', isOpen: true },
+          { day: 'tuesday', open: '09:00', close: '18:00', isOpen: true },
+          { day: 'wednesday', open: '09:00', close: '18:00', isOpen: true },
+          { day: 'thursday', open: '09:00', close: '18:00', isOpen: true },
+          { day: 'friday', open: '09:00', close: '18:00', isOpen: true },
+          { day: 'saturday', open: '10:00', close: '15:00', isOpen: true },
+          { day: 'sunday', open: '', close: '', isOpen: false },
+        ],
+        rating: 4.6,
+        totalReviews: 145,
+        totalPickups: 720,
+        isVerified: true,
+        verificationStatus: 'approved',
+      },
+      // International Agencies - Asia Pacific
+      {
+        userId: agencyUser9._id,
+        name: 'Tokyo Green Tech',
+        email: 'tokyo@greentech.jp',
+        phone: '+81-3-1234-5678',
+        description: 'Japan\'s trusted e-waste recycler. Compliant with Home Appliance Recycling Law. High-tech secure data destruction.',
+        services: ['Home Appliances', 'IT Equipment', 'Secure Destruction', 'Corporate Pickup'],
+        address: {
+          street: '1-2-3 Shibuya',
+          city: 'Tokyo',
+          state: 'Tokyo',
+          country: 'Japan',
+          zipCode: '150-0002',
+        },
+        location: {
+          type: 'Point',
+          coordinates: [139.6503, 35.6762]
+        },
+        operatingHours: [
+          { day: 'monday', open: '09:00', close: '18:00', isOpen: true },
+          { day: 'tuesday', open: '09:00', close: '18:00', isOpen: true },
+          { day: 'wednesday', open: '09:00', close: '18:00', isOpen: true },
+          { day: 'thursday', open: '09:00', close: '18:00', isOpen: true },
+          { day: 'friday', open: '09:00', close: '18:00', isOpen: true },
+          { day: 'saturday', open: '10:00', close: '16:00', isOpen: true },
+          { day: 'sunday', open: '', close: '', isOpen: false },
+        ],
+        rating: 4.9,
+        totalReviews: 523,
+        totalPickups: 3200,
+        isVerified: true,
+        verificationStatus: 'approved',
+      },
+      {
+        userId: agencyUser10._id,
+        name: 'Sydney EcoRecycle',
+        email: 'sydney@ecorecycle.au',
+        phone: '+61-2-9876-5432',
+        description: 'Australia\'s eco-friendly e-waste solution. NTCRS accredited. Serving Sydney metro and NSW with responsible recycling.',
+        services: ['E-Waste Drop-off', 'Business Collection', 'TV Recycling', 'Computer Disposal'],
+        address: {
+          street: '100 George Street',
+          city: 'Sydney',
+          state: 'NSW',
+          country: 'Australia',
+          zipCode: '2000',
+        },
+        location: {
+          type: 'Point',
+          coordinates: [151.2093, -33.8688]
+        },
+        operatingHours: [
+          { day: 'monday', open: '08:00', close: '17:00', isOpen: true },
+          { day: 'tuesday', open: '08:00', close: '17:00', isOpen: true },
+          { day: 'wednesday', open: '08:00', close: '17:00', isOpen: true },
+          { day: 'thursday', open: '08:00', close: '17:00', isOpen: true },
+          { day: 'friday', open: '08:00', close: '17:00', isOpen: true },
+          { day: 'saturday', open: '09:00', close: '13:00', isOpen: true },
+          { day: 'sunday', open: '', close: '', isOpen: false },
+        ],
+        rating: 4.7,
+        totalReviews: 267,
+        totalPickups: 1400,
+        isVerified: true,
+        verificationStatus: 'approved',
+      },
+      {
+        userId: agencyUser11._id,
+        name: 'Dubai E-Waste Solutions',
+        email: 'dubai@ewaste.ae',
+        phone: '+971-4-123-4567',
+        description: 'UAE\'s premier e-waste management company. TADWEER approved. Serving Dubai, Abu Dhabi, and Northern Emirates.',
+        services: ['Free Collection', 'IT Asset Management', 'Data Wiping', 'Certified Recycling'],
+        address: {
+          street: 'Dubai Silicon Oasis',
+          city: 'Dubai',
+          state: 'Dubai',
+          country: 'UAE',
+          zipCode: '00000',
+        },
+        location: {
+          type: 'Point',
+          coordinates: [55.2708, 25.2048]
+        },
+        operatingHours: [
+          { day: 'monday', open: '08:00', close: '18:00', isOpen: true },
+          { day: 'tuesday', open: '08:00', close: '18:00', isOpen: true },
+          { day: 'wednesday', open: '08:00', close: '18:00', isOpen: true },
+          { day: 'thursday', open: '08:00', close: '18:00', isOpen: true },
+          { day: 'friday', open: '', close: '', isOpen: false },
+          { day: 'saturday', open: '09:00', close: '17:00', isOpen: true },
+          { day: 'sunday', open: '09:00', close: '17:00', isOpen: true },
+        ],
+        rating: 4.8,
+        totalReviews: 198,
+        totalPickups: 1100,
+        isVerified: true,
+        verificationStatus: 'approved',
+      },
+      {
+        userId: agencyUser12._id,
+        name: 'Singapore Green Hub',
+        email: 'singapore@greenhub.sg',
+        phone: '+65-6789-0123',
+        description: 'Singapore\'s leading e-waste recycler. NEA licensed. Zero-waste commitment with full traceability.',
+        services: ['Island-wide Collection', 'Corporate Pickup', 'Secure Disposal', 'Monthly Reports'],
+        address: {
+          street: '50 Jurong Gateway Road',
+          city: 'Singapore',
+          state: 'Singapore',
+          country: 'Singapore',
+          zipCode: '608549',
+        },
+        location: {
+          type: 'Point',
+          coordinates: [103.8198, 1.3521]
+        },
+        operatingHours: [
+          { day: 'monday', open: '08:00', close: '18:00', isOpen: true },
+          { day: 'tuesday', open: '08:00', close: '18:00', isOpen: true },
+          { day: 'wednesday', open: '08:00', close: '18:00', isOpen: true },
+          { day: 'thursday', open: '08:00', close: '18:00', isOpen: true },
+          { day: 'friday', open: '08:00', close: '18:00', isOpen: true },
+          { day: 'saturday', open: '09:00', close: '14:00', isOpen: true },
+          { day: 'sunday', open: '', close: '', isOpen: false },
+        ],
+        rating: 4.9,
+        totalReviews: 356,
+        totalPickups: 2400,
+        isVerified: true,
+        verificationStatus: 'approved',
+      },
+      // International Agencies - Americas
+      {
+        userId: agencyUser15._id,
+        name: 'Toronto Green Recyclers',
+        email: 'toronto@greenrecycle.ca',
+        phone: '+1-416-555-0199',
+        description: 'Canada\'s trusted e-waste partner. EPRA certified. Serving Greater Toronto Area with responsible recycling.',
+        services: ['Curbside Pickup', 'Business Services', 'Electronics Recycling', 'Data Destruction'],
+        address: {
+          street: '200 Bay Street',
+          city: 'Toronto',
+          state: 'Ontario',
+          country: 'Canada',
+          zipCode: 'M5J 2J2',
+        },
+        location: {
+          type: 'Point',
+          coordinates: [-79.3832, 43.6532]
+        },
+        operatingHours: [
+          { day: 'monday', open: '08:00', close: '18:00', isOpen: true },
+          { day: 'tuesday', open: '08:00', close: '18:00', isOpen: true },
+          { day: 'wednesday', open: '08:00', close: '18:00', isOpen: true },
+          { day: 'thursday', open: '08:00', close: '18:00', isOpen: true },
+          { day: 'friday', open: '08:00', close: '18:00', isOpen: true },
+          { day: 'saturday', open: '09:00', close: '15:00', isOpen: true },
+          { day: 'sunday', open: '', close: '', isOpen: false },
+        ],
+        rating: 4.6,
+        totalReviews: 189,
+        totalPickups: 980,
+        isVerified: true,
+        verificationStatus: 'approved',
       },
     ]);
     console.log('Created agencies');

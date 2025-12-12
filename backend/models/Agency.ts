@@ -13,6 +13,7 @@ export interface IAgency extends Document {
     street: string;
     city: string;
     state: string;
+    country?: string;
     zipCode: string;
     coordinates?: {
       lat: number;
@@ -71,6 +72,7 @@ const AgencySchema = new Schema<IAgency>({
     street: { type: String, required: true },
     city: { type: String, required: true },
     state: { type: String, required: true },
+    country: { type: String, default: '' },
     zipCode: { type: String, required: true },
     coordinates: {
       lat: Number,

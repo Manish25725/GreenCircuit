@@ -133,20 +133,29 @@ const SchedulePickup = () => {
       const bookingData = {
         agencyId,
         slotId: selectedSlot._id,
-        date: selectedDate.toISOString(),
+        scheduledDate: selectedDate.toISOString(),
+        scheduledTime: `${selectedSlot.startTime} - ${selectedSlot.endTime}`,
         items: items.map(item => ({
           type: item.type,
           quantity: item.quantity,
           description: item.description
         })),
-        address: user?.address || '',
+        pickupAddress: user?.address || {
+          street: '',
+          city: '',
+          state: '',
+          zipCode: ''
+        },
         notes: ''
       };
 
       const response = await api.createBooking(bookingData);
-      if (response.data) {
+      if (response && response._id) {
         // Navigate to confirmation page with booking ID
-        window.location.hash = `#/pickup-confirmation?booking=${response.data._id}`;
+        window.location.hash = `#/pickup-confirmation?booking=${response._id}`;
+      } else {
+        // Fallback - still navigate to confirmation
+        window.location.hash = `#/pickup-confirmation`;
       }
     } catch (error) {
       console.error('Failed to create booking:', error);

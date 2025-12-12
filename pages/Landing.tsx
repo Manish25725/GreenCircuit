@@ -14,7 +14,12 @@ const Landing = () => {
             trigger: document.body,
             start: 'top -50',
             end: 99999,
-            toggleClass: { className: 'shadow-lg bg-[#0B1120]/95', targets: navbarRef.current }
+            onEnter: () => {
+              navbarRef.current?.classList.add('shadow-lg', 'scrolled-nav');
+            },
+            onLeaveBack: () => {
+              navbarRef.current?.classList.remove('shadow-lg', 'scrolled-nav');
+            }
         });
 
         // Hero Text Reveal Animation
