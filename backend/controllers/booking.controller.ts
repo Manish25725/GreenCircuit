@@ -12,6 +12,16 @@ export const createBooking = async (req: Request, res: Response) => {
     const { agencyId, slotId, items, scheduledDate, scheduledTime, pickupAddress, notes } = req.body;
     const userId = (req as any).user.id;
 
+    // Check if user already has 1 active booking
+    const activeBookingsCount = await Booking.countDocuments({
+      userId,
+      status: { $in: ['pending', 'confirmed', 'in-progress'] }
+    });
+
+    if (activeBookingsCount >= 1) {
+      return sendError(res, 'You can only have 1 active pickup request at a time. Please wait for your current pickup to be completed.', 400);
+    }
+
     // Validate required fields
     if (!agencyId || !items || items.length === 0) {
       return sendError(res, 'Agency and items are required', 400);
@@ -42,6 +52,7 @@ export const createBooking = async (req: Request, res: Response) => {
     const bookingId = `ECO-${String(bookingCount + 1).padStart(6, '0')}`;
 
     // Create booking
+    const ecoPoints = items.reduce((acc: number, item: any) => acc + (item.quantity * 10), 0);
     const booking = await Booking.create({
       userId,
       agencyId,
@@ -50,10 +61,15 @@ export const createBooking = async (req: Request, res: Response) => {
       items,
       scheduledDate: new Date(scheduledDate || Date.now()),
       scheduledTime: scheduledTime || 'TBD',
-      pickupAddress: pickupAddress || {},
-      notes,
+      pickupAddress: {
+        street: pickupAddress?.street || 'Not provided',
+        city: pickupAddress?.city || 'Not provided',
+        state: pickupAddress?.state || 'Not provided',
+        zipCode: pickupAddress?.zipCode || '000000'
+      },
+      notes: notes || '',
       status: 'pending',
-      pointsEarned: items.reduce((acc: number, item: any) => acc + (item.quantity * 10), 0),
+      ecoPointsEarned: ecoPoints,
       trackingHistory: [{
         status: 'pending',
         message: 'Booking request placed',
@@ -67,12 +83,11 @@ export const createBooking = async (req: Request, res: Response) => {
     }
 
     // Update user's total pickups and eco points
-    const pointsEarned = items.reduce((acc: number, item: any) => acc + (item.quantity * 10), 0);
     await User.findByIdAndUpdate(userId, { 
       $inc: { 
         totalPickups: 1,
         totalBookings: 1,
-        ecoPoints: pointsEarned
+        ecoPoints: ecoPoints
       } 
     });
 

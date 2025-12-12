@@ -84,10 +84,10 @@ const BookingSchema = new Schema<IBooking>({
     required: true
   },
   pickupAddress: {
-    street: { type: String, required: true },
-    city: { type: String, required: true },
-    state: { type: String, required: true },
-    zipCode: { type: String, required: true }
+    street: { type: String, default: '' },
+    city: { type: String, default: '' },
+    state: { type: String, default: '' },
+    zipCode: { type: String, default: '' }
   },
   totalWeight: Number,
   ecoPointsEarned: {

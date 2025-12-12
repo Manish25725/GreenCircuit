@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Layout from '../components/Layout';
-import { api, Agency, getCurrentUser } from '../services/api';
+import { api, Agency, getCurrentUser, isAuthenticated } from '../services/api';
 
 // Declare Leaflet types
 declare const L: any;
@@ -317,6 +317,12 @@ const SearchAgencies = () => {
   };
 
   const handleBookPickup = (agency: Agency) => {
+    // Check if user is logged in before booking
+    if (!isAuthenticated()) {
+      alert('Please log in to schedule a pickup');
+      window.location.hash = '#/login';
+      return;
+    }
     // Navigate to schedule page with agency ID - data will be fetched from MongoDB
     window.location.hash = `#/schedule?agency=${agency._id}`;
   };
@@ -346,7 +352,7 @@ const SearchAgencies = () => {
 
   return (
     <Layout title="" role="User" fullWidth hideSidebar>
-      <div className="flex flex-col h-screen bg-[#0B1116] text-gray-200 font-sans overflow-hidden">
+      <div className="flex flex-col h-screen bg-[#0B1116] text-white font-sans overflow-hidden">
         
         {/* Header */}
         <header className="flex items-center justify-between whitespace-nowrap border-b border-white/5 px-4 sm:px-6 lg:px-10 py-4 bg-[#0B1116]/80 backdrop-blur-md fixed top-0 left-0 right-0 z-50">
@@ -372,7 +378,7 @@ const SearchAgencies = () => {
                     <div className="size-8 rounded-full bg-[#10b981] flex items-center justify-center ring-2 ring-white/10 group-hover:ring-[#10b981]/50 transition-all text-white font-bold text-sm">
                       {user?.name?.charAt(0) || 'U'}
                     </div>
-                    <span className="text-sm font-medium text-gray-200">{user?.name || 'User'}</span>
+                    <span className="text-sm font-medium text-white">{user?.name || 'User'}</span>
                 </button>
                 <button className="relative p-2.5 rounded-full bg-[#151F26] border border-white/5 text-gray-400 hover:text-white hover:bg-white/10 transition-colors">
                     <span className="absolute top-2.5 right-3 size-2 bg-red-500 rounded-full border-2 border-[#151F26]"></span>
@@ -440,7 +446,28 @@ const SearchAgencies = () => {
                <div className="flex-1 overflow-y-auto p-3 space-y-2">
                   {loading ? (
                     <div className="flex flex-col items-center justify-center py-16">
-                      <div className="animate-spin rounded-full h-10 w-10 border-2 border-[#10b981] border-t-transparent mb-3"></div>
+                      {/* Loader with orbiting dot - matching LoadingScreen style */}
+                      <div className="relative flex items-center justify-center mb-4">
+                        <div className="w-20 h-20 rounded-full border border-[#10b981]/20 flex items-center justify-center relative bg-[#0B1116]/50 backdrop-blur-sm shadow-[0_0_40px_-10px_rgba(16,185,129,0.2)]">
+                          {/* Inner Glow */}
+                          <div className="absolute inset-0 bg-[#10b981]/5 rounded-full blur-xl animate-pulse"></div>
+                          
+                          {/* Logo SVG */}
+                          <div className="size-10 text-[#10b981] relative z-10 flex items-center justify-center">
+                            <svg className="w-full h-full drop-shadow-[0_0_15px_rgba(16,185,129,0.5)]" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M42.4379 44C42.4379 44 36.0744 33.9038 41.1692 24C46.8624 12.9336 42.2078 4 42.2078 4L7.01134 4C7.01134 4 11.6577 12.932 5.96912 23.9969C0.876273 33.9029 7.27094 44 7.27094 44L42.4379 44Z" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="3"></path>
+                            </svg>
+                          </div>
+
+                          {/* Orbiting Dot */}
+                          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full animate-spin [animation-duration:2s]">
+                            <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-[#10b981] rounded-full shadow-[0_0_10px_#10b981]"></div>
+                          </div>
+                        </div>
+                        {/* Decorative Particles */}
+                        <div className="absolute top-0 right-0 w-1.5 h-1.5 bg-[#10b981]/40 rounded-full animate-ping [animation-duration:2s]"></div>
+                        <div className="absolute bottom-2 -left-2 w-1 h-1 bg-[#10b981]/30 rounded-full animate-pulse"></div>
+                      </div>
                       <p className="text-[#94a3b8] text-sm">Searching global network...</p>
                     </div>
                   ) : agencies.length === 0 ? (
@@ -557,14 +584,14 @@ const SearchAgencies = () => {
                
                {/* Map Header with Stats */}
                <div className="absolute top-4 left-4 right-4 flex items-start justify-between z-[1000]">
-                 <div className="bg-[#151F26]/90 backdrop-blur-xl px-5 py-4 rounded-2xl border border-white/10 shadow-2xl">
+                 <div className="bg-[#0d1f17]/95 backdrop-blur-xl px-5 py-4 rounded-2xl border border-[#10b981]/20 shadow-2xl shadow-[#10b981]/5">
                    <div className="flex items-center gap-3 mb-3">
-                     <div className="p-2 bg-[#10b981]/20 rounded-xl">
+                     <div className="p-2.5 bg-[#10b981]/15 rounded-xl border border-[#10b981]/20">
                        <span className="material-symbols-outlined text-[#10b981] text-xl">public</span>
                      </div>
                      <div>
                        <h3 className="text-white font-bold text-sm">Global Recycling Network</h3>
-                       <p className="text-[#94a3b8] text-xs">Real-time agency locations</p>
+                       <p className="text-[#10b981]/70 text-xs">Real-time agency locations</p>
                      </div>
                    </div>
                    <div className="flex items-center gap-4">
@@ -573,10 +600,10 @@ const SearchAgencies = () => {
                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#10b981] opacity-75"></span>
                          <span className="relative inline-flex rounded-full h-3 w-3 bg-[#10b981]"></span>
                        </span>
-                       <span className="text-white text-xs font-medium">{agencies.length} Active</span>
+                       <span className="text-[#10b981] text-xs font-semibold">{agencies.length} Active</span>
                      </div>
-                     <div className="h-4 w-px bg-white/10" />
-                     <span className="text-[#94a3b8] text-xs">Click markers to explore</span>
+                     <div className="h-4 w-px bg-[#10b981]/20" />
+                     <span className="text-white/60 text-xs">Click markers to explore</span>
                    </div>
                  </div>
                  
@@ -593,10 +620,10 @@ const SearchAgencies = () => {
                            mapInstanceRef.current.flyTo(region.coords, region.zoom, { duration: 1.5 });
                          }
                        }}
-                       className="bg-[#151F26]/90 backdrop-blur-xl px-4 py-2.5 rounded-xl border border-white/10 hover:border-[#10b981]/50 transition-all flex items-center gap-2 group"
+                       className="bg-[#0d1f17]/95 backdrop-blur-xl px-4 py-2.5 rounded-xl border border-[#10b981]/20 hover:border-[#10b981]/50 hover:bg-[#10b981]/10 transition-all flex items-center gap-2 group shadow-lg"
                      >
                        <span className="text-base">{region.flag}</span>
-                       <span className="text-white text-xs font-medium group-hover:text-[#10b981] transition-colors">{region.name}</span>
+                       <span className="text-white/90 text-xs font-medium group-hover:text-[#10b981] transition-colors">{region.name}</span>
                      </button>
                    ))}
                  </div>
@@ -604,10 +631,10 @@ const SearchAgencies = () => {
                
                {/* Selected Agency Panel - Improved */}
                {selectedAgency && (
-                 <div className="absolute bottom-6 left-6 right-6 md:left-auto md:right-6 md:w-96 bg-[#151F26]/95 backdrop-blur-xl rounded-2xl border border-white/10 shadow-2xl overflow-hidden z-[1000] animate-slideUp">
+                 <div className="absolute bottom-6 left-6 right-6 md:left-auto md:right-6 md:w-96 bg-[#0d1f17]/95 backdrop-blur-xl rounded-2xl border border-[#10b981]/20 shadow-2xl shadow-[#10b981]/10 overflow-hidden z-[1000] animate-slideUp">
                    <div className="p-4">
                      <div className="flex items-start gap-3">
-                       <div className="p-3 bg-[#10b981]/20 rounded-xl">
+                       <div className="p-3 bg-[#10b981]/15 rounded-xl border border-[#10b981]/20">
                          <span className="material-symbols-outlined text-[#10b981] text-xl">recycling</span>
                        </div>
                        <div className="flex-1 min-w-0">
@@ -617,27 +644,27 @@ const SearchAgencies = () => {
                              <span className="material-symbols-outlined text-[#10b981] text-sm">verified</span>
                            )}
                          </div>
-                         <p className="text-[#94a3b8] text-xs mt-0.5">{selectedAgency.address?.street}</p>
-                         <p className="text-[#94a3b8] text-xs">{selectedAgency.address?.city}, {selectedAgency.address?.country || selectedAgency.address?.state}</p>
+                         <p className="text-[#10b981]/60 text-xs mt-0.5">{selectedAgency.address?.street}</p>
+                         <p className="text-white/50 text-xs">{selectedAgency.address?.city}, {selectedAgency.address?.country || selectedAgency.address?.state}</p>
                        </div>
                        <button 
                          onClick={() => setSelectedAgency(null)}
-                         className="p-1 hover:bg-white/10 rounded-lg transition-colors"
+                         className="p-1.5 hover:bg-[#10b981]/10 rounded-lg transition-colors"
                        >
-                         <span className="material-symbols-outlined text-[#94a3b8] text-lg">close</span>
+                         <span className="material-symbols-outlined text-white/50 hover:text-white text-lg">close</span>
                        </button>
                      </div>
                      
-                     <div className="flex items-center gap-3 mt-3 pt-3 border-t border-white/5">
-                       <div className="flex items-center gap-1 text-yellow-500">
+                     <div className="flex items-center gap-3 mt-3 pt-3 border-t border-[#10b981]/10">
+                       <div className="flex items-center gap-1 text-[#fbbf24]">
                          <span className="material-symbols-outlined text-sm fill">star</span>
                          <span className="text-sm font-bold">{selectedAgency.rating?.toFixed(1) || '4.5'}</span>
                        </div>
-                       <span className="text-[#94a3b8] text-xs">({selectedAgency.totalReviews || 0} reviews)</span>
+                       <span className="text-white/50 text-xs">({selectedAgency.totalReviews || 0} reviews)</span>
                        <div className="flex-1" />
                        <div className="flex gap-1">
                          {selectedAgency.services?.slice(0, 2).map(s => (
-                           <span key={s} className="text-[9px] uppercase bg-white/5 text-[#94a3b8] px-1.5 py-0.5 rounded">{s}</span>
+                           <span key={s} className="text-[9px] uppercase bg-[#10b981]/10 text-[#10b981] px-2 py-0.5 rounded-full font-medium">{s}</span>
                          ))}
                        </div>
                      </div>
@@ -645,10 +672,10 @@ const SearchAgencies = () => {
                    
                    <button
                      onClick={() => handleBookPickup(selectedAgency)}
-                     className="w-full bg-[#10b981] text-white py-3.5 font-bold hover:bg-[#059669] transition-colors flex items-center justify-center gap-2"
+                     className="w-full bg-gradient-to-r from-[#10b981] to-[#059669] text-white py-3.5 font-bold hover:from-[#059669] hover:to-[#047857] transition-all flex items-center justify-center gap-2"
                    >
                      <span className="material-symbols-outlined">calendar_month</span>
-                     Schedule International Pickup
+                     Schedule Pickup
                    </button>
                  </div>
                )}

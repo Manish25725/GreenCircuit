@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Layout from '../components/Layout';
 import { api, getCurrentUser } from '../services/api';
+import gsap from 'gsap';
 
 interface BookingDetails {
   _id: string;
@@ -16,14 +17,64 @@ const PickupConfirmation = () => {
   const [booking, setBooking] = useState<BookingDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const user = getCurrentUser();
+  const heroRef = useRef<HTMLDivElement>(null);
+  const cardsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     loadBooking();
   }, []);
 
+  useEffect(() => {
+    if (!loading && booking) {
+      // GSAP animations after content loads
+      const ctx = gsap.context(() => {
+        // Animate hero section
+        gsap.fromTo('.hero-icon', 
+          { scale: 0, rotation: -180 },
+          { scale: 1, rotation: 0, duration: 0.8, ease: 'back.out(1.7)' }
+        );
+        
+        gsap.fromTo('.hero-title', 
+          { y: 50, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.6, delay: 0.3, ease: 'power3.out' }
+        );
+        
+        gsap.fromTo('.hero-subtitle', 
+          { y: 30, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.6, delay: 0.5, ease: 'power3.out' }
+        );
+
+        // Animate cards
+        gsap.fromTo('.animate-card', 
+          { y: 60, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.7, stagger: 0.15, delay: 0.6, ease: 'power3.out' }
+        );
+
+        // Pulse animation for success icon
+        gsap.to('.pulse-ring', {
+          scale: 1.5,
+          opacity: 0,
+          duration: 1.5,
+          repeat: -1,
+          ease: 'power2.out'
+        });
+
+        // Floating animation
+        gsap.to('.float-element', {
+          y: -10,
+          duration: 2,
+          repeat: -1,
+          yoyo: true,
+          ease: 'sine.inOut'
+        });
+      });
+
+      return () => ctx.revert();
+    }
+  }, [loading, booking]);
+
   const loadBooking = async () => {
     try {
-      // Get booking ID from URL params
       const hash = window.location.hash;
       const params = new URLSearchParams(hash.split('?')[1] || '');
       const bookingId = params.get('booking');
@@ -32,7 +83,6 @@ const PickupConfirmation = () => {
         const response = await api.getBookingById(bookingId);
         setBooking(response);
       } else {
-        // Try to get the active booking
         const activeBooking = await api.getActiveBooking();
         if (activeBooking) {
           setBooking(activeBooking);
@@ -76,10 +126,10 @@ const PickupConfirmation = () => {
   if (loading) {
     return (
       <Layout title="" role="User" fullWidth hideSidebar>
-        <div className="min-h-screen bg-[#102216] flex items-center justify-center">
-          <div className="text-center">
-            <div className="w-12 h-12 border-4 border-[#2bee6c] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-gray-400">Loading booking details...</p>
+        <div className="min-h-screen bg-[#0B1120] flex items-center justify-center">
+          <div className="relative flex items-center justify-center">
+            <div className="w-16 h-16 rounded-full border-4 border-[#34D399]/20 border-t-[#34D399] animate-spin"></div>
+            <div className="absolute w-10 h-10 rounded-full border-4 border-[#6EE7B7]/20 border-b-[#6EE7B7] animate-spin" style={{ animationDirection: 'reverse', animationDuration: '0.8s' }}></div>
           </div>
         </div>
       </Layout>
@@ -88,179 +138,267 @@ const PickupConfirmation = () => {
 
   return (
     <Layout title="" role="User" fullWidth hideSidebar>
-      <div className="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden bg-[#f6f8f6] dark:bg-[#102216] text-slate-900 dark:text-white font-sans">
-        {/* TopNavBar */}
-        <header className="sticky top-0 z-50 flex items-center justify-between whitespace-nowrap border-b border-solid border-gray-200 dark:border-[#28392e] bg-[#f6f8f6]/95 dark:bg-[#102216]/95 backdrop-blur-md px-4 sm:px-10 py-3">
-          <div className="flex items-center gap-4 text-slate-900 dark:text-white cursor-pointer" onClick={() => window.location.hash = '#/'}>
-            <div className="size-8 text-[#2bee6c]">
-              <span className="material-symbols-outlined text-[32px]">recycling</span>
-            </div>
-            <h2 className="text-lg font-bold leading-tight tracking-[-0.015em]">EcoCycle</h2>
-          </div>
-          <div className="hidden md:flex flex-1 justify-end gap-8">
-            <nav className="flex items-center gap-9">
-              <a className="text-sm font-medium leading-normal hover:text-[#2bee6c] transition-colors cursor-pointer" onClick={() => window.location.hash = '#/dashboard'}>Dashboard</a>
-              <a className="text-sm font-medium leading-normal hover:text-[#2bee6c] transition-colors cursor-pointer" onClick={() => window.location.hash = '#/search'}>Book Pickup</a>
-              <a className="text-sm font-medium leading-normal hover:text-[#2bee6c] transition-colors cursor-pointer" onClick={() => window.location.hash = '#/certificate'}>Certificates</a>
-              <a className="text-sm font-medium leading-normal hover:text-[#2bee6c] transition-colors cursor-pointer" onClick={() => window.location.hash = '#/profile'}>Profile</a>
-            </nav>
-            <div className="flex items-center gap-4">
-              <button className="flex items-center justify-center overflow-hidden rounded-lg h-10 w-10 bg-gray-200 dark:bg-[#28392e] text-slate-900 dark:text-white hover:bg-gray-300 dark:hover:bg-opacity-80 transition-colors">
-                <span className="material-symbols-outlined text-[20px]">notifications</span>
-              </button>
-              <div 
-                className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 ring-2 ring-[#2bee6c]/20 cursor-pointer" 
-                style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuANn32gvr-fc9z2IHxhBX_sCZK5DZQMjOFKRZRjNdc6PaIkzdVUHN3ySRzmJNT45peL-frDuE8kRDeMZn6DUcCfk9tSRNZ2GxydtrU17QCYByjQnxsbI95sT8lZfPvLqs2oyzwCHMz_PrDlakBSOjnnkYLwqVrB5eNHAVkZ1ye8Y7Fmt1CnYYakDoWeZ7dXrCI14wDqopSp8DcbPCG5iDZnz3Myq4mAv6fI22J4wcvud2XnioBRkfp2HMOAafYlRmyQ3n8WATYkvmo")' }}
-                onClick={() => window.location.hash = '#/profile'}
-              ></div>
-            </div>
-          </div>
-          {/* Mobile Menu Icon */}
-          <button className="md:hidden flex items-center justify-center text-slate-900 dark:text-white">
-            <span className="material-symbols-outlined">menu</span>
-          </button>
-        </header>
+      <div className="relative flex min-h-screen w-full flex-col font-display bg-[#0B1120] text-slate-300 selection:bg-[#34D399] selection:text-slate-900 overflow-x-hidden">
+        
+        {/* Background Effects */}
+        <div className="fixed inset-0 pointer-events-none">
+          <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-[#34D399]/5 rounded-full blur-[150px]"></div>
+          <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-[#3B82F6]/5 rounded-full blur-[150px]"></div>
+        </div>
 
-        <main className="flex h-full grow flex-col items-center">
-          <div className="px-4 sm:px-10 md:px-40 flex flex-1 justify-center py-8 w-full">
-            <div className="flex flex-col max-w-[800px] flex-1 gap-8">
-              
-              {/* Success Hero Section */}
-              <section className="flex flex-col items-center gap-6 text-center animate-fade-in-up">
-                <div className="relative flex items-center justify-center size-24 rounded-full bg-[#2bee6c]/10 ring-1 ring-[#2bee6c]/30">
-                  <span className="material-symbols-outlined text-[#2bee6c] text-[48px]">check_circle</span>
-                  <div className="absolute inset-0 rounded-full border border-[#2bee6c]/20 animate-ping opacity-20"></div>
+        {/* Navbar - Matching Homepage */}
+        <div className="w-full flex justify-center fixed top-0 left-0 right-0 z-50">
+          <div className="absolute inset-0 bg-[#0B1120]/80 backdrop-blur-md border-b border-white/5"></div>
+          <div className="w-full max-w-7xl px-4 sm:px-6 relative z-10">
+            <header className="flex items-center justify-between h-16 sm:h-20">
+              <div className="flex items-center gap-3 cursor-pointer" onClick={() => window.location.hash = '#/'}>
+                <div className="size-8 sm:size-10 text-[#34D399] flex items-center justify-center">
+                  <svg className="w-full h-full drop-shadow-[0_0_8px_rgba(52,211,153,0.5)]" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M42.4379 44C42.4379 44 36.0744 33.9038 41.1692 24C46.8624 12.9336 42.2078 4 42.2078 4L7.01134 4C7.01134 4 11.6577 12.932 5.96912 23.9969C0.876273 33.9029 7.27094 44 7.27094 44L42.4379 44Z" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="3"></path>
+                  </svg>
                 </div>
-                <div className="flex flex-col items-center gap-3 max-w-[560px]">
-                  <h1 className="text-3xl sm:text-4xl font-extrabold leading-tight tracking-tight text-slate-900 dark:text-white">
-                    {booking?.status === 'completed' ? 'Pickup Complete!' : 'Booking Confirmed!'}
-                  </h1>
-                  <p className="text-slate-600 dark:text-[#9db9a6] text-base sm:text-lg font-normal leading-relaxed">
-                    {booking?.status === 'completed' 
-                      ? `${booking?.agency?.name || 'The agency'} has successfully collected your e-waste.`
-                      : `Your pickup has been scheduled with ${booking?.agency?.name || 'the agency'}.`
-                    }
+                <span className="text-slate-50 text-xl sm:text-2xl font-black tracking-tight">EcoCycle</span>
+              </div>
+              <nav className="hidden md:flex items-center gap-8">
+              </nav>
+              <div className="flex items-center gap-4">
+                <button 
+                  onClick={() => window.location.hash = '#/profile'}
+                  className="hidden sm:flex h-10 px-5 items-center justify-center rounded-full bg-white/5 text-white hover:bg-white/10 border border-white/10 text-sm font-bold transition-all duration-300 cursor-pointer"
+                >
+                  <span className="material-symbols-outlined text-[18px] mr-2">person</span>
+                  Profile
+                </button>
+                <button 
+                  onClick={() => window.location.hash = '#/search'}
+                  className="h-10 px-6 flex items-center justify-center rounded-full bg-[#34D399] text-slate-900 hover:bg-[#6EE7B7] shadow-[0_0_15px_rgba(52,211,153,0.3)] hover:shadow-[0_0_25px_rgba(52,211,153,0.5)] text-sm font-bold transition-all duration-300 transform hover:scale-105 cursor-pointer"
+                >
+                  New Pickup
+                </button>
+              </div>
+            </header>
+          </div>
+        </div>
+
+        {/* Main Content */}
+        <main className="w-full flex flex-col items-center pt-32 pb-20 relative z-10">
+          <div className="w-full max-w-4xl px-4 sm:px-6 flex flex-col gap-10">
+            
+            {/* Success Hero Section */}
+            <div ref={heroRef} className="flex flex-col items-center gap-6 text-center">
+              <div className="relative">
+                <div className="hero-icon relative flex items-center justify-center size-28 rounded-full bg-gradient-to-br from-[#34D399]/20 to-[#34D399]/5 ring-1 ring-[#34D399]/30 shadow-[0_0_50px_rgba(52,211,153,0.2)]">
+                  <span className="material-symbols-outlined text-[#34D399] text-6xl">check_circle</span>
+                </div>
+                <div className="pulse-ring absolute inset-0 rounded-full border-2 border-[#34D399]/50"></div>
+              </div>
+              <div className="flex flex-col items-center gap-3 max-w-xl">
+                <h1 className="hero-title text-4xl sm:text-5xl font-black text-white leading-tight tracking-tight">
+                  {booking?.status === 'completed' ? (
+                    <>Pickup <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#34D399] to-[#6EE7B7]">Complete!</span></>
+                  ) : (
+                    <>Booking <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#34D399] to-[#6EE7B7]">Confirmed!</span></>
+                  )}
+                </h1>
+                <p className="hero-subtitle text-slate-400 text-lg sm:text-xl font-light leading-relaxed">
+                  {booking?.status === 'completed' 
+                    ? `${booking?.agency?.name || 'The agency'} has successfully collected your e-waste.`
+                    : `Your pickup has been scheduled with ${booking?.agency?.name || 'the agency'}.`
+                  }
+                </p>
+              </div>
+            </div>
+
+            {/* Points Earned Card */}
+            <div ref={cardsRef} className="animate-card group relative rounded-[2rem] bg-gradient-to-b from-slate-800/50 to-slate-900/50 border border-white/5 p-8 overflow-hidden transition-all duration-500 hover:shadow-[0_20px_40px_-15px_rgba(52,211,153,0.2)]">
+              <div className="absolute inset-0 bg-gradient-to-br from-[#34D399]/0 to-[#34D399]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+              <div className="absolute top-0 right-0 opacity-5">
+                <span className="material-symbols-outlined text-[200px] text-[#34D399]">eco</span>
+              </div>
+              
+              <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
+                <div className="flex flex-col gap-4">
+                  <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#34D399]/10 border border-[#34D399]/20 w-fit">
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#34D399] opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-[#34D399]"></span>
+                    </span>
+                    <span className="text-[#34D399] text-sm font-bold">+{booking?.pointsEarned || 50} Eco-Points Earned</span>
+                  </div>
+                  <h3 className="text-2xl sm:text-3xl font-bold text-white">
+                    Pickup #{booking?._id?.slice(-6).toUpperCase() || 'XXXXXX'}
+                  </h3>
+                  <p className="text-slate-400 text-base">
+                    {booking?.agency?.name ? (
+                      <>Handled by <span className="text-[#34D399] font-semibold">{booking.agency.name}</span> (Verified Partner)</>
+                    ) : (
+                      'Pickup scheduled successfully'
+                    )}
                   </p>
                 </div>
-              </section>
-
-              {/* Status Card with Points */}
-              <section className="w-full">
-                <div className="flex flex-col md:flex-row items-stretch justify-between gap-6 rounded-xl bg-white dark:bg-[#1c271f] p-6 shadow-sm border border-gray-200 dark:border-[#28392e]">
-                  <div className="flex flex-col justify-center gap-2 flex-[2_2_0px]">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#2bee6c]/10 w-fit">
-                      <span className="material-symbols-outlined text-[#2bee6c] text-[18px]">eco</span>
-                      <p className="text-[#2bee6c] text-sm font-bold leading-normal">+{booking?.pointsEarned || 50} Eco-Points Earned</p>
-                    </div>
-                    <h3 className="text-xl font-bold leading-tight mt-2 text-slate-900 dark:text-white">
-                      Pickup #{booking?._id?.slice(-6).toUpperCase() || 'XXXXXX'} Summary
-                    </h3>
-                    <p className="text-slate-500 dark:text-[#9db9a6] text-sm font-normal leading-normal">
-                      {booking?.agency?.name ? (
-                        <>Handled by <span className="text-slate-900 dark:text-white font-medium">{booking.agency.name}</span> (Verified Partner)</>
-                      ) : (
-                        'Pickup scheduled successfully'
-                      )}
-                    </p>
-                  </div>
-                  <div className="w-full md:w-48 h-32 md:h-auto bg-center bg-no-repeat bg-cover rounded-lg flex-none relative overflow-hidden group bg-gradient-to-br from-[#2bee6c]/20 to-[#2bee6c]/5 flex items-center justify-center">
-                    <span className="material-symbols-outlined text-[#2bee6c] text-6xl">recycling</span>
-                  </div>
-                </div>
-              </section>
-
-              {/* Progress Bar */}
-              <section className="w-full flex flex-col gap-3">
-                <div className="flex gap-6 justify-between items-end">
-                  <div>
-                    <p className="text-base font-bold leading-normal text-slate-900 dark:text-white">Recycling Process Status</p>
-                    <p className="text-slate-500 dark:text-[#9db9a6] text-xs">Status: {booking?.status || 'pending'}</p>
-                  </div>
-                  <p className="text-[#2bee6c] text-sm font-bold leading-normal">{getProgressPercentage(booking?.status || 'pending')}%</p>
-                </div>
-                <div className="relative w-full h-3 rounded-full bg-gray-200 dark:bg-[#28392e] overflow-hidden">
-                  <div className="absolute left-0 top-0 h-full rounded-full bg-[#2bee6c] shadow-[0_0_10px_rgba(43,238,108,0.5)] transition-all duration-500" style={{ width: `${getProgressPercentage(booking?.status || 'pending')}%` }}></div>
-                </div>
-                <div className="flex justify-between text-xs font-medium text-slate-400 dark:text-[#9db9a6] mt-1">
-                  <span>Booked</span>
-                  <span>Collected</span>
-                  <span className="text-[#2bee6c]">Processing</span>
-                  <span>Certificate</span>
-                </div>
-              </section>
-
-              {/* Detailed Info Grid */}
-              <section className="rounded-xl border border-solid border-gray-200 dark:border-[#28392e] bg-transparent overflow-hidden">
-                <div className="grid grid-cols-1 sm:grid-cols-2">
-                  <div className="flex flex-col gap-1 border-b sm:border-b-0 sm:border-r border-solid border-gray-200 dark:border-[#28392e] p-5 hover:bg-white/5 transition-colors">
-                    <p className="text-slate-500 dark:text-[#9db9a6] text-sm font-normal leading-normal mb-1 flex items-center gap-2">
-                      <span className="material-symbols-outlined text-[18px]">tag</span> Pickup ID
-                    </p>
-                    <p className="text-base font-semibold text-slate-900 dark:text-white">#{booking?._id?.slice(-6).toUpperCase() || 'XXXXXX'}</p>
-                  </div>
-                  <div className="flex flex-col gap-1 border-b border-solid border-gray-200 dark:border-[#28392e] p-5 hover:bg-white/5 transition-colors">
-                    <p className="text-slate-500 dark:text-[#9db9a6] text-sm font-normal leading-normal mb-1 flex items-center gap-2">
-                      <span className="material-symbols-outlined text-[18px]">event</span> Date & Time
-                    </p>
-                    <p className="text-base font-semibold text-slate-900 dark:text-white">
-                      {booking?.date ? formatDate(booking.date) : 'Pending'} 
-                      {booking?.slot ? ` • ${formatTime(booking.slot.startTime)}` : ''}
-                    </p>
-                  </div>
-                  <div className="flex flex-col gap-1 border-b sm:border-b-0 sm:border-r border-solid border-gray-200 dark:border-[#28392e] p-5 hover:bg-white/5 transition-colors">
-                    <p className="text-slate-500 dark:text-[#9db9a6] text-sm font-normal leading-normal mb-1 flex items-center gap-2">
-                      <span className="material-symbols-outlined text-[18px]">inventory_2</span> Items
-                    </p>
-                    <p className="text-base font-semibold text-slate-900 dark:text-white">
-                      {booking?.items?.length || 0} item(s): {booking?.items?.map(i => i.type).join(', ') || 'N/A'}
-                    </p>
-                  </div>
-                  <div className="flex flex-col gap-1 p-5 hover:bg-white/5 transition-colors">
-                    <p className="text-slate-500 dark:text-[#9db9a6] text-sm font-normal leading-normal mb-1 flex items-center gap-2">
-                      <span className="material-symbols-outlined text-[18px]">next_plan</span> Status
-                    </p>
-                    <p className="text-base font-semibold text-[#2bee6c] capitalize">{booking?.status || 'Pending'}</p>
-                  </div>
-                </div>
-              </section>
-
-              {/* Action Buttons */}
-              <div className="flex flex-col sm:flex-row gap-4 pt-4">
-                <button 
-                    onClick={() => window.location.hash = '#/certificate'}
-                    className="flex-1 cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 bg-[#2bee6c] hover:bg-[#2bee6c]/90 text-[#102216] gap-2 text-base font-bold leading-normal tracking-[0.015em] px-6 transition-all transform active:scale-95 shadow-[0_0_15px_rgba(43,238,108,0.2)]"
-                >
-                  <span className="material-symbols-outlined text-[20px]">verified</span>
-                  View Digital Certificate
-                </button>
-                <button 
-                    onClick={() => window.location.hash = '#/dashboard'}
-                    className="flex-1 cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 border border-gray-300 dark:border-[#28392e] bg-transparent hover:bg-gray-100 dark:hover:bg-[#28392e] text-slate-900 dark:text-white gap-2 text-base font-medium leading-normal tracking-[0.015em] px-6 transition-colors"
-                >
-                  Back to Dashboard
-                </button>
-              </div>
-
-              {/* Social Share Micro-interaction */}
-              <div className="flex justify-center items-center gap-4 pt-4">
-                <p className="text-xs text-slate-500 dark:text-[#9db9a6] font-medium uppercase tracking-wider">Share your impact</p>
-                <div className="flex gap-2">
-                  <button className="size-8 rounded-full bg-[#1c271f] border border-[#28392e] flex items-center justify-center text-white hover:border-[#2bee6c] hover:text-[#2bee6c] transition-colors cursor-pointer">
-                    <span className="text-xs font-bold">X</span>
-                  </button>
-                  <button className="size-8 rounded-full bg-[#1c271f] border border-[#28392e] flex items-center justify-center text-white hover:border-[#2bee6c] hover:text-[#2bee6c] transition-colors cursor-pointer">
-                    <span className="text-xs font-bold">in</span>
-                  </button>
+                <div className="float-element size-32 rounded-2xl bg-gradient-to-br from-[#34D399]/20 to-[#34D399]/5 border border-[#34D399]/20 flex items-center justify-center shadow-[0_0_30px_rgba(52,211,153,0.15)]">
+                  <span className="material-symbols-outlined text-[#34D399] text-6xl">recycling</span>
                 </div>
               </div>
-
             </div>
+
+            {/* Progress Section */}
+            <div className="animate-card rounded-[2rem] bg-gradient-to-b from-slate-800/50 to-slate-900/50 border border-white/5 p-8">
+              <div className="flex flex-col gap-4">
+                <div className="flex justify-between items-end">
+                  <div>
+                    <h3 className="text-xl font-bold text-white mb-1">Recycling Process Status</h3>
+                    <p className="text-slate-500 text-sm capitalize">Current: {booking?.status || 'pending'}</p>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-[#34D399] to-[#6EE7B7]">
+                      {getProgressPercentage(booking?.status || 'pending')}%
+                    </span>
+                  </div>
+                </div>
+                
+                <div className="relative w-full h-4 rounded-full bg-slate-800 overflow-hidden mt-2">
+                  <div 
+                    className="absolute left-0 top-0 h-full rounded-full bg-gradient-to-r from-[#34D399] to-[#6EE7B7] shadow-[0_0_20px_rgba(52,211,153,0.5)] transition-all duration-1000" 
+                    style={{ width: `${getProgressPercentage(booking?.status || 'pending')}%` }}
+                  ></div>
+                </div>
+                
+                <div className="flex justify-between text-xs font-medium text-slate-500 mt-2">
+                  <span className={booking?.status === 'pending' ? 'text-[#34D399]' : ''}>Booked</span>
+                  <span className={booking?.status === 'confirmed' ? 'text-[#34D399]' : ''}>Confirmed</span>
+                  <span className={booking?.status === 'collected' ? 'text-[#34D399]' : ''}>Collected</span>
+                  <span className={booking?.status === 'completed' ? 'text-[#34D399]' : ''}>Complete</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Detailed Info Grid */}
+            <div className="animate-card grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* Pickup ID */}
+              <div className="group rounded-2xl bg-gradient-to-b from-slate-800/50 to-slate-900/50 border border-white/5 p-6 hover:border-[#34D399]/20 transition-all duration-300">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="size-10 rounded-xl bg-[#34D399]/10 flex items-center justify-center">
+                    <span className="material-symbols-outlined text-[#34D399] text-xl">tag</span>
+                  </div>
+                  <span className="text-slate-400 text-sm font-medium">Pickup ID</span>
+                </div>
+                <p className="text-xl font-bold text-white">#{booking?._id?.slice(-6).toUpperCase() || 'XXXXXX'}</p>
+              </div>
+
+              {/* Date & Time */}
+              <div className="group rounded-2xl bg-gradient-to-b from-slate-800/50 to-slate-900/50 border border-white/5 p-6 hover:border-[#34D399]/20 transition-all duration-300">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="size-10 rounded-xl bg-[#3B82F6]/10 flex items-center justify-center">
+                    <span className="material-symbols-outlined text-[#3B82F6] text-xl">event</span>
+                  </div>
+                  <span className="text-slate-400 text-sm font-medium">Date & Time</span>
+                </div>
+                <p className="text-xl font-bold text-white">
+                  {booking?.date ? formatDate(booking.date) : 'Pending'}
+                  {booking?.slot ? <span className="text-slate-400 font-normal text-base ml-2">• {formatTime(booking.slot.startTime)}</span> : ''}
+                </p>
+              </div>
+
+              {/* Items */}
+              <div className="group rounded-2xl bg-gradient-to-b from-slate-800/50 to-slate-900/50 border border-white/5 p-6 hover:border-[#34D399]/20 transition-all duration-300">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="size-10 rounded-xl bg-[#A855F7]/10 flex items-center justify-center">
+                    <span className="material-symbols-outlined text-[#A855F7] text-xl">inventory_2</span>
+                  </div>
+                  <span className="text-slate-400 text-sm font-medium">Items</span>
+                </div>
+                <p className="text-xl font-bold text-white">
+                  {booking?.items?.length || 0} item(s)
+                  <span className="text-slate-400 font-normal text-base ml-2">• {booking?.items?.map(i => i.type).join(', ') || 'N/A'}</span>
+                </p>
+              </div>
+
+              {/* Status */}
+              <div className="group rounded-2xl bg-gradient-to-b from-slate-800/50 to-slate-900/50 border border-white/5 p-6 hover:border-[#34D399]/20 transition-all duration-300">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="size-10 rounded-xl bg-[#F59E0B]/10 flex items-center justify-center">
+                    <span className="material-symbols-outlined text-[#F59E0B] text-xl">pending_actions</span>
+                  </div>
+                  <span className="text-slate-400 text-sm font-medium">Status</span>
+                </div>
+                <p className="text-xl font-bold text-[#34D399] capitalize">{booking?.status || 'Pending'}</p>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="animate-card flex flex-col sm:flex-row gap-4 pt-4">
+              {(booking?.status === 'completed' || booking?.status === 'collected') ? (
+                <button 
+                  onClick={() => window.location.hash = '#/certificate'}
+                  className="relative group flex-1 h-14 rounded-full overflow-hidden cursor-pointer"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-[#34D399] to-[#6EE7B7] transition-transform duration-300 group-hover:scale-105"></div>
+                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-r from-[#6EE7B7] to-[#34D399]"></div>
+                  <div className="relative z-10 flex items-center justify-center gap-2 h-full text-slate-900 font-bold">
+                    <span className="material-symbols-outlined text-xl">verified</span>
+                    View Digital Certificate
+                  </div>
+                </button>
+              ) : (
+                <button 
+                  onClick={() => window.location.hash = '#/dashboard'}
+                  className="relative group flex-1 h-14 rounded-full overflow-hidden cursor-pointer"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-[#34D399] to-[#6EE7B7] transition-transform duration-300 group-hover:scale-105"></div>
+                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-r from-[#6EE7B7] to-[#34D399]"></div>
+                  <div className="relative z-10 flex items-center justify-center gap-2 h-full text-slate-900 font-bold">
+                    <span className="material-symbols-outlined text-xl">dashboard</span>
+                    Go to Dashboard
+                  </div>
+                </button>
+              )}
+              <button 
+                onClick={() => window.location.hash = '#/search'}
+                className="flex-1 h-14 rounded-full border border-white/10 bg-white/5 text-white font-bold hover:bg-white/10 hover:border-white/20 transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <span className="material-symbols-outlined text-xl">add_circle</span>
+                Schedule Another Pickup
+              </button>
+            </div>
+
+            {/* Social Share */}
+            <div className="animate-card flex flex-col items-center gap-4 pt-8 pb-4">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-800/50 border border-white/5">
+                <span className="text-slate-500 text-xs font-semibold uppercase tracking-widest">Share Your Impact</span>
+              </div>
+              <div className="flex gap-3">
+                <button className="size-12 rounded-full bg-slate-800/50 border border-white/5 flex items-center justify-center text-slate-400 hover:text-white hover:border-[#34D399]/30 hover:bg-[#34D399]/10 transition-all duration-300 cursor-pointer">
+                  <span className="text-sm font-bold">X</span>
+                </button>
+                  <button className="size-12 rounded-full bg-slate-800/50 border border-white/5 flex items-center justify-center text-slate-400 hover:text-white hover:border-[#3B82F6]/30 hover:bg-[#3B82F6]/10 transition-all duration-300 cursor-pointer">
+                  <span className="text-sm font-bold">in</span>
+                </button>
+                <button className="size-12 rounded-full bg-slate-800/50 border border-white/5 flex items-center justify-center text-slate-400 hover:text-white hover:border-[#A855F7]/30 hover:bg-[#A855F7]/10 transition-all duration-300 cursor-pointer">
+                  <span className="material-symbols-outlined text-xl">share</span>
+                </button>
+              </div>
+            </div>
+
           </div>
         </main>
 
-        <footer className="mt-auto border-t border-gray-200 dark:border-[#28392e] py-6 bg-[#f6f8f6] dark:bg-[#102216]">
-          <div className="px-4 sm:px-10 md:px-40 text-center">
-            <p className="text-slate-500 dark:text-[#9db9a6] text-sm">© 2023 EcoCycle Inc. Together for a cleaner future.</p>
+        {/* Footer */}
+        <footer className="mt-auto border-t border-white/5 py-8 relative z-10">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div className="flex items-center gap-3">
+              <div className="size-8 text-[#34D399]">
+                <svg className="w-full h-full" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M42.4379 44C42.4379 44 36.0744 33.9038 41.1692 24C46.8624 12.9336 42.2078 4 42.2078 4L7.01134 4C7.01134 4 11.6577 12.932 5.96912 23.9969C0.876273 33.9029 7.27094 44 7.27094 44L42.4379 44Z" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="3"></path>
+                </svg>
+              </div>
+              <span className="text-slate-400 text-sm">© 2024 EcoCycle. Together for a cleaner future.</span>
+            </div>
+            <div className="flex items-center gap-6">
+              <button onClick={() => window.location.hash = '#/about'} className="text-slate-500 hover:text-[#34D399] text-sm transition-colors cursor-pointer bg-transparent border-none">About</button>
+              <button onClick={() => window.location.hash = '#/contact'} className="text-slate-500 hover:text-[#34D399] text-sm transition-colors cursor-pointer bg-transparent border-none">Contact</button>
+              <button onClick={() => window.location.hash = '#/how-it-works'} className="text-slate-500 hover:text-[#34D399] text-sm transition-colors cursor-pointer bg-transparent border-none">Help</button>
+            </div>
           </div>
         </footer>
       </div>

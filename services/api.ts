@@ -282,6 +282,22 @@ export const api = {
     localStorage.removeItem('user');
   },
 
+  // Validate current token - returns true if valid, false if invalid
+  validateToken: async (): Promise<boolean> => {
+    const token = getToken();
+    if (!token) return false;
+    
+    try {
+      await apiRequest<User>('/auth/me');
+      return true;
+    } catch (error) {
+      // Token is invalid - clear it
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      return false;
+    }
+  },
+
   getMe: async (): Promise<User> => {
     return apiRequest<User>('/auth/me');
   },

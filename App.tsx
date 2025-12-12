@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { api } from './services/api';
 import AgencyAnalytics from './pages/AgencyAnalytics';
 import ManageSlots from './pages/ManageSlots';
 import AgencyBookings from './pages/AgencyBookings';
@@ -23,6 +24,8 @@ import AdminUsers from './pages/AdminUsers';
 import AdminAgencies from './pages/AdminAgencies';
 import AdminReports from './pages/AdminReports';
 import PickupConfirmation from './pages/PickupConfirmation';
+import PickupLimitReached from './pages/PickupLimitReached';
+import History from './pages/History';
 import LoadingScreen from './components/LoadingScreen';
 import BusinessInventory from './pages/BusinessInventory';
 import BusinessCertificates from './pages/BusinessCertificates';
@@ -34,6 +37,27 @@ const App = () => {
   // Removed loading screen to fix dark green screen issue
   const [isLoading, setIsLoading] = useState(false);
   const [progress, setProgress] = useState(100);
+
+  // Validate token on app start
+  useEffect(() => {
+    const validateSession = async () => {
+      const token = localStorage.getItem('token');
+      if (token) {
+        const isValid = await api.validateToken();
+        if (!isValid) {
+          console.log('Invalid token detected - session cleared');
+          // Token was invalid and has been cleared
+          // If user is on a protected page, redirect to login
+          const protectedPaths = ['#/dashboard', '#/profile', '#/rewards', '#/schedule', '#/search'];
+          const currentPath = window.location.hash.split('?')[0];
+          if (protectedPaths.some(p => currentPath.startsWith(p))) {
+            window.location.hash = '#/login';
+          }
+        }
+      }
+    };
+    validateSession();
+  }, []);
 
   useEffect(() => {
     const handleHashChange = () => {
@@ -70,6 +94,10 @@ const App = () => {
         return <SchedulePickup />;
       case '#/pickup-confirmation':
         return <PickupConfirmation />;
+      case '#/pickup-limit':
+        return <PickupLimitReached />;
+      case '#/history':
+        return <History />;
       case '#/admin':
         return <AdminDashboard />;
       case '#/admin/vetting':

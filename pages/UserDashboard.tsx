@@ -3,10 +3,13 @@ import Layout from '../components/Layout';
 import { api, getCurrentUser, User, Booking } from '../services/api';
 
 const UserDashboard = () => {
-  const [user, setUser] = useState<User | null>(getCurrentUser());
-  const [activeBooking, setActiveBooking] = useState<Booking | null>(null);
-  const [recentBookings, setRecentBookings] = useState<Booking[]>([]);
+  const [user, setUser] = useState<User | null>(getCurrentUser()); 
+  const [activeBookings, setActiveBookings] = useState<Booking[]>([]);
+  const [allBookings, setAllBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showAllBookings, setShowAllBookings] = useState(false);
+  const [cancelling, setCancelling] = useState<string | null>(null);
+  const [showCancelModal, setShowCancelModal] = useState<string | null>(null);
   const [stats, setStats] = useState({
     totalRecycled: 0,
     co2Offset: 0,
@@ -36,13 +39,13 @@ const UserDashboard = () => {
       try {
         const bookingsData = await api.getUserBookings();
         const bookings = bookingsData.bookings || bookingsData || [];
-        setRecentBookings(bookings);
+        setAllBookings(bookings);
         
-        // Find active/in-progress booking
-        const active = bookings.find((b: Booking) => 
+        // Find ALL active/in-progress bookings (not just the first one)
+        const active = bookings.filter((b: Booking) => 
           b.status === 'pending' || b.status === 'confirmed' || b.status === 'in-progress'
         );
-        setActiveBooking(active || null);
+        setActiveBookings(active || []);
       } catch (e) {
         console.log('No bookings found');
       }
@@ -51,6 +54,21 @@ const UserDashboard = () => {
       // If API fails, use cached user data
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleCancelBooking = async (bookingId: string) => {
+    setCancelling(bookingId);
+    try {
+      await api.cancelBooking(bookingId);
+      // Reload data after cancellation
+      await loadUserData();
+      setShowCancelModal(null);
+    } catch (error) {
+      console.error('Failed to cancel booking:', error);
+      alert('Failed to cancel booking. Please try again.');
+    } finally {
+      setCancelling(null);
     }
   };
 
@@ -82,18 +100,18 @@ const UserDashboard = () => {
     }
   };
 
-  const getTrackingSteps = () => {
-    if (!activeBooking) return [];
+  const getTrackingSteps = (booking: Booking) => {
+    if (!booking) return [];
     
     const steps = [
-      { key: 'pending', label: 'Request Placed', icon: 'check', message: `Your recycling request ${activeBooking.bookingId || '#REQ'} was received.` },
-      { key: 'confirmed', label: 'Agency Confirmed', icon: 'verified', message: `${typeof activeBooking.agencyId === 'object' ? activeBooking.agencyId.name : 'Agency'} confirmed your request.` },
+      { key: 'pending', label: 'Request Placed', icon: 'check', message: `Your recycling request ${booking.bookingId || '#REQ'} was received.` },
+      { key: 'confirmed', label: 'Agency Confirmed', icon: 'verified', message: `${typeof booking.agencyId === 'object' ? booking.agencyId.name : 'Agency'} confirmed your request.` },
       { key: 'in-progress', label: 'Pickup Scheduled', icon: 'local_shipping', message: 'Vehicle on the way for pickup.' },
       { key: 'completed', label: 'Recycling Completed', icon: 'recycling', message: 'Your e-waste has been processed successfully.' },
     ];
     
     const statusOrder = ['pending', 'confirmed', 'in-progress', 'completed'];
-    const currentIndex = statusOrder.indexOf(activeBooking.status);
+    const currentIndex = statusOrder.indexOf(booking.status);
     
     return steps.map((step, index) => ({
       ...step,
@@ -173,9 +191,9 @@ const UserDashboard = () => {
                           <span className="p-2 bg-[#3b82f6]/10 rounded-lg text-[#3b82f6]">
                             <span className="material-symbols-outlined">local_shipping</span>
                           </span>
-                          {activeBooking ? 'Live Tracking' : 'Recent Activity'}
+                          {activeBookings.length > 0 ? `Active Pickups (${activeBookings.length})` : 'Recent Activity'}
                         </h2>
-                        {activeBooking && (
+                        {activeBookings.length > 0 && (
                           <span className="px-3 py-1 rounded-full bg-[#3b82f6]/10 text-[#3b82f6] text-xs font-bold uppercase tracking-wider border border-[#3b82f6]/20 animate-pulse">Live Update</span>
                         )}
                       </div>
@@ -187,92 +205,86 @@ const UserDashboard = () => {
                           <div className="flex items-center justify-center py-12">
                             <div className="animate-spin rounded-full h-10 w-10 border-2 border-[#10b981] border-t-transparent"></div>
                           </div>
-                        ) : activeBooking ? (
-                          <div className="relative flex flex-col">
-                            {/* Tracking line background */}
-                            <div className="absolute left-[23px] top-6 bottom-12 w-0.5 bg-gray-800 rounded-full"></div>
-                            {/* Progress line */}
-                            <div 
-                              className="absolute left-[23px] top-6 w-0.5 bg-gradient-to-b from-[#10b981] via-[#10b981] to-[#3b82f6] rounded-full shadow-[0_0_10px_rgba(59,130,246,0.5)]"
-                              style={{ height: `${Math.min(getTrackingSteps().filter(s => s.completed || s.current).length / getTrackingSteps().length * 100, 75)}%` }}
-                            ></div>
-                            
-                            {getTrackingSteps().map((step, index) => (
-                              <div key={step.key} className={`relative flex gap-6 ${index < 3 ? 'pb-12' : ''} group/step ${step.pending ? 'opacity-50 hover:opacity-100 transition-opacity duration-300' : ''}`}>
-                                <div className={`z-10 shrink-0 ${step.current ? 'relative' : ''}`}>
-                                  {step.current && (
-                                    <div className="absolute inset-0 -m-2 rounded-full border-2 border-[#3b82f6]/30 animate-pulse"></div>
-                                  )}
-                                  <div className={`flex size-12 items-center justify-center rounded-full text-white ring-4 ring-[#151F26] transition-transform duration-500 group-hover/step:scale-110 ${
-                                    step.completed ? 'bg-[#10b981] shadow-[0_0_15px_rgba(16,185,129,0.4)]' :
-                                    step.current ? 'bg-[#3b82f6] shadow-[0_0_25px_rgba(59,130,246,0.6)]' :
-                                    'bg-[#151F26] border-2 border-dashed border-gray-600 text-gray-500'
-                                  }`}>
-                                    <span className={`material-symbols-outlined ${step.current ? 'animate-bounce' : ''}`}>{step.icon}</span>
+                        ) : activeBookings.length > 0 ? (
+                          <div className="space-y-6">
+                            {activeBookings.map((booking, bookingIndex) => (
+                              <div key={booking._id} className={`${bookingIndex > 0 ? 'pt-6 border-t border-white/10' : ''}`}>
+                                {/* Booking Header */}
+                                <div className="flex items-center justify-between mb-4">
+                                  <div className="flex items-center gap-3">
+                                    <div className="p-2 rounded-lg bg-[#3b82f6]/10">
+                                      <span className="material-symbols-outlined text-[#3b82f6]">package_2</span>
+                                    </div>
+                                    <div>
+                                      <p className="text-white font-bold">{booking.bookingId || `#REQ-${booking._id?.slice(-6).toUpperCase()}`}</p>
+                                      <p className="text-gray-400 text-sm">{formatDate(booking.scheduledDate)} • {formatTime(booking.scheduledTime)}</p>
+                                    </div>
                                   </div>
+                                  <span className={`text-[10px] font-bold uppercase px-3 py-1.5 rounded-full border ${getStatusColor(booking.status)}`}>
+                                    {booking.status}
+                                  </span>
                                 </div>
                                 
-                                {step.current ? (
-                                  <div className="flex-1 -mt-2">
-                                    <div className="bg-gradient-to-br from-[#3b82f6]/10 to-transparent p-5 rounded-xl border border-[#3b82f6]/30 shadow-[0_4px_20px_rgba(0,0,0,0.2)] transition-all duration-300 hover:border-[#3b82f6]/50 group/card relative overflow-hidden">
-                                      <div className="absolute top-0 right-0 w-24 h-24 bg-[#3b82f6]/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2"></div>
-                                      <div className="flex flex-wrap justify-between items-start gap-2 mb-3 relative z-10">
-                                        <div>
-                                          <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                                            {step.label}
-                                            <span className="flex size-2 rounded-full bg-[#3b82f6] shadow-[0_0_10px_#3b82f6] animate-pulse"></span>
-                                          </h3>
-                                          <p className="text-[#3b82f6] text-sm font-medium mt-0.5">{step.message}</p>
-                                        </div>
-                                        <span className="text-[10px] font-bold uppercase tracking-wider text-[#3b82f6] bg-[#3b82f6]/10 px-3 py-1.5 rounded-full border border-[#3b82f6]/20 shadow-sm">In Progress</span>
-                                      </div>
-                                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4 relative z-10">
-                                        <div className="bg-[#151F26]/80 p-3 rounded-lg border border-white/5 flex items-center gap-3">
-                                          <div className="size-10 rounded-full bg-gray-800 flex items-center justify-center shrink-0 border border-white/5">
-                                            <span className="material-symbols-outlined text-gray-400 text-sm">badge</span>
-                                          </div>
-                                          <div className="overflow-hidden">
-                                            <p className="text-xs text-gray-400 truncate">Agency</p>
-                                            <p className="text-sm font-semibold text-white truncate">
-                                              {typeof activeBooking.agencyId === 'object' ? activeBooking.agencyId.name : 'Assigned Agency'}
-                                            </p>
-                                          </div>
-                                        </div>
-                                        <div className="bg-[#151F26]/80 p-3 rounded-lg border border-white/5 flex items-center gap-3">
-                                          <div className="size-10 rounded-full bg-gray-800 flex items-center justify-center shrink-0 border border-white/5">
-                                            <span className="material-symbols-outlined text-gray-400 text-sm">schedule</span>
-                                          </div>
-                                          <div className="overflow-hidden">
-                                            <p className="text-xs text-gray-400 truncate">Est. Time</p>
-                                            <p className="text-sm font-semibold text-white truncate">{formatTime(activeBooking.scheduledTime)}</p>
-                                          </div>
+                                {/* Tracking Steps */}
+                                <div className="relative flex flex-col">
+                                  <div className="absolute left-[23px] top-6 bottom-12 w-0.5 bg-gray-800 rounded-full"></div>
+                                  <div 
+                                    className="absolute left-[23px] top-6 w-0.5 bg-gradient-to-b from-[#10b981] via-[#10b981] to-[#3b82f6] rounded-full shadow-[0_0_10px_rgba(59,130,246,0.5)]"
+                                    style={{ height: `${Math.min(getTrackingSteps(booking).filter(s => s.completed || s.current).length / getTrackingSteps(booking).length * 100, 75)}%` }}
+                                  ></div>
+                                  
+                                  {getTrackingSteps(booking).map((step, index) => (
+                                    <div key={step.key} className={`relative flex gap-6 ${index < 3 ? 'pb-8' : ''} group/step ${step.pending ? 'opacity-50 hover:opacity-100 transition-opacity duration-300' : ''}`}>
+                                      <div className={`z-10 shrink-0 ${step.current ? 'relative' : ''}`}>
+                                        {step.current && (
+                                          <div className="absolute inset-0 -m-2 rounded-full border-2 border-[#3b82f6]/30 animate-pulse"></div>
+                                        )}
+                                        <div className={`flex size-10 items-center justify-center rounded-full text-white ring-4 ring-[#151F26] transition-transform duration-500 group-hover/step:scale-110 ${
+                                          step.completed ? 'bg-[#10b981] shadow-[0_0_15px_rgba(16,185,129,0.4)]' :
+                                          step.current ? 'bg-[#3b82f6] shadow-[0_0_25px_rgba(59,130,246,0.6)]' :
+                                          'bg-[#151F26] border-2 border-dashed border-gray-600 text-gray-500'
+                                        }`}>
+                                          <span className={`material-symbols-outlined text-lg ${step.current ? 'animate-bounce' : ''}`}>{step.icon}</span>
                                         </div>
                                       </div>
-                                      <div className="mt-4 pt-4 border-t border-white/5 flex items-center justify-between">
-                                        <p className="text-xs text-gray-400 flex items-center gap-1">
-                                          <span className="material-symbols-outlined text-[14px]">event</span> {formatDate(activeBooking.scheduledDate)}
-                                        </p>
-                                        <span className="text-xs font-medium text-[#94a3b8]">
-                                          {activeBooking.bookingId || `#REQ-${activeBooking._id?.slice(-6).toUpperCase()}`}
-                                        </span>
+                                      
+                                      <div className="flex-1 pt-1">
+                                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-1">
+                                          <h3 className={`text-base font-bold group-hover/step:text-[#10b981] transition-colors ${step.completed || step.current ? 'text-white' : 'text-gray-500'}`}>{step.label}</h3>
+                                          <span className={`w-fit text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded border ${
+                                            step.completed ? 'text-[#10b981] bg-[#10b981]/10 border-[#10b981]/20' : 
+                                            step.current ? 'text-[#3b82f6] bg-[#3b82f6]/10 border-[#3b82f6]/20' :
+                                            'text-gray-500 bg-gray-800 border-gray-700'
+                                          }`}>{step.completed ? 'Completed' : step.current ? 'In Progress' : 'Pending'}</span>
+                                        </div>
+                                        <p className={`text-sm ${step.completed || step.current ? 'text-[#94a3b8]' : 'text-gray-600'}`}>{step.message}</p>
                                       </div>
                                     </div>
+                                  ))}
+                                </div>
+                                
+                                {/* Agency Info */}
+                                <div className="mt-4 p-3 bg-white/5 rounded-lg border border-white/5 flex items-center gap-3">
+                                  <div className="size-10 rounded-full bg-gray-800 flex items-center justify-center shrink-0 border border-white/5">
+                                    <span className="material-symbols-outlined text-gray-400 text-sm">badge</span>
                                   </div>
-                                ) : (
-                                  <div className="flex-1 pt-1">
-                                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-1">
-                                      <h3 className={`text-lg font-bold group-hover/step:text-[#10b981] transition-colors ${step.completed ? 'text-white' : 'text-gray-500'}`}>{step.label}</h3>
-                                      <span className={`w-fit text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded border ${
-                                        step.completed ? 'text-[#10b981] bg-[#10b981]/10 border-[#10b981]/20' : 'text-gray-500 bg-gray-800 border-gray-700'
-                                      }`}>{step.completed ? 'Completed' : 'Pending'}</span>
-                                    </div>
-                                    <p className={`text-sm ${step.completed ? 'text-[#94a3b8]' : 'text-gray-600'}`}>{step.message}</p>
-                                    {step.completed && activeBooking.trackingHistory?.[index] && (
-                                      <p className="text-xs text-gray-500 mt-2 font-mono">
-                                        {new Date(activeBooking.trackingHistory[index].timestamp).toLocaleString()}
-                                      </p>
-                                    )}
+                                  <div className="overflow-hidden">
+                                    <p className="text-xs text-gray-400 truncate">Assigned Agency</p>
+                                    <p className="text-sm font-semibold text-white truncate">
+                                      {typeof booking.agencyId === 'object' ? booking.agencyId.name : 'Agency Assigned'}
+                                    </p>
                                   </div>
+                                </div>
+
+                                {/* Cancel Button - Only for pending and confirmed status */}
+                                {(booking.status === 'pending' || booking.status === 'confirmed') && (
+                                  <button
+                                    onClick={() => setShowCancelModal(booking._id)}
+                                    className="mt-4 w-full py-3 px-4 rounded-xl bg-red-500/10 text-red-400 font-medium border border-red-500/20 hover:bg-red-500/20 hover:border-red-500/30 transition-all flex items-center justify-center gap-2"
+                                  >
+                                    <span className="material-symbols-outlined text-lg">cancel</span>
+                                    Cancel Pickup Request
+                                  </button>
                                 )}
                               </div>
                             ))}
@@ -294,40 +306,78 @@ const UserDashboard = () => {
                               <span className="material-symbols-outlined">add</span>
                               Schedule New Pickup
                             </button>
-                            
-                            {/* Recent Bookings */}
-                            {recentBookings.length > 0 && (
-                              <div className="mt-8 pt-6 border-t border-white/5 text-left">
-                                <h4 className="text-sm font-bold text-[#94a3b8] uppercase tracking-wider mb-4">Recent Bookings</h4>
-                                <div className="space-y-3">
-                                  {recentBookings.slice(0, 3).map(booking => (
-                                    <div key={booking._id} className="flex items-center justify-between p-3 bg-white/5 rounded-lg border border-white/5">
-                                      <div className="flex items-center gap-3">
-                                        <div className={`p-2 rounded-lg ${getStatusColor(booking.status)}`}>
-                                          <span className="material-symbols-outlined text-sm">
-                                            {booking.status === 'completed' ? 'check_circle' : 
-                                             booking.status === 'cancelled' ? 'cancel' : 'pending'}
-                                          </span>
-                                        </div>
-                                        <div>
-                                          <p className="text-white text-sm font-medium">
-                                            {booking.bookingId || `#REQ-${booking._id?.slice(-6).toUpperCase()}`}
-                                          </p>
-                                          <p className="text-[#94a3b8] text-xs">{formatDate(booking.scheduledDate)}</p>
-                                        </div>
-                                      </div>
-                                      <span className={`text-[10px] font-bold uppercase px-2 py-1 rounded border ${getStatusColor(booking.status)}`}>
-                                        {booking.status}
-                                      </span>
-                                    </div>
-                                  ))}
-                                </div>
-                              </div>
-                            )}
                           </div>
                         )}
                       </div>
                     </section>
+
+                    {/* All Bookings Section */}
+                    {allBookings.length > 0 && (
+                      <section className="flex flex-col gap-5">
+                        <div className="flex items-center justify-between">
+                          <h2 className="text-white text-2xl font-bold tracking-tight flex items-center gap-3">
+                            <span className="p-2 bg-purple-500/10 rounded-lg text-purple-400">
+                              <span className="material-symbols-outlined">history</span>
+                            </span>
+                            All Pickups ({allBookings.length})
+                          </h2>
+                          <button 
+                            onClick={() => setShowAllBookings(!showAllBookings)}
+                            className="text-sm text-[#94a3b8] hover:text-white transition-colors flex items-center gap-1"
+                          >
+                            {showAllBookings ? 'Show Less' : 'View All'}
+                            <span className="material-symbols-outlined text-lg">{showAllBookings ? 'expand_less' : 'expand_more'}</span>
+                          </button>
+                        </div>
+                        
+                        <div className="bg-[#151F26] rounded-2xl p-6 shadow-[0_10px_15px_-3px_rgba(0,0,0,0.3)] border border-white/5">
+                          <div className="space-y-3">
+                            {(showAllBookings ? allBookings : allBookings.slice(0, 5)).map(booking => (
+                              <div key={booking._id} className="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/5 hover:bg-white/10 hover:border-white/10 transition-all group">
+                                <div className="flex items-center gap-4">
+                                  <div className={`p-3 rounded-xl ${getStatusColor(booking.status)}`}>
+                                    <span className="material-symbols-outlined">
+                                      {booking.status === 'completed' ? 'check_circle' : 
+                                       booking.status === 'cancelled' ? 'cancel' : 
+                                       booking.status === 'in-progress' ? 'local_shipping' :
+                                       booking.status === 'confirmed' ? 'verified' : 'pending'}
+                                    </span>
+                                  </div>
+                                  <div>
+                                    <p className="text-white font-bold">
+                                      {booking.bookingId || `#REQ-${booking._id?.slice(-6).toUpperCase()}`}
+                                    </p>
+                                    <div className="flex items-center gap-2 text-[#94a3b8] text-sm">
+                                      <span>{formatDate(booking.scheduledDate)}</span>
+                                      <span>•</span>
+                                      <span>{formatTime(booking.scheduledTime)}</span>
+                                    </div>
+                                    <p className="text-gray-500 text-xs mt-1">
+                                      {typeof booking.agencyId === 'object' ? booking.agencyId.name : 'Agency Assigned'}
+                                    </p>
+                                  </div>
+                                </div>
+                                <div className="flex items-center gap-3">
+                                  <span className={`text-xs font-bold uppercase px-3 py-1.5 rounded-full border ${getStatusColor(booking.status)}`}>
+                                    {booking.status}
+                                  </span>
+                                  <span className="material-symbols-outlined text-gray-500 group-hover:text-white transition-colors">chevron_right</span>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                          
+                          {!showAllBookings && allBookings.length > 5 && (
+                            <button 
+                              onClick={() => setShowAllBookings(true)}
+                              className="w-full mt-4 py-3 text-center text-[#94a3b8] hover:text-white text-sm font-medium border border-white/5 rounded-xl hover:bg-white/5 transition-all"
+                            >
+                              Show {allBookings.length - 5} more pickups
+                            </button>
+                          )}
+                        </div>
+                      </section>
+                    )}
 
                     {/* Impact Section */}
                     <section className="flex flex-col gap-5">
@@ -427,7 +477,7 @@ const UserDashboard = () => {
                           </div>
                           <span className="material-symbols-outlined text-gray-500 group-hover:text-white transition-colors">chevron_right</span>
                         </button>
-                        <button className="flex w-full group cursor-pointer items-center justify-between overflow-hidden rounded-xl h-14 px-4 bg-white/5 text-gray-200 border border-white/5 hover:bg-white/10 hover:border-white/10 transition-all">
+                        <button onClick={() => window.location.hash = '#/history'} className="flex w-full group cursor-pointer items-center justify-between overflow-hidden rounded-xl h-14 px-4 bg-white/5 text-gray-200 border border-white/5 hover:bg-white/10 hover:border-white/10 transition-all">
                           <div className="flex items-center gap-3">
                             <div className="size-8 rounded-lg bg-[#3b82f6]/20 text-[#3b82f6] flex items-center justify-center">
                               <span className="material-symbols-outlined text-xl">history</span>
@@ -454,6 +504,57 @@ const UserDashboard = () => {
           </div>
         </div>
       </div>
+
+      {/* Cancel Confirmation Modal */}
+      {showCancelModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          {/* Backdrop */}
+          <div 
+            className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+            onClick={() => !cancelling && setShowCancelModal(null)}
+          ></div>
+          
+          {/* Modal */}
+          <div className="relative bg-[#151F26] rounded-2xl p-6 sm:p-8 max-w-md w-full border border-white/10 shadow-2xl">
+            {/* Warning Icon */}
+            <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-red-500/10 flex items-center justify-center">
+              <span className="material-symbols-outlined text-4xl text-red-400">warning</span>
+            </div>
+            
+            <h3 className="text-2xl font-bold text-white text-center mb-2">Cancel Pickup?</h3>
+            <p className="text-gray-400 text-center mb-8">
+              Are you sure you want to cancel this pickup request? This action cannot be undone.
+            </p>
+            
+            <div className="flex flex-col sm:flex-row gap-3">
+              <button
+                onClick={() => setShowCancelModal(null)}
+                disabled={cancelling !== null}
+                className="flex-1 py-3 px-6 rounded-xl bg-white/5 text-white font-medium border border-white/10 hover:bg-white/10 transition-all disabled:opacity-50"
+              >
+                Keep Pickup
+              </button>
+              <button
+                onClick={() => handleCancelBooking(showCancelModal)}
+                disabled={cancelling !== null}
+                className="flex-1 py-3 px-6 rounded-xl bg-red-500 text-white font-bold hover:bg-red-600 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+              >
+                {cancelling === showCancelModal ? (
+                  <>
+                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                    Cancelling...
+                  </>
+                ) : (
+                  <>
+                    <span className="material-symbols-outlined text-lg">delete</span>
+                    Yes, Cancel
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </Layout>
   );
 };
