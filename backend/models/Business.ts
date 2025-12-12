@@ -69,15 +69,15 @@ const BusinessSchema = new Schema<IBusiness>({
   },
   phone: {
     type: String,
-    required: [true, 'Phone is required']
+    default: ''
   },
   website: String,
   address: {
-    street: { type: String, required: true },
-    city: { type: String, required: true },
-    state: { type: String, required: true },
+    street: { type: String, default: '' },
+    city: { type: String, default: '' },
+    state: { type: String, default: '' },
     country: { type: String, default: 'India' },
-    zipCode: { type: String, required: true }
+    zipCode: { type: String, default: '' }
   },
   totalWasteProcessed: {
     type: Number,

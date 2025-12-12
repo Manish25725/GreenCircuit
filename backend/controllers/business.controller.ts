@@ -15,7 +15,7 @@ import mongoose from 'mongoose';
 // Get business dashboard data
 export const getBusinessDashboard = async (req: Request, res: Response) => {
   try {
-    const userId = (req as any).user.id;
+    const userId = (req as any).user._id || (req as any).user.id;
     
     // Find or create business profile
     let business = await Business.findOne({ userId });
@@ -123,7 +123,7 @@ export const getBusinessDashboard = async (req: Request, res: Response) => {
 // Get business profile
 export const getBusinessProfile = async (req: Request, res: Response) => {
   try {
-    const userId = (req as any).user.id;
+    const userId = (req as any).user._id || (req as any).user.id;
     const business = await Business.findOne({ userId }).populate('userId', 'name email avatar');
 
     if (!business) {
@@ -139,7 +139,7 @@ export const getBusinessProfile = async (req: Request, res: Response) => {
 // Create business profile
 export const createBusinessProfile = async (req: Request, res: Response) => {
   try {
-    const userId = (req as any).user.id;
+    const userId = (req as any).user._id || (req as any).user.id;
     const { companyName, description, industry, email, phone, website, address, contactPerson } = req.body;
 
     // Check if business already exists
@@ -172,7 +172,7 @@ export const createBusinessProfile = async (req: Request, res: Response) => {
 // Update business profile
 export const updateBusinessProfile = async (req: Request, res: Response) => {
   try {
-    const userId = (req as any).user.id;
+    const userId = (req as any).user._id || (req as any).user.id;
     const updates = req.body;
 
     // Prevent updating certain fields
@@ -204,30 +204,39 @@ export const updateBusinessProfile = async (req: Request, res: Response) => {
 // Get all inventory items
 export const getInventory = async (req: Request, res: Response) => {
   try {
-    const userId = (req as any).user.id;
+    const userId = (req as any).user._id || (req as any).user.id;
     const { category, status, search, page = 1, limit = 50 } = req.query;
+
+    console.log('getInventory called for userId:', userId);
 
     // Find or create business profile
     let business = await Business.findOne({ userId });
     if (!business) {
+      console.log('No business found, creating new one...');
       const user = await User.findById(userId);
       if (!user) {
         return sendError(res, 'User not found', 404);
       }
-      business = await Business.create({
-        userId,
-        companyName: user.name + "'s Business",
-        email: user.email,
-        phone: user.phone || '',
-        industry: 'Technology',
-        address: user.address || {
-          street: '',
-          city: '',
-          state: '',
-          country: 'India',
-          zipCode: ''
-        }
-      });
+      try {
+        business = await Business.create({
+          userId,
+          companyName: user.name + "'s Business",
+          email: user.email,
+          phone: user.phone || '',
+          industry: 'Technology',
+          address: {
+            street: user.address?.street || 'Not specified',
+            city: user.address?.city || 'Not specified',
+            state: user.address?.state || 'Not specified',
+            country: 'India',
+            zipCode: user.address?.zipCode || '000000'
+          }
+        });
+        console.log('Business created:', business._id);
+      } catch (createError: any) {
+        console.error('Error creating business:', createError);
+        return sendError(res, 'Failed to create business profile: ' + createError.message, 500);
+      }
     }
 
     const query: any = { businessId: business._id };
@@ -250,16 +259,21 @@ export const getInventory = async (req: Request, res: Response) => {
     const total = await Inventory.countDocuments(query);
 
     // Get stats by category
-    const categoryStats = await Inventory.aggregate([
-      { $match: { businessId: business._id } },
-      {
-        $group: {
-          _id: '$category',
-          count: { $sum: '$quantity' },
-          weight: { $sum: { $multiply: ['$weight', '$quantity'] } }
+    let categoryStats: any[] = [];
+    try {
+      categoryStats = await Inventory.aggregate([
+        { $match: { businessId: new mongoose.Types.ObjectId(business._id.toString()) } },
+        {
+          $group: {
+            _id: '$category',
+            count: { $sum: '$quantity' },
+            weight: { $sum: { $multiply: ['$weight', '$quantity'] } }
+          }
         }
-      }
-    ]);
+      ]);
+    } catch (aggError) {
+      console.error('Aggregate error:', aggError);
+    }
 
     sendSuccess(res, {
       items,
@@ -272,14 +286,15 @@ export const getInventory = async (req: Request, res: Response) => {
       categoryStats
     });
   } catch (error: any) {
-    sendError(res, error.message);
+    console.error('getInventory error:', error);
+    sendError(res, error.message || 'Failed to fetch inventory');
   }
 };
 
 // Get single inventory item
 export const getInventoryItem = async (req: Request, res: Response) => {
   try {
-    const userId = (req as any).user.id;
+    const userId = (req as any).user._id || (req as any).user.id;
     const { id } = req.params;
 
     const business = await Business.findOne({ userId });
@@ -303,8 +318,10 @@ export const getInventoryItem = async (req: Request, res: Response) => {
 // Add inventory item
 export const addInventoryItem = async (req: Request, res: Response) => {
   try {
-    const userId = (req as any).user.id;
+    const userId = (req as any).user._id || (req as any).user.id;
     const itemData = req.body;
+
+    console.log('addInventoryItem called for userId:', userId, 'data:', itemData);
 
     // Find or create business profile
     let business = await Business.findOne({ userId });
@@ -319,21 +336,28 @@ export const addInventoryItem = async (req: Request, res: Response) => {
         email: user.email,
         phone: user.phone || '',
         industry: 'Technology',
-        address: user.address || {
-          street: '',
-          city: '',
-          state: '',
+        address: {
+          street: user.address?.street || 'Not specified',
+          city: user.address?.city || 'Not specified',
+          state: user.address?.state || 'Not specified',
           country: 'India',
-          zipCode: ''
+          zipCode: user.address?.zipCode || '000000'
         }
       });
     }
+
+    // Generate asset ID
+    const category = itemData.category || 'Other';
+    const prefix = category.substring(0, 3).toUpperCase();
+    const random = Math.random().toString(36).substring(2, 8).toUpperCase();
+    const assetId = `${prefix}-${Date.now().toString().slice(-6)}-${random}`;
 
     // Map frontend fields to backend model fields
     const inventoryData = {
       businessId: business._id,
       itemName: itemData.name || itemData.itemName,
-      category: itemData.category || 'Other',
+      category: category,
+      assetId: assetId,
       quantity: itemData.quantity || 1,
       weight: itemData.weight || 0,
       status: itemData.status || 'in-storage',
@@ -346,19 +370,23 @@ export const addInventoryItem = async (req: Request, res: Response) => {
       notes: itemData.notes || ''
     };
 
+    console.log('Creating inventory with data:', inventoryData);
+
     const item = await Inventory.create(inventoryData);
 
-    sendSuccess(res, item, 201);
+    console.log('Inventory item created:', item._id);
+
+    return sendSuccess(res, item, 201);
   } catch (error: any) {
     console.error('Add inventory error:', error);
-    sendError(res, error.message);
+    return sendError(res, error.message);
   }
 };
 
 // Update inventory item
 export const updateInventoryItem = async (req: Request, res: Response) => {
   try {
-    const userId = (req as any).user.id;
+    const userId = (req as any).user._id || (req as any).user.id;
     const { id } = req.params;
     const updates = req.body;
 
@@ -412,7 +440,7 @@ export const updateInventoryItem = async (req: Request, res: Response) => {
 // Delete inventory item
 export const deleteInventoryItem = async (req: Request, res: Response) => {
   try {
-    const userId = (req as any).user.id;
+    const userId = (req as any).user._id || (req as any).user.id;
     const { id } = req.params;
 
     const business = await Business.findOne({ userId });
@@ -435,7 +463,7 @@ export const deleteInventoryItem = async (req: Request, res: Response) => {
 // Bulk update inventory status
 export const bulkUpdateInventoryStatus = async (req: Request, res: Response) => {
   try {
-    const userId = (req as any).user.id;
+    const userId = (req as any).user._id || (req as any).user.id;
     const { itemIds, status } = req.body;
 
     const business = await Business.findOne({ userId });
@@ -460,7 +488,7 @@ export const bulkUpdateInventoryStatus = async (req: Request, res: Response) => 
 // Mark items ready for pickup
 export const markItemsForPickup = async (req: Request, res: Response) => {
   try {
-    const userId = (req as any).user.id;
+    const userId = (req as any).user._id || (req as any).user.id;
     const { itemIds } = req.body;
 
     const business = await Business.findOne({ userId });
@@ -494,7 +522,7 @@ export const markItemsForPickup = async (req: Request, res: Response) => {
 // Get all certificates
 export const getCertificates = async (req: Request, res: Response) => {
   try {
-    const userId = (req as any).user.id;
+    const userId = (req as any).user._id || (req as any).user.id;
     const { type, status, page = 1, limit = 20 } = req.query;
 
     const business = await Business.findOne({ userId });
@@ -545,7 +573,7 @@ export const getCertificates = async (req: Request, res: Response) => {
 // Get single certificate
 export const getCertificate = async (req: Request, res: Response) => {
   try {
-    const userId = (req as any).user.id;
+    const userId = (req as any).user._id || (req as any).user.id;
     const { id } = req.params;
 
     const business = await Business.findOne({ userId });
@@ -573,7 +601,7 @@ export const getCertificate = async (req: Request, res: Response) => {
 // Download certificate (returns URL)
 export const downloadCertificate = async (req: Request, res: Response) => {
   try {
-    const userId = (req as any).user.id;
+    const userId = (req as any).user._id || (req as any).user.id;
     const { id } = req.params;
 
     const business = await Business.findOne({ userId });
@@ -607,7 +635,7 @@ export const downloadCertificate = async (req: Request, res: Response) => {
 // Get business analytics
 export const getBusinessAnalytics = async (req: Request, res: Response) => {
   try {
-    const userId = (req as any).user.id;
+    const userId = (req as any).user._id || (req as any).user.id;
     const { period = '30d', category } = req.query;
 
     const business = await Business.findOne({ userId });
@@ -732,7 +760,7 @@ export const getBusinessAnalytics = async (req: Request, res: Response) => {
 // Export report
 export const exportReport = async (req: Request, res: Response) => {
   try {
-    const userId = (req as any).user.id;
+    const userId = (req as any).user._id || (req as any).user.id;
     const { type = 'summary', format = 'json', period = '30d' } = req.query;
 
     const business = await Business.findOne({ userId });
@@ -799,7 +827,7 @@ export const exportReport = async (req: Request, res: Response) => {
 // Schedule business pickup
 export const scheduleBusinessPickup = async (req: Request, res: Response) => {
   try {
-    const userId = (req as any).user.id;
+    const userId = (req as any).user._id || (req as any).user.id;
     const { agencyId, slotId, items, pickupAddress, notes, inventoryItemIds, scheduledDate, scheduledTime } = req.body;
 
     const business = await Business.findOne({ userId });
@@ -852,7 +880,7 @@ export const scheduleBusinessPickup = async (req: Request, res: Response) => {
 // Get business bookings
 export const getBusinessBookings = async (req: Request, res: Response) => {
   try {
-    const userId = (req as any).user.id;
+    const userId = (req as any).user._id || (req as any).user.id;
     const { status, page = 1, limit = 10 } = req.query;
 
     const query: any = { userId };

@@ -16,6 +16,14 @@ interface InventoryItem {
   createdAt: string;
 }
 
+interface Agency {
+  _id: string;
+  name: string;
+  logo?: string;
+  rating: number;
+  address: { city: string; state: string };
+}
+
 const API_BASE = 'http://localhost:3001/api';
 
 const BusinessInventory = () => {
@@ -30,6 +38,19 @@ const BusinessInventory = () => {
   const [editingItem, setEditingItem] = useState<InventoryItem | null>(null);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState<string | null>(null);
+  
+  // Pickup booking states
+  const [selectedItems, setSelectedItems] = useState<string[]>([]);
+  const [showPickupModal, setShowPickupModal] = useState(false);
+  const [agencies, setAgencies] = useState<Agency[]>([]);
+  const [loadingAgencies, setLoadingAgencies] = useState(false);
+  const [bookingPickup, setBookingPickup] = useState(false);
+  const [pickupData, setPickupData] = useState({
+    agencyId: '',
+    scheduledDate: '',
+    scheduledTime: '09:00',
+    notes: ''
+  });
   
   const [newItem, setNewItem] = useState({
     name: '',
@@ -75,6 +96,156 @@ const BusinessInventory = () => {
       console.error('Error fetching inventory:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchAgencies = async () => {
+    try {
+      setLoadingAgencies(true);
+      const res = await fetch(`${API_BASE}/agencies?verified=true`, {
+        headers: getAuthHeaders()
+      });
+      const data = await res.json();
+      if (data.success) {
+        setAgencies(data.data.agencies || data.data || []);
+      }
+    } catch (error) {
+      console.error('Error fetching agencies:', error);
+    } finally {
+      setLoadingAgencies(false);
+    }
+  };
+
+  // Selection handlers
+  const toggleItemSelection = (id: string) => {
+    setSelectedItems(prev => 
+      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
+    );
+  };
+
+  const toggleSelectAll = () => {
+    const eligibleItems = filteredInventory.filter(i => 
+      i.status !== 'scheduled' && i.status !== 'recycled'
+    );
+    if (selectedItems.length === eligibleItems.length) {
+      setSelectedItems([]);
+    } else {
+      setSelectedItems(eligibleItems.map(i => i._id));
+    }
+  };
+
+  const getSelectedItemsData = () => {
+    return inventory.filter(i => selectedItems.includes(i._id));
+  };
+
+  const getSelectedTotalWeight = () => {
+    return getSelectedItemsData().reduce((sum, item) => sum + (item.weight * item.quantity), 0);
+  };
+
+  // Open pickup modal
+  const openPickupModal = () => {
+    if (selectedItems.length === 0) {
+      alert('Please select at least one item to schedule pickup');
+      return;
+    }
+    
+    // Set default date to tomorrow
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    setPickupData({
+      agencyId: '',
+      scheduledDate: tomorrow.toISOString().split('T')[0],
+      scheduledTime: '09:00',
+      notes: ''
+    });
+    
+    fetchAgencies();
+    setShowPickupModal(true);
+  };
+
+  // Book pickup
+  const handleBookPickup = async () => {
+    if (!pickupData.agencyId || !pickupData.scheduledDate) {
+      alert('Please select an agency and date');
+      return;
+    }
+
+    try {
+      setBookingPickup(true);
+      
+      const selectedItemsData = getSelectedItemsData();
+      const items = selectedItemsData.map(item => ({
+        type: item.category,
+        name: item.itemName,
+        category: item.category,
+        quantity: item.quantity,
+        weight: item.weight,
+        description: item.description || item.itemName
+      }));
+
+      const res = await fetch(`${API_BASE}/business/bookings`, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({
+          agencyId: pickupData.agencyId,
+          items,
+          inventoryItemIds: selectedItems,
+          scheduledDate: pickupData.scheduledDate,
+          scheduledTime: pickupData.scheduledTime,
+          notes: pickupData.notes
+        })
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        // Update local inventory status
+        setInventory(inventory.map(item => 
+          selectedItems.includes(item._id) 
+            ? { ...item, status: 'scheduled' as const }
+            : item
+        ));
+        setSelectedItems([]);
+        setShowPickupModal(false);
+        alert('Pickup scheduled successfully!');
+      } else {
+        alert('Failed to schedule pickup: ' + (data.message || data.error));
+      }
+    } catch (error) {
+      console.error('Error booking pickup:', error);
+      alert('Failed to schedule pickup. Please try again.');
+    } finally {
+      setBookingPickup(false);
+    }
+  };
+
+  // Mark items ready for pickup
+  const handleMarkReadyForPickup = async () => {
+    if (selectedItems.length === 0) return;
+
+    try {
+      setSaving(true);
+      const res = await fetch(`${API_BASE}/business/inventory/mark-pickup`, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ itemIds: selectedItems })
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        setInventory(inventory.map(item => 
+          selectedItems.includes(item._id) 
+            ? { ...item, status: 'ready-for-pickup' as const }
+            : item
+        ));
+        setSelectedItems([]);
+      } else {
+        alert('Failed to update items: ' + data.message);
+      }
+    } catch (error) {
+      console.error('Error marking items:', error);
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -269,13 +440,34 @@ const BusinessInventory = () => {
                     <h1 className="text-white text-3xl sm:text-4xl font-black leading-tight tracking-tighter mb-2">E-Waste Inventory</h1>
                     <p className="text-[#94a3b8] text-base">Track and manage your electronic waste before disposal.</p>
                   </div>
-                  <button 
-                    onClick={() => setShowAddModal(true)}
-                    className="bg-[#06b6d4] text-white px-5 py-2.5 rounded-xl font-bold text-sm hover:bg-[#0891b2] transition-colors flex items-center gap-2"
-                  >
-                    <span className="material-symbols-outlined text-lg">add</span>
-                    Add Item
-                  </button>
+                  <div className="flex flex-wrap gap-3">
+                    {selectedItems.length > 0 && (
+                      <>
+                        <button 
+                          onClick={handleMarkReadyForPickup}
+                          disabled={saving}
+                          className="bg-amber-500/20 text-amber-400 border border-amber-500/30 px-4 py-2.5 rounded-xl font-bold text-sm hover:bg-amber-500/30 transition-colors flex items-center gap-2 disabled:opacity-50"
+                        >
+                          <span className="material-symbols-outlined text-lg">pending_actions</span>
+                          Mark Ready ({selectedItems.length})
+                        </button>
+                        <button 
+                          onClick={openPickupModal}
+                          className="bg-[#8b5cf6] text-white px-4 py-2.5 rounded-xl font-bold text-sm hover:bg-[#7c3aed] transition-colors flex items-center gap-2"
+                        >
+                          <span className="material-symbols-outlined text-lg">local_shipping</span>
+                          Schedule Pickup ({selectedItems.length})
+                        </button>
+                      </>
+                    )}
+                    <button 
+                      onClick={() => setShowAddModal(true)}
+                      className="bg-[#06b6d4] text-white px-5 py-2.5 rounded-xl font-bold text-sm hover:bg-[#0891b2] transition-colors flex items-center gap-2"
+                    >
+                      <span className="material-symbols-outlined text-lg">add</span>
+                      Add Item
+                    </button>
+                  </div>
                 </div>
 
                 {/* Stats Cards */}
@@ -358,7 +550,15 @@ const BusinessInventory = () => {
                   ) : (
                     <>
                       {/* Table Header */}
-                      <div className="hidden lg:grid grid-cols-7 gap-4 p-4 border-b border-white/5 text-sm font-medium text-gray-500">
+                      <div className="hidden lg:grid grid-cols-8 gap-4 p-4 border-b border-white/5 text-sm font-medium text-gray-500">
+                        <div className="flex items-center">
+                          <input
+                            type="checkbox"
+                            checked={selectedItems.length > 0 && selectedItems.length === filteredInventory.filter(i => i.status !== 'scheduled' && i.status !== 'recycled').length}
+                            onChange={toggleSelectAll}
+                            className="w-4 h-4 rounded border-gray-600 bg-white/5 text-[#06b6d4] focus:ring-[#06b6d4] focus:ring-offset-0 cursor-pointer"
+                          />
+                        </div>
                         <div>Item Name</div>
                         <div>Category</div>
                         <div>Qty / Weight</div>
@@ -387,7 +587,19 @@ const BusinessInventory = () => {
                         </div>
                       ) : (
                         filteredInventory.map((item) => (
-                          <div key={item._id} className="grid grid-cols-1 lg:grid-cols-7 gap-4 p-4 border-b border-white/5 last:border-b-0 hover:bg-white/5 transition-colors items-center">
+                          <div key={item._id} className={`grid grid-cols-1 lg:grid-cols-8 gap-4 p-4 border-b border-white/5 last:border-b-0 hover:bg-white/5 transition-colors items-center ${selectedItems.includes(item._id) ? 'bg-[#06b6d4]/5' : ''}`}>
+                            <div className="flex items-center">
+                              {item.status !== 'scheduled' && item.status !== 'recycled' ? (
+                                <input
+                                  type="checkbox"
+                                  checked={selectedItems.includes(item._id)}
+                                  onChange={() => toggleItemSelection(item._id)}
+                                  className="w-4 h-4 rounded border-gray-600 bg-white/5 text-[#06b6d4] focus:ring-[#06b6d4] focus:ring-offset-0 cursor-pointer"
+                                />
+                              ) : (
+                                <div className="w-4 h-4"></div>
+                              )}
+                            </div>
                             <div className="flex items-center gap-3">
                               <div className="p-2 rounded-lg bg-[#06b6d4]/10 text-[#06b6d4]">
                                 <span className="material-symbols-outlined text-lg">devices</span>
@@ -698,6 +910,155 @@ const BusinessInventory = () => {
                     </>
                   ) : (
                     'Save Changes'
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Schedule Pickup Modal */}
+        {showPickupModal && (
+          <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => !bookingPickup && setShowPickupModal(false)}>
+            <div className="bg-[#151F26] rounded-3xl w-full max-w-2xl border border-white/10 overflow-hidden max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+              <div className="flex items-center justify-between p-6 border-b border-white/10 sticky top-0 bg-[#151F26]">
+                <div>
+                  <h3 className="text-white font-bold text-lg">Schedule Pickup</h3>
+                  <p className="text-gray-500 text-sm">{selectedItems.length} items selected • {getSelectedTotalWeight().toFixed(1)} kg total</p>
+                </div>
+                <button onClick={() => !bookingPickup && setShowPickupModal(false)} className="p-2 rounded-lg hover:bg-white/10 transition-colors text-gray-400 hover:text-white">
+                  <span className="material-symbols-outlined">close</span>
+                </button>
+              </div>
+              
+              <div className="p-6 space-y-6">
+                {/* Selected Items Summary */}
+                <div className="bg-white/5 rounded-xl p-4 max-h-40 overflow-y-auto">
+                  <p className="text-sm font-medium text-gray-400 mb-3">Items to pickup:</p>
+                  <div className="space-y-2">
+                    {getSelectedItemsData().map(item => (
+                      <div key={item._id} className="flex justify-between items-center text-sm">
+                        <span className="text-white">{item.itemName}</span>
+                        <span className="text-gray-500">{item.quantity} × {item.weight}kg</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Select Agency */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-400 mb-2">Select Recycling Agency *</label>
+                  {loadingAgencies ? (
+                    <div className="bg-white/5 border border-white/10 rounded-xl p-4 text-center">
+                      <div className="animate-spin w-6 h-6 border-2 border-[#06b6d4] border-t-transparent rounded-full mx-auto"></div>
+                    </div>
+                  ) : (
+                    <div className="space-y-2 max-h-48 overflow-y-auto">
+                      {agencies.length === 0 ? (
+                        <p className="text-gray-500 text-sm text-center py-4">No verified agencies available</p>
+                      ) : (
+                        agencies.map(agency => (
+                          <label
+                            key={agency._id}
+                            className={`flex items-center gap-4 p-4 rounded-xl border cursor-pointer transition-all ${
+                              pickupData.agencyId === agency._id 
+                                ? 'border-[#06b6d4] bg-[#06b6d4]/10' 
+                                : 'border-white/10 bg-white/5 hover:border-white/20'
+                            }`}
+                          >
+                            <input
+                              type="radio"
+                              name="agency"
+                              value={agency._id}
+                              checked={pickupData.agencyId === agency._id}
+                              onChange={(e) => setPickupData({...pickupData, agencyId: e.target.value})}
+                              className="hidden"
+                            />
+                            <div className="w-10 h-10 rounded-lg bg-[#8b5cf6]/20 flex items-center justify-center text-[#8b5cf6] font-bold">
+                              {agency.name.charAt(0)}
+                            </div>
+                            <div className="flex-1">
+                              <p className="text-white font-medium">{agency.name}</p>
+                              <p className="text-gray-500 text-sm">{agency.address?.city}, {agency.address?.state}</p>
+                            </div>
+                            <div className="flex items-center gap-1 text-amber-400">
+                              <span className="material-symbols-outlined text-sm">star</span>
+                              <span className="text-sm font-medium">{agency.rating?.toFixed(1) || '4.5'}</span>
+                            </div>
+                          </label>
+                        ))
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                {/* Schedule Date & Time */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-400 mb-2">Pickup Date *</label>
+                    <input
+                      type="date"
+                      value={pickupData.scheduledDate}
+                      onChange={(e) => setPickupData({...pickupData, scheduledDate: e.target.value})}
+                      min={new Date().toISOString().split('T')[0]}
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-[#06b6d4]/50 focus:border-[#06b6d4] outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-400 mb-2">Preferred Time</label>
+                    <select
+                      value={pickupData.scheduledTime}
+                      onChange={(e) => setPickupData({...pickupData, scheduledTime: e.target.value})}
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-[#06b6d4]/50 focus:border-[#06b6d4] outline-none cursor-pointer"
+                    >
+                      <option value="09:00">9:00 AM</option>
+                      <option value="10:00">10:00 AM</option>
+                      <option value="11:00">11:00 AM</option>
+                      <option value="12:00">12:00 PM</option>
+                      <option value="14:00">2:00 PM</option>
+                      <option value="15:00">3:00 PM</option>
+                      <option value="16:00">4:00 PM</option>
+                      <option value="17:00">5:00 PM</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Notes */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-400 mb-2">Special Instructions (Optional)</label>
+                  <textarea
+                    value={pickupData.notes}
+                    onChange={(e) => setPickupData({...pickupData, notes: e.target.value})}
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:ring-2 focus:ring-[#06b6d4]/50 focus:border-[#06b6d4] outline-none resize-none"
+                    placeholder="Any special handling instructions, access codes, etc..."
+                    rows={3}
+                  />
+                </div>
+              </div>
+              
+              <div className="flex gap-4 p-6 pt-0">
+                <button
+                  onClick={() => !bookingPickup && setShowPickupModal(false)}
+                  disabled={bookingPickup}
+                  className="flex-1 bg-white/10 text-white px-6 py-3 rounded-xl font-bold hover:bg-white/20 transition-colors disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleBookPickup}
+                  disabled={!pickupData.agencyId || !pickupData.scheduledDate || bookingPickup}
+                  className="flex-1 bg-[#8b5cf6] text-white px-6 py-3 rounded-xl font-bold hover:bg-[#7c3aed] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  {bookingPickup ? (
+                    <>
+                      <div className="animate-spin w-5 h-5 border-2 border-white border-t-transparent rounded-full"></div>
+                      Scheduling...
+                    </>
+                  ) : (
+                    <>
+                      <span className="material-symbols-outlined text-lg">local_shipping</span>
+                      Schedule Pickup
+                    </>
                   )}
                 </button>
               </div>

@@ -58,7 +58,11 @@ const InventorySchema = new Schema<IInventoryItem>({
   subcategory: String,
   assetId: {
     type: String,
-    required: true
+    default: function() {
+      const prefix = (this as any).category ? (this as any).category.substring(0, 3).toUpperCase() : 'ITM';
+      const random = Math.random().toString(36).substring(2, 8).toUpperCase();
+      return `${prefix}-${Date.now().toString().slice(-6)}-${random}`;
+    }
   },
   serialNumber: String,
   manufacturer: String,
@@ -113,15 +117,6 @@ InventorySchema.index({ businessId: 1, status: 1 });
 InventorySchema.index({ assetId: 1 });
 InventorySchema.index({ category: 1 });
 InventorySchema.index({ itemName: 'text', description: 'text' });
-
-// Generate unique asset ID before saving
-InventorySchema.pre('save', function() {
-  if (this.isNew && !this.assetId) {
-    const prefix = this.category.substring(0, 3).toUpperCase();
-    const random = Math.random().toString(36).substring(2, 8).toUpperCase();
-    this.assetId = `${prefix}-${Date.now().toString().slice(-6)}-${random}`;
-  }
-});
 
 const Inventory = mongoose.model<IInventoryItem>('Inventory', InventorySchema);
 export { Inventory };
