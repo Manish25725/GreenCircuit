@@ -22,6 +22,7 @@ export interface IBusiness extends Document {
   co2Saved: number;
   totalPickups: number;
   complianceScore: number;
+  monthlyTarget: number; // Monthly e-waste disposal target in kg
   // Subscription/Plan
   plan: 'starter' | 'professional' | 'enterprise';
   // Verification
@@ -96,6 +97,11 @@ const BusinessSchema = new Schema<IBusiness>({
     default: 100,
     min: 0,
     max: 100
+  },
+  monthlyTarget: {
+    type: Number,
+    default: 200, // 200 kg per month default target
+    min: 0
   },
   plan: {
     type: String,

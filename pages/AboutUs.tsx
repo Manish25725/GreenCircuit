@@ -8,11 +8,19 @@ const AboutUs = () => {
             <div className="absolute inset-0 bg-[#0B1120]/80 backdrop-blur-md border-b border-white/5"></div>
             <div className="w-full max-w-7xl px-4 sm:px-6 relative z-10">
                 <header className="flex items-center justify-between h-16 sm:h-20">
-                    <div className="flex items-center gap-3 cursor-pointer" onClick={() => window.location.hash = '#/'}>
+                    <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-2 cursor-pointer mr-4" onClick={() => window.history.back()}>
+                            <svg className="w-5 h-5 text-[#34D399]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                            </svg>
+                            <span className="text-slate-400 hover:text-[#34D399] text-sm font-medium">Back</span>
+                        </div>
+                        <div className="flex items-center gap-3 cursor-pointer" onClick={() => window.location.hash = '#/'}>
                         <div className="size-8 sm:size-10 text-[#34D399] flex items-center justify-center">
                             <svg className="w-full h-full drop-shadow-[0_0_8px_rgba(52,211,153,0.5)]" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M42.4379 44C42.4379 44 36.0744 33.9038 41.1692 24C46.8624 12.9336 42.2078 4 42.2078 4L7.01134 4C7.01134 4 11.6577 12.932 5.96912 23.9969C0.876273 33.9029 7.27094 44 7.27094 44L42.4379 44Z" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="3"></path>
                             </svg>
+                        </div>
                         </div>
                         <span className="text-slate-50 text-xl sm:text-2xl font-black tracking-tight">EcoCycle</span>
                     </div>

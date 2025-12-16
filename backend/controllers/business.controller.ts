@@ -897,6 +897,7 @@ export const getBusinessAnalytics = async (req: Request, res: Response) => {
 
     // Check if we have real data, otherwise provide sample data for demo
     const hasRealData = completedBookings.length > 0 || wasteByCategory.length > 0;
+    const monthlyTarget = business.monthlyTarget || 200;
 
     if (!hasRealData) {
       // Return sample/demo data when no real bookings exist
@@ -906,7 +907,8 @@ export const getBusinessAnalytics = async (req: Request, res: Response) => {
           co2Saved: 837.5,
           treesEquivalent: 42,
           totalBookings: 15,
-          complianceScore: business.complianceScore || 85
+          complianceScore: business.complianceScore || 85,
+          monthlyTarget
         },
         wasteByCategory: [
           { _id: 'IT Equipment', totalWeight: 450, count: 25 },
@@ -943,7 +945,8 @@ export const getBusinessAnalytics = async (req: Request, res: Response) => {
         co2Saved,
         treesEquivalent,
         totalBookings: completedBookings.length,
-        complianceScore: business.complianceScore
+        complianceScore: business.complianceScore,
+        monthlyTarget
       },
       wasteByCategory,
       monthlyTrends,

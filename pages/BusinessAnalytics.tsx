@@ -9,6 +9,7 @@ interface AnalyticsData {
     treesEquivalent: number;
     totalBookings: number;
     complianceScore: number;
+    monthlyTarget: number;
   };
   wasteByCategory: Array<{ _id: string; totalWeight: number; count: number }>;
   monthlyTrends: Array<{ _id: string; totalWeight: number; bookings: number; co2Saved: number }>;
@@ -25,11 +26,34 @@ const BusinessAnalytics = () => {
   const [loading, setLoading] = useState(true);
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
   const [recentActivity, setRecentActivity] = useState<any[]>([]);
+  const [showTargetModal, setShowTargetModal] = useState(false);
+  const [editTarget, setEditTarget] = useState(200);
+  const [savingTarget, setSavingTarget] = useState(false);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     window.location.hash = '#/login';
+  };
+
+  const handleSaveTarget = async () => {
+    try {
+      setSavingTarget(true);
+      const res = await fetch(`${API_BASE}/business/profile`, {
+        method: 'PUT',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ monthlyTarget: editTarget })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setShowTargetModal(false);
+        fetchAnalytics(); // Refresh analytics with new target
+      }
+    } catch (error) {
+      console.error('Error saving target:', error);
+    } finally {
+      setSavingTarget(false);
+    }
   };
 
   const getAuthHeaders = () => {
@@ -124,11 +148,14 @@ const BusinessAnalytics = () => {
     return months[monthNum] || monthStr;
   };
 
+  // Use API target or default
+  const monthlyTarget = analytics?.summary?.monthlyTarget || 200;
+
   // Process monthly data from API
   const monthlyData = analytics?.monthlyTrends?.length ? analytics.monthlyTrends.map(t => ({
     month: getMonthName(t._id),
     disposed: Math.round(t.totalWeight),
-    target: 200
+    target: monthlyTarget
   })) : [];
 
   const categoryColors: Record<string, string> = {
@@ -151,7 +178,8 @@ const BusinessAnalytics = () => {
     color: categoryColors[c._id] || '#64748b'
   })) : [];
 
-  const maxValue = Math.max(...monthlyData.map(d => d.disposed), 200);
+  // Include target in maxValue calculation so target line stays within chart bounds
+  const maxValue = Math.max(...monthlyData.map(d => Math.max(d.disposed, d.target)), monthlyTarget, 100);
   
   // Use API data
   const totalDisposed = analytics?.summary?.totalWasteProcessed || 0;
@@ -220,6 +248,16 @@ const BusinessAnalytics = () => {
                     <p className="text-[#94a3b8] text-base">Track your environmental impact and disposal metrics.</p>
                   </div>
                   <div className="flex items-center gap-3">
+                    <button
+                      onClick={() => {
+                        setEditTarget(monthlyTarget);
+                        setShowTargetModal(true);
+                      }}
+                      className="flex items-center gap-2 bg-[#151F26] border border-white/10 text-white text-sm rounded-xl px-4 py-2.5 hover:bg-white/5 transition-colors"
+                    >
+                      <span className="material-symbols-outlined text-lg">flag</span>
+                      <span className="hidden sm:inline">Target: {monthlyTarget} kg</span>
+                    </button>
                     <select 
                       value={timeRange}
                       onChange={(e) => setTimeRange(e.target.value)}
@@ -242,6 +280,17 @@ const BusinessAnalytics = () => {
                   </div>
                 ) : (
                   <>
+                {/* Demo Data Banner */}
+                {analytics?.isDemo && (
+                  <div className="mb-6 p-4 bg-amber-500/10 border border-amber-500/20 rounded-xl flex items-center gap-3">
+                    <span className="material-symbols-outlined text-amber-400">info</span>
+                    <div>
+                      <p className="text-amber-400 font-semibold text-sm">Sample Data Preview</p>
+                      <p className="text-gray-400 text-xs">This is demo data. Complete your first pickup to see your real analytics.</p>
+                    </div>
+                  </div>
+                )}
+
                 {/* Key Metrics */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                   <div className="bg-[#151F26] rounded-2xl p-6 border border-white/5 relative overflow-hidden group hover:border-[#06b6d4]/20 transition-all">
@@ -467,6 +516,79 @@ const BusinessAnalytics = () => {
             </main>
           </div>
         </div>
+
+        {/* Set Target Modal */}
+        {showTargetModal && (
+          <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setShowTargetModal(false)}>
+            <div className="bg-[#151F26] rounded-2xl w-full max-w-md border border-white/10 overflow-hidden" onClick={(e) => e.stopPropagation()}>
+              <div className="flex items-center justify-between p-6 border-b border-white/10">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-amber-500/10 text-amber-400">
+                    <span className="material-symbols-outlined">flag</span>
+                  </div>
+                  <h3 className="text-white font-bold text-lg">Set Monthly Target</h3>
+                </div>
+                <button onClick={() => setShowTargetModal(false)} className="p-2 rounded-lg hover:bg-white/10 transition-colors text-gray-400 hover:text-white">
+                  <span className="material-symbols-outlined">close</span>
+                </button>
+              </div>
+              
+              <div className="p-6">
+                <p className="text-gray-400 text-sm mb-4">Set your monthly e-waste disposal target in kilograms. This helps track your progress on the analytics chart.</p>
+                
+                <div className="mb-6">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Monthly Target (kg)</label>
+                  <input
+                    type="number"
+                    value={editTarget}
+                    onChange={(e) => setEditTarget(Math.max(0, parseInt(e.target.value) || 0))}
+                    className="w-full bg-[#0B1116] border border-white/10 rounded-xl px-4 py-3 text-white text-lg font-bold focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 outline-none"
+                    min="0"
+                    step="50"
+                  />
+                </div>
+
+                <div className="grid grid-cols-4 gap-2 mb-6">
+                  {[100, 200, 500, 1000].map(val => (
+                    <button
+                      key={val}
+                      onClick={() => setEditTarget(val)}
+                      className={`px-3 py-2 rounded-lg text-sm font-semibold transition-colors ${editTarget === val ? 'bg-amber-500 text-white' : 'bg-white/5 text-gray-400 hover:bg-white/10'}`}
+                    >
+                      {val} kg
+                    </button>
+                  ))}
+                </div>
+                
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setShowTargetModal(false)}
+                    className="flex-1 bg-white/10 text-white px-4 py-3 rounded-xl font-bold hover:bg-white/20 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleSaveTarget}
+                    disabled={savingTarget}
+                    className="flex-1 bg-amber-500 text-white px-4 py-3 rounded-xl font-bold hover:bg-amber-600 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                  >
+                    {savingTarget ? (
+                      <>
+                        <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full"></div>
+                        Saving...
+                      </>
+                    ) : (
+                      <>
+                        <span className="material-symbols-outlined text-lg">check</span>
+                        Save Target
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </Layout>
   );
