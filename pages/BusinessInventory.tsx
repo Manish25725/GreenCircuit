@@ -133,6 +133,13 @@ const BusinessInventory = () => {
     notes: ''
   });
   
+  // Notification state
+  const [notification, setNotification] = useState<{show: boolean; type: 'success' | 'error'; message: string}>({
+    show: false,
+    type: 'success',
+    message: ''
+  });
+  
   // Map ref for pickup modal
   const pickupMapRef = useRef<HTMLDivElement>(null);
   const pickupMapInstance = useRef<any>(null);
@@ -456,13 +463,28 @@ const BusinessInventory = () => {
         ));
         setSelectedItems([]);
         setShowPickupModal(false);
-        alert('Pickup scheduled successfully!');
+        setNotification({
+          show: true,
+          type: 'success',
+          message: 'Pickup scheduled successfully!'
+        });
+        setTimeout(() => setNotification({ show: false, type: 'success', message: '' }), 3000);
       } else {
-        alert('Failed to schedule pickup: ' + (data.message || data.error));
+        setNotification({
+          show: true,
+          type: 'error',
+          message: 'Failed to schedule pickup: ' + (data.message || data.error)
+        });
+        setTimeout(() => setNotification({ show: false, type: 'error', message: '' }), 5000);
       }
     } catch (error) {
       console.error('Error booking pickup:', error);
-      alert('Failed to schedule pickup. Please try again.');
+      setNotification({
+        show: true,
+        type: 'error',
+        message: 'Failed to schedule pickup. Please try again.'
+      });
+      setTimeout(() => setNotification({ show: false, type: 'error', message: '' }), 5000);
     } finally {
       setBookingPickup(false);
     }
