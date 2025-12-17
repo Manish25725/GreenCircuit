@@ -5,13 +5,24 @@ import { sendSuccess, sendError } from '../utils/response';
 export const getSlots = async (req: Request, res: Response) => {
   try {
     const { date, agencyId } = req.query;
+    const userId = (req as any).user?.id;
     let query: any = {};
+    
+    // If user is an agency, auto-filter by their agency
+    if (userId && (req as any).user?.role === 'agency') {
+      const Agency = require('../models/Agency').default;
+      const agency = await Agency.findOne({ userId });
+      if (agency) {
+        query.agencyId = agency._id;
+      }
+    } else if (agencyId) {
+      query.agencyId = agencyId;
+    }
+    
     if (date) {
       query.date = parseInt(date as string);
     }
-    if (agencyId) {
-      query.agencyId = agencyId;
-    }
+    
     const slots = await Slot.find(query).sort({ date: 1, startTime: 1 });
     sendSuccess(res, slots);
   } catch (error: any) {

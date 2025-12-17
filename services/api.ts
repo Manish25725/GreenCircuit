@@ -239,6 +239,13 @@ export const api = {
     });
   },
 
+  addSlot: async (slotData: Partial<Slot>) => {
+    return apiRequest<Slot>('/slots', {
+      method: 'POST',
+      body: JSON.stringify(slotData),
+    });
+  },
+
   deleteSlot: async (id: string) => {
     if (USE_MOCK_FALLBACK) {
       const index = MOCK_SLOTS.findIndex(s => s.id === id);
@@ -554,6 +561,45 @@ export const api = {
     return apiRequest(`/bookings/${bookingId}/status`, {
       method: 'PUT',
       body: JSON.stringify({ status, message }),
+    });
+  },
+
+  // Agency profile management
+  getAgencyProfile: async () => {
+    return apiRequest('/agencies/profile/me');
+  },
+
+  updateAgencyProfile: async (profileData: any) => {
+    return apiRequest('/agencies/profile/me', {
+      method: 'PUT',
+      body: JSON.stringify(profileData),
+    });
+  },
+
+  addCertification: async (certData: { name: string; type: string; icon?: string; color?: string }) => {
+    return apiRequest('/agencies/profile/certifications', {
+      method: 'POST',
+      body: JSON.stringify(certData),
+    });
+  },
+
+  removeCertification: async (index: number) => {
+    return apiRequest(`/agencies/profile/certifications/${index}`, {
+      method: 'DELETE',
+    });
+  },
+
+  updateOperatingHours: async (operatingHours: any[]) => {
+    return apiRequest('/agencies/profile/operating-hours', {
+      method: 'PUT',
+      body: JSON.stringify({ operatingHours }),
+    });
+  },
+
+  updateAgencyLogo: async (logoUrl: string) => {
+    return apiRequest('/agencies/profile/logo', {
+      method: 'PUT',
+      body: JSON.stringify({ logo: logoUrl }),
     });
   },
 };

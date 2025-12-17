@@ -11,7 +11,13 @@ import {
   getAgencyAnalytics,
   getAgencyPublicProfile,
   submitVerificationRequest,
-  getAgencyVettingRequests
+  getAgencyVettingRequests,
+  getAgencyProfile,
+  updateAgencyProfile,
+  addCertification,
+  removeCertification,
+  updateOperatingHours,
+  updateAgencyLogo
 } from '../controllers/agency.controller';
 import { protect, authorize, optionalAuth } from '../middleware/auth.middleware';
 
@@ -30,6 +36,14 @@ router.get('/dashboard/me', protect, authorize('agency'), getAgencyDashboard);
 router.get('/bookings/me', protect, authorize('agency'), getAgencyBookings);
 router.put('/bookings/:bookingId/status', protect, authorize('agency'), updateBookingStatus);
 router.get('/analytics/me', protect, authorize('agency'), getAgencyAnalytics);
+
+// Profile management routes
+router.get('/profile/me', protect, authorize('agency'), getAgencyProfile);
+router.put('/profile/me', protect, authorize('agency'), updateAgencyProfile);
+router.post('/profile/certifications', protect, authorize('agency'), addCertification);
+router.delete('/profile/certifications/:index', protect, authorize('agency'), removeCertification);
+router.put('/profile/operating-hours', protect, authorize('agency'), updateOperatingHours);
+router.put('/profile/logo', protect, authorize('agency'), updateAgencyLogo);
 
 // Vetting requests
 router.post('/vetting', protect, authorize('agency'), submitVerificationRequest);

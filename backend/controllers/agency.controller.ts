@@ -519,3 +519,163 @@ export const getAgencyVettingRequests = async (req: Request, res: Response) => {
     sendError(res, error.message);
   }
 };
+
+// Get agency profile
+export const getAgencyProfile = async (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).user.id;
+
+    const agency = await Agency.findOne({ userId })
+      .populate('userId', 'name email');
+
+    if (!agency) {
+      return sendError(res, 'Agency not found', 404);
+    }
+
+    sendSuccess(res, agency);
+  } catch (error: any) {
+    sendError(res, error.message);
+  }
+};
+
+// Update agency profile
+export const updateAgencyProfile = async (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).user.id;
+    const {
+      name,
+      description,
+      email,
+      phone,
+      address,
+      services,
+      certifications,
+      operatingHours
+    } = req.body;
+
+    const agency = await Agency.findOne({ userId });
+    if (!agency) {
+      return sendError(res, 'Agency not found', 404);
+    }
+
+    // Update fields
+    if (name) agency.name = name;
+    if (description) agency.description = description;
+    if (email) agency.email = email;
+    if (phone) agency.phone = phone;
+    if (address) {
+      agency.address = {
+        ...agency.address,
+        ...address
+      };
+    }
+    if (services) agency.services = services;
+    if (certifications) agency.certifications = certifications;
+    if (operatingHours) agency.operatingHours = operatingHours;
+
+    await agency.save();
+
+    sendSuccess(res, agency);
+  } catch (error: any) {
+    sendError(res, error.message);
+  }
+};
+
+// Add certification
+export const addCertification = async (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).user.id;
+    const { name, type, icon, color } = req.body;
+
+    if (!name || !type) {
+      return sendError(res, 'Certification name and type are required', 400);
+    }
+
+    const agency = await Agency.findOne({ userId });
+    if (!agency) {
+      return sendError(res, 'Agency not found', 404);
+    }
+
+    // Add certification (stored as JSON string for flexibility)
+    const certData = JSON.stringify({ name, type, icon, color });
+    agency.certifications.push(certData);
+    await agency.save();
+
+    sendSuccess(res, { message: 'Certification added', agency });
+  } catch (error: any) {
+    sendError(res, error.message);
+  }
+};
+
+// Remove certification
+export const removeCertification = async (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).user.id;
+    const { index } = req.params;
+
+    const agency = await Agency.findOne({ userId });
+    if (!agency) {
+      return sendError(res, 'Agency not found', 404);
+    }
+
+    const certIndex = parseInt(index);
+    if (certIndex < 0 || certIndex >= agency.certifications.length) {
+      return sendError(res, 'Invalid certification index', 400);
+    }
+
+    agency.certifications.splice(certIndex, 1);
+    await agency.save();
+
+    sendSuccess(res, { message: 'Certification removed', agency });
+  } catch (error: any) {
+    sendError(res, error.message);
+  }
+};
+
+// Update operating hours
+export const updateOperatingHours = async (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).user.id;
+    const { operatingHours } = req.body;
+
+    if (!operatingHours || !Array.isArray(operatingHours)) {
+      return sendError(res, 'Operating hours must be an array', 400);
+    }
+
+    const agency = await Agency.findOne({ userId });
+    if (!agency) {
+      return sendError(res, 'Agency not found', 404);
+    }
+
+    agency.operatingHours = operatingHours;
+    await agency.save();
+
+    sendSuccess(res, { message: 'Operating hours updated', agency });
+  } catch (error: any) {
+    sendError(res, error.message);
+  }
+};
+
+// Update agency logo/profile picture
+export const updateAgencyLogo = async (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).user.id;
+    const { logo } = req.body;
+
+    if (!logo) {
+      return sendError(res, 'Logo URL is required', 400);
+    }
+
+    const agency = await Agency.findOne({ userId });
+    if (!agency) {
+      return sendError(res, 'Agency not found', 404);
+    }
+
+    agency.logo = logo;
+    await agency.save();
+
+    sendSuccess(res, { message: 'Logo updated', agency });
+  } catch (error: any) {
+    sendError(res, error.message);
+  }
+};

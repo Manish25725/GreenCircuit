@@ -4,6 +4,7 @@ export interface IAgency extends Document {
   _id: mongoose.Types.ObjectId;
   userId: mongoose.Types.ObjectId;
   name: string;
+  registrationNumber?: string;
   description: string;
   logo?: string;
   coverImage?: string;
@@ -51,6 +52,10 @@ const AgencySchema = new Schema<IAgency>({
     required: [true, 'Agency name is required'],
     trim: true,
     maxlength: [200, 'Name cannot exceed 200 characters']
+  },
+  registrationNumber: {
+    type: String,
+    trim: true
   },
   description: {
     type: String,

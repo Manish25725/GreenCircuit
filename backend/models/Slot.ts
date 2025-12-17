@@ -5,6 +5,7 @@ export interface ISlot extends mongoose.Document {
   date: number;
   startTime: string;
   endTime: string;
+  capacity?: number;
   status: 'Available' | 'Booked' | 'Unavailable';
   bookedBy?: string | mongoose.Types.ObjectId;
   bookingId?: mongoose.Types.ObjectId;
@@ -15,6 +16,7 @@ const slotSchema = new mongoose.Schema({
   date: { type: Number, required: true }, // Day of month (1-31)
   startTime: { type: String, required: true },
   endTime: { type: String, required: true },
+  capacity: { type: Number, default: 5 },
   status: { 
     type: String, 
     enum: ['Available', 'Booked', 'Unavailable'], 
