@@ -54,7 +54,7 @@ const ManageSlots = () => {
   const handleDelete = async (id: number) => {
     setDeletingSlot(id);
     try {
-      await api.deleteSlot(id);
+      await api.deleteSlot(String(id));
       setSlots(prev => prev.filter(s => s.id !== id));
     } catch (error) {
       console.error('Failed to delete slot:', error);
