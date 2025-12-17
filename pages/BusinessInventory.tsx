@@ -1585,7 +1585,51 @@ const BusinessInventory = () => {
               transform: translateY(-8px);
             }
           }
+          @keyframes slideIn {
+            from {
+              transform: translateX(400px);
+              opacity: 0;
+            }
+            to {
+              transform: translateX(0);
+              opacity: 1;
+            }
+          }
+          .animate-slideIn {
+            animation: slideIn 0.3s ease-out;
+          }
         `}</style>
+
+        {/* Notification Overlay */}
+        {notification.show && (
+          <div className="fixed top-20 right-4 z-[100] animate-slideIn">
+            <div className={`rounded-xl p-4 shadow-2xl border backdrop-blur-md flex items-center gap-3 min-w-[320px] ${
+              notification.type === 'success' 
+                ? 'bg-[#10b981]/10 border-[#10b981]/30 text-[#10b981]' 
+                : 'bg-red-500/10 border-red-500/30 text-red-400'
+            }`}>
+              <div className={`p-2 rounded-lg ${
+                notification.type === 'success' ? 'bg-[#10b981]/20' : 'bg-red-500/20'
+              }`}>
+                <span className="material-symbols-outlined text-2xl">
+                  {notification.type === 'success' ? 'check_circle' : 'error'}
+                </span>
+              </div>
+              <div className="flex-1">
+                <p className="font-semibold text-white text-sm">
+                  {notification.type === 'success' ? 'Success!' : 'Error'}
+                </p>
+                <p className="text-sm">{notification.message}</p>
+              </div>
+              <button 
+                onClick={() => setNotification({ show: false, type: 'success', message: '' })}
+                className="p-1 hover:bg-white/10 rounded transition-colors"
+              >
+                <span className="material-symbols-outlined text-lg">close</span>
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </Layout>
   );

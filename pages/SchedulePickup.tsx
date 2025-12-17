@@ -63,6 +63,12 @@ const SchedulePickup = () => {
   const userRole = getUserRole();
   const dashboardPath = getDashboardPath(userRole);
 
+  // Business-specific theme colors
+  const isBusiness = userRole === 'Business';
+  const primaryColor = isBusiness ? '#3b82f6' : '#10b981';
+  const primaryColorLight = isBusiness ? 'blue-500' : '[#10b981]';
+  const brandName = isBusiness ? 'EcoCycle Business' : 'EcoCycle';
+
   useEffect(() => {
     // Check if user is logged in
     if (!isAuthenticated()) {
@@ -356,12 +362,12 @@ const SchedulePickup = () => {
           <div className="w-full flex justify-center fixed top-0 left-0 right-0 z-50">
             <header className="flex items-center justify-between w-full max-w-7xl px-4 sm:px-6 lg:px-10 py-4 bg-[#0B1120]/80 backdrop-blur-xl border-b border-white/5">
               <div className="flex items-center gap-3 cursor-pointer" onClick={() => window.location.hash = '#/'}>
-                <div className="p-2 bg-[#10b981]/10 rounded-xl">
-                  <svg className="h-6 w-6 text-[#10b981]" fill="currentColor" viewBox="0 0 48 48">
+                <div className={`p-2 rounded-xl ${isBusiness ? 'bg-blue-500/10' : 'bg-[#10b981]/10'}`}>
+                  <svg className={`h-6 w-6 ${isBusiness ? 'text-blue-500' : 'text-[#10b981]'}`} fill="currentColor" viewBox="0 0 48 48">
                     <path d="M42.4379 44C42.4379 44 36.0744 33.9038 41.1692 24C46.8624 12.9336 42.2078 4 42.2078 4L7.01134 4C7.01134 4 11.6577 12.932 5.96912 23.9969C0.876273 33.9029 7.27094 44 7.27094 44L42.4379 44Z"></path>
                   </svg>
                 </div>
-                <span className="text-xl font-bold text-white tracking-tight">EcoCycle</span>
+                <span className="text-xl font-bold text-white tracking-tight">{brandName}</span>
               </div>
             </header>
           </div>
@@ -503,21 +509,21 @@ const SchedulePickup = () => {
           </div>
         </div>
       ) : (
-      <div className="bg-[#0B1116] font-sans text-gray-200 min-h-screen flex flex-col relative overflow-x-hidden selection:bg-[#10b981] selection:text-white">
+      <div className={`bg-[#0B1116] font-sans text-gray-200 min-h-screen flex flex-col relative overflow-x-hidden selection:text-white ${isBusiness ? 'selection:bg-blue-500' : 'selection:bg-[#10b981]'}`}>
         
         {/* Background Ambient Blobs */}
-        <div className="fixed top-0 left-0 w-full h-[500px] bg-[#10b981]/5 rounded-full blur-[120px] -translate-y-1/2 pointer-events-none"></div>
+        <div className={`fixed top-0 left-0 w-full h-[500px] rounded-full blur-[120px] -translate-y-1/2 pointer-events-none ${isBusiness ? 'bg-blue-500/5' : 'bg-[#10b981]/5'}`}></div>
         <div className="fixed bottom-0 right-0 w-full h-[500px] bg-[#3b82f6]/5 rounded-full blur-[120px] translate-y-1/2 pointer-events-none"></div>
 
         {/* Standard User Header */}
         <header className="flex items-center justify-between whitespace-nowrap border-b border-white/5 px-4 sm:px-6 lg:px-10 py-4 bg-[#0B1116]/80 backdrop-blur-md fixed top-0 left-0 right-0 z-50 transition-all duration-300">
             <div className="flex items-center gap-3 text-white cursor-pointer" onClick={() => window.location.hash = '#/'}>
-                <div className="p-2 bg-[#10b981]/10 rounded-lg">
-                    <svg className="h-6 w-6 text-[#10b981]" fill="currentColor" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                <div className={`p-2 rounded-lg ${isBusiness ? 'bg-blue-500/10' : 'bg-[#10b981]/10'}`}>
+                    <svg className={`h-6 w-6 ${isBusiness ? 'text-blue-500' : 'text-[#10b981]'}`} fill="currentColor" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
                     <path d="M42.4379 44C42.4379 44 36.0744 33.9038 41.1692 24C46.8624 12.9336 42.2078 4 42.2078 4L7.01134 4C7.01134 4 11.6577 12.932 5.96912 23.9969C0.876273 33.9029 7.27094 44 7.27094 44L42.4379 44Z"></path>
                     </svg>
                 </div>
-                <h2 className="text-xl font-bold tracking-tight text-white">EcoCycle</h2>
+                <h2 className="text-xl font-bold tracking-tight text-white">{brandName}</h2>
             </div>
             <nav className="hidden md:flex flex-1 justify-center gap-1">
             </nav>
@@ -565,7 +571,7 @@ const SchedulePickup = () => {
                   <div className="mb-8 space-y-3">
                     {items.map(item => (
                         <div key={item.id} className="flex items-start gap-4 p-3 rounded-xl bg-[#0B1116] border border-white/5 group hover:border-white/10 transition-colors">
-                            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-[#151F26] text-[#10b981] shadow-inner border border-white/5">
+                            <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-[#151F26] shadow-inner border border-white/5 ${isBusiness ? 'text-blue-500' : 'text-[#10b981]'}`}>
                                 <span className="material-symbols-outlined">
                                     {item.type.includes('Appliance') ? 'kitchen' : 
                                      item.type.includes('Electronics') ? 'laptop_mac' : 
@@ -575,7 +581,7 @@ const SchedulePickup = () => {
                             <div className="flex-1 min-w-0 py-1">
                                 <div className="flex justify-between items-start mb-1">
                                     <p className="text-sm font-bold text-white truncate">{item.type}</p>
-                                    <span className="text-xs font-bold px-2 py-0.5 rounded bg-[#10b981]/10 text-[#10b981] border border-[#10b981]/20">Qty: {item.quantity}</span>
+                                    <span className={`text-xs font-bold px-2 py-0.5 rounded border ${isBusiness ? 'bg-blue-500/10 text-blue-500 border-blue-500/20' : 'bg-[#10b981]/10 text-[#10b981] border-[#10b981]/20'}`}>Qty: {item.quantity}</span>
                                 </div>
                                 <p className="text-xs text-[#94a3b8] line-clamp-1">{item.description}</p>
                             </div>
@@ -593,7 +599,7 @@ const SchedulePickup = () => {
                   {/* Add New Item Form */}
                   <div className="pt-6 border-t border-white/5">
                     <div className="flex items-center gap-2 mb-4">
-                      <span className="material-symbols-outlined text-[#10b981] text-xl">add_circle</span>
+                      <span className={`material-symbols-outlined text-xl ${isBusiness ? 'text-blue-500' : 'text-[#10b981]'}`}>add_circle</span>
                       <h4 className="text-sm font-bold text-white uppercase tracking-wider">Add New Item</h4>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
@@ -603,7 +609,7 @@ const SchedulePickup = () => {
                           <select 
                             value={newItem.type}
                             onChange={(e) => setNewItem({...newItem, type: e.target.value})}
-                            className="w-full h-11 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-[#10b981] focus:border-[#10b981] transition-all appearance-none cursor-pointer placeholder-gray-500" 
+                            className={`w-full h-11 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/10 text-white focus:outline-none focus:ring-1 transition-all appearance-none cursor-pointer placeholder-gray-500 ${isBusiness ? 'focus:ring-blue-500 focus:border-blue-500' : 'focus:ring-[#10b981] focus:border-[#10b981]'}`} 
                             id="material-type"
                           >
                             <option value="" disabled>Select category</option>
@@ -622,7 +628,7 @@ const SchedulePickup = () => {
                           <input 
                             value={newItem.quantity}
                             onChange={(e) => setNewItem({...newItem, quantity: parseInt(e.target.value) || 0})}
-                            className="w-full h-11 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-[#10b981] focus:border-[#10b981] transition-all" 
+                            className={`w-full h-11 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/10 text-white focus:outline-none focus:ring-1 transition-all ${isBusiness ? 'focus:ring-blue-500 focus:border-blue-500' : 'focus:ring-[#10b981] focus:border-[#10b981]'}`} 
                             id="item-count" 
                             min="1" 
                             placeholder="1" 
@@ -635,7 +641,7 @@ const SchedulePickup = () => {
                         <textarea 
                             value={newItem.description}
                             onChange={(e) => setNewItem({...newItem, description: e.target.value})}
-                            className="w-full px-3 py-2 bg-[#0B1116] border rounded-xl border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-[#10b981] focus:border-[#10b981] resize-none transition-all placeholder:text-gray-600" 
+                            className={`w-full px-3 py-2 bg-[#0B1116] border rounded-xl border-white/10 text-white focus:outline-none focus:ring-1 resize-none transition-all placeholder:text-gray-600 ${isBusiness ? 'focus:ring-blue-500 focus:border-blue-500' : 'focus:ring-[#10b981] focus:border-[#10b981]'}`} 
                             id="item-details" 
                             placeholder="Please describe the condition and specifics (e.g., 'Broken screen on laptop', 'Old CRT Monitor')" 
                             rows={2}
@@ -644,7 +650,7 @@ const SchedulePickup = () => {
                       <div className="md:col-span-12 flex justify-end">
                         <button 
                             onClick={handleAddItem}
-                            className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#0B1116] border border-[#10b981] text-[#10b981] hover:bg-[#10b981] hover:text-[#0B1116] transition-all duration-200 font-bold text-sm shadow-lg shadow-[#10b981]/10 cursor-pointer"
+                            className={`flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#0B1116] border font-bold text-sm shadow-lg transition-all duration-200 cursor-pointer ${isBusiness ? 'border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-[#0B1116] shadow-blue-500/10' : 'border-[#10b981] text-[#10b981] hover:bg-[#10b981] hover:text-[#0B1116] shadow-[#10b981]/10'}`}
                         >
                             Add Item
                         </button>
@@ -697,7 +703,7 @@ const SchedulePickup = () => {
                             disabled={isPast}
                             className={`relative h-12 w-full text-sm font-medium leading-normal transition-all group rounded-lg
                                 ${isSelected 
-                                    ? 'bg-[#10b981] text-[#0B1116] font-bold shadow-lg shadow-[#10b981]/20' 
+                                    ? (isBusiness ? 'bg-blue-500 text-white font-bold shadow-lg shadow-blue-500/20' : 'bg-[#10b981] text-[#0B1116] font-bold shadow-lg shadow-[#10b981]/20')
                                     : isPast
                                     ? 'text-gray-600 cursor-not-allowed'
                                     : 'text-gray-300 hover:bg-white/5 hover:text-white cursor-pointer'
@@ -706,7 +712,7 @@ const SchedulePickup = () => {
                           >
                             <div className="flex size-full items-center justify-center">{day}</div>
                             {isToday && !isSelected && (
-                                <div className="absolute bottom-2 left-1/2 -translate-x-1/2 size-1.5 rounded-full bg-[#10b981]"></div>
+                                <div className={`absolute bottom-2 left-1/2 -translate-x-1/2 size-1.5 rounded-full ${isBusiness ? 'bg-blue-500' : 'bg-[#10b981]'}`}></div>
                             )}
                           </button>
                         );
@@ -714,7 +720,7 @@ const SchedulePickup = () => {
                     </div>
                     <div className="mt-4 flex items-center justify-center gap-6 pt-4 border-t border-white/5">
                       <div className="flex items-center gap-2">
-                        <div className="size-2 rounded-full bg-[#10b981] shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
+                        <div className={`size-2 rounded-full ${isBusiness ? 'bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]' : 'bg-[#10b981] shadow-[0_0_8px_rgba(16,185,129,0.5)]'}`}></div>
                         <span className="text-xs text-[#94a3b8]">Available</span>
                       </div>
                       <div className="flex items-center gap-2">
@@ -759,7 +765,7 @@ const SchedulePickup = () => {
                                     onClick={() => setSelectedSlot(slot)}
                                     className={`h-14 w-full rounded-xl border text-sm font-medium transition-all cursor-pointer flex items-center px-4 justify-between group
                                         ${selectedSlot?._id === slot._id 
-                                            ? 'bg-[#10b981]/20 border-[#10b981] text-[#10b981]' 
+                                            ? (isBusiness ? 'bg-blue-500/20 border-blue-500 text-blue-500' : 'bg-[#10b981]/20 border-[#10b981] text-[#10b981]')
                                             : 'bg-[#0B1116] border-white/5 text-gray-300 hover:border-white/20 hover:bg-white/5'
                                         }
                                     `}
@@ -781,10 +787,10 @@ const SchedulePickup = () => {
                     <button 
                         onClick={handleConfirmBooking}
                         disabled={!selectedSlot || items.length === 0 || submitting}
-                        className={`w-full flex min-w-[84px] items-center justify-center overflow-hidden rounded-xl h-14 px-8 text-[#0B1116] text-base font-bold leading-normal tracking-[0.015em] transition-all
+                        className={`w-full flex min-w-[84px] items-center justify-center overflow-hidden rounded-xl h-14 px-8 text-white text-base font-bold leading-normal tracking-[0.015em] transition-all
                             ${selectedSlot && items.length > 0 && !submitting
-                                ? 'bg-[#10b981] hover:bg-[#059669] cursor-pointer shadow-lg shadow-[#10b981]/30 transform hover:-translate-y-1' 
-                                : 'bg-[#10b981]/50 opacity-50 cursor-not-allowed'
+                                ? (isBusiness ? 'bg-blue-500 hover:bg-blue-600 cursor-pointer shadow-lg shadow-blue-500/30 transform hover:-translate-y-1' : 'bg-[#10b981] hover:bg-[#059669] cursor-pointer shadow-lg shadow-[#10b981]/30 transform hover:-translate-y-1')
+                                : (isBusiness ? 'bg-blue-500/50 opacity-50 cursor-not-allowed' : 'bg-[#10b981]/50 opacity-50 cursor-not-allowed')
                             }
                         `}
                     >
