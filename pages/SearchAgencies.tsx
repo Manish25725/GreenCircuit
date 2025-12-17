@@ -152,6 +152,12 @@ const SearchAgencies = () => {
     // Clear existing markers
     markersRef.current.forEach(marker => marker.remove());
     markersRef.current = [];
+    
+    // Dynamic colors based on user role
+    const markerColor = isBusiness ? '#3b82f6' : '#10b981';
+    const markerColorDark = isBusiness ? '#2563eb' : '#059669';
+    const markerColorDarker = isBusiness ? '#1d4ed8' : '#047857';
+    const markerColorRgb = isBusiness ? '59, 130, 246' : '16, 185, 129';
 
     // Add markers for each agency
     agencies.forEach(agency => {
@@ -168,9 +174,9 @@ const SearchAgencies = () => {
         const customIcon = L.divIcon({
           className: 'custom-marker-wrapper',
           html: `
-            <div class="marker-container ${isSelected ? 'selected' : ''}">
-              <div class="marker-pulse"></div>
-              <div class="marker-pin">
+            <div class="marker-container ${isSelected ? 'selected' : ''}" data-color="${markerColor}" data-color-dark="${markerColorDark}" data-color-darker="${markerColorDarker}" data-color-rgb="${markerColorRgb}">
+              <div class="marker-pulse" style="background: rgba(${markerColorRgb}, 0.3);"></div>
+              <div class="marker-pin" style="background: linear-gradient(135deg, ${markerColor} 0%, ${markerColorDark} 100%); box-shadow: 0 4px 15px rgba(${markerColorRgb}, 0.4), 0 0 0 3px rgba(255,255,255,0.2);">
                 <div class="marker-icon">
                   <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
                     <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
@@ -199,7 +205,7 @@ const SearchAgencies = () => {
         marker.bindPopup(`
           <div class="agency-popup">
             <div class="popup-header">
-              <div class="popup-icon">♻️</div>
+              <div class="popup-icon" style="background: rgba(${markerColorRgb}, 0.15);">♻️</div>
               <div class="popup-title">
                 <h3>${agency.name}</h3>
                 <span class="popup-location">${agency.address?.city || ''}, ${country || ''}</span>
@@ -217,7 +223,7 @@ const SearchAgencies = () => {
             </div>
             <div class="popup-services">
               ${(agency.services || ['Electronics', 'Batteries']).slice(0, 3).map(s => 
-                `<span class="service-tag">${s}</span>`
+                `<span class="service-tag" style="background: rgba(${markerColorRgb}, 0.1); color: ${markerColor};">${s}</span>`
               ).join('')}
             </div>
           </div>
@@ -241,7 +247,7 @@ const SearchAgencies = () => {
         duration: 1
       });
     }
-  }, [agencies, mapReady, selectedAgency]);
+  }, [agencies, mapReady, selectedAgency, isBusiness]);
 
   const loadAgencies = async () => {
     setLoading(true);
@@ -377,6 +383,12 @@ const SearchAgencies = () => {
     return flags[country] || '🌍';
   };
 
+  // Business-specific theme colors
+  const isBusiness = userRole === 'Business';
+  const primaryColor = isBusiness ? '#3b82f6' : '#10b981'; // Blue for business, green for users
+  const primaryColorRgb = isBusiness ? '59, 130, 246' : '16, 185, 129';
+  const brandName = isBusiness ? 'EcoCycle Business' : 'EcoCycle';
+  
   return (
     <Layout title="" role={userRole} fullWidth hideSidebar>
       <div className="flex flex-col h-screen bg-[#0B1116] text-white font-sans overflow-hidden">
@@ -384,12 +396,12 @@ const SearchAgencies = () => {
         {/* Header */}
         <header className="flex items-center justify-between whitespace-nowrap border-b border-white/5 px-4 sm:px-6 lg:px-10 py-4 bg-[#0B1116]/80 backdrop-blur-md fixed top-0 left-0 right-0 z-50">
             <div className="flex items-center gap-3 text-white cursor-pointer" onClick={() => window.location.hash = '#/'}>
-                <div className="p-2 bg-[#10b981]/10 rounded-lg">
-                    <svg className="h-6 w-6 text-[#10b981]" fill="currentColor" viewBox="0 0 48 48">
+                <div className={`p-2 rounded-lg ${isBusiness ? 'bg-blue-500/10' : 'bg-[#10b981]/10'}`}>
+                    <svg className={`h-6 w-6 ${isBusiness ? 'text-blue-500' : 'text-[#10b981]'}`} fill="currentColor" viewBox="0 0 48 48">
                     <path d="M42.4379 44C42.4379 44 36.0744 33.9038 41.1692 24C46.8624 12.9336 42.2078 4 42.2078 4L7.01134 4C7.01134 4 11.6577 12.932 5.96912 23.9969C0.876273 33.9029 7.27094 44 7.27094 44L42.4379 44Z"></path>
                     </svg>
                 </div>
-                <h2 className="text-xl font-bold tracking-tight text-white">EcoCycle</h2>
+                <h2 className="text-xl font-bold tracking-tight text-white">{brandName}</h2>
             </div>
             <nav className="hidden md:flex flex-1 justify-center gap-1">
             </nav>
@@ -398,7 +410,7 @@ const SearchAgencies = () => {
                     onClick={() => window.location.hash = '#/profile'}
                     className="hidden sm:flex items-center gap-3 pl-1 pr-4 py-1 rounded-full bg-[#151F26] border border-white/5 hover:bg-white/5 transition-colors group cursor-pointer"
                 >
-                    <div className="size-8 rounded-full bg-[#10b981] flex items-center justify-center ring-2 ring-white/10 group-hover:ring-[#10b981]/50 transition-all text-white font-bold text-sm">
+                    <div className={`size-8 rounded-full flex items-center justify-center ring-2 ring-white/10 transition-all text-white font-bold text-sm ${isBusiness ? 'bg-blue-500 group-hover:ring-blue-500/50' : 'bg-[#10b981] group-hover:ring-[#10b981]/50'}`}>
                       {user?.name?.charAt(0) || 'U'}
                     </div>
                     <span className="text-sm font-medium text-white">{user?.name || 'User'}</span>
@@ -436,11 +448,11 @@ const SearchAgencies = () => {
                        value={searchLocation}
                        onChange={(e) => setSearchLocation(e.target.value)}
                        onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                       className="w-full pl-10 pr-20 py-2.5 rounded-lg bg-[#0B1116] border border-white/10 text-white text-sm focus:ring-2 focus:ring-[#10b981]/50 focus:border-[#10b981] outline-none transition-all placeholder:text-gray-600" 
+                       className={`w-full pl-10 pr-20 py-2.5 rounded-lg bg-[#0B1116] border border-white/10 text-white text-sm focus:ring-2 outline-none transition-all placeholder:text-gray-600 ${isBusiness ? 'focus:ring-blue-500/50 focus:border-blue-500' : 'focus:ring-[#10b981]/50 focus:border-[#10b981]'}`} 
                      />
                      <button 
                        onClick={handleSearch}
-                       className="absolute right-1.5 top-1/2 -translate-y-1/2 px-3 py-1.5 bg-[#10b981] text-white text-xs font-bold rounded-md hover:bg-[#059669] transition-colors"
+                       className={`absolute right-1.5 top-1/2 -translate-y-1/2 px-3 py-1.5 text-white text-xs font-bold rounded-md transition-colors ${isBusiness ? 'bg-blue-500 hover:bg-blue-600' : 'bg-[#10b981] hover:bg-[#059669]'}`}
                      >
                         Search
                      </button>
@@ -454,7 +466,7 @@ const SearchAgencies = () => {
                           onClick={() => handleRegionFilter(region.name)}
                           className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all flex items-center gap-1.5 ${
                             activeRegion === region.name 
-                              ? 'bg-[#10b981] text-white' 
+                              ? (isBusiness ? 'bg-blue-500 text-white' : 'bg-[#10b981] text-white')
                               : 'bg-white/5 text-[#94a3b8] hover:bg-white/10 hover:text-white'
                           }`}
                         >
@@ -471,12 +483,12 @@ const SearchAgencies = () => {
                     <div className="flex flex-col items-center justify-center py-16">
                       {/* Loader with orbiting dot - matching LoadingScreen style */}
                       <div className="relative flex items-center justify-center mb-4">
-                        <div className="w-20 h-20 rounded-full border border-[#10b981]/20 flex items-center justify-center relative bg-[#0B1116]/50 backdrop-blur-sm shadow-[0_0_40px_-10px_rgba(16,185,129,0.2)]">
+                        <div className={`w-20 h-20 rounded-full flex items-center justify-center relative bg-[#0B1116]/50 backdrop-blur-sm ${isBusiness ? 'border border-blue-500/20 shadow-[0_0_40px_-10px_rgba(59,130,246,0.2)]' : 'border border-[#10b981]/20 shadow-[0_0_40px_-10px_rgba(16,185,129,0.2)]'}`}>
                           {/* Inner Glow */}
-                          <div className="absolute inset-0 bg-[#10b981]/5 rounded-full blur-xl animate-pulse"></div>
+                          <div className={`absolute inset-0 rounded-full blur-xl animate-pulse ${isBusiness ? 'bg-blue-500/5' : 'bg-[#10b981]/5'}`}></div>
                           
                           {/* Logo SVG */}
-                          <div className="size-10 text-[#10b981] relative z-10 flex items-center justify-center">
+                          <div className={`size-10 relative z-10 flex items-center justify-center ${isBusiness ? 'text-blue-500' : 'text-[#10b981]'}`}>
                             <svg className="w-full h-full drop-shadow-[0_0_15px_rgba(16,185,129,0.5)]" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
                               <path d="M42.4379 44C42.4379 44 36.0744 33.9038 41.1692 24C46.8624 12.9336 42.2078 4 42.2078 4L7.01134 4C7.01134 4 11.6577 12.932 5.96912 23.9969C0.876273 33.9029 7.27094 44 7.27094 44L42.4379 44Z" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="3"></path>
                             </svg>
@@ -484,12 +496,12 @@ const SearchAgencies = () => {
 
                           {/* Orbiting Dot */}
                           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full animate-spin [animation-duration:2s]">
-                            <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-[#10b981] rounded-full shadow-[0_0_10px_#10b981]"></div>
+                            <div className={`absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full ${isBusiness ? 'bg-blue-500 shadow-[0_0_10px_#3b82f6]' : 'bg-[#10b981] shadow-[0_0_10px_#10b981]'}`}></div>
                           </div>
                         </div>
                         {/* Decorative Particles */}
-                        <div className="absolute top-0 right-0 w-1.5 h-1.5 bg-[#10b981]/40 rounded-full animate-ping [animation-duration:2s]"></div>
-                        <div className="absolute bottom-2 -left-2 w-1 h-1 bg-[#10b981]/30 rounded-full animate-pulse"></div>
+                        <div className={`absolute top-0 right-0 w-1.5 h-1.5 rounded-full animate-ping [animation-duration:2s] ${isBusiness ? 'bg-blue-500/40' : 'bg-[#10b981]/40'}`}></div>
+                        <div className={`absolute bottom-2 -left-2 w-1 h-1 rounded-full animate-pulse ${isBusiness ? 'bg-blue-500/30' : 'bg-[#10b981]/30'}`}></div>
                       </div>
                       <p className="text-[#94a3b8] text-sm">Searching global network...</p>
                     </div>
@@ -512,15 +524,17 @@ const SearchAgencies = () => {
                       return (
                         <div 
                             key={agency._id} 
-                            className={`bg-[#151F26] border rounded-xl p-3.5 hover:border-[#10b981]/50 transition-all cursor-pointer group ${
-                              selectedAgency?._id === agency._id ? 'border-[#10b981] ring-1 ring-[#10b981]/20' : 'border-white/5'
+                            className={`bg-[#151F26] border rounded-xl p-3.5 transition-all cursor-pointer group ${
+                              selectedAgency?._id === agency._id 
+                                ? (isBusiness ? 'border-blue-500 ring-1 ring-blue-500/20 hover:border-blue-500/50' : 'border-[#10b981] ring-1 ring-[#10b981]/20 hover:border-[#10b981]/50')
+                                : (isBusiness ? 'border-white/5 hover:border-blue-500/50' : 'border-white/5 hover:border-[#10b981]/50')
                             }`}
                             onClick={() => handleAgencyClick(agency)}
                         >
                            <div className="flex gap-3">
                               {/* Icon with Country Flag */}
-                              <div className="h-14 w-14 rounded-xl bg-gradient-to-br from-[#10b981]/20 to-[#10b981]/5 flex items-center justify-center shrink-0 border border-[#10b981]/20 relative">
-                                <span className="material-symbols-outlined text-[#10b981] text-2xl">recycling</span>
+                              <div className={`h-14 w-14 rounded-xl flex items-center justify-center shrink-0 relative ${isBusiness ? 'bg-gradient-to-br from-blue-500/20 to-blue-500/5 border border-blue-500/20' : 'bg-gradient-to-br from-[#10b981]/20 to-[#10b981]/5 border border-[#10b981]/20'}`}>
+                                <span className={`material-symbols-outlined text-2xl ${isBusiness ? 'text-blue-500' : 'text-[#10b981]'}`}>recycling</span>
                                 {country && (
                                   <span className="absolute -bottom-1 -right-1 text-sm">
                                     {getCountryFlag(country)}
@@ -531,9 +545,9 @@ const SearchAgencies = () => {
                               {/* Content */}
                               <div className="flex-1 min-w-0">
                                  <div className="flex items-start justify-between gap-2">
-                                     <h3 className="font-semibold text-white text-sm truncate group-hover:text-[#10b981] transition-colors">{agency.name}</h3>
+                                     <h3 className={`font-semibold text-white text-sm truncate transition-colors ${isBusiness ? 'group-hover:text-blue-500' : 'group-hover:text-[#10b981]'}`}>{agency.name}</h3>
                                      {agency.isVerified && (
-                                       <span className="material-symbols-outlined text-[#10b981] text-base shrink-0" title="Verified">verified</span>
+                                       <span className={`material-symbols-outlined text-base shrink-0 ${isBusiness ? 'text-blue-500' : 'text-[#10b981]'}`} title="Verified">verified</span>
                                      )}
                                  </div>
                                  
@@ -552,12 +566,12 @@ const SearchAgencies = () => {
                                  <div className="flex items-center justify-between mt-2.5">
                                     <div className="flex gap-1">
                                         {agency.services?.slice(0, 2).map(t => (
-                                          <span key={t} className="text-[10px] uppercase font-medium tracking-wide bg-[#10b981]/10 text-[#10b981] px-2 py-0.5 rounded">{t}</span>
+                                          <span key={t} className={`text-[10px] uppercase font-medium tracking-wide px-2 py-0.5 rounded ${isBusiness ? 'bg-blue-500/10 text-blue-500' : 'bg-[#10b981]/10 text-[#10b981]'}`}>{t}</span>
                                         ))}
                                     </div>
                                     <button 
                                       onClick={(e) => { e.stopPropagation(); handleBookPickup(agency); }}
-                                      className="bg-[#10b981] text-white px-3 py-1.5 rounded-lg text-xs font-semibold hover:bg-[#059669] transition-colors flex items-center gap-1"
+                                      className={`text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1 ${isBusiness ? 'bg-blue-500 hover:bg-blue-600' : 'bg-[#10b981] hover:bg-[#059669]'}`}
                                     >
                                         <span className="material-symbols-outlined text-sm">calendar_month</span>
                                         Book
@@ -607,25 +621,25 @@ const SearchAgencies = () => {
                
                {/* Map Header with Stats */}
                <div className="absolute top-4 left-4 right-4 flex items-start justify-between z-[1000]">
-                 <div className="bg-[#0d1f17]/95 backdrop-blur-xl px-5 py-4 rounded-2xl border border-[#10b981]/20 shadow-2xl shadow-[#10b981]/5">
+                 <div className={`backdrop-blur-xl px-5 py-4 rounded-2xl border shadow-2xl ${isBusiness ? 'bg-[#1e3a8a]/95 border-blue-500/20 shadow-blue-500/5' : 'bg-[#0d1f17]/95 border-[#10b981]/20 shadow-[#10b981]/5'}`}>
                    <div className="flex items-center gap-3 mb-3">
-                     <div className="p-2.5 bg-[#10b981]/15 rounded-xl border border-[#10b981]/20">
-                       <span className="material-symbols-outlined text-[#10b981] text-xl">public</span>
+                     <div className={`p-2.5 rounded-xl border ${isBusiness ? 'bg-blue-500/15 border-blue-500/20' : 'bg-[#10b981]/15 border-[#10b981]/20'}`}>
+                       <span className={`material-symbols-outlined text-xl ${isBusiness ? 'text-blue-500' : 'text-[#10b981]'}`}>public</span>
                      </div>
                      <div>
-                       <h3 className="text-white font-bold text-sm">Global Recycling Network</h3>
-                       <p className="text-[#10b981]/70 text-xs">Real-time agency locations</p>
+                       <h3 className="text-white font-bold text-sm">{isBusiness ? 'Business Disposal Network' : 'Global Recycling Network'}</h3>
+                       <p className={`text-xs ${isBusiness ? 'text-blue-500/70' : 'text-[#10b981]/70'}`}>Real-time agency locations</p>
                      </div>
                    </div>
                    <div className="flex items-center gap-4">
                      <div className="flex items-center gap-2">
                        <span className="relative flex h-3 w-3">
-                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#10b981] opacity-75"></span>
-                         <span className="relative inline-flex rounded-full h-3 w-3 bg-[#10b981]"></span>
+                         <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${isBusiness ? 'bg-blue-500' : 'bg-[#10b981]'}`}></span>
+                         <span className={`relative inline-flex rounded-full h-3 w-3 ${isBusiness ? 'bg-blue-500' : 'bg-[#10b981]'}`}></span>
                        </span>
-                       <span className="text-[#10b981] text-xs font-semibold">{agencies.length} Active</span>
+                       <span className={`text-xs font-semibold ${isBusiness ? 'text-blue-500' : 'text-[#10b981]'}`}>{agencies.length} Active</span>
                      </div>
-                     <div className="h-4 w-px bg-[#10b981]/20" />
+                     <div className={`h-4 w-px ${isBusiness ? 'bg-blue-500/20' : 'bg-[#10b981]/20'}`} />
                      <span className="text-white/60 text-xs">Click markers to explore</span>
                    </div>
                  </div>
@@ -643,10 +657,10 @@ const SearchAgencies = () => {
                            mapInstanceRef.current.flyTo(region.coords, region.zoom, { duration: 1.5 });
                          }
                        }}
-                       className="bg-[#0d1f17]/95 backdrop-blur-xl px-4 py-2.5 rounded-xl border border-[#10b981]/20 hover:border-[#10b981]/50 hover:bg-[#10b981]/10 transition-all flex items-center gap-2 group shadow-lg"
+                       className={`backdrop-blur-xl px-4 py-2.5 rounded-xl border transition-all flex items-center gap-2 group shadow-lg ${isBusiness ? 'bg-[#1e3a8a]/95 border-blue-500/20 hover:border-blue-500/50 hover:bg-blue-500/10' : 'bg-[#0d1f17]/95 border-[#10b981]/20 hover:border-[#10b981]/50 hover:bg-[#10b981]/10'}`}
                      >
                        <span className="text-base">{region.flag}</span>
-                       <span className="text-white/90 text-xs font-medium group-hover:text-[#10b981] transition-colors">{region.name}</span>
+                       <span className={`text-white/90 text-xs font-medium transition-colors ${isBusiness ? 'group-hover:text-blue-500' : 'group-hover:text-[#10b981]'}`}>{region.name}</span>
                      </button>
                    ))}
                  </div>
@@ -654,31 +668,31 @@ const SearchAgencies = () => {
                
                {/* Selected Agency Panel - Improved */}
                {selectedAgency && (
-                 <div className="absolute bottom-6 left-6 right-6 md:left-auto md:right-6 md:w-96 bg-[#0d1f17]/95 backdrop-blur-xl rounded-2xl border border-[#10b981]/20 shadow-2xl shadow-[#10b981]/10 overflow-hidden z-[1000] animate-slideUp">
+                 <div className={`absolute bottom-6 left-6 right-6 md:left-auto md:right-6 md:w-96 backdrop-blur-xl rounded-2xl border shadow-2xl overflow-hidden z-[1000] animate-slideUp ${isBusiness ? 'bg-[#1e3a8a]/95 border-blue-500/20 shadow-blue-500/10' : 'bg-[#0d1f17]/95 border-[#10b981]/20 shadow-[#10b981]/10'}`}>
                    <div className="p-4">
                      <div className="flex items-start gap-3">
-                       <div className="p-3 bg-[#10b981]/15 rounded-xl border border-[#10b981]/20">
-                         <span className="material-symbols-outlined text-[#10b981] text-xl">recycling</span>
+                       <div className={`p-3 rounded-xl border ${isBusiness ? 'bg-blue-500/15 border-blue-500/20' : 'bg-[#10b981]/15 border-[#10b981]/20'}`}>
+                         <span className={`material-symbols-outlined text-xl ${isBusiness ? 'text-blue-500' : 'text-[#10b981]'}`}>recycling</span>
                        </div>
                        <div className="flex-1 min-w-0">
                          <div className="flex items-center gap-2">
                            <h3 className="font-bold text-white truncate">{selectedAgency.name}</h3>
                            {selectedAgency.isVerified && (
-                             <span className="material-symbols-outlined text-[#10b981] text-sm">verified</span>
+                             <span className={`material-symbols-outlined text-sm ${isBusiness ? 'text-blue-500' : 'text-[#10b981]'}`}>verified</span>
                            )}
                          </div>
-                         <p className="text-[#10b981]/60 text-xs mt-0.5">{selectedAgency.address?.street}</p>
+                         <p className={`text-xs mt-0.5 ${isBusiness ? 'text-blue-500/60' : 'text-[#10b981]/60'}`}>{selectedAgency.address?.street}</p>
                          <p className="text-white/50 text-xs">{selectedAgency.address?.city}, {selectedAgency.address?.country || selectedAgency.address?.state}</p>
                        </div>
                        <button 
                          onClick={() => setSelectedAgency(null)}
-                         className="p-1.5 hover:bg-[#10b981]/10 rounded-lg transition-colors"
+                         className={`p-1.5 rounded-lg transition-colors ${isBusiness ? 'hover:bg-blue-500/10' : 'hover:bg-[#10b981]/10'}`}
                        >
                          <span className="material-symbols-outlined text-white/50 hover:text-white text-lg">close</span>
                        </button>
                      </div>
                      
-                     <div className="flex items-center gap-3 mt-3 pt-3 border-t border-[#10b981]/10">
+                     <div className={`flex items-center gap-3 mt-3 pt-3 border-t ${isBusiness ? 'border-blue-500/10' : 'border-[#10b981]/10'}`}>
                        <div className="flex items-center gap-1 text-[#fbbf24]">
                          <span className="material-symbols-outlined text-sm fill">star</span>
                          <span className="text-sm font-bold">{selectedAgency.rating?.toFixed(1) || '4.5'}</span>
@@ -687,7 +701,7 @@ const SearchAgencies = () => {
                        <div className="flex-1" />
                        <div className="flex gap-1">
                          {selectedAgency.services?.slice(0, 2).map(s => (
-                           <span key={s} className="text-[9px] uppercase bg-[#10b981]/10 text-[#10b981] px-2 py-0.5 rounded-full font-medium">{s}</span>
+                           <span key={s} className={`text-[9px] uppercase px-2 py-0.5 rounded-full font-medium ${isBusiness ? 'bg-blue-500/10 text-blue-500' : 'bg-[#10b981]/10 text-[#10b981]'}`}>{s}</span>
                          ))}
                        </div>
                      </div>
@@ -695,7 +709,7 @@ const SearchAgencies = () => {
                    
                    <button
                      onClick={() => handleBookPickup(selectedAgency)}
-                     className="w-full bg-gradient-to-r from-[#10b981] to-[#059669] text-white py-3.5 font-bold hover:from-[#059669] hover:to-[#047857] transition-all flex items-center justify-center gap-2"
+                     className={`w-full text-white py-3.5 font-bold transition-all flex items-center justify-center gap-2 ${isBusiness ? 'bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700' : 'bg-gradient-to-r from-[#10b981] to-[#059669] hover:from-[#059669] hover:to-[#047857]'}`}
                    >
                      <span className="material-symbols-outlined">calendar_month</span>
                      Schedule Pickup
