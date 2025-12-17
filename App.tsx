@@ -69,8 +69,14 @@ const App = () => {
       return userRole === 'business';
     }
 
-    // User routes (dashboard, profile, rewards, etc.) - only regular users can access
-    const userOnlyRoutes = ['#/dashboard', '#/rewards', '#/certificate', '#/history', '#/profile', '#/notifications', '#/security', '#/settings'];
+    // Common routes accessible by all logged-in users (user, business, agency)
+    const commonRoutes = ['#/profile', '#/notifications', '#/security', '#/settings'];
+    if (commonRoutes.some(r => path.startsWith(r))) {
+      return userRole === 'user' || userRole === 'business' || userRole === 'agency';
+    }
+
+    // User-only routes (dashboard, rewards, etc.)
+    const userOnlyRoutes = ['#/dashboard', '#/rewards', '#/certificate', '#/history'];
     if (userOnlyRoutes.some(r => path.startsWith(r))) {
       return userRole === 'user';
     }
