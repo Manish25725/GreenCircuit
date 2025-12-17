@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { api, getCurrentUser } from './services/api';
+import AgencyDashboard from './pages/AgencyDashboard';
 import AgencyAnalytics from './pages/AgencyAnalytics';
 import ManageSlots from './pages/ManageSlots';
 import AgencyBookings from './pages/AgencyBookings';
@@ -151,7 +152,7 @@ const App = () => {
     
     switch (basePath) {
       case '#/agency':
-        return <AgencyAnalytics />;
+        return <AgencyDashboard />;
       case '#/agency/slots':
         return <ManageSlots />;
       case '#/agency/bookings':
