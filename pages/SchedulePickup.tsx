@@ -545,12 +545,21 @@ const SchedulePickup = () => {
         <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 mt-20 relative z-10">
           <div className="flex flex-col gap-8">
             <div className="space-y-4">
-              <div className="flex flex-wrap gap-2 items-center text-sm">
-                <a className="text-[#94a3b8] font-medium hover:text-white cursor-pointer transition-colors" onClick={() => window.location.hash = '#/search'}>Agency Selection</a>
-                <span className="text-[#94a3b8] font-medium">/</span>
-                <span className="text-white font-medium">Schedule Pickup</span>
-                <span className="text-[#94a3b8] font-medium">/</span>
-                <span className="text-[#94a3b8] font-medium">Confirmation</span>
+              <div className="flex items-center gap-3 mb-2">
+                <button 
+                  onClick={() => window.location.hash = dashboardPath}
+                  className={`p-2 rounded-lg border transition-colors ${isBusiness ? 'bg-blue-500/10 border-blue-500/20 text-blue-400 hover:bg-blue-500/20' : 'bg-[#10b981]/10 border-[#10b981]/20 text-[#10b981] hover:bg-[#10b981]/20'}`}
+                  title="Back to Dashboard"
+                >
+                  <span className="material-symbols-outlined text-xl">arrow_back</span>
+                </button>
+                <div className="flex flex-wrap gap-2 items-center text-sm">
+                  <a className="text-[#94a3b8] font-medium hover:text-white cursor-pointer transition-colors" onClick={() => window.location.hash = '#/search'}>Agency Selection</a>
+                  <span className="text-[#94a3b8] font-medium">/</span>
+                  <span className="text-white font-medium">Schedule Pickup</span>
+                  <span className="text-[#94a3b8] font-medium">/</span>
+                  <span className="text-[#94a3b8] font-medium">Confirmation</span>
+                </div>
               </div>
               <div className="flex min-w-72 flex-col gap-2">
                 <p className="text-white text-3xl sm:text-4xl font-black leading-tight tracking-[-0.033em]">Schedule Your Pickup</p>
