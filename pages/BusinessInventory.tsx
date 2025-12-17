@@ -360,6 +360,29 @@ const BusinessInventory = () => {
     }
   };
 
+  const toggleSelectAllReadyForPickup = () => {
+    const readyItems = filteredInventory.filter(i => i.status === 'ready-for-pickup');
+    const allReadySelected = readyItems.every(item => selectedItems.includes(item._id));
+    
+    if (allReadySelected) {
+      // Deselect all ready-for-pickup items
+      setSelectedItems(prev => prev.filter(id => !readyItems.find(item => item._id === id)));
+    } else {
+      // Select all ready-for-pickup items
+      const readyIds = readyItems.map(i => i._id);
+      setSelectedItems(prev => [...new Set([...prev, ...readyIds])]);
+    }
+  };
+
+  const getReadyForPickupCount = () => {
+    return filteredInventory.filter(i => i.status === 'ready-for-pickup').length;
+  };
+
+  const getSelectedReadyForPickupCount = () => {
+    const readyItems = filteredInventory.filter(i => i.status === 'ready-for-pickup');
+    return readyItems.filter(item => selectedItems.includes(item._id)).length;
+  };
+
   const getSelectedItemsData = () => {
     return inventory.filter(i => selectedItems.includes(i._id));
   };
@@ -777,13 +800,19 @@ const BusinessInventory = () => {
                     <>
                       {/* Table Header */}
                       <div className="hidden lg:grid grid-cols-8 gap-4 p-4 border-b border-white/5 text-sm font-medium text-gray-500">
-                        <div className="flex items-center">
-                          <input
-                            type="checkbox"
-                            checked={selectedItems.length > 0 && selectedItems.length === filteredInventory.filter(i => i.status !== 'scheduled' && i.status !== 'recycled').length}
-                            onChange={toggleSelectAll}
-                            className="w-4 h-4 rounded border-gray-600 bg-white/5 text-[#06b6d4] focus:ring-[#06b6d4] focus:ring-offset-0 cursor-pointer"
-                          />
+                        <div className="flex items-center gap-2">
+                          {getReadyForPickupCount() > 0 && (
+                            <>
+                              <input
+                                type="checkbox"
+                                checked={getReadyForPickupCount() > 0 && getSelectedReadyForPickupCount() === getReadyForPickupCount()}
+                                onChange={toggleSelectAllReadyForPickup}
+                                className="w-4 h-4 rounded border-amber-500/50 bg-amber-500/10 text-amber-500 focus:ring-amber-500 focus:ring-offset-0 cursor-pointer"
+                                title="Select all ready for pickup items"
+                              />
+                              <span className="text-xs text-amber-400 font-medium">Ready ({getReadyForPickupCount()})</span>
+                            </>
+                          )}
                         </div>
                         <div>Item Name</div>
                         <div>Category</div>
@@ -813,15 +842,24 @@ const BusinessInventory = () => {
                         </div>
                       ) : (
                         filteredInventory.map((item) => (
-                          <div key={item._id} className={`grid grid-cols-1 lg:grid-cols-8 gap-4 p-4 border-b border-white/5 last:border-b-0 hover:bg-white/5 transition-colors items-center ${selectedItems.includes(item._id) ? 'bg-[#06b6d4]/5' : ''}`}>
+                          <div key={item._id} className={`grid grid-cols-1 lg:grid-cols-8 gap-4 p-4 border-b border-white/5 last:border-b-0 hover:bg-white/5 transition-colors items-center ${
+                            selectedItems.includes(item._id) 
+                              ? (item.status === 'ready-for-pickup' ? 'bg-amber-500/10 border-l-2 border-amber-500/50' : 'bg-[#06b6d4]/5')
+                              : (item.status === 'ready-for-pickup' ? 'bg-amber-500/5' : '')
+                          }`}>
                             <div className="flex items-center">
-                              {item.status !== 'scheduled' && item.status !== 'recycled' ? (
-                                <input
-                                  type="checkbox"
-                                  checked={selectedItems.includes(item._id)}
-                                  onChange={() => toggleItemSelection(item._id)}
-                                  className="w-4 h-4 rounded border-gray-600 bg-white/5 text-[#06b6d4] focus:ring-[#06b6d4] focus:ring-offset-0 cursor-pointer"
-                                />
+                              {item.status === 'ready-for-pickup' ? (
+                                <div className="flex items-center gap-2">
+                                  <input
+                                    type="checkbox"
+                                    checked={selectedItems.includes(item._id)}
+                                    onChange={() => toggleItemSelection(item._id)}
+                                    className="w-4 h-4 rounded border-amber-500/50 bg-amber-500/10 text-amber-500 focus:ring-amber-500 focus:ring-offset-0 cursor-pointer"
+                                  />
+                                  <span className="material-symbols-outlined text-amber-400 text-sm" title="Ready for pickup">
+                                    local_shipping
+                                  </span>
+                                </div>
                               ) : (
                                 <div className="w-4 h-4"></div>
                               )}

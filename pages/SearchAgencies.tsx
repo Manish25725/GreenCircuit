@@ -92,6 +92,12 @@ const SearchAgencies = () => {
   const userRole = getUserRole();
   const dashboardPath = getDashboardPath(userRole);
 
+  // Business-specific theme colors
+  const isBusiness = userRole === 'Business';
+  const primaryColor = isBusiness ? '#3b82f6' : '#10b981';
+  const primaryColorRgb = isBusiness ? '59, 130, 246' : '16, 185, 129';
+  const brandName = isBusiness ? 'EcoCycle Business' : 'EcoCycle';
+
   useEffect(() => {
     loadAgencies();
   }, []);
@@ -383,12 +389,6 @@ const SearchAgencies = () => {
     return flags[country] || '🌍';
   };
 
-  // Business-specific theme colors
-  const isBusiness = userRole === 'Business';
-  const primaryColor = isBusiness ? '#3b82f6' : '#10b981'; // Blue for business, green for users
-  const primaryColorRgb = isBusiness ? '59, 130, 246' : '16, 185, 129';
-  const brandName = isBusiness ? 'EcoCycle Business' : 'EcoCycle';
-  
   return (
     <Layout title="" role={userRole} fullWidth hideSidebar>
       <div className="flex flex-col h-screen bg-[#0B1116] text-white font-sans overflow-hidden">
@@ -765,7 +765,7 @@ const SearchAgencies = () => {
           animation: bounce-marker 1s ease-in-out infinite;
         }
         
-        /* Pulse effect */
+        /* Pulse effect - dynamic via inline styles */
         .marker-pulse {
           position: absolute;
           top: 50%;
@@ -773,35 +773,31 @@ const SearchAgencies = () => {
           transform: translate(-50%, -50%);
           width: 40px;
           height: 40px;
-          background: rgba(16, 185, 129, 0.3);
           border-radius: 50%;
           animation: pulse-ring 2s ease-out infinite;
         }
         .marker-container.selected .marker-pulse {
-          background: rgba(16, 185, 129, 0.5);
+          opacity: 0.5;
           animation: pulse-ring 1.5s ease-out infinite;
         }
         
-        /* Main marker pin */
+        /* Main marker pin - dynamic via inline styles */
         .marker-pin {
           position: relative;
           width: 40px;
           height: 40px;
-          background: linear-gradient(135deg, #10b981 0%, #059669 100%);
           border-radius: 50% 50% 50% 0;
           transform: rotate(-45deg);
           display: flex;
           align-items: center;
           justify-content: center;
-          box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4), 0 0 0 3px rgba(255,255,255,0.2);
           transition: all 0.3s ease;
         }
         .marker-container:hover .marker-pin {
-          box-shadow: 0 6px 25px rgba(16, 185, 129, 0.6), 0 0 0 4px rgba(255,255,255,0.3);
+          filter: brightness(1.1);
         }
         .marker-container.selected .marker-pin {
-          background: linear-gradient(135deg, #059669 0%, #047857 100%);
-          box-shadow: 0 8px 30px rgba(16, 185, 129, 0.7), 0 0 0 4px rgba(16, 185, 129, 0.4);
+          filter: brightness(0.9);
         }
         
         /* Marker icon */
@@ -866,7 +862,6 @@ const SearchAgencies = () => {
         }
         .popup-icon {
           font-size: 24px;
-          background: rgba(16, 185, 129, 0.15);
           padding: 8px;
           border-radius: 12px;
         }
@@ -908,8 +903,6 @@ const SearchAgencies = () => {
           gap: 6px;
         }
         .service-tag {
-          background: rgba(16, 185, 129, 0.1);
-          color: #10b981;
           font-size: 10px;
           font-weight: 600;
           padding: 4px 10px;
@@ -937,7 +930,7 @@ const SearchAgencies = () => {
           transition: all 0.2s ease !important;
         }
         .leaflet-control-zoom a:hover {
-          background: #10b981 !important;
+          background: ${isBusiness ? '#3b82f6' : '#10b981'} !important;
           color: white !important;
         }
         .leaflet-control-zoom-in {
