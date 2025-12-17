@@ -428,8 +428,15 @@ const SearchAgencies = () => {
             <div className="w-full md:w-[420px] flex flex-col border-r border-white/5 bg-[#0F1419] shrink-0 z-10">
                {/* Header & Search */}
                <div className="p-5 border-b border-white/5 bg-[#151F26]">
-                  <div className="flex items-center justify-between mb-4">
-                     <div>
+                  <div className="flex items-center gap-2 mb-4">
+                     <button 
+                        onClick={() => window.location.hash = dashboardPath}
+                        className={`p-2 rounded-lg border transition-colors ${isBusiness ? 'bg-blue-500/10 border-blue-500/20 text-blue-400 hover:bg-blue-500/20' : 'bg-[#10b981]/10 border-[#10b981]/20 text-[#10b981] hover:bg-[#10b981]/20'}`}
+                        title="Back to Dashboard"
+                     >
+                        <span className="material-symbols-outlined text-lg">arrow_back</span>
+                     </button>
+                     <div className="flex-1">
                         <h1 className="text-xl font-bold text-white flex items-center gap-2">
                           <span>🌍</span> Global Recyclers
                         </h1>
