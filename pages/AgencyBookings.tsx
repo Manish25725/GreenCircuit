@@ -98,6 +98,34 @@ const AgencyBookings = () => {
     window.location.hash = '#/login';
   };
 
+  const handleExportCSV = () => {
+    const headers = ['Booking ID', 'Client Name', 'Email', 'Date', 'Time Slot', 'Waste Type', 'Status'];
+    const csvData = filteredBookings.map(b => [
+      b.id,
+      b.userName || 'N/A',
+      b.userEmail || 'N/A',
+      b.date,
+      b.timeSlot,
+      b.wasteType || 'E-Waste',
+      b.status
+    ]);
+    
+    const csvContent = [
+      headers.join(','),
+      ...csvData.map(row => row.map(cell => `"${cell}"`).join(','))
+    ].join('\n');
+    
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `bookings_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <Layout title="" role="Agency" fullWidth hideSidebar>
       <div className="bg-[#0B1116] font-sans text-gray-200 antialiased selection:bg-[#f59e0b] selection:text-white min-h-screen">
@@ -157,7 +185,9 @@ const AgencyBookings = () => {
                     </div>
                   </div>
                   <button 
-                    className="flex items-center justify-center h-12 px-6 text-base font-bold leading-normal transition-all bg-white/5 text-gray-200 rounded-xl hover:bg-white/10 border border-white/5 hover:border-white/10"
+                    onClick={handleExportCSV}
+                    disabled={filteredBookings.length === 0}
+                    className="flex items-center justify-center h-12 px-6 text-base font-bold leading-normal transition-all bg-white/5 text-gray-200 rounded-xl hover:bg-white/10 border border-white/5 hover:border-white/10 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <span className="material-symbols-outlined mr-2">download</span>
                     <span className="truncate">Export CSV</span>
@@ -331,64 +361,6 @@ const AgencyBookings = () => {
                       </table>
                     </div>
                   )}
-                </div>
-
-                {/* Quick Actions */}
-                <div className="bg-[#151F26] rounded-2xl p-6 shadow-[0_10px_15px_-3px_rgba(0,0,0,0.3)] border border-white/5 mt-6">
-                  <h3 className="text-white text-lg font-bold mb-4 flex items-center gap-2">
-                    <span className="material-symbols-outlined text-gray-400">bolt</span>
-                    Quick Actions
-                  </h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-                    <button 
-                      onClick={() => window.location.hash = '#/agency'}
-                      className="flex group cursor-pointer items-center justify-between overflow-hidden rounded-xl h-12 px-4 bg-white/5 text-gray-200 border border-white/5 hover:bg-white/10 hover:border-white/10 transition-all"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="size-7 rounded-lg bg-[#f59e0b]/20 text-[#f59e0b] flex items-center justify-center">
-                          <span className="material-symbols-outlined text-lg">dashboard</span>
-                        </div>
-                        <span className="font-medium text-sm">Dashboard</span>
-                      </div>
-                      <span className="material-symbols-outlined text-gray-500 group-hover:text-white transition-colors text-lg">chevron_right</span>
-                    </button>
-                    <button 
-                      onClick={() => window.location.hash = '#/agency/slots'}
-                      className="flex group cursor-pointer items-center justify-between overflow-hidden rounded-xl h-12 px-4 bg-white/5 text-gray-200 border border-white/5 hover:bg-white/10 hover:border-white/10 transition-all"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="size-7 rounded-lg bg-[#8b5cf6]/20 text-[#8b5cf6] flex items-center justify-center">
-                          <span className="material-symbols-outlined text-lg">calendar_month</span>
-                        </div>
-                        <span className="font-medium text-sm">Manage Slots</span>
-                      </div>
-                      <span className="material-symbols-outlined text-gray-500 group-hover:text-white transition-colors text-lg">chevron_right</span>
-                    </button>
-                    <button 
-                      onClick={() => window.location.hash = '#/agency/profile'}
-                      className="flex group cursor-pointer items-center justify-between overflow-hidden rounded-xl h-12 px-4 bg-white/5 text-gray-200 border border-white/5 hover:bg-white/10 hover:border-white/10 transition-all"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="size-7 rounded-lg bg-green-500/20 text-green-400 flex items-center justify-center">
-                          <span className="material-symbols-outlined text-lg">badge</span>
-                        </div>
-                        <span className="font-medium text-sm">Agency Profile</span>
-                      </div>
-                      <span className="material-symbols-outlined text-gray-500 group-hover:text-white transition-colors text-lg">chevron_right</span>
-                    </button>
-                    <button 
-                      onClick={() => window.location.hash = '#/contact'}
-                      className="flex group cursor-pointer items-center justify-between overflow-hidden rounded-xl h-12 px-4 bg-white/5 text-gray-200 border border-white/5 hover:bg-white/10 hover:border-white/10 transition-all"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="size-7 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center">
-                          <span className="material-symbols-outlined text-lg">support_agent</span>
-                        </div>
-                        <span className="font-medium text-sm">Get Support</span>
-                      </div>
-                      <span className="material-symbols-outlined text-gray-500 group-hover:text-white transition-colors text-lg">chevron_right</span>
-                    </button>
-                  </div>
                 </div>
 
               </div>
