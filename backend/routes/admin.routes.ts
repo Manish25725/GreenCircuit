@@ -11,11 +11,14 @@ import {
   deleteUser,
   // Agencies
   getAllAgencies,
+  getAgencyForVerification,
   getPendingAgencies,
   updateAgencyVerification,
   getAgencyDetails,
   suspendAgency,
   reactivateAgency,
+  approvePartnerRegistration,
+  rejectPartnerRegistration,
   // Vetting
   getVettingRequests,
   getVettingRequest,
@@ -58,7 +61,10 @@ router.delete('/users/:id', deleteUser);
 router.get('/agencies', getAllAgencies);
 router.get('/agencies/pending', getPendingAgencies);
 router.get('/agencies/:id', getAgencyDetails);
+router.get('/agencies/:id/verify', getAgencyForVerification);
 router.put('/agencies/:id/verify', updateAgencyVerification);
+router.post('/agencies/:id/approve', approvePartnerRegistration);
+router.post('/agencies/:id/reject', rejectPartnerRegistration);
 router.post('/agencies/:id/suspend', suspendAgency);
 router.post('/agencies/:id/reactivate', reactivateAgency);
 

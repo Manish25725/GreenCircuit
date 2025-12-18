@@ -24,6 +24,7 @@ import AdminVetting from './pages/AdminVetting';
 import AdminUsers from './pages/AdminUsers';
 import AdminAgencies from './pages/AdminAgencies';
 import AdminReports from './pages/AdminReports';
+import AdminPartnerApproval from './pages/AdminPartnerApproval';
 import PickupConfirmation from './pages/PickupConfirmation';
 import PickupLimitReached from './pages/PickupLimitReached';
 import History from './pages/History';
@@ -32,6 +33,8 @@ import BusinessInventory from './pages/BusinessInventory';
 import BusinessCertificates from './pages/BusinessCertificates';
 import BusinessDashboard from './pages/BusinessDashboard';
 import BusinessAnalytics from './pages/BusinessAnalytics';
+import PartnerRegistration from './pages/PartnerRegistration';
+import PartnerPending from './pages/PartnerPending';
 
 const App = () => {
   const [route, setRoute] = useState(window.location.hash || '#/');
@@ -48,7 +51,7 @@ const App = () => {
   // Check if user can access a route based on their role
   const canAccessRoute = (path: string, userRole: string | null): boolean => {
     // Public routes - anyone can access
-    const publicRoutes = ['#/', '#/login', '#/contact', '#/how-it-works', '#/about'];
+    const publicRoutes = ['#/', '#/login', '#/contact', '#/how-it-works', '#/about', '#/partner/register', '#/partner/pending'];
     if (publicRoutes.includes(path)) return true;
 
     // If no user is logged in, they can only access public routes
@@ -62,6 +65,11 @@ const App = () => {
     // Agency/Partner routes - only agency can access
     if (path.startsWith('#/agency')) {
       return userRole === 'agency';
+    }
+
+    // Partner registration routes - accessible to logged-in users who want to become partners
+    if (path.startsWith('#/partner')) {
+      return true; // Allow any logged-in user to access partner registration
     }
 
     // Business routes - only business can access
@@ -160,11 +168,10 @@ const App = () => {
       case '#/agency':
         return <AgencyDashboard />;
       case '#/agency/slots':
-        return <ManageSlots />;
-      case '#/agency/bookings':
-        return <AgencyBookings />;
-      case '#/agency/profile':
-        return <AgencyProfile />;
+        returnpartner/register':
+        return <PartnerRegistration />;
+      case '#/partner/pending':
+        return <PartnerPending />;
       case '#/dashboard':
         return <UserDashboard />;
       case '#/rewards':
@@ -184,6 +191,13 @@ const App = () => {
       case '#/admin':
         return <AdminDashboard />;
       case '#/admin/vetting':
+        return <AdminVetting />;
+      case '#/admin/users':
+        return <AdminUsers />;
+      case '#/admin/agencies':
+        return <AdminAgencies />;
+      case '#/admin/partners':
+        return <AdminPartnerApproval
         return <AdminVetting />;
       case '#/admin/users':
         return <AdminUsers />;

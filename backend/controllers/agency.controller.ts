@@ -5,6 +5,7 @@ import Booking from '../models/Booking';
 import Business from '../models/Business';
 import BusinessCertificate from '../models/BusinessCertificate';
 import Certificate from '../models/Certificate';
+import Notification from '../models/Notification';
 import { sendSuccess, sendError } from '../utils/response';
 
 // Get all agencies (with filters)
@@ -69,11 +70,29 @@ export const getAgencyById = async (req: Request, res: Response) => {
   }
 };
 
-// Create agency profile (for agency users)
+// Create agency profile (for agency users) - Partner Registration
 export const createAgency = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).user.id;
-    const { name, description, email, phone, address, services } = req.body;
+    const { 
+      name, 
+      description, 
+      email, 
+      phone, 
+      address, 
+      services,
+      gstNumber,
+      udyamCertificate,
+      headName,
+      businessType,
+      establishedYear,
+      verificationDocuments
+    } = req.body;
+
+    // Validate required partner details
+    if (!name || !email || !phone || !address || !gstNumber || !headName) {
+      return sendError(res, 'Please provide all required details: name, email, phone, address, GST number, and head name', 400);
+    }
 
     // Check if agency already exists for this user
     const existingAgency = await Agency.findOne({ userId });
@@ -88,14 +107,33 @@ export const createAgency = async (req: Request, res: Response) => {
       email,
       phone,
       address,
-      services,
-      verificationStatus: 'pending'
+      services: services || [],
+      gstNumber,
+      udyamCertificate,
+      headName,
+      businessType,
+      establishedYear,
+      verificationDocuments: verificationDocuments || [],
+      verificationStatus: 'pending',
+      isVerified: false
     });
 
-    // Update user role to agency
+    // Update user role to agency (but they still can't access dashboard until approved)
     await User.findByIdAndUpdate(userId, { role: 'agency' });
 
-    sendSuccess(res, agency, 201);
+    // Create a notification for admin
+    await Notification.create({
+      userId: '000000000000000000000000', // Admin notification (use actual admin ID in production)
+      type: 'admin',
+      title: 'New Partner Registration',
+      message: `New partner registration from ${name}. GST: ${gstNumber}`,
+      priority: 'high'
+    });
+
+    sendSuccess(res, { 
+      message: 'Partner registration submitted successfully. Your request is pending admin approval.',
+      agency 
+    }, 201);
   } catch (error: any) {
     sendError(res, error.message);
   }
@@ -133,7 +171,34 @@ export const getAgencyDashboard = async (req: Request, res: Response) => {
       return sendError(res, 'Agency not found', 404);
     }
 
-    // Get booking stats
+    // Check verification status
+    if (agency.verificationStatus === 'pending') {
+      return sendSuccess(res, {
+        status: 'pending',
+        message: 'Your partner registration is under review. Please wait for admin approval.',
+        agency: {
+          name: agency.name,
+          email: agency.email,
+          verificationStatus: agency.verificationStatus,
+          submittedAt: agency.createdAt
+        }
+      });
+    }
+
+    if (agency.verificationStatus === 'rejected') {
+      return sendSuccess(res, {
+        status: 'rejected',
+        message: 'Your partner registration was rejected.',
+        rejectionReason: agency.rejectionReason || 'Please contact admin for more details.',
+        agency: {
+          name: agency.name,
+          email: agency.email,
+          verificationStatus: agency.verificationStatus
+        }
+      });
+    }
+
+    // Get booking stats (only for approved agencies)
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
@@ -157,6 +222,7 @@ export const getAgencyDashboard = async (req: Request, res: Response) => {
       .limit(5);
 
     sendSuccess(res, {
+      status: 'approved',
       agency,
       stats: {
         todayBookings,

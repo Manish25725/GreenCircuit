@@ -21,6 +21,13 @@ export interface IAgency extends Document {
       lng: number;
     };
   };
+  // Partner Registration Details
+  gstNumber?: string;
+  udyamCertificate?: string;
+  headName?: string;
+  businessType?: string;
+  establishedYear?: number;
+  // End Partner Registration Details
   services: string[];
   certifications: string[];
   rating: number;
@@ -31,6 +38,7 @@ export interface IAgency extends Document {
   isVerified: boolean;
   verificationStatus: 'pending' | 'approved' | 'rejected';
   verificationDocuments: string[];
+  rejectionReason?: string;
   operatingHours: {
     day: string;
     open: string;
@@ -84,6 +92,27 @@ const AgencySchema = new Schema<IAgency>({
       lng: Number
     }
   },
+  // Partner Registration Details
+  gstNumber: {
+    type: String,
+    trim: true
+  },
+  udyamCertificate: {
+    type: String,
+    trim: true
+  },
+  headName: {
+    type: String,
+    trim: true
+  },
+  businessType: {
+    type: String,
+    trim: true
+  },
+  establishedYear: {
+    type: Number
+  },
+  // End Partner Registration Details
   services: [{
     type: String,
   }],
@@ -120,6 +149,10 @@ const AgencySchema = new Schema<IAgency>({
     default: 'pending'
   },
   verificationDocuments: [String],
+  rejectionReason: {
+    type: String,
+    default: ''
+  },
   operatingHours: [{
     day: String,
     open: String,

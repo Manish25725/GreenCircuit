@@ -174,6 +174,105 @@ export const getAllAgencies = async (req: Request, res: Response) => {
   }
 };
 
+// Get agency details for verification (admin)
+export const getAgencyForVerification = async (req: Request, res: Response) => {
+  try {
+    const agency = await Agency.findById(req.params.id)
+      .populate('userId', 'name email phone createdAt');
+
+    if (!agency) {
+      return sendError(res, 'Agency not found', 404);
+    }
+
+    sendSuccess(res, agency);
+  } catch (error: any) {
+    sendError(res, error.message);
+  }
+};
+
+// Approve partner registration (admin)
+export const approvePartnerRegistration = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { notes } = req.body;
+
+    const agency = await Agency.findById(id).populate('userId', 'name email');
+    
+    if (!agency) {
+      return sendError(res, 'Agency not found', 404);
+    }
+
+    if (agency.verificationStatus !== 'pending') {
+      return sendError(res, `Agency is already ${agency.verificationStatus}`, 400);
+    }
+
+    // Update agency status
+    agency.verificationStatus = 'approved';
+    agency.isVerified = true;
+    await agency.save();
+
+    // Create notification for agency user
+    await Notification.create({
+      userId: agency.userId,
+      type: 'account',
+      title: 'Partner Registration Approved',
+      message: `Congratulations! Your partner registration has been approved. You can now access your partner dashboard.${notes ? ` Note: ${notes}` : ''}`,
+      priority: 'high'
+    });
+
+    sendSuccess(res, { 
+      message: 'Partner registration approved successfully',
+      agency 
+    });
+  } catch (error: any) {
+    sendError(res, error.message);
+  }
+};
+
+// Reject partner registration (admin)
+export const rejectPartnerRegistration = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { reason } = req.body;
+
+    if (!reason) {
+      return sendError(res, 'Rejection reason is required', 400);
+    }
+
+    const agency = await Agency.findById(id).populate('userId', 'name email');
+    
+    if (!agency) {
+      return sendError(res, 'Agency not found', 404);
+    }
+
+    if (agency.verificationStatus !== 'pending') {
+      return sendError(res, `Agency is already ${agency.verificationStatus}`, 400);
+    }
+
+    // Update agency status
+    agency.verificationStatus = 'rejected';
+    agency.isVerified = false;
+    agency.rejectionReason = reason;
+    await agency.save();
+
+    // Create notification for agency user
+    await Notification.create({
+      userId: agency.userId,
+      type: 'account',
+      title: 'Partner Registration Rejected',
+      message: `Your partner registration has been rejected. Reason: ${reason}. Please contact support for more information.`,
+      priority: 'high'
+    });
+
+    sendSuccess(res, { 
+      message: 'Partner registration rejected',
+      agency 
+    });
+  } catch (error: any) {
+    sendError(res, error.message);
+  }
+};
+
 // Get platform reports
 export const getReports = async (req: Request, res: Response) => {
   try {
