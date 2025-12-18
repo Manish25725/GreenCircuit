@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { api } from '../services/api';
 
 const PartnerRegistration: React.FC = () => {
-  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [formData, setFormData] = useState({
@@ -82,7 +80,7 @@ const PartnerRegistration: React.FC = () => {
       await api.post('/agency/create', formData);
       
       // Redirect to pending status page
-      navigate('/partner/pending');
+      window.location.hash = '#/partner/pending';
     } catch (err: any) {
       setError(err.response?.data?.message || err.message || 'Failed to submit registration');
     } finally {
@@ -345,7 +343,7 @@ const PartnerRegistration: React.FC = () => {
             <div className="flex justify-end space-x-4 pt-6">
               <button
                 type="button"
-                onClick={() => navigate(-1)}
+                onClick={() => window.history.back()}
                 className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
               >
                 Cancel

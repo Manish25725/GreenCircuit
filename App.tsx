@@ -51,7 +51,7 @@ const App = () => {
   // Check if user can access a route based on their role
   const canAccessRoute = (path: string, userRole: string | null): boolean => {
     // Public routes - anyone can access
-    const publicRoutes = ['#/', '#/login', '#/contact', '#/how-it-works', '#/about', '#/partner/register', '#/partner/pending'];
+    const publicRoutes = ['#/', '#/login', '#/contact', '#/how-it-works', '#/about', '#/partner/register', '#/partner/pending', '#/admin'];
     if (publicRoutes.includes(path)) return true;
 
     // If no user is logged in, they can only access public routes
@@ -77,10 +77,10 @@ const App = () => {
       return userRole === 'business';
     }
 
-    // Common routes accessible by all logged-in users (user, business, agency)
+    // Common routes accessible by all logged-in users (user, business, agency, admin)
     const commonRoutes = ['#/profile', '#/notifications', '#/security', '#/settings'];
     if (commonRoutes.some(r => path.startsWith(r))) {
-      return userRole === 'user' || userRole === 'business' || userRole === 'agency';
+      return userRole === 'user' || userRole === 'business' || userRole === 'agency' || userRole === 'admin';
     }
 
     // User-only routes (dashboard, rewards, etc.)
@@ -150,10 +150,8 @@ const App = () => {
       // If logged in but trying to access wrong dashboard, redirect to correct one
       if (userRole) {
         const correctDashboard = getDashboardForRole(userRole);
-        if (basePath !== correctDashboard) {
-          window.location.hash = correctDashboard;
-          return null;
-        }
+        window.location.hash = correctDashboard;
+        return null;
       } else {
         // Not logged in, redirect to login for protected routes
         const publicRoutes = ['#/', '#/login', '#/contact', '#/how-it-works', '#/about'];
@@ -168,7 +166,12 @@ const App = () => {
       case '#/agency':
         return <AgencyDashboard />;
       case '#/agency/slots':
-        returnpartner/register':
+        return <ManageSlots />;
+      case '#/agency/bookings':
+        return <AgencyBookings />;
+      case '#/agency/profile':
+        return <AgencyProfile />;
+      case '#/partner/register':
         return <PartnerRegistration />;
       case '#/partner/pending':
         return <PartnerPending />;
@@ -197,12 +200,7 @@ const App = () => {
       case '#/admin/agencies':
         return <AdminAgencies />;
       case '#/admin/partners':
-        return <AdminPartnerApproval
-        return <AdminVetting />;
-      case '#/admin/users':
-        return <AdminUsers />;
-      case '#/admin/agencies':
-        return <AdminAgencies />;
+        return <AdminPartnerApproval />;
       case '#/admin/reports':
         return <AdminReports />;
       case '#/login':

@@ -20,7 +20,8 @@ const Login = () => {
       const roleMap: Record<string, string> = {
         'resident': 'user',
         'business': 'business', 
-        'partner': 'agency'
+        'partner': 'agency',
+        'admin': 'admin'
       };
       const backendRole = roleMap[role] || 'user';
 

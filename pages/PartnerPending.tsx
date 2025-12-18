@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { api } from '../services/api';
 
 const PartnerPending: React.FC = () => {
-  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [agency, setAgency] = useState<any>(null);
   const [status, setStatus] = useState<'pending' | 'approved' | 'rejected'>('pending');
@@ -25,13 +23,13 @@ const PartnerPending: React.FC = () => {
         setRejectionReason(data.rejectionReason || '');
       } else if (data.status === 'approved') {
         // If approved, redirect to agency dashboard
-        navigate('/agency/dashboard');
+        window.location.hash = '#/agency';
       }
     } catch (error: any) {
       console.error('Failed to check status:', error);
       // If no agency found, redirect to registration
       if (error.response?.status === 404) {
-        navigate('/partner/register');
+        window.location.hash = '#/partner/register';
       }
     } finally {
       setLoading(false);
@@ -39,11 +37,11 @@ const PartnerPending: React.FC = () => {
   };
 
   const handleContactSupport = () => {
-    navigate('/contact-us');
+    window.location.hash = '#/contact';
   };
 
   const handleReapply = () => {
-    navigate('/partner/register');
+    window.location.hash = '#/partner/register';
   };
 
   if (loading) {
@@ -110,7 +108,7 @@ const PartnerPending: React.FC = () => {
               Contact Support
             </button>
             <button
-              onClick={() => navigate('/')}
+              onClick={() => window.location.hash = '#/'}
               className="w-full px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
             >
               Return to Home
@@ -257,7 +255,7 @@ const PartnerPending: React.FC = () => {
 
         <div className="mt-6 text-center">
           <button
-            onClick={() => navigate('/')}
+            onClick={() => window.location.hash = '#/'}
             className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
           >
             Return to Home
