@@ -3,12 +3,15 @@ import Layout from '../components/Layout';
 import ProfileHeader from '../components/ProfileHeader';
 import ProfileSidebar from '../components/ProfileSidebar';
 import { api, getCurrentUser } from '../services/api';
+import { useLanguage } from '../contexts/LanguageContext';
+import { Language } from '../i18n/translations';
 
 const AppSettings = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const { language, setLanguage, t } = useLanguage();
   const [settings, setSettings] = useState({
-    language: 'en',
+    language: language,
     theme: 'dark',
     locationAccess: true,
     notificationsPermission: true
@@ -18,6 +21,11 @@ const AppSettings = () => {
   useEffect(() => {
     loadSettings();
   }, []);
+  
+  useEffect(() => {
+    // Update local settings when global language changes
+    setSettings(prev => ({ ...prev, language }));
+  }, [language]);
 
   const loadSettings = async () => {
     try {
@@ -40,14 +48,15 @@ const AppSettings = () => {
     }
   };
 
-  const handleLanguageChange = async (language: string) => {
+  const handleLanguageChange = async (lang: string) => {
     const previousLanguage = settings.language;
     try {
       setSaving(true);
-      setSettings(prev => ({ ...prev, language }));
+      setSettings(prev => ({ ...prev, language: lang }));
+      setLanguage(lang as Language); // Update global language
       
       const appSettings = {
-        language,
+        language: lang,
         theme: settings.theme,
         emailDigest: preferences?.app?.emailDigest || 'weekly',
         autoBackup: preferences?.app?.autoBackup !== false
@@ -68,13 +77,14 @@ const AppSettings = () => {
       // Show success feedback
       const notification = document.createElement('div');
       notification.className = 'fixed top-24 right-4 bg-[#10b981] text-white px-6 py-3 rounded-lg shadow-lg z-50';
-      notification.textContent = 'Language preference saved!';
+      notification.textContent = t('languageSaved');
       document.body.appendChild(notification);
       setTimeout(() => notification.remove(), 3000);
     } catch (error) {
       console.error('Failed to update language:', error);
       setSettings(prev => ({ ...prev, language: previousLanguage }));
-      alert('Failed to update language. Please try again.');
+      setLanguage(previousLanguage as Language); // Rollback global language
+      alert(t('updateFailed'));
     } finally {
       setSaving(false);
     }
@@ -109,33 +119,28 @@ const AppSettings = () => {
       // Show success feedback
       const notification = document.createElement('div');
       notification.className = 'fixed top-24 right-4 bg-[#10b981] text-white px-6 py-3 rounded-lg shadow-lg z-50';
-      notification.textContent = 'Theme preference saved!';
+      notification.textContent = t('themeSaved');
       document.body.appendChild(notification);
       setTimeout(() => notification.remove(), 3000);
     } catch (error) {
       console.error('Failed to update theme:', error);
       setSettings(prev => ({ ...prev, theme: previousTheme }));
-      alert('Failed to update theme. Please try again.');
-    } finally {
-      setSaving(false);
-    }
-  };
-      alert('Failed to update theme. Please try again.');
+      alert(t('updateFailed'));
     } finally {
       setSaving(false);
     }
   };
 
   const handleClearCache = () => {
-    if (confirm('Are you sure you want to clear the cache? This will remove temporary data and may require reloading.')) {
+    if (window.confirm(t('cacheClearConfirm'))) {
       localStorage.removeItem('agenciesCache');
       localStorage.removeItem('bookingsCache');
-      alert('Cache cleared successfully!');
+      alert(t('cacheCleared'));
     }
   };
 
   const handleLogout = () => {
-    if (confirm('Are you sure you want to log out?')) {
+    if (window.confirm(t('logoutConfirm'))) {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
       window.location.hash = '#/';
@@ -174,20 +179,20 @@ const AppSettings = () => {
                     <div className="flex flex-col gap-8">
                         <div className="flex flex-wrap justify-between gap-3 border-b border-white/5 pb-6">
                             <div className="flex flex-col gap-1">
-                                <p className="text-white text-2xl font-bold leading-tight tracking-[-0.033em]">App Settings</p>
-                                <p className="text-[#94a3b8] text-base font-normal leading-normal">Customize your app experience, manage permissions, and view legal info.</p>
+                                <p className="text-white text-2xl font-bold leading-tight tracking-[-0.033em]">{t('appSettings')}</p>
+                                <p className="text-[#94a3b8] text-base font-normal leading-normal">{t('appSettingsDesc')}</p>
                             </div>
                         </div>
-                        <div className="flex flex-col gap-8">
+                        <div className="flex flex-col gap-8">\
                             
                             {/* General Preferences */}
                             <section className="flex flex-col gap-5">
-                                <h3 className="text-white text-lg font-bold leading-tight">General Preferences</h3>
+                                <h3 className="text-white text-lg font-bold leading-tight">{t('generalPreferences')}</h3>
                                 <div className="grid gap-6">
                                     <div className="flex items-center justify-between p-4 bg-[#0B1116]/50 rounded-lg border border-white/5">
                                         <div className="flex flex-col gap-1">
-                                            <span className="text-white font-medium text-base">Language Selection</span>
-                                            <span className="text-[#94a3b8] text-sm">Choose the language for the application interface.</span>
+                                            <span className="text-white font-medium text-base">{t('languageSelection')}</span>
+                                            <span className="text-[#94a3b8] text-sm">{t('languageDesc')}</span>
                                         </div>
                                         <select 
                                             value={settings.language}
@@ -203,11 +208,11 @@ const AppSettings = () => {
                                     </div>
                                     <div className="flex items-center justify-between p-4 bg-[#0B1116]/50 rounded-lg border border-white/5">
                                         <div className="flex flex-col gap-1">
-                                            <span className="text-white font-medium text-base">Display Theme</span>
-                                            <span className="text-[#94a3b8] text-sm">Switch between dark and light appearance.</span>
+                                            <span className="text-white font-medium text-base">{t('displayTheme')}</span>
+                                            <span className="text-[#94a3b8] text-sm">{t('themeDesc')}</span>
                                         </div>
                                         <div className="flex items-center gap-3">
-                                            <span className="text-[#94a3b8] text-sm font-medium">Light</span>
+                                            <span className="text-[#94a3b8] text-sm font-medium">{t('light')}</span>
                                             <label className="relative inline-flex items-center cursor-pointer">
                                                 <input 
                                                     checked={settings.theme === 'dark'}
@@ -217,7 +222,7 @@ const AppSettings = () => {
                                                 />
                                                 <div className="w-11 h-6 bg-[#0B1116] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#10b981] border border-white/10"></div>
                                             </label>
-                                            <span className="text-white text-sm font-medium">Dark</span>
+                                            <span className="text-white text-sm font-medium">{t('dark')}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -225,7 +230,7 @@ const AppSettings = () => {
 
                             {/* Permissions */}
                             <section className="flex flex-col gap-5">
-                                <h3 className="text-white text-lg font-bold leading-tight">Permissions</h3>
+                                <h3 className="text-white text-lg font-bold leading-tight">{t('permissions')}</h3>
                                 <div className="flex flex-col gap-1 bg-[#0B1116]/50 rounded-lg border border-white/5 divide-y divide-white/5">
                                     <div className="flex items-center justify-between p-4">
                                         <div className="flex gap-4 items-center">
@@ -233,8 +238,8 @@ const AppSettings = () => {
                                                 <span className="material-symbols-outlined">location_on</span>
                                             </div>
                                             <div className="flex flex-col">
-                                                <span className="text-white font-medium">Location Access</span>
-                                                <span className="text-[#94a3b8] text-sm">Allow app to access your location for pickups.</span>
+                                                <span className="text-white font-medium">{t('locationAccess')}</span>
+                                                <span className="text-[#94a3b8] text-sm">{t('locationDesc')}</span>
                                             </div>
                                         </div>
                                         <label className="relative inline-flex items-center cursor-pointer">
@@ -253,8 +258,8 @@ const AppSettings = () => {
                                                 <span className="material-symbols-outlined">notifications</span>
                                             </div>
                                             <div className="flex flex-col">
-                                                <span className="text-white font-medium">Notifications</span>
-                                                <span className="text-[#94a3b8] text-sm">Receive updates on pickups and rewards.</span>
+                                                <span className="text-white font-medium">{t('notificationsPermission')}</span>
+                                                <span className="text-[#94a3b8] text-sm">{t('notificationsDesc')}</span>
                                             </div>
                                         </div>
                                         <label className="relative inline-flex items-center cursor-pointer">
@@ -272,24 +277,24 @@ const AppSettings = () => {
 
                             {/* Data & Storage */}
                             <section className="flex flex-col gap-5">
-                                <h3 className="text-white text-lg font-bold leading-tight">Data & Storage</h3>
+                                <h3 className="text-white text-lg font-bold leading-tight">{t('dataManagement')}</h3>
                                 <div className="flex items-center justify-between p-4 bg-[#0B1116]/50 rounded-lg border border-white/5">
                                     <div className="flex flex-col gap-1">
-                                        <span className="text-white font-medium text-base">Cache Management</span>
-                                        <span className="text-[#94a3b8] text-sm">Clear temporary application data to free up space (145 MB).</span>
+                                        <span className="text-white font-medium text-base">{t('clearCache')}</span>
+                                        <span className="text-[#94a3b8] text-sm">{t('clearCacheDesc')}</span>
                                     </div>
                                     <button 
                                         onClick={handleClearCache}
                                         className="flex cursor-pointer items-center justify-center rounded-lg h-9 px-4 bg-[#151F26] hover:bg-white/5 border border-white/10 text-white text-sm font-medium transition-colors"
                                     >
-                                        Clear Cache
+                                        {t('clearCacheBtn')}
                                     </button>
                                 </div>
                             </section>
 
                             {/* Legal & Support */}
                             <section className="flex flex-col gap-5">
-                                <h3 className="text-white text-lg font-bold leading-tight">Legal & Support</h3>
+                                <h3 className="text-white text-lg font-bold leading-tight">{t('legal')}</h3>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <button 
                                         onClick={() => window.location.hash = '#/about'}
@@ -299,11 +304,11 @@ const AppSettings = () => {
                                         <span className="material-symbols-outlined text-[#94a3b8] group-hover:text-[#10b981] transition-colors">chevron_right</span>
                                     </button>
                                     <button className="flex items-center justify-between p-4 bg-[#0B1116]/50 rounded-lg border border-white/5 hover:bg-[#151F26] transition-colors group cursor-pointer">
-                                        <span className="text-white font-medium">Terms & Conditions</span>
+                                        <span className="text-white font-medium">{t('termsOfService')}</span>
                                         <span className="material-symbols-outlined text-[#94a3b8] group-hover:text-[#10b981] transition-colors">chevron_right</span>
                                     </button>
                                     <button className="flex items-center justify-between p-4 bg-[#0B1116]/50 rounded-lg border border-white/5 hover:bg-[#151F26] transition-colors group cursor-pointer">
-                                        <span className="text-white font-medium">Privacy Policy</span>
+                                        <span className="text-white font-medium">{t('privacyPolicy')}</span>
                                         <span className="material-symbols-outlined text-[#94a3b8] group-hover:text-[#10b981] transition-colors">chevron_right</span>
                                     </button>
                                     <button 
@@ -322,7 +327,7 @@ const AppSettings = () => {
                                     className="w-full flex cursor-pointer items-center justify-center rounded-lg h-12 px-6 bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/20 text-base font-bold transition-colors gap-2"
                                 >
                                     <span className="material-symbols-outlined">logout</span>
-                                    Log Out of Application
+                                    {t('logoutBtn')}
                                 </button>
                             </section>
                         </div>
