@@ -9,17 +9,31 @@ interface UserProfile {
   phone?: string;
   address?: string;
   avatar?: string;
+  role?: string;
 }
 
 const Profile = () => {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
-    address: ''
+    address: '',
+    avatar: ''
   });
+
+  // Helper to get address as string
+  const getAddressString = (address: any): string => {
+    if (!address) return '';
+    if (typeof address === 'string') return address;
+    if (typeof address === 'object') {
+      const { street, city, state, zipCode } = address;
+      return [street, city, state, zipCode].filter(Boolean).join(', ');
+    }
+    return '';
+  };
 
   useEffect(() => {
     loadUserProfile();
@@ -34,13 +48,71 @@ const Profile = () => {
         setFormData({
           name: currentUser.name || '',
           phone: currentUser.phone || '',
-          address: currentUser.address || ''
+          address: getAddressString(currentUser.address),
+          avatar: currentUser.avatar || ''
         });
       }
     } catch (error) {
       console.error('Failed to load user profile:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      alert('Please select an image file');
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Image size should be less than 5MB');
+      return;
+    }
+
+    try {
+      setUploadingAvatar(true);
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('upload_preset', 'ml_default'); // You may need to create this in Cloudinary
+      formData.append('cloud_name', 'dideet7oz');
+
+      const response = await fetch(
+        'https://api.cloudinary.com/v1_1/dideet7oz/image/upload',
+        {
+          method: 'POST',
+          body: formData
+        }
+      );
+
+      const data = await response.json();
+      
+      if (data.secure_url) {
+        // Update avatar in the form
+        setFormData(prev => ({ ...prev, avatar: data.secure_url }));
+        
+        // Immediately save the avatar
+        const updateResponse = await api.auth.updateProfile({ avatar: data.secure_url });
+        if (updateResponse.data) {
+          setUser(updateResponse.data);
+          // Update localStorage
+          const storedUser = localStorage.getItem('user');
+          if (storedUser) {
+            const userData = JSON.parse(storedUser);
+            localStorage.setItem('user', JSON.stringify({ ...userData, ...updateResponse.data }));
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Failed to upload avatar:', error);
+      alert('Failed to upload avatar. Please try again.');
+    } finally {
+      setUploadingAvatar(false);
     }
   };
 
@@ -115,8 +187,11 @@ const Profile = () => {
                     onClick={() => window.location.hash = '#/profile'}
                     className="hidden sm:flex items-center gap-3 pl-1 pr-4 py-1 rounded-full bg-[#151F26] border border-white/5 hover:bg-white/5 transition-colors group cursor-pointer"
                 >
-                    <div className="size-8 rounded-full bg-cover bg-center ring-2 ring-white/10 group-hover:ring-[#10b981]/50 transition-all" style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuAreboopkKSy4YYDs4PFvd-l4xnboU1-dCb6q7kuogZsIpVK9icd7CNdE17iE4uQKdoqiJuI30CTaWxw7GK3QrR7H_FstEqPZBbUqkey_74QXoP8uhTfR9RY780_K4O8UAQpRMWJiKbRdh5-SdE7JAIX5lG3yPPg3Wisf3RGrXHACYJxJFU0vYynDCqaru_FI7DW3EV-buSFuzGK8Z7LP7p7c25u8kqkBUXlt5pQG5d-4WVmAzmNX9U0trABs1cC--zDVlgdRcgww")' }}></div>
-                    <span className="text-sm font-medium text-gray-200">Alex Morgan</span>
+                    <div 
+                      className="size-8 rounded-full bg-cover bg-center ring-2 ring-white/10 group-hover:ring-[#10b981]/50 transition-all" 
+                      style={{ backgroundImage: `url("${formData.avatar || user?.avatar || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user?.name || 'User') + '&background=10b981&color=fff'}")` }}
+                    ></div>
+                    <span className="text-sm font-medium text-gray-200">{user?.name || 'User'}</span>
                 </button>
                 <button className="relative p-2.5 rounded-full bg-[#151F26] border border-white/5 text-gray-400 hover:text-white hover:bg-white/10 transition-colors">
                     <span className="absolute top-2.5 right-3 size-2 bg-red-500 rounded-full border-2 border-[#151F26]"></span>
@@ -134,15 +209,26 @@ const Profile = () => {
                     <div className="flex items-center gap-3">
                     <div className="relative">
                         <div 
-                        className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-12" 
-                        style={{ backgroundImage: `url("${user?.avatar || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user?.name || 'User') + '&background=10b981&color=fff'}")` }}
+                        className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-14" 
+                        style={{ backgroundImage: `url("${formData.avatar || user?.avatar || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user?.name || 'User') + '&background=10b981&color=fff'}")` }}
                         ></div>
-                        <button className="absolute -bottom-1 -right-1 flex items-center justify-center size-6 bg-[#10b981] rounded-full text-[#0B1116] hover:bg-opacity-90 cursor-pointer">
-                        <span className="material-symbols-outlined text-base">edit</span>
-                        </button>
+                        <label className="absolute -bottom-1 -right-1 flex items-center justify-center size-7 bg-[#10b981] rounded-full text-[#0B1116] hover:bg-[#059669] cursor-pointer transition-colors shadow-lg">
+                          {uploadingAvatar ? (
+                            <div className="w-4 h-4 border-2 border-[#0B1116] border-t-transparent rounded-full animate-spin"></div>
+                          ) : (
+                            <span className="material-symbols-outlined text-base">photo_camera</span>
+                          )}
+                          <input 
+                            type="file" 
+                            accept="image/*" 
+                            className="hidden" 
+                            onChange={handleAvatarUpload}
+                            disabled={uploadingAvatar}
+                          />
+                        </label>
                     </div>
                     <div className="flex flex-col">
-                        <h1 className="text-white text-base font-medium leading-normal">{user?.name || 'User'}</h1>
+                        <h1 className="text-white text-base font-semibold leading-normal">{user?.name || 'User'}</h1>
                         <p className="text-[#94a3b8] text-sm font-normal leading-normal">{user?.email || ''}</p>
                     </div>
                     </div>

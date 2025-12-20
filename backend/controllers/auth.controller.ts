@@ -100,3 +100,136 @@ export const updateProfile = async (req: Request, res: Response) => {
     sendError(res, error.message);
   }
 };
+
+// Update notification preferences
+export const updateNotificationPreferences = async (req: Request, res: Response) => {
+  try {
+    const { notifications } = req.body;
+    const user = await User.findByIdAndUpdate(
+      (req as any).user.id,
+      { 'preferences.notifications': notifications },
+      { new: true, runValidators: true }
+    );
+    if (!user) {
+      return sendError(res, 'User not found', 404);
+    }
+    sendSuccess(res, { preferences: user.preferences });
+  } catch (error: any) {
+    sendError(res, error.message);
+  }
+};
+
+// Update privacy settings
+export const updatePrivacySettings = async (req: Request, res: Response) => {
+  try {
+    const { privacy } = req.body;
+    const user = await User.findByIdAndUpdate(
+      (req as any).user.id,
+      { 'preferences.privacy': privacy },
+      { new: true, runValidators: true }
+    );
+    if (!user) {
+      return sendError(res, 'User not found', 404);
+    }
+    sendSuccess(res, { preferences: user.preferences });
+  } catch (error: any) {
+    sendError(res, error.message);
+  }
+};
+
+// Update app settings
+export const updateAppSettings = async (req: Request, res: Response) => {
+  try {
+    const { app } = req.body;
+    const user = await User.findByIdAndUpdate(
+      (req as any).user.id,
+      { 'preferences.app': app },
+      { new: true, runValidators: true }
+    );
+    if (!user) {
+      return sendError(res, 'User not found', 404);
+    }
+    sendSuccess(res, { preferences: user.preferences });
+  } catch (error: any) {
+    sendError(res, error.message);
+  }
+};
+
+// Change password
+export const changePassword = async (req: Request, res: Response) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    
+    if (!currentPassword || !newPassword) {
+      return sendError(res, 'Please provide current and new password', 400);
+    }
+
+    if (newPassword.length < 6) {
+      return sendError(res, 'New password must be at least 6 characters', 400);
+    }
+
+    const user: any = await User.findById((req as any).user.id).select('+password');
+    
+    if (!user) {
+      return sendError(res, 'User not found', 404);
+    }
+
+    // Verify current password
+    const isMatch = await user.matchPassword(currentPassword);
+    if (!isMatch) {
+      return sendError(res, 'Current password is incorrect', 401);
+    }
+
+    // Update password
+    user.password = newPassword;
+    await user.save();
+
+    sendSuccess(res, { message: 'Password updated successfully' });
+  } catch (error: any) {
+    sendError(res, error.message);
+  }
+};
+
+// Enable/Disable Two-Factor Authentication
+export const toggleTwoFactor = async (req: Request, res: Response) => {
+  try {
+    const { enabled } = req.body;
+    
+    const updateData: any = { twoFactorEnabled: enabled };
+    
+    // If disabling, clear the secret
+    if (!enabled) {
+      updateData.twoFactorSecret = undefined;
+    }
+
+    const user = await User.findByIdAndUpdate(
+      (req as any).user.id,
+      updateData,
+      { new: true, runValidators: true }
+    );
+
+    if (!user) {
+      return sendError(res, 'User not found', 404);
+    }
+
+    sendSuccess(res, { 
+      twoFactorEnabled: user.twoFactorEnabled,
+      message: enabled ? 'Two-factor authentication enabled' : 'Two-factor authentication disabled'
+    });
+  } catch (error: any) {
+    sendError(res, error.message);
+  }
+};
+
+// Get user preferences
+export const getPreferences = async (req: Request, res: Response) => {
+  try {
+    const user = await User.findById((req as any).user.id);
+    if (!user) {
+      return sendError(res, 'User not found', 404);
+    }
+    sendSuccess(res, { preferences: user.preferences || {} });
+  } catch (error: any) {
+    sendError(res, error.message);
+  }
+};

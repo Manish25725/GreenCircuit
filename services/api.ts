@@ -11,6 +11,13 @@ export interface User {
   email: string;
   role: 'user' | 'agency' | 'business' | 'admin';
   avatar?: string;
+  phone?: string;
+  address?: string | {
+    street: string;
+    city: string;
+    state: string;
+    zipCode: string;
+  };
   ecoPoints: number;
   totalWasteRecycled: number;
   totalPickups: number;

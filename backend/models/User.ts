@@ -8,16 +8,37 @@ export interface IUser extends mongoose.Document {
   role: 'user' | 'agency' | 'business' | 'admin';
   avatar?: string;
   phone?: string;
-  address?: {
-    street: string;
-    city: string;
-    state: string;
-    zipCode: string;
-  };
+  address?: any;
   ecoPoints: number;
   totalWasteRecycled: number;
   totalPickups: number;
   isVerified: boolean;
+  preferences?: {
+    notifications: {
+      pickupReminders: boolean;
+      statusUpdates: boolean;
+      rewardPoints: boolean;
+      promotions: boolean;
+      newsletter: boolean;
+      emailNotifications: boolean;
+      pushNotifications: boolean;
+      smsNotifications: boolean;
+    };
+    privacy: {
+      profileVisibility: 'public' | 'private';
+      showEmail: boolean;
+      showPhone: boolean;
+      dataSharing: boolean;
+    };
+    app: {
+      language: string;
+      theme: 'light' | 'dark' | 'auto';
+      emailDigest: 'daily' | 'weekly' | 'monthly' | 'never';
+      autoBackup: boolean;
+    };
+  };
+  twoFactorEnabled?: boolean;
+  twoFactorSecret?: string;
   matchPassword(enteredPassword: string): Promise<boolean>;
 }
 
@@ -32,16 +53,37 @@ const userSchema = new mongoose.Schema({
   },
   avatar: { type: String, default: '' },
   phone: { type: String },
-  address: {
-    street: String,
-    city: String,
-    state: String,
-    zipCode: String
-  },
+  address: mongoose.Schema.Types.Mixed, // Support both string and object
   ecoPoints: { type: Number, default: 0 },
   totalWasteRecycled: { type: Number, default: 0 },
   totalPickups: { type: Number, default: 0 },
-  isVerified: { type: Boolean, default: false }
+  isVerified: { type: Boolean, default: false },
+  preferences: {
+    notifications: {
+      pickupReminders: { type: Boolean, default: true },
+      statusUpdates: { type: Boolean, default: true },
+      rewardPoints: { type: Boolean, default: true },
+      promotions: { type: Boolean, default: false },
+      newsletter: { type: Boolean, default: false },
+      emailNotifications: { type: Boolean, default: true },
+      pushNotifications: { type: Boolean, default: true },
+      smsNotifications: { type: Boolean, default: false }
+    },
+    privacy: {
+      profileVisibility: { type: String, enum: ['public', 'private'], default: 'public' },
+      showEmail: { type: Boolean, default: false },
+      showPhone: { type: Boolean, default: false },
+      dataSharing: { type: Boolean, default: true }
+    },
+    app: {
+      language: { type: String, default: 'en' },
+      theme: { type: String, enum: ['light', 'dark', 'auto'], default: 'dark' },
+      emailDigest: { type: String, enum: ['daily', 'weekly', 'monthly', 'never'], default: 'weekly' },
+      autoBackup: { type: Boolean, default: true }
+    }
+  },
+  twoFactorEnabled: { type: Boolean, default: false },
+  twoFactorSecret: { type: String, select: false }
 }, {
   timestamps: true,
 });

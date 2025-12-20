@@ -16,7 +16,20 @@ const ContactUs = () => {
             </div>
         </header>
 
-        <main className="flex-1 px-4 py-10 sm:px-10 lg:px-40 lg:py-20">
+        {/* Back Button */}
+        <div className="w-full max-w-[960px] mx-auto px-4 sm:px-10 lg:px-0 pt-6">
+            <button 
+                onClick={() => window.history.back()}
+                className="group flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-slate-400 hover:text-[#34D399] hover:border-[#34D399]/30 hover:bg-[#34D399]/10 transition-all duration-300 cursor-pointer backdrop-blur-sm"
+            >
+                <svg className="w-4 h-4 transition-transform duration-300 group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+                <span className="text-sm font-medium">Back</span>
+            </button>
+        </div>
+
+        <main className="flex-1 px-4 py-6 sm:px-10 lg:px-40 lg:py-14">
           <div className="mx-auto flex max-w-[960px] flex-col gap-10">
             <div className="flex min-w-72 flex-col gap-3">
               <p className="text-white text-4xl font-black leading-tight tracking-tight md:text-5xl">Get in Touch</p>

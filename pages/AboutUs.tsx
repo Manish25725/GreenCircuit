@@ -9,12 +9,6 @@ const AboutUs = () => {
             <div className="w-full max-w-7xl px-4 sm:px-6 relative z-10">
                 <header className="flex items-center justify-between h-16 sm:h-20">
                     <div className="flex items-center gap-3">
-                        <div className="flex items-center gap-2 cursor-pointer mr-4" onClick={() => window.history.back()}>
-                            <svg className="w-5 h-5 text-[#34D399]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                            </svg>
-                            <span className="text-slate-400 hover:text-[#34D399] text-sm font-medium">Back</span>
-                        </div>
                         <div className="flex items-center gap-3 cursor-pointer" onClick={() => window.location.hash = '#/'}>
                         <div className="size-8 sm:size-10 text-[#34D399] flex items-center justify-center">
                             <svg className="w-full h-full drop-shadow-[0_0_8px_rgba(52,211,153,0.5)]" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
@@ -48,8 +42,21 @@ const AboutUs = () => {
             </div>
         </div>
 
+        {/* Back Button */}
+        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 pt-24 sm:pt-28">
+            <button 
+                onClick={() => window.history.back()}
+                className="group flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-slate-400 hover:text-[#34D399] hover:border-[#34D399]/30 hover:bg-[#34D399]/10 transition-all duration-300 cursor-pointer backdrop-blur-sm"
+            >
+                <svg className="w-4 h-4 transition-transform duration-300 group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+                <span className="text-sm font-medium">Back</span>
+            </button>
+        </div>
+
         {/* Main Content */}
-        <main className="flex-grow flex flex-col items-center pt-24 sm:pt-32">
+        <main className="flex-grow flex flex-col items-center pt-4 sm:pt-8">
             {/* Hero Section */}
             <section className="w-full max-w-7xl px-4 py-12 md:px-10 md:py-20">
                 <div className="relative overflow-hidden rounded-3xl bg-[#1E293B]/50 border border-white/5 shadow-2xl">

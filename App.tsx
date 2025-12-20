@@ -35,6 +35,7 @@ import BusinessDashboard from './pages/BusinessDashboard';
 import BusinessAnalytics from './pages/BusinessAnalytics';
 import PartnerRegistration from './pages/PartnerRegistration';
 import PartnerPending from './pages/PartnerPending';
+import Services from './pages/Services';
 
 const App = () => {
   const [route, setRoute] = useState(window.location.hash || '#/');
@@ -51,7 +52,7 @@ const App = () => {
   // Check if user can access a route based on their role
   const canAccessRoute = (path: string, userRole: string | null): boolean => {
     // Public routes - anyone can access
-    const publicRoutes = ['#/', '#/login', '#/contact', '#/how-it-works', '#/about', '#/partner/register', '#/partner/pending'];
+    const publicRoutes = ['#/', '#/login', '#/contact', '#/how-it-works', '#/about', '#/services', '#/partner/register', '#/partner/pending'];
     if (publicRoutes.includes(path)) return true;
 
     // Admin routes - anyone can access (no authentication required)
@@ -211,6 +212,8 @@ const App = () => {
         return <HowItWorks />;
       case '#/about':
         return <AboutUs />;
+      case '#/services':
+        return <Services />;
       case '#/profile':
         return <Profile />;
       case '#/notifications':
