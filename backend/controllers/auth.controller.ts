@@ -233,3 +233,38 @@ export const getPreferences = async (req: Request, res: Response) => {
     sendError(res, error.message);
   }
 };
+
+// Admin login with key
+export const adminLogin = async (req: Request, res: Response) => {
+  const { adminKey } = req.body;
+
+  try {
+    // Validate admin key against environment variable
+    if (adminKey !== process.env.ADMIN_KEY) {
+      return sendError(res, 'Invalid admin key', 401);
+    }
+
+    // Find or create admin user
+    let adminUser = await User.findOne({ role: 'admin', email: 'admin@ecocycle.com' });
+    
+    if (!adminUser) {
+      // Create default admin user if doesn't exist
+      adminUser = await User.create({
+        name: 'Administrator',
+        email: 'admin@ecocycle.com',
+        password: adminKey, // Use admin key as password
+        role: 'admin'
+      });
+    }
+
+    sendSuccess(res, {
+      _id: adminUser._id,
+      name: adminUser.name,
+      email: adminUser.email,
+      role: adminUser.role,
+      token: generateToken(adminUser._id.toString(), adminUser.role),
+    });
+  } catch (error: any) {
+    sendError(res, error.message);
+  }
+};
