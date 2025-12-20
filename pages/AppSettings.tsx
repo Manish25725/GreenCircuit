@@ -41,29 +41,88 @@ const AppSettings = () => {
   };
 
   const handleLanguageChange = async (language: string) => {
+    const previousLanguage = settings.language;
     try {
+      setSaving(true);
       setSettings(prev => ({ ...prev, language }));
-      await api.auth.updateAppSettings({
-        ...preferences?.app,
-        language
-      });
+      
+      const appSettings = {
+        language,
+        theme: settings.theme,
+        emailDigest: preferences?.app?.emailDigest || 'weekly',
+        autoBackup: preferences?.app?.autoBackup !== false
+      };
+      
+      const response = await api.auth.updateAppSettings(appSettings);
+      
+      if (response.data?.preferences?.app) {
+        setPreferences(response.data.preferences);
+        // Update settings state with saved values
+        setSettings(prev => ({
+          ...prev,
+          language: response.data.preferences.app.language,
+          theme: response.data.preferences.app.theme
+        }));
+      }
+      
+      // Show success feedback
+      const notification = document.createElement('div');
+      notification.className = 'fixed top-24 right-4 bg-[#10b981] text-white px-6 py-3 rounded-lg shadow-lg z-50';
+      notification.textContent = 'Language preference saved!';
+      document.body.appendChild(notification);
+      setTimeout(() => notification.remove(), 3000);
     } catch (error) {
       console.error('Failed to update language:', error);
-      alert('Failed to update language');
+      setSettings(prev => ({ ...prev, language: previousLanguage }));
+      alert('Failed to update language. Please try again.');
+    } finally {
+      setSaving(false);
     }
   };
 
   const handleThemeToggle = async (isDark: boolean) => {
+    const previousTheme = settings.theme;
     try {
+      setSaving(true);
       const theme = isDark ? 'dark' : 'light';
       setSettings(prev => ({ ...prev, theme }));
-      await api.auth.updateAppSettings({
-        ...preferences?.app,
-        theme
-      });
+      
+      const appSettings = {
+        language: settings.language,
+        theme,
+        emailDigest: preferences?.app?.emailDigest || 'weekly',
+        autoBackup: preferences?.app?.autoBackup !== false
+      };
+      
+      const response = await api.auth.updateAppSettings(appSettings);
+      
+      if (response.data?.preferences?.app) {
+        setPreferences(response.data.preferences);
+        // Update settings state with saved values
+        setSettings(prev => ({
+          ...prev,
+          language: response.data.preferences.app.language,
+          theme: response.data.preferences.app.theme
+        }));
+      }
+      
+      // Show success feedback
+      const notification = document.createElement('div');
+      notification.className = 'fixed top-24 right-4 bg-[#10b981] text-white px-6 py-3 rounded-lg shadow-lg z-50';
+      notification.textContent = 'Theme preference saved!';
+      document.body.appendChild(notification);
+      setTimeout(() => notification.remove(), 3000);
     } catch (error) {
       console.error('Failed to update theme:', error);
-      alert('Failed to update theme');
+      setSettings(prev => ({ ...prev, theme: previousTheme }));
+      alert('Failed to update theme. Please try again.');
+    } finally {
+      setSaving(false);
+    }
+  };
+      alert('Failed to update theme. Please try again.');
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -133,7 +192,8 @@ const AppSettings = () => {
                                         <select 
                                             value={settings.language}
                                             onChange={(e) => handleLanguageChange(e.target.value)}
-                                            className="bg-[#0B1116] border border-white/10 text-white rounded-lg px-4 py-2 text-sm focus:ring-1 focus:ring-[#10b981] focus:border-[#10b981] outline-none min-w-[140px] cursor-pointer"
+                                            disabled={saving}
+                                            className="bg-[#0B1116] border border-white/10 text-white rounded-lg px-4 py-2 text-sm focus:ring-1 focus:ring-[#10b981] focus:border-[#10b981] outline-none min-w-[140px] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                                         >
                                             <option value="en">English (US)</option>
                                             <option value="es">Español</option>
@@ -178,7 +238,12 @@ const AppSettings = () => {
                                             </div>
                                         </div>
                                         <label className="relative inline-flex items-center cursor-pointer">
-                                            <input defaultChecked className="sr-only peer" type="checkbox" />
+                                            <input 
+                                                checked={settings.locationAccess}
+                                                onChange={(e) => setSettings(prev => ({ ...prev, locationAccess: e.target.checked }))}
+                                                className="sr-only peer" 
+                                                type="checkbox" 
+                                            />
                                             <div className="w-11 h-6 bg-[#0B1116] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#10b981] border border-white/10"></div>
                                         </label>
                                     </div>
@@ -193,7 +258,12 @@ const AppSettings = () => {
                                             </div>
                                         </div>
                                         <label className="relative inline-flex items-center cursor-pointer">
-                                            <input defaultChecked className="sr-only peer" type="checkbox" />
+                                            <input 
+                                                checked={settings.notificationsPermission}
+                                                onChange={(e) => setSettings(prev => ({ ...prev, notificationsPermission: e.target.checked }))}
+                                                className="sr-only peer" 
+                                                type="checkbox" 
+                                            />
                                             <div className="w-11 h-6 bg-[#0B1116] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#10b981] border border-white/10"></div>
                                         </label>
                                     </div>
@@ -208,7 +278,10 @@ const AppSettings = () => {
                                         <span className="text-white font-medium text-base">Cache Management</span>
                                         <span className="text-[#94a3b8] text-sm">Clear temporary application data to free up space (145 MB).</span>
                                     </div>
-                                    <button className="flex cursor-pointer items-center justify-center rounded-lg h-9 px-4 bg-[#151F26] hover:bg-white/5 border border-white/10 text-white text-sm font-medium transition-colors">
+                                    <button 
+                                        onClick={handleClearCache}
+                                        className="flex cursor-pointer items-center justify-center rounded-lg h-9 px-4 bg-[#151F26] hover:bg-white/5 border border-white/10 text-white text-sm font-medium transition-colors"
+                                    >
                                         Clear Cache
                                     </button>
                                 </div>
@@ -245,7 +318,7 @@ const AppSettings = () => {
 
                             <section className="pt-6 mt-2 border-t border-white/5">
                                 <button 
-                                    onClick={() => window.location.hash = '#/'}
+                                    onClick={handleLogout}
                                     className="w-full flex cursor-pointer items-center justify-center rounded-lg h-12 px-6 bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/20 text-base font-bold transition-colors gap-2"
                                 >
                                     <span className="material-symbols-outlined">logout</span>
