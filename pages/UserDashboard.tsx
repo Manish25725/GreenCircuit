@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
 import { api, getCurrentUser, User, Booking } from '../services/api';
+import { useLanguage } from '../contexts/LanguageContext';
 
 const UserDashboard = () => {
+  const { t } = useLanguage();
   const [user, setUser] = useState<User | null>(getCurrentUser()); 
   const [activeBookings, setActiveBookings] = useState<Booking[]>([]);
   const [allBookings, setAllBookings] = useState<Booking[]>([]);
@@ -23,10 +25,9 @@ const UserDashboard = () => {
 
   const loadUserData = async () => {
     try {
-      // Try to get fresh user data from API
+      // Try to get fresh user data from API (this now saves to cookies automatically)
       const userData = await api.getMe();
       setUser(userData);
-      localStorage.setItem('user', JSON.stringify(userData));
       
       setStats({
         totalRecycled: userData.totalWasteRecycled || 0,

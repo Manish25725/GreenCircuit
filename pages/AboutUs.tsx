@@ -2,48 +2,22 @@ import React from 'react';
 
 const AboutUs = () => {
   return (
-    <div className="relative flex min-h-screen flex-col bg-[#0B1120] font-sans text-slate-300 antialiased overflow-x-hidden selection:bg-[#34D399] selection:text-[#0B1120]">
-        {/* Full Navbar */}
-        <div className="w-full flex justify-center fixed top-0 left-0 right-0 z-50">
-            <div className="absolute inset-0 bg-[#0B1120]/80 backdrop-blur-md border-b border-white/5"></div>
-            <div className="w-full max-w-7xl px-4 sm:px-6 relative z-10">
-                <header className="flex items-center justify-between h-16 sm:h-20">
-                    <div className="flex items-center gap-3">
-                        <div className="flex items-center gap-3 cursor-pointer" onClick={() => window.location.hash = '#/'}>
-                        <div className="size-8 sm:size-10 text-[#34D399] flex items-center justify-center">
-                            <svg className="w-full h-full drop-shadow-[0_0_8px_rgba(52,211,153,0.5)]" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M42.4379 44C42.4379 44 36.0744 33.9038 41.1692 24C46.8624 12.9336 42.2078 4 42.2078 4L7.01134 4C7.01134 4 11.6577 12.932 5.96912 23.9969C0.876273 33.9029 7.27094 44 7.27094 44L42.4379 44Z" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="3"></path>
-                            </svg>
-                        </div>
-                        </div>
-                        <span className="text-slate-50 text-xl sm:text-2xl font-black tracking-tight">EcoCycle</span>
-                    </div>
-                    <nav className="hidden md:flex items-center gap-8">
-                        <button className="text-slate-400 hover:text-[#34D399] text-sm font-medium transition-colors bg-transparent border-none cursor-pointer" onClick={() => window.location.hash = '#/how-it-works'}>How It Works</button>
-                        <button className="text-slate-400 hover:text-[#34D399] text-sm font-medium transition-colors bg-transparent border-none cursor-pointer" onClick={() => window.location.hash = '#/search'}>Services</button>
-                        <button className="text-[#34D399] text-sm font-medium transition-colors bg-transparent border-none cursor-pointer" onClick={() => window.location.hash = '#/about'}>About Us</button>
-                        <button className="text-slate-400 hover:text-[#34D399] text-sm font-medium transition-colors bg-transparent border-none cursor-pointer" onClick={() => window.location.hash = '#/contact'}>Contact</button>
-                    </nav>
-                    <div className="flex items-center gap-4">
-                        <button 
-                            onClick={() => window.location.hash = '#/login'}
-                            className="hidden sm:flex h-10 px-5 items-center justify-center rounded-full bg-white/5 text-white hover:bg-white/10 border border-white/10 text-sm font-bold transition-all duration-300 cursor-pointer"
-                        >
-                            Log In
-                        </button>
-                        <button 
-                            onClick={() => window.location.hash = '#/search'}
-                            className="h-10 px-6 flex items-center justify-center rounded-full bg-[#34D399] text-slate-900 hover:bg-[#6EE7B7] shadow-[0_0_15px_rgba(52,211,153,0.3)] hover:shadow-[0_0_25px_rgba(52,211,153,0.5)] text-sm font-bold transition-all duration-300 transform hover:scale-105 cursor-pointer"
-                        >
-                            Get Started
-                        </button>
-                    </div>
-                </header>
+    <div className="relative flex h-auto min-h-screen w-full flex-col bg-[#0B1120] text-slate-300 font-sans group/design-root overflow-x-hidden selection:bg-[#34D399] selection:text-[#0B1120]">
+      <div className="layout-container flex h-full grow flex-col">
+        {/* Header - Logo Only */}
+        <header className="sticky top-0 z-50 flex items-center justify-center border-b border-white/5 bg-[#0B1120]/80 backdrop-blur-md px-6 py-4">
+            <div className="flex items-center gap-3 cursor-pointer" onClick={() => window.location.hash = '#/'}>
+                <div className="size-8 text-[#34D399] flex items-center justify-center">
+                    <svg className="w-full h-full drop-shadow-[0_0_8px_rgba(52,211,153,0.5)]" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M42.4379 44C42.4379 44 36.0744 33.9038 41.1692 24C46.8624 12.9336 42.2078 4 42.2078 4L7.01134 4C7.01134 4 11.6577 12.932 5.96912 23.9969C0.876273 33.9029 7.27094 44 7.27094 44L42.4379 44Z" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="3"></path>
+                    </svg>
+                </div>
+                <h2 className="text-white text-xl font-black tracking-tight">EcoCycle</h2>
             </div>
-        </div>
+        </header>
 
         {/* Back Button */}
-        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 pt-24 sm:pt-28">
+        <div className="w-full max-w-[960px] mx-auto px-4 sm:px-10 lg:px-0 pt-6">
             <button 
                 onClick={() => window.history.back()}
                 className="group flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-slate-400 hover:text-[#34D399] hover:border-[#34D399]/30 hover:bg-[#34D399]/10 transition-all duration-300 cursor-pointer backdrop-blur-sm"
@@ -55,56 +29,50 @@ const AboutUs = () => {
             </button>
         </div>
 
-        {/* Main Content */}
-        <main className="flex-grow flex flex-col items-center pt-4 sm:pt-8">
+        <main className="flex-1 px-4 py-6 sm:px-10 lg:px-40 lg:py-14">
+          <div className="mx-auto flex max-w-[960px] flex-col gap-10">
+        <main className="flex-1 px-4 py-6 sm:px-10 lg:px-40 lg:py-14">
+          <div className="mx-auto flex max-w-[960px] flex-col gap-10">
+            {/* Page Header */}
+            <div className="flex min-w-72 flex-col gap-3">
+              <p className="text-white text-4xl font-black leading-tight tracking-tight md:text-5xl">About EcoCycle</p>
+              <p className="text-slate-400 text-base font-normal leading-normal md:text-lg">Transforming the global e-waste crisis into a sustainable opportunity.</p>
+            </div>
+
             {/* Hero Section */}
-            <section className="w-full max-w-7xl px-4 py-12 md:px-10 md:py-20">
-                <div className="relative overflow-hidden rounded-3xl bg-[#1E293B]/50 border border-white/5 shadow-2xl">
-                    <div 
-                        className="absolute inset-0 bg-cover bg-center opacity-30" 
-                        style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuCrsLiC0nxjqeTfacyb3X1M16q-VSh7ZB-yPcCf2GKIlm-ssCwFsUqZB9OIhRlJ5pp2W6ukykkDmh0d47H9aE871Cw0ALWhcnTe2fo0EuA8JtvdgBQqVLszK5UhEyezfVf3bDMTcl38iMBCym-COJ7PWrA6tkMbZXojK8Pvf5q74S8D9ZVnNnmMMQMehgCMvSQGUMDw22D1xpdR7mPKceoD_XfOfOjOpLbe97sBqc1538-pvXjsfWf3K3_p6NypGXbZyTfs5r6v0ow')" }}
-                    ></div>
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#0B1120] via-[#0B1120]/80 to-transparent"></div>
-                    <div className="relative z-10 flex min-h-[480px] flex-col items-center justify-center gap-6 p-8 text-center">
-                        <div className="flex flex-col gap-4 max-w-3xl">
-                            <h1 className="text-white text-5xl font-black leading-tight tracking-tight md:text-7xl">
-                                Rewiring the <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#34D399] to-[#6EE7B7]">Future</span>
-                            </h1>
-                            <p className="text-slate-300 text-lg font-light leading-relaxed md:text-xl">
-                                Transforming the global e-waste crisis into a sustainable opportunity. We are building the circular economy of tomorrow, today.
-                            </p>
-                        </div>
-                        <div className="flex gap-4 pt-4">
-                            <button onClick={() => window.location.hash = '#/search'} className="flex h-12 items-center justify-center rounded-full bg-[#34D399] px-8 text-[#0B1120] text-base font-bold transition-transform hover:scale-105 shadow-[0_0_15px_rgba(52,211,153,0.3)] cursor-pointer">
-                                Join the Movement
-                            </button>
-                            <button className="flex h-12 items-center justify-center rounded-full border border-white/10 bg-white/5 px-8 text-white text-base font-bold backdrop-blur-sm transition-colors hover:bg-white/10 cursor-pointer">
-                                Watch Video
-                            </button>
-                        </div>
-                    </div>
+            <section className="relative overflow-hidden rounded-3xl bg-[#1E293B]/50 border border-white/5 shadow-2xl">
+                <div 
+                    className="absolute inset-0 bg-cover bg-center opacity-30" 
+                    style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuCrsLiC0nxjqeTfacyb3X1M16q-VSh7ZB-yPcCf2GKIlm-ssCwFsUqZB9OIhRlJ5pp2W6ukykkDmh0d47H9aE871Cw0ALWhcnTe2fo0EuA8JtvdgBQqVLszK5UhEyezfVf3bDMTcl38iMBCym-COJ7PWrA6tkMbZXojK8Pvf5q74S8D9ZVnNnmMMQMehgCMvSQGUMDw22D1xpdR7mPKceoD_XfOfOjOpLbe97sBqc1538-pvXjsfWf3K3_p6NypGXbZyTfs5r6v0ow')" }}
+                ></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0B1120] via-[#0B1120]/80 to-transparent"></div>
+                <div className="relative z-10 flex min-h-[360px] flex-col items-center justify-center gap-6 p-8 text-center">
+                    <h2 className="text-white text-4xl font-black leading-tight tracking-tight md:text-5xl max-w-2xl">
+                        Rewiring the <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#34D399] to-[#6EE7B7]">Future</span>
+                    </h2>
+                    <p className="text-slate-300 text-lg font-light leading-relaxed max-w-xl">
+                        Building the circular economy of tomorrow, today.
+                    </p>
                 </div>
             </section>
 
             {/* Stats Section */}
-            <section className="w-full max-w-7xl px-4 py-10 md:px-10">
-                <div className="grid grid-cols-2 gap-6 md:grid-cols-4 border-y border-white/5 py-12">
-                    <div className="flex flex-col items-center justify-center gap-2 text-center">
-                        <span className="text-4xl font-black text-[#34D399] md:text-5xl">50K+</span>
-                        <span className="text-sm font-bold text-slate-500 uppercase tracking-widest">Devices Recycled</span>
-                    </div>
-                    <div className="flex flex-col items-center justify-center gap-2 text-center">
-                        <span className="text-4xl font-black text-[#34D399] md:text-5xl">120</span>
-                        <span className="text-sm font-bold text-slate-500 uppercase tracking-widest">Partner Agencies</span>
-                    </div>
-                    <div className="flex flex-col items-center justify-center gap-2 text-center">
-                        <span className="text-4xl font-black text-[#34D399] md:text-5xl">800T</span>
-                        <span className="text-sm font-bold text-slate-500 uppercase tracking-widest">CO2 Emissions Saved</span>
-                    </div>
-                    <div className="flex flex-col items-center justify-center gap-2 text-center">
-                        <span className="text-4xl font-black text-[#34D399] md:text-5xl">15+</span>
-                        <span className="text-sm font-bold text-slate-500 uppercase tracking-widest">Countries Reached</span>
-                    </div>
+            <section className="grid grid-cols-2 gap-6 md:grid-cols-4 border-y border-white/5 py-8">
+                <div className="flex flex-col items-center justify-center gap-2 text-center">
+                    <span className="text-3xl font-black text-[#34D399] md:text-4xl">50K+</span>
+                    <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Devices Recycled</span>
+                </div>
+                <div className="flex flex-col items-center justify-center gap-2 text-center">
+                    <span className="text-3xl font-black text-[#34D399] md:text-4xl">120</span>
+                    <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Partner Agencies</span>
+                </div>
+                <div className="flex flex-col items-center justify-center gap-2 text-center">
+                    <span className="text-3xl font-black text-[#34D399] md:text-4xl">800T</span>
+                    <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">CO2 Saved</span>
+                </div>
+                <div className="flex flex-col items-center justify-center gap-2 text-center">
+                    <span className="text-3xl font-black text-[#34D399] md:text-4xl">15+</span>
+                    <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Countries</span>
                 </div>
             </section>
 

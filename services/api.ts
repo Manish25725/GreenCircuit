@@ -4,6 +4,8 @@ const API_BASE_URL = 'http://localhost:3001/api';
 // Set to true to use internal mock data (useful for frontend preview without running server)
 const USE_MOCK_FALLBACK = false; 
 
+import { getCookie, setCookie, deleteCookie } from '../utils/cookies';
+
 // Types
 export interface User {
   _id: string;
@@ -160,7 +162,22 @@ const MOCK_SLOTS: Slot[] = [
 ];
 
 // --- HELPER FUNCTIONS ---
-const getToken = () => localStorage.getItem('token');
+const getToken = () => {
+  // Try to get token from cookie first, then fallback to localStorage
+  return getCookie('token') || localStorage.getItem('token');
+};
+
+const saveToken = (token: string) => {
+  // Save token to both cookie (with 7 days expiration) and localStorage
+  setCookie('token', token, 7);
+  localStorage.setItem('token', token);
+};
+
+const removeToken = () => {
+  // Remove token from both cookie and localStorage
+  deleteCookie('token');
+  localStorage.removeItem('token');
+};
 
 const getHeaders = (includeAuth = true) => {
   const headers: Record<string, string> = {
@@ -273,8 +290,8 @@ export const api = {
       body: JSON.stringify({ email, password }),
     });
     if (data.token) {
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('user', JSON.stringify(data));
+      saveToken(data.token);
+      saveUser(data);
     }
     return data;
   },
@@ -285,15 +302,15 @@ export const api = {
       body: JSON.stringify({ name, email, password, role }),
     });
     if (data.token) {
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('user', JSON.stringify(data));
+      saveToken(data.token);
+      saveUser(data);
     }
     return data;
   },
 
   logout: () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    removeToken();
+    clearUser();
   },
 
   // Validate current token - returns true if valid, false if invalid
@@ -306,21 +323,31 @@ export const api = {
       return true;
     } catch (error) {
       // Token is invalid - clear it
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
+      removeToken();
+      clearUser();
       return false;
     }
   },
 
   getMe: async (): Promise<User> => {
-    return apiRequest<User>('/auth/me');
+    const user = await apiRequest<User>('/auth/me');
+    // Update saved user data with fresh data from server
+    if (user) {
+      saveUser(user);
+    }
+    return user;
   },
 
   updateProfile: async (data: Partial<User>): Promise<User> => {
-    return apiRequest<User>('/auth/profile', {
+    const user = await apiRequest<User>('/auth/profile', {
       method: 'PUT',
       body: JSON.stringify(data),
     });
+    // Update saved user data after profile update
+    if (user) {
+      saveUser(user);
+    }
+    return user;
   },
 
   // Preferences
@@ -688,8 +715,31 @@ export const api = {
 
 // Export current user helper
 export const getCurrentUser = (): User | null => {
+  // Try to get user from cookie first, then fallback to localStorage
+  const userCookie = getCookie('user');
+  if (userCookie) {
+    try {
+      return JSON.parse(decodeURIComponent(userCookie));
+    } catch (e) {
+      console.error('Error parsing user cookie:', e);
+    }
+  }
+  
   const userStr = localStorage.getItem('user');
   return userStr ? JSON.parse(userStr) : null;
+};
+
+export const saveUser = (user: User) => {
+  // Save user to both cookie and localStorage
+  const userStr = JSON.stringify(user);
+  setCookie('user', encodeURIComponent(userStr), 7);
+  localStorage.setItem('user', userStr);
+};
+
+export const clearUser = () => {
+  // Clear user from both cookie and localStorage
+  deleteCookie('user');
+  localStorage.removeItem('user');
 };
 
 export const isAuthenticated = (): boolean => {

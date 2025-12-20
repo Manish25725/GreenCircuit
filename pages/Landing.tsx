@@ -1,13 +1,20 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { getCurrentUser } from '../services/api';
+import * as api from '../services/api';
 
 gsap.registerPlugin(ScrollTrigger);
 
 const Landing = () => {
   const navbarRef = useRef<HTMLDivElement>(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   
   useEffect(() => {
+    // Check if user is logged in
+    const user = getCurrentUser();
+    setIsLoggedIn(!!user);
+    
     // Navbar Scroll Effect
     const ctx = gsap.context(() => {
         ScrollTrigger.create({
@@ -183,23 +190,42 @@ const Landing = () => {
                     </div>
                     <nav className="hidden md:flex items-center gap-8">
                         <button className="text-slate-400 hover:text-[#34D399] text-sm font-medium transition-colors bg-transparent border-none cursor-pointer" onClick={() => window.location.hash = '#/how-it-works'}>How It Works</button>
-                        <button className="text-slate-400 hover:text-[#34D399] text-sm font-medium transition-colors bg-transparent border-none cursor-pointer" onClick={() => window.location.hash = '#/login'}>Dashboard</button>
+                        {isLoggedIn && (
+                          <button className="text-slate-400 hover:text-[#34D399] text-sm font-medium transition-colors bg-transparent border-none cursor-pointer" onClick={() => window.location.hash = '#/dashboard'}>Dashboard</button>
+                        )}
                         <button className="text-slate-400 hover:text-[#34D399] text-sm font-medium transition-colors bg-transparent border-none cursor-pointer" onClick={() => window.location.hash = '#/about'}>About Us</button>
                         <button className="text-slate-400 hover:text-[#34D399] text-sm font-medium transition-colors bg-transparent border-none cursor-pointer" onClick={() => window.location.hash = '#/contact'}>Contact</button>
                     </nav>
                     <div className="flex items-center gap-4">
-                        <button 
-                            onClick={() => window.location.hash = '#/login'}
-                            className="hidden sm:flex h-10 px-5 items-center justify-center rounded-full bg-white/5 text-white hover:bg-white/10 border border-white/10 text-sm font-bold transition-all duration-300 cursor-pointer"
-                        >
-                            Log In
-                        </button>
-                        <button 
-                            onClick={() => window.location.hash = '#/search'}
-                            className="h-10 px-6 flex items-center justify-center rounded-full bg-[#34D399] text-slate-900 hover:bg-[#6EE7B7] shadow-[0_0_15px_rgba(52,211,153,0.3)] hover:shadow-[0_0_25px_rgba(52,211,153,0.5)] text-sm font-bold transition-all duration-300 transform hover:scale-105 cursor-pointer"
-                        >
-                            Get Started
-                        </button>
+                        {!isLoggedIn && (
+                          <>
+                            <button 
+                                onClick={() => window.location.hash = '#/login'}
+                                className="hidden sm:flex h-10 px-5 items-center justify-center rounded-full bg-white/5 text-white hover:bg-white/10 border border-white/10 text-sm font-bold transition-all duration-300 cursor-pointer"
+                            >
+                                Log In
+                            </button>
+                            <button 
+                                onClick={() => window.location.hash = '#/search'}
+                                className="h-10 px-6 flex items-center justify-center rounded-full bg-[#34D399] text-slate-900 hover:bg-[#6EE7B7] shadow-[0_0_15px_rgba(52,211,153,0.3)] hover:shadow-[0_0_25px_rgba(52,211,153,0.5)] text-sm font-bold transition-all duration-300 transform hover:scale-105 cursor-pointer"
+                            >
+                                Get Started
+                            </button>
+                          </>
+                        )}
+                        {isLoggedIn && (
+                          <button 
+                              onClick={async () => {
+                                await api.logout();
+                                setIsLoggedIn(false);
+                                window.location.hash = '#/';
+                              }}
+                              className="flex items-center gap-2 h-10 px-5 rounded-full bg-white/5 text-white hover:bg-white/10 border border-white/10 text-sm font-bold transition-all duration-300 cursor-pointer"
+                          >
+                              <span className="material-symbols-outlined text-[#34D399]">logout</span>
+                              <span className="hidden sm:inline">Log Out</span>
+                          </button>
+                        )}
                     </div>
                 </header>
             </div>
@@ -237,10 +263,6 @@ const Landing = () => {
                                     <span className="material-symbols-outlined text-[#34D399] text-xl transition-transform group-hover:translate-x-1">arrow_forward</span>
                                 </button>
                             </div>
-                            <button onClick={() => window.location.hash = '#/how-it-works'} className="w-full sm:w-auto h-12 px-8 rounded-full text-slate-300 font-medium hover:text-white hover:bg-white/5 transition-all flex items-center justify-center gap-2 group cursor-pointer">
-                                <span className="material-symbols-outlined group-hover:text-[#34D399] transition-colors">play_circle</span>
-                                <span>Watch Demo</span>
-                            </button>
                         </div>
                     </div>
                     <div className="relative order-1 lg:order-2 h-[400px] lg:h-[500px] rounded-3xl overflow-hidden group hero-image-container opacity-0 scale-95">

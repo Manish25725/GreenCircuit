@@ -20,7 +20,7 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   const loadLanguagePreference = async () => {
     try {
-      const response = await api.auth.getPreferences();
+      const response = await api.getPreferences();
       if (response.data?.preferences?.app?.language) {
         setLanguageState(response.data.preferences.app.language as Language);
       }

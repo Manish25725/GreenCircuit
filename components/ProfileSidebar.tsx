@@ -62,8 +62,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ activePage }) => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    api.logout();
     window.location.hash = '#/';
   };
 

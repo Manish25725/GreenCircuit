@@ -30,7 +30,7 @@ const AppSettings = () => {
   const loadSettings = async () => {
     try {
       setLoading(true);
-      const response = await api.auth.getPreferences();
+      const response = await api.getPreferences();
       if (response.data?.preferences?.app) {
         const appSettings = response.data.preferences.app;
         setSettings({
@@ -62,7 +62,7 @@ const AppSettings = () => {
         autoBackup: preferences?.app?.autoBackup !== false
       };
       
-      const response = await api.auth.updateAppSettings(appSettings);
+      const response = await api.updateAppSettings(appSettings);
       
       if (response.data?.preferences?.app) {
         setPreferences(response.data.preferences);
@@ -104,7 +104,7 @@ const AppSettings = () => {
         autoBackup: preferences?.app?.autoBackup !== false
       };
       
-      const response = await api.auth.updateAppSettings(appSettings);
+      const response = await api.updateAppSettings(appSettings);
       
       if (response.data?.preferences?.app) {
         setPreferences(response.data.preferences);
@@ -141,8 +141,7 @@ const AppSettings = () => {
 
   const handleLogout = () => {
     if (window.confirm(t('logoutConfirm'))) {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
+      api.logout();
       window.location.hash = '#/';
     }
   };
@@ -183,7 +182,7 @@ const AppSettings = () => {
                                 <p className="text-[#94a3b8] text-base font-normal leading-normal">{t('appSettingsDesc')}</p>
                             </div>
                         </div>
-                        <div className="flex flex-col gap-8">\
+                        <div className="flex flex-col gap-8">
                             
                             {/* General Preferences */}
                             <section className="flex flex-col gap-5">
