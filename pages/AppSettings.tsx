@@ -1,9 +1,100 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
 import ProfileHeader from '../components/ProfileHeader';
 import ProfileSidebar from '../components/ProfileSidebar';
+import { api, getCurrentUser } from '../services/api';
 
 const AppSettings = () => {
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [settings, setSettings] = useState({
+    language: 'en',
+    theme: 'dark',
+    locationAccess: true,
+    notificationsPermission: true
+  });
+  const [preferences, setPreferences] = useState<any>(null);
+
+  useEffect(() => {
+    loadSettings();
+  }, []);
+
+  const loadSettings = async () => {
+    try {
+      setLoading(true);
+      const response = await api.auth.getPreferences();
+      if (response.data?.preferences?.app) {
+        const appSettings = response.data.preferences.app;
+        setSettings({
+          language: appSettings.language || 'en',
+          theme: appSettings.theme || 'dark',
+          locationAccess: true,
+          notificationsPermission: true
+        });
+        setPreferences(response.data.preferences);
+      }
+    } catch (error) {
+      console.error('Failed to load settings:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleLanguageChange = async (language: string) => {
+    try {
+      setSettings(prev => ({ ...prev, language }));
+      await api.auth.updateAppSettings({
+        ...preferences?.app,
+        language
+      });
+    } catch (error) {
+      console.error('Failed to update language:', error);
+      alert('Failed to update language');
+    }
+  };
+
+  const handleThemeToggle = async (isDark: boolean) => {
+    try {
+      const theme = isDark ? 'dark' : 'light';
+      setSettings(prev => ({ ...prev, theme }));
+      await api.auth.updateAppSettings({
+        ...preferences?.app,
+        theme
+      });
+    } catch (error) {
+      console.error('Failed to update theme:', error);
+      alert('Failed to update theme');
+    }
+  };
+
+  const handleClearCache = () => {
+    if (confirm('Are you sure you want to clear the cache? This will remove temporary data and may require reloading.')) {
+      localStorage.removeItem('agenciesCache');
+      localStorage.removeItem('bookingsCache');
+      alert('Cache cleared successfully!');
+    }
+  };
+
+  const handleLogout = () => {
+    if (confirm('Are you sure you want to log out?')) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      window.location.hash = '#/';
+    }
+  };
+
+  if (loading) {
+    return (
+      <Layout title="" role="User" fullWidth hideSidebar>
+        <div className="bg-[#0B1116] min-h-screen flex items-center justify-center">
+          <div className="text-center">
+            <div className="w-12 h-12 border-4 border-[#10b981] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-gray-400">Loading settings...</p>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
   return (
     <Layout title="" role="User" fullWidth hideSidebar>
       <div className="bg-[#0B1116] font-sans text-gray-200 antialiased selection:bg-[#10b981] selection:text-white min-h-screen flex flex-col relative overflow-hidden">
@@ -39,7 +130,11 @@ const AppSettings = () => {
                                             <span className="text-white font-medium text-base">Language Selection</span>
                                             <span className="text-[#94a3b8] text-sm">Choose the language for the application interface.</span>
                                         </div>
-                                        <select className="bg-[#0B1116] border border-white/10 text-white rounded-lg px-4 py-2 text-sm focus:ring-1 focus:ring-[#10b981] focus:border-[#10b981] outline-none min-w-[140px] cursor-pointer">
+                                        <select 
+                                            value={settings.language}
+                                            onChange={(e) => handleLanguageChange(e.target.value)}
+                                            className="bg-[#0B1116] border border-white/10 text-white rounded-lg px-4 py-2 text-sm focus:ring-1 focus:ring-[#10b981] focus:border-[#10b981] outline-none min-w-[140px] cursor-pointer"
+                                        >
                                             <option value="en">English (US)</option>
                                             <option value="es">Español</option>
                                             <option value="fr">Français</option>
@@ -54,7 +149,12 @@ const AppSettings = () => {
                                         <div className="flex items-center gap-3">
                                             <span className="text-[#94a3b8] text-sm font-medium">Light</span>
                                             <label className="relative inline-flex items-center cursor-pointer">
-                                                <input defaultChecked className="sr-only peer" type="checkbox" />
+                                                <input 
+                                                    checked={settings.theme === 'dark'}
+                                                    onChange={(e) => handleThemeToggle(e.target.checked)}
+                                                    className="sr-only peer" 
+                                                    type="checkbox" 
+                                                />
                                                 <div className="w-11 h-6 bg-[#0B1116] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#10b981] border border-white/10"></div>
                                             </label>
                                             <span className="text-white text-sm font-medium">Dark</span>

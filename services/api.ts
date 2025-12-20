@@ -323,6 +323,47 @@ export const api = {
     });
   },
 
+  // Preferences
+  getPreferences: async () => {
+    return apiRequest('/auth/preferences');
+  },
+
+  updateNotificationPreferences: async (notifications: any) => {
+    return apiRequest('/auth/preferences/notifications', {
+      method: 'PUT',
+      body: JSON.stringify({ notifications }),
+    });
+  },
+
+  updatePrivacySettings: async (privacy: any) => {
+    return apiRequest('/auth/preferences/privacy', {
+      method: 'PUT',
+      body: JSON.stringify({ privacy }),
+    });
+  },
+
+  updateAppSettings: async (app: any) => {
+    return apiRequest('/auth/preferences/app', {
+      method: 'PUT',
+      body: JSON.stringify({ app }),
+    });
+  },
+
+  // Security
+  changePassword: async (currentPassword: string, newPassword: string) => {
+    return apiRequest('/auth/security/change-password', {
+      method: 'PUT',
+      body: JSON.stringify({ currentPassword, newPassword }),
+    });
+  },
+
+  toggleTwoFactor: async (enabled: boolean) => {
+    return apiRequest('/auth/security/two-factor', {
+      method: 'PUT',
+      body: JSON.stringify({ enabled }),
+    });
+  },
+
   // Agencies
   getAgencies: async (params?: { city?: string; service?: string; page?: number }) => {
     const searchParams = new URLSearchParams();
