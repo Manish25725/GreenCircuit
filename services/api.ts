@@ -212,9 +212,14 @@ async function fetchWithFallback<T>(endpoint: string, mockData: T, options?: Req
 }
 
 async function apiRequest<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
+  const headers = {
+    ...getHeaders(),
+    ...(options.headers || {}),
+  };
+  
   const res = await fetch(`${API_BASE_URL}${endpoint}`, {
-    headers: getHeaders(),
     ...options,
+    headers,
   });
   
   const data = await res.json();

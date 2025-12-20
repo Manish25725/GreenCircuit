@@ -47,10 +47,14 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ activePage }) => {
       if (data.secure_url) {
         // Update avatar in API and localStorage
         const { api } = await import('../services/api');
-        const updatedUser = await api.updateProfile({ avatar: data.secure_url });
-        if (updatedUser) {
-          // User is already saved by the API function
-          window.location.reload(); // Refresh to show new avatar
+        try {
+          const updatedUser = await api.updateProfile({ avatar: data.secure_url });
+          // Success - reload to show new avatar
+          window.location.reload();
+        } catch (apiError) {
+          console.error('Failed to save avatar to profile:', apiError);
+          // Even if API fails, Cloudinary upload succeeded
+          alert('Avatar uploaded but failed to save to profile. Please refresh the page.');
         }
       }
     } catch (error) {

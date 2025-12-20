@@ -100,9 +100,15 @@ const Profile = () => {
         setFormData(prev => ({ ...prev, avatar: data.secure_url }));
         
         // Immediately save the avatar
-        const updatedUser = await api.updateProfile({ avatar: data.secure_url });
-        if (updatedUser) {
+        try {
+          const updatedUser = await api.updateProfile({ avatar: data.secure_url });
           setUser(updatedUser);
+          // Show success message
+          alert('Avatar updated successfully!');
+        } catch (apiError) {
+          console.error('Failed to save avatar to profile:', apiError);
+          // Even if API fails, Cloudinary upload succeeded
+          alert('Avatar uploaded but failed to save to profile. Please try saving your profile.');
         }
       }
     } catch (error) {
