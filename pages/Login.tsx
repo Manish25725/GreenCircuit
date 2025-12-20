@@ -28,19 +28,50 @@ const Login = () => {
       let user;
       if (mode === 'Login') {
         user = await api.login(email, password);
+        
+        // Navigate based on user role from response
+        if (user.role === 'agency') {
+          // Check if agency is approved before redirecting to dashboard
+          try {
+            const agencyStatus = await api.get('/agencies/dashboard/me');
+            const responseData = agencyStatus.data?.data || agencyStatus.data;
+            const status = responseData?.status;
+            
+            console.log('Agency status response:', agencyStatus.data);
+            console.log('Parsed status:', status);
+            
+            if (status === 'approved') {
+              window.location.hash = '#/agency';
+            } else {
+              // pending, rejected, or any other status - show tracker
+              window.location.hash = '#/partner/pending';
+            }
+          } catch (error) {
+            console.error('Error checking agency status:', error);
+            // No agency found or error, redirect to registration
+            window.location.hash = '#/partner/register';
+          }
+        } else if (user.role === 'business') {
+          window.location.hash = '#/business';
+        } else if (user.role === 'admin') {
+          window.location.hash = '#/admin';
+        } else {
+          window.location.hash = '#/dashboard';
+        }
       } else {
+        // Sign up
         user = await api.register(name, email, password, backendRole);
-      }
-
-      // Navigate based on user role from response
-      if (user.role === 'agency') {
-        window.location.hash = '#/agency';
-      } else if (user.role === 'business') {
-        window.location.hash = '#/business';
-      } else if (user.role === 'admin') {
-        window.location.hash = '#/admin';
-      } else {
-        window.location.hash = '#/dashboard';
+        
+        // For new partner signup, redirect to registration form
+        if (user.role === 'agency') {
+          window.location.hash = '#/partner/register';
+        } else if (user.role === 'business') {
+          window.location.hash = '#/business';
+        } else if (user.role === 'admin') {
+          window.location.hash = '#/admin';
+        } else {
+          window.location.hash = '#/dashboard';
+        }
       }
     } catch (err: any) {
       setError(err.message || 'Authentication failed. Please try again.');

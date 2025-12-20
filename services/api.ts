@@ -602,6 +602,40 @@ export const api = {
       body: JSON.stringify({ logo: logoUrl }),
     });
   },
+
+  // Generic methods for admin and other custom endpoints
+  get: async <T = any>(endpoint: string, config?: { params?: any }): Promise<{ data: T }> => {
+    let url = endpoint;
+    if (config?.params) {
+      const params = new URLSearchParams(config.params);
+      url += `?${params.toString()}`;
+    }
+    const data = await apiRequest<any>(url);
+    return { data };
+  },
+
+  post: async <T = any>(endpoint: string, body?: any): Promise<{ data: T }> => {
+    const data = await apiRequest<any>(endpoint, {
+      method: 'POST',
+      body: body ? JSON.stringify(body) : undefined,
+    });
+    return { data };
+  },
+
+  put: async <T = any>(endpoint: string, body?: any): Promise<{ data: T }> => {
+    const data = await apiRequest<any>(endpoint, {
+      method: 'PUT',
+      body: body ? JSON.stringify(body) : undefined,
+    });
+    return { data };
+  },
+
+  delete: async <T = any>(endpoint: string): Promise<{ data: T }> => {
+    const data = await apiRequest<any>(endpoint, {
+      method: 'DELETE',
+    });
+    return { data };
+  },
 };
 
 // Export current user helper

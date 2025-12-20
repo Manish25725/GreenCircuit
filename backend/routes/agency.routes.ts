@@ -27,12 +27,11 @@ const router = Router();
 router.get('/', optionalAuth, getAgencies);
 router.get('/search', searchAgencies);
 router.get('/public/:id', getAgencyPublicProfile);
-router.get('/:id', optionalAuth, getAgencyById);
 
-// Protected agency routes
+// Protected agency routes - MUST be before /:id to avoid conflicts
 router.post('/', protect, createAgency);
 router.put('/', protect, authorize('agency'), updateAgency);
-router.get('/dashboard/me', protect, authorize('agency'), getAgencyDashboard);
+router.get('/dashboard/me', protect, getAgencyDashboard);
 router.get('/bookings/me', protect, authorize('agency'), getAgencyBookings);
 router.put('/bookings/:bookingId/status', protect, authorize('agency'), updateBookingStatus);
 router.get('/analytics/me', protect, authorize('agency'), getAgencyAnalytics);
@@ -48,5 +47,8 @@ router.put('/profile/logo', protect, authorize('agency'), updateAgencyLogo);
 // Vetting requests
 router.post('/vetting', protect, authorize('agency'), submitVerificationRequest);
 router.get('/vetting/me', protect, authorize('agency'), getAgencyVettingRequests);
+
+// This must be LAST - dynamic :id route
+router.get('/:id', optionalAuth, getAgencyById);
 
 export default router;

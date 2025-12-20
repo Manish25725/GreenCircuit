@@ -18,8 +18,46 @@ const AgencyDashboard = () => {
   });
 
   useEffect(() => {
-    loadAgencyData();
+    checkAgencyStatus();
   }, []);
+
+  const checkAgencyStatus = async () => {
+    try {
+      // First check if agency registration is approved
+      const dashboardData = await api.get('/agencies/dashboard/me');
+      const responseData = dashboardData.data?.data || dashboardData.data;
+      const status = responseData?.status;
+      
+      console.log('Agency dashboard - API response:', dashboardData.data);
+      console.log('Agency dashboard - Status:', status);
+      
+      // If pending or rejected, redirect to pending page
+      if (status === 'pending' || status === 'rejected') {
+        window.location.hash = '#/partner/pending';
+        return;
+      }
+      
+      // If approved, load agency data
+      if (status === 'approved') {
+        await loadAgencyData();
+      } else {
+        // Unknown status, redirect to pending
+        window.location.hash = '#/partner/pending';
+      }
+    } catch (error: any) {
+      console.error('Failed to check agency status:', error);
+      // If agency not found, redirect to registration
+      if (error.response?.status === 404) {
+        window.location.hash = '#/partner/register';
+      } else if (error.response?.status === 401 || error.response?.status === 403) {
+        // Not authenticated
+        window.location.hash = '#/login';
+      } else {
+        // Other error - show pending page
+        window.location.hash = '#/partner/pending';
+      }
+    }
+  };
 
   const loadAgencyData = async () => {
     try {

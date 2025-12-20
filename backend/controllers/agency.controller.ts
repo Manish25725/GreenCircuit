@@ -126,8 +126,7 @@ export const createAgency = async (req: Request, res: Response) => {
       userId: '000000000000000000000000', // Admin notification (use actual admin ID in production)
       type: 'admin',
       title: 'New Partner Registration',
-      message: `New partner registration from ${name}. GST: ${gstNumber}`,
-      priority: 'high'
+      message: `New partner registration from ${name}. GST: ${gstNumber}`
     });
 
     sendSuccess(res, { 
@@ -168,7 +167,7 @@ export const getAgencyDashboard = async (req: Request, res: Response) => {
     const agency = await Agency.findOne({ userId });
 
     if (!agency) {
-      return sendError(res, 'Agency not found', 404);
+      return sendError(res, 'Agency profile not found. Please complete partner registration.', 404);
     }
 
     // Check verification status
@@ -179,6 +178,7 @@ export const getAgencyDashboard = async (req: Request, res: Response) => {
         agency: {
           name: agency.name,
           email: agency.email,
+          gstNumber: agency.gstNumber,
           verificationStatus: agency.verificationStatus,
           submittedAt: agency.createdAt
         }
@@ -193,6 +193,7 @@ export const getAgencyDashboard = async (req: Request, res: Response) => {
         agency: {
           name: agency.name,
           email: agency.email,
+          gstNumber: agency.gstNumber,
           verificationStatus: agency.verificationStatus
         }
       });

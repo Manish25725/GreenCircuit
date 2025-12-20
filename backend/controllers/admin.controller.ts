@@ -216,8 +216,7 @@ export const approvePartnerRegistration = async (req: Request, res: Response) =>
       userId: agency.userId,
       type: 'account',
       title: 'Partner Registration Approved',
-      message: `Congratulations! Your partner registration has been approved. You can now access your partner dashboard.${notes ? ` Note: ${notes}` : ''}`,
-      priority: 'high'
+      message: `Congratulations! Your partner registration has been approved. You can now access your partner dashboard.${notes ? ` Note: ${notes}` : ''}`
     });
 
     sendSuccess(res, { 
@@ -260,8 +259,7 @@ export const rejectPartnerRegistration = async (req: Request, res: Response) => 
       userId: agency.userId,
       type: 'account',
       title: 'Partner Registration Rejected',
-      message: `Your partner registration has been rejected. Reason: ${reason}. Please contact support for more information.`,
-      priority: 'high'
+      message: `Your partner registration has been rejected. Reason: ${reason}. Please contact support for more information.`
     });
 
     sendSuccess(res, { 
@@ -388,8 +386,7 @@ export const suspendUser = async (req: Request, res: Response) => {
       userId: user._id,
       type: 'account',
       title: 'Account Suspended',
-      message: `Your account has been suspended. Reason: ${reason || 'Policy violation'}`,
-      priority: 'high'
+      message: `Your account has been suspended. Reason: ${reason || 'Policy violation'}`
     });
 
     sendSuccess(res, { message: 'User suspended successfully', user });
@@ -579,8 +576,7 @@ export const updateVettingRequest = async (req: Request, res: Response) => {
           ? `Your ${request.type} request has been approved!`
           : status === 'rejected'
           ? `Your ${request.type} request has been rejected. Reason: ${rejectionReason || 'Not specified'}`
-          : `Your ${request.type} request status has been updated to: ${status}`,
-        priority: status === 'rejected' ? 'high' : 'normal'
+          : `Your ${request.type} request status has been updated to: ${status}`
       });
     }
 
@@ -721,8 +717,7 @@ export const suspendAgency = async (req: Request, res: Response) => {
       userId: agency.userId,
       type: 'account',
       title: 'Agency Suspended',
-      message: `Your agency has been suspended. Reason: ${reason || 'Compliance issues'}`,
-      priority: 'high'
+      message: `Your agency has been suspended. Reason: ${reason || 'Compliance issues'}`
     });
 
     sendSuccess(res, { message: 'Agency suspended successfully', agency });

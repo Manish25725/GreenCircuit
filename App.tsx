@@ -51,16 +51,16 @@ const App = () => {
   // Check if user can access a route based on their role
   const canAccessRoute = (path: string, userRole: string | null): boolean => {
     // Public routes - anyone can access
-    const publicRoutes = ['#/', '#/login', '#/contact', '#/how-it-works', '#/about', '#/partner/register', '#/partner/pending', '#/admin'];
+    const publicRoutes = ['#/', '#/login', '#/contact', '#/how-it-works', '#/about', '#/partner/register', '#/partner/pending'];
     if (publicRoutes.includes(path)) return true;
+
+    // Admin routes - anyone can access (no authentication required)
+    if (path.startsWith('#/admin')) {
+      return true;
+    }
 
     // If no user is logged in, they can only access public routes
     if (!userRole) return false;
-
-    // Admin routes - only admin can access
-    if (path.startsWith('#/admin')) {
-      return userRole === 'admin';
-    }
 
     // Agency/Partner routes - only agency can access
     if (path.startsWith('#/agency')) {

@@ -77,7 +77,7 @@ const PartnerRegistration: React.FC = () => {
         throw new Error('Please complete the address details');
       }
 
-      await api.post('/agency/create', formData);
+      await api.post('/agencies', formData);
       
       // Redirect to pending status page
       window.location.hash = '#/partner/pending';
@@ -89,59 +89,74 @@ const PartnerRegistration: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 py-12 px-4">
-      <div className="max-w-4xl mx-auto">
-        <div className="bg-white rounded-2xl shadow-xl p-8">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Partner Registration</h1>
-            <p className="text-gray-600">
-              Join our network of verified e-waste recycling partners. Please provide accurate information for verification.
-            </p>
+    <div className="min-h-screen bg-gradient-to-br from-[#0B1116] via-[#0f1419] to-[#0B1116] font-sans text-gray-100 antialiased selection:bg-cyan-500 selection:text-white py-12 px-4">
+      {/* Blue gradient effects */}
+      <div className="fixed top-0 left-0 w-full h-[500px] bg-cyan-500/10 rounded-full blur-[120px] -translate-y-1/2 pointer-events-none"></div>
+      <div className="fixed bottom-0 right-0 w-full h-[500px] bg-blue-500/10 rounded-full blur-[120px] translate-y-1/2 pointer-events-none"></div>
+      
+      <div className="max-w-4xl mx-auto relative z-10">
+        {/* Header */}
+        <div className="mb-8 text-center">
+          <div className="inline-flex items-center gap-3 mb-6 cursor-pointer" onClick={() => window.location.hash = '#/'}>
+            <div className="p-2 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-lg shadow-lg">
+              <svg className="h-8 w-8 text-white" fill="currentColor" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                <path d="M42.4379 44C42.4379 44 36.0744 33.9038 41.1692 24C46.8624 12.9336 42.2078 4 42.2078 4L7.01134 4C7.01134 4 11.6577 12.932 5.96912 23.9969C0.876273 33.9029 7.27094 44 7.27094 44L42.4379 44Z"></path>
+              </svg>
+            </div>
           </div>
+          <h1 className="text-4xl font-bold mb-3 bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">Partner Registration</h1>
+          <p className="text-gray-300 text-lg">
+            Join our network of verified e-waste recycling partners. Please provide accurate information for verification.
+          </p>
+        </div>
 
+        <div className="bg-[#1a2332]/90 backdrop-blur-sm border border-cyan-500/30 rounded-2xl p-8 shadow-2xl">
           {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-              <p className="text-red-700">{error}</p>
+            <div className="mb-6 p-4 bg-red-500/20 border border-red-400/50 rounded-lg">
+              <p className="text-red-300 font-medium">{error}</p>
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Business Information */}
-            <div className="border-b pb-6">
-              <h2 className="text-xl font-semibold text-gray-800 mb-4">Business Information</h2>
+            <div className="border-b border-cyan-500/20 pb-6">
+              <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+                <span className="material-symbols-outlined text-cyan-400">business</span>
+                Business Information
+              </h2>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Agency Name <span className="text-red-500">*</span>
+                  <label className="block text-sm font-medium text-gray-200 mb-2">
+                    Agency Name <span className="text-cyan-400">*</span>
                   </label>
                   <input
                     type="text"
                     name="name"
                     value={formData.name}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full px-4 py-2.5 bg-[#0f1823] border border-cyan-500/30 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 text-white placeholder-gray-400 transition-all"
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Head/Owner Name <span className="text-red-500">*</span>
+                  <label className="block text-sm font-medium text-gray-200 mb-2">
+                    Head/Owner Name <span className="text-cyan-400">*</span>
                   </label>
                   <input
                     type="text"
                     name="headName"
                     value={formData.headName}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full px-4 py-2.5 bg-[#0f1823] border border-cyan-500/30 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 text-white placeholder-gray-400 transition-all"
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    GST Number <span className="text-red-500">*</span>
+                  <label className="block text-sm font-medium text-gray-200 mb-2">
+                    GST Number <span className="text-cyan-400">*</span>
                   </label>
                   <input
                     type="text"
@@ -149,13 +164,13 @@ const PartnerRegistration: React.FC = () => {
                     value={formData.gstNumber}
                     onChange={handleInputChange}
                     placeholder="e.g., 22AAAAA0000A1Z5"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full px-4 py-2.5 bg-[#0f1823] border border-cyan-500/30 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 text-white placeholder-gray-400 transition-all"
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-200 mb-2">
                     Udyam Certificate Number
                   </label>
                   <input
@@ -164,30 +179,30 @@ const PartnerRegistration: React.FC = () => {
                     value={formData.udyamCertificate}
                     onChange={handleInputChange}
                     placeholder="e.g., UDYAM-XX-00-0000000"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full px-4 py-2.5 bg-[#0f1823] border border-cyan-500/30 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 text-white placeholder-gray-400 transition-all"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-200 mb-2">
                     Business Type
                   </label>
                   <select
                     name="businessType"
                     value={formData.businessType}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full px-4 py-2.5 bg-[#0f1823] border border-cyan-500/30 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 text-white transition-all"
                   >
-                    <option value="">Select Type</option>
-                    <option value="Private Limited">Private Limited</option>
-                    <option value="Partnership">Partnership</option>
-                    <option value="Proprietorship">Proprietorship</option>
-                    <option value="LLP">LLP</option>
+                    <option value="" className="bg-[#0f1823]">Select Type</option>
+                    <option value="Private Limited" className="bg-[#0f1823]">Private Limited</option>
+                    <option value="Partnership" className="bg-[#0f1823]">Partnership</option>
+                    <option value="Proprietorship" className="bg-[#0f1823]">Proprietorship</option>
+                    <option value="LLP" className="bg-[#0f1823]">LLP</option>
                   </select>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-200 mb-2">
                     Established Year
                   </label>
                   <input
@@ -197,13 +212,13 @@ const PartnerRegistration: React.FC = () => {
                     onChange={handleInputChange}
                     min="1900"
                     max={new Date().getFullYear()}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full px-4 py-2.5 bg-[#0f1823] border border-cyan-500/30 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 text-white transition-all"
                   />
                 </div>
               </div>
 
               <div className="mt-4">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-200 mb-2">
                   Description
                 </label>
                 <textarea
@@ -211,41 +226,44 @@ const PartnerRegistration: React.FC = () => {
                   value={formData.description}
                   onChange={handleInputChange}
                   rows={3}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  className="w-full px-4 py-2.5 bg-[#0f1823] border border-cyan-500/30 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 text-white placeholder-gray-400 transition-all"
                   placeholder="Brief description of your services and capabilities"
                 />
               </div>
             </div>
 
             {/* Contact Information */}
-            <div className="border-b pb-6">
-              <h2 className="text-xl font-semibold text-gray-800 mb-4">Contact Information</h2>
+            <div className="border-b border-cyan-500/20 pb-6">
+              <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+                <span className="material-symbols-outlined text-blue-400">contact_mail</span>
+                Contact Information
+              </h2>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Email <span className="text-red-500">*</span>
+                  <label className="block text-sm font-medium text-gray-200 mb-2">
+                    Email <span className="text-cyan-400">*</span>
                   </label>
                   <input
                     type="email"
                     name="email"
                     value={formData.email}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full px-4 py-2.5 bg-[#0f1823] border border-cyan-500/30 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white placeholder-gray-400 transition-all"
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Phone <span className="text-red-500">*</span>
+                  <label className="block text-sm font-medium text-gray-200 mb-2">
+                    Phone <span className="text-cyan-400">*</span>
                   </label>
                   <input
                     type="tel"
                     name="phone"
                     value={formData.phone}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full px-4 py-2.5 bg-[#0f1823] border border-cyan-500/30 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white placeholder-gray-400 transition-all"
                     required
                   />
                 </div>
@@ -253,63 +271,66 @@ const PartnerRegistration: React.FC = () => {
             </div>
 
             {/* Address */}
-            <div className="border-b pb-6">
-              <h2 className="text-xl font-semibold text-gray-800 mb-4">Address Details</h2>
+            <div className="border-b border-cyan-500/20 pb-6">
+              <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+                <span className="material-symbols-outlined text-cyan-400">location_on</span>
+                Address Details
+              </h2>
               
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Street Address <span className="text-red-500">*</span>
+                  <label className="block text-sm font-medium text-gray-200 mb-2">
+                    Street Address <span className="text-cyan-400">*</span>
                   </label>
                   <input
                     type="text"
                     name="street"
                     value={formData.address.street}
                     onChange={handleAddressChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full px-4 py-2.5 bg-[#0f1823] border border-cyan-500/30 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 text-white placeholder-gray-400 transition-all"
                     required
                   />
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      City <span className="text-red-500">*</span>
+                    <label className="block text-sm font-medium text-gray-200 mb-2">
+                      City <span className="text-cyan-400">*</span>
                     </label>
                     <input
                       type="text"
                       name="city"
                       value={formData.address.city}
                       onChange={handleAddressChange}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      className="w-full px-4 py-2.5 bg-[#0f1823] border border-cyan-500/30 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 text-white placeholder-gray-400 transition-all"
                       required
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      State <span className="text-red-500">*</span>
+                    <label className="block text-sm font-medium text-gray-200 mb-2">
+                      State <span className="text-cyan-400">*</span>
                     </label>
                     <input
                       type="text"
                       name="state"
                       value={formData.address.state}
                       onChange={handleAddressChange}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      className="w-full px-4 py-2.5 bg-[#0f1823] border border-cyan-500/30 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 text-white placeholder-gray-400 transition-all"
                       required
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      ZIP Code <span className="text-red-500">*</span>
+                    <label className="block text-sm font-medium text-gray-200 mb-2">
+                      ZIP Code <span className="text-cyan-400">*</span>
                     </label>
                     <input
                       type="text"
                       name="zipCode"
                       value={formData.address.zipCode}
                       onChange={handleAddressChange}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      className="w-full px-4 py-2.5 bg-[#0f1823] border border-cyan-500/30 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 text-white placeholder-gray-400 transition-all"
                       required
                     />
                   </div>
@@ -319,21 +340,28 @@ const PartnerRegistration: React.FC = () => {
 
             {/* Services */}
             <div className="pb-6">
-              <h2 className="text-xl font-semibold text-gray-800 mb-4">Services Offered</h2>
+              <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+                <span className="material-symbols-outlined text-blue-400">build</span>
+                Services Offered
+              </h2>
               
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                 {serviceOptions.map(service => (
                   <label
                     key={service}
-                    className="flex items-center p-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-green-50 transition-colors"
+                    className={`flex items-center p-3 border rounded-lg cursor-pointer transition-all ${
+                      formData.services.includes(service)
+                        ? 'bg-cyan-500/20 border-cyan-500/50 text-white'
+                        : 'bg-[#0f1823] border-cyan-500/20 text-gray-300 hover:bg-cyan-500/10 hover:border-cyan-500/40'
+                    }`}
                   >
                     <input
                       type="checkbox"
                       checked={formData.services.includes(service)}
                       onChange={() => handleServiceToggle(service)}
-                      className="mr-2 w-4 h-4 text-green-600 rounded focus:ring-green-500"
+                      className="mr-2 w-4 h-4 text-cyan-600 rounded focus:ring-cyan-500 bg-[#0f1823] border-cyan-500/30"
                     />
-                    <span className="text-sm text-gray-700">{service}</span>
+                    <span className="text-sm font-medium">{service}</span>
                   </label>
                 ))}
               </div>
@@ -344,23 +372,33 @@ const PartnerRegistration: React.FC = () => {
               <button
                 type="button"
                 onClick={() => window.history.back()}
-                className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+                className="px-6 py-2.5 border border-cyan-500/30 rounded-lg text-gray-200 hover:bg-cyan-500/10 transition-all"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={loading}
-                className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+                className="px-6 py-2.5 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-lg hover:from-cyan-600 hover:to-blue-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed font-medium shadow-lg shadow-cyan-500/20"
               >
-                {loading ? 'Submitting...' : 'Submit Registration'}
+                {loading ? (
+                  <span className="flex items-center gap-2">
+                    <span className="animate-spin material-symbols-outlined text-sm">progress_activity</span>
+                    Submitting...
+                  </span>
+                ) : (
+                  'Submit Registration'
+                )}
               </button>
             </div>
           </form>
 
-          <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-            <h3 className="font-semibold text-blue-900 mb-2">Important Information</h3>
-            <ul className="text-sm text-blue-800 space-y-1 list-disc list-inside">
+          <div className="mt-6 p-4 bg-cyan-500/10 border border-cyan-500/30 rounded-lg">
+            <h3 className="font-semibold text-cyan-400 mb-2 flex items-center gap-2">
+              <span className="material-symbols-outlined text-lg">info</span>
+              Important Information
+            </h3>
+            <ul className="text-sm text-gray-200 space-y-1 list-disc list-inside ml-1">
               <li>Your registration will be reviewed by our admin team</li>
               <li>Verification typically takes 2-3 business days</li>
               <li>You'll receive an email notification once approved</li>

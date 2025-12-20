@@ -37,8 +37,8 @@ import { protect, authorize } from '../middleware/auth.middleware';
 
 const router = Router();
 
-// All admin routes require admin role
-router.use(protect, authorize('admin'));
+// Admin routes - currently open for development (no authentication required)
+// TODO: Add back authentication for production: router.use(protect, authorize('admin'));
 
 // ==========================================
 // DASHBOARD

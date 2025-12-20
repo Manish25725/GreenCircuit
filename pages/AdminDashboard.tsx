@@ -19,11 +19,13 @@ const AdminDashboard = () => {
   const loadDashboardData = async () => {
     try {
       const response = await api.get('/admin/dashboard');
+      console.log('Dashboard response:', response.data);
+      const data = response.data?.data || response.data;
       setStats({
-        totalUsers: response.data.data.users.total,
-        pendingPartners: response.data.data.agencies.pending,
-        verifiedPartners: response.data.data.agencies.total,
-        totalBookings: response.data.data.bookings.total
+        totalUsers: data?.users?.total || 0,
+        pendingPartners: data?.agencies?.pending || 0,
+        verifiedPartners: data?.agencies?.total || 0,
+        totalBookings: data?.bookings?.total || 0
       });
     } catch (error) {
       console.error('Failed to load dashboard data:', error);
@@ -169,214 +171,113 @@ const AdminDashboard = () => {
                 </div>
 
                 {/* Main Content Grid */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                  {/* Left Column - Recent Activity */}
-                  <div className="lg:col-span-2 space-y-6">
-                    {/* Recent Activity Card */}
-                    <div className="bg-gradient-to-br from-[#1E293B]/60 to-[#0B1116]/60 backdrop-blur-sm border border-pink-500/20 rounded-2xl overflow-hidden">
-                      <div className="p-6 border-b border-white/5 flex items-center justify-between bg-gradient-to-r from-pink-500/5 to-purple-500/5">
-                        <div className="flex items-center gap-3">
-                          <div className="p-2 rounded-lg bg-pink-500/10 border border-pink-500/20">
-                            <span className="material-symbols-outlined text-pink-400 text-sm">history</span>
-                          </div>
-                          <h3 className="text-lg font-bold text-white">Recent Activity</h3>
-                        </div>
-                        <button className="text-xs text-pink-400 hover:text-pink-300 font-medium transition-colors">View All</button>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {/* Quick Actions */}
+                  <div className="bg-gradient-to-br from-[#1E293B]/60 to-[#0B1116]/60 backdrop-blur-sm border border-pink-500/20 rounded-2xl p-6">
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="p-2 rounded-lg bg-pink-500/10 border border-pink-500/20">
+                        <span className="material-symbols-outlined text-pink-400">bolt</span>
                       </div>
-                      
-                      <div className="divide-y divide-white/5">
-                        {/* Activity Item 1 */}
-                        <div className="p-4 hover:bg-white/5 transition-colors flex items-start gap-4">
-                          <div className="mt-1 relative">
-                            <div className="size-10 rounded-full bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center border border-pink-500/30 text-white font-bold">
-                              GE
-                            </div>
-                            <div className="absolute -bottom-1 -right-1 bg-yellow-500 rounded-full p-0.5 border-2 border-[#1E293B]">
-                              <span className="material-symbols-outlined text-[10px] text-black font-bold">priority_high</span>
-                            </div>
-                          </div>
-                          <div className="flex-1">
-                            <div className="flex justify-between items-start">
-                              <p className="text-sm text-white font-medium">GreenEarth Recyclers <span className="font-normal text-gray-400">submitted a new</span> Verification Request</p>
-                              <span className="text-xs text-gray-500 whitespace-nowrap ml-4">2 hrs ago</span>
-                            </div>
-                            <p className="text-xs text-gray-400 mt-1">Application for full e-waste processing license pending review.</p>
-                            <div className="mt-3">
-                              <button 
-                                onClick={() => window.location.hash = '#/admin/vetting'}
-                                className="text-xs bg-pink-500/10 text-pink-400 px-3 py-1.5 rounded-lg border border-pink-500/20 hover:bg-pink-500 hover:text-white transition-all font-semibold"
-                              >
-                                Review Application
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Activity Item 2 */}
-                        <div className="p-4 hover:bg-white/5 transition-colors flex items-start gap-4">
-                          <div className="mt-1 relative">
-                            <div className="size-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center border border-purple-500/30 text-white font-bold">
-                              UM
-                            </div>
-                            <div className="absolute -bottom-1 -right-1 bg-blue-500 rounded-full p-0.5 border-2 border-[#1E293B]">
-                              <span className="material-symbols-outlined text-[10px] text-white font-bold">edit</span>
-                            </div>
-                          </div>
-                          <div className="flex-1">
-                            <div className="flex justify-between items-start">
-                              <p className="text-sm text-white font-medium">Urban Miners Co. <span className="font-normal text-gray-400">updated their</span> Pickup Slots</p>
-                              <span className="text-xs text-gray-500 whitespace-nowrap ml-4">5 hrs ago</span>
-                            </div>
-                            <p className="text-xs text-gray-400 mt-1">Added 50 new slots for Zone B - Downtown District.</p>
-                          </div>
-                        </div>
-
-                        {/* Activity Item 3 */}
-                        <div className="p-4 hover:bg-white/5 transition-colors flex items-start gap-4">
-                          <div className="mt-1 relative">
-                            <div className="size-10 rounded-full bg-[#0B1116] flex items-center justify-center border border-pink-500/20">
-                              <span className="material-symbols-outlined text-pink-400">person_add</span>
-                            </div>
-                            <div className="absolute -bottom-1 -right-1 bg-green-500 rounded-full p-0.5 border-2 border-[#1E293B]">
-                              <span className="material-symbols-outlined text-[10px] text-black font-bold">add</span>
-                            </div>
-                          </div>
-                          <div className="flex-1">
-                            <div className="flex justify-between items-start">
-                              <p className="text-sm text-white font-medium">New User Registration</p>
-                              <span className="text-xs text-gray-500 whitespace-nowrap ml-4">8 hrs ago</span>
-                            </div>
-                            <p className="text-xs text-gray-400 mt-1">Welcome <span className="text-pink-400 font-medium">Sarah Jenkins</span> to EcoCycle.</p>
-                          </div>
-                        </div>
-                      </div>
+                      <h3 className="text-lg font-bold text-white">Quick Actions</h3>
                     </div>
-
-                    {/* Collection Trends Chart */}
-                    <div className="bg-gradient-to-br from-[#1E293B]/60 to-[#0B1116]/60 backdrop-blur-sm border border-pink-500/20 rounded-2xl p-6">
-                      <h3 className="text-lg font-bold text-white mb-6">Weekly Collection Trends</h3>
-                      <div className="h-48 flex items-end justify-between gap-2">
-                        {[
-                          { day: 'Mon', height: '40%', value: '120T' },
-                          { day: 'Tue', height: '65%', value: '195T' },
-                          { day: 'Wed', height: '85%', value: '255T', active: true },
-                          { day: 'Thu', height: '55%', value: '165T' },
-                          { day: 'Fri', height: '45%', value: '135T' },
-                          { day: 'Sat', height: '30%', value: '90T' },
-                          { day: 'Sun', height: '25%', value: '75T' }
-                        ].map((bar, i) => (
-                          <div key={i} className="w-full h-full flex flex-col justify-end group">
-                            <div 
-                              className={`w-full rounded-t-lg relative transition-all duration-300 ${
-                                bar.active 
-                                  ? 'bg-gradient-to-t from-pink-600 to-pink-400 shadow-lg shadow-pink-500/50' 
-                                  : 'bg-gradient-to-t from-purple-900/40 to-purple-700/40 hover:from-pink-500/40 hover:to-pink-400/40'
-                              }`}
-                              style={{ height: bar.height }}
-                            >
-                              <div className="opacity-0 group-hover:opacity-100 absolute -top-10 left-1/2 -translate-x-1/2 bg-pink-500/90 backdrop-blur text-white text-xs py-1 px-2 rounded-lg border border-pink-400/30 transition-opacity whitespace-nowrap pointer-events-none">
-                                {bar.value}
-                              </div>
-                            </div>
-                            <span className={`text-[10px] text-center mt-2 transition-colors ${bar.active ? 'text-pink-400 font-bold' : 'text-gray-500'}`}>
-                              {bar.day}
-                            </span>
+                    <div className="space-y-3">
+                      <button 
+                        onClick={() => window.location.hash = '#/admin/partners'}
+                        className="w-full flex items-center justify-between gap-3 p-4 rounded-xl hover:bg-pink-500/10 text-gray-300 hover:text-white transition-all border border-white/5 hover:border-pink-500/30 group"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="bg-pink-500/20 text-pink-400 p-2 rounded-lg group-hover:scale-110 transition-transform">
+                            <span className="material-symbols-outlined text-[20px]">verified_user</span>
                           </div>
-                        ))}
-                      </div>
+                          <div className="text-left">
+                            <span className="text-sm font-bold block">Review Partner Applications</span>
+                            <span className="text-xs text-gray-500">{stats.pendingPartners} pending</span>
+                          </div>
+                        </div>
+                        <span className="material-symbols-outlined text-pink-400 opacity-0 group-hover:opacity-100 transition-opacity">arrow_forward</span>
+                      </button>
+                      
+                      <button 
+                        onClick={() => window.location.hash = '#/admin/users'}
+                        className="w-full flex items-center justify-between gap-3 p-4 rounded-xl hover:bg-purple-500/10 text-gray-300 hover:text-white transition-all border border-white/5 hover:border-purple-500/30 group"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="bg-purple-500/20 text-purple-400 p-2 rounded-lg group-hover:scale-110 transition-transform">
+                            <span className="material-symbols-outlined text-[20px]">group</span>
+                          </div>
+                          <div className="text-left">
+                            <span className="text-sm font-bold block">Manage Users</span>
+                            <span className="text-xs text-gray-500">{stats.totalUsers} total users</span>
+                          </div>
+                        </div>
+                        <span className="material-symbols-outlined text-purple-400 opacity-0 group-hover:opacity-100 transition-opacity">arrow_forward</span>
+                      </button>
+                      
+                      <button 
+                        onClick={() => window.location.hash = '#/admin/agencies'}
+                        className="w-full flex items-center justify-between gap-3 p-4 rounded-xl hover:bg-pink-500/10 text-gray-300 hover:text-white transition-all border border-white/5 hover:border-pink-500/30 group"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="bg-pink-500/20 text-pink-400 p-2 rounded-lg group-hover:scale-110 transition-transform">
+                            <span className="material-symbols-outlined text-[20px]">domain</span>
+                          </div>
+                          <div className="text-left">
+                            <span className="text-sm font-bold block">View All Partners</span>
+                            <span className="text-xs text-gray-500">{stats.verifiedPartners} verified</span>
+                          </div>
+                        </div>
+                        <span className="material-symbols-outlined text-pink-400 opacity-0 group-hover:opacity-100 transition-opacity">arrow_forward</span>
+                      </button>
                     </div>
                   </div>
 
-                  {/* Right Column - Quick Actions & Info */}
-                  <div className="space-y-6">
-                    {/* Quick Actions */}
-                    <div className="bg-gradient-to-br from-[#1E293B]/60 to-[#0B1116]/60 backdrop-blur-sm border border-pink-500/20 rounded-2xl p-6">
-                      <h3 className="text-lg font-bold text-white mb-4">Quick Actions</h3>
-                      <div className="space-y-2">
-                        <button 
-                          onClick={() => window.location.hash = '#/admin/partners'}
-                          className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-pink-500/10 text-gray-400 hover:text-white transition-all border border-transparent hover:border-pink-500/20"
-                        >
-                          <div className="bg-pink-500/20 text-pink-400 p-2 rounded-lg">
-                            <span className="material-symbols-outlined text-[20px]">add_business</span>
-                          </div>
-                          <span className="text-sm font-medium">Review Partners</span>
-                        </button>
-                        <button 
-                          onClick={() => window.location.hash = '#/admin/users'}
-                          className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-purple-500/10 text-gray-400 hover:text-white transition-all border border-transparent hover:border-purple-500/20"
-                        >
-                          <div className="bg-purple-500/20 text-purple-400 p-2 rounded-lg">
-                            <span className="material-symbols-outlined text-[20px]">group</span>
-                          </div>
-                          <span className="text-sm font-medium">Manage Users</span>
-                        </button>
-                        <button 
-                          onClick={() => window.location.hash = '#/admin/reports'}
-                          className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-pink-500/10 text-gray-400 hover:text-white transition-all border border-transparent hover:border-pink-500/20"
-                        >
-                          <div className="bg-pink-500/20 text-pink-400 p-2 rounded-lg">
-                            <span className="material-symbols-outlined text-[20px]">summarize</span>
-                          </div>
-                          <span className="text-sm font-medium">Generate Reports</span>
-                        </button>
+                  {/* System Status */}
+                  <div className="bg-gradient-to-br from-[#1E293B]/60 to-[#0B1116]/60 backdrop-blur-sm border border-pink-500/20 rounded-2xl p-6">
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="p-2 rounded-lg bg-pink-500/10 border border-pink-500/20">
+                        <span className="material-symbols-outlined text-pink-400">dashboard</span>
                       </div>
+                      <h3 className="text-lg font-bold text-white">System Overview</h3>
                     </div>
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between p-3 rounded-lg bg-green-500/10 border border-green-500/20">
+                        <div className="flex items-center gap-3">
+                          <div className="size-2 rounded-full bg-green-500 animate-pulse"></div>
+                          <span className="text-sm font-medium text-white">Platform Status</span>
+                        </div>
+                        <span className="text-xs text-green-400 font-bold">Operational</span>
+                      </div>
+                      
+                      <div className="p-3 rounded-lg border border-white/5">
+                        <div className="flex justify-between mb-2">
+                          <span className="text-xs text-gray-400">Active Sessions</span>
+                          <span className="text-xs text-white font-medium">2,487</span>
+                        </div>
+                        <div className="w-full bg-white/5 rounded-full h-2">
+                          <div className="bg-gradient-to-r from-pink-500 to-purple-400 h-2 rounded-full" style={{ width: '65%' }}></div>
+                        </div>
+                      </div>
+                      
+                      <div className="p-3 rounded-lg border border-white/5">
+                        <div className="flex justify-between mb-2">
+                          <span className="text-xs text-gray-400">API Response Time</span>
+                          <span className="text-xs text-white font-medium">142ms</span>
+                        </div>
+                        <div className="w-full bg-white/5 rounded-full h-2">
+                          <div className="bg-gradient-to-r from-green-500 to-green-400 h-2 rounded-full" style={{ width: '20%' }}></div>
+                        </div>
+                      </div>
 
-                    {/* Platform Health */}
-                    <div className="bg-gradient-to-br from-[#1E293B]/60 to-[#0B1116]/60 backdrop-blur-sm border border-pink-500/20 rounded-2xl p-6">
-                      <h3 className="text-lg font-bold text-white mb-4">Platform Health</h3>
-                      <div className="space-y-4">
-                        <div>
-                          <div className="flex justify-between mb-2">
-                            <span className="text-xs text-gray-400">Server Load</span>
-                            <span className="text-xs text-white font-medium">32%</span>
-                          </div>
-                          <div className="w-full bg-white/5 rounded-full h-2">
-                            <div className="bg-gradient-to-r from-green-500 to-green-400 h-2 rounded-full transition-all" style={{ width: '32%' }}></div>
-                          </div>
+                      <div className="grid grid-cols-2 gap-3 mt-4">
+                        <div className="p-3 rounded-lg border border-white/5 text-center">
+                          <p className="text-2xl font-bold text-white">{stats.totalBookings}</p>
+                          <p className="text-xs text-gray-400 mt-1">Total Bookings</p>
                         </div>
-                        <div>
-                          <div className="flex justify-between mb-2">
-                            <span className="text-xs text-gray-400">Storage Usage</span>
-                            <span className="text-xs text-white font-medium">68%</span>
-                          </div>
-                          <div className="w-full bg-white/5 rounded-full h-2">
-                            <div className="bg-gradient-to-r from-yellow-500 to-orange-400 h-2 rounded-full transition-all" style={{ width: '68%' }}></div>
-                          </div>
-                        </div>
-                        <div>
-                          <div className="flex justify-between mb-2">
-                            <span className="text-xs text-gray-400">API Response</span>
-                            <span className="text-xs text-white font-medium">124ms</span>
-                          </div>
-                          <div className="w-full bg-white/5 rounded-full h-2">
-                            <div className="bg-gradient-to-r from-blue-500 to-blue-400 h-2 rounded-full transition-all" style={{ width: '15%' }}></div>
-                          </div>
+                        <div className="p-3 rounded-lg border border-white/5 text-center">
+                          <p className="text-2xl font-bold text-pink-400">{stats.verifiedPartners}</p>
+                          <p className="text-xs text-gray-400 mt-1">Active Partners</p>
                         </div>
                       </div>
-                      <div className="mt-6 pt-4 border-t border-white/5 flex items-center gap-3">
-                        <div className="size-2 rounded-full bg-green-500 animate-pulse"></div>
-                        <span className="text-xs text-white font-medium">All systems operational</span>
-                      </div>
-                    </div>
-
-                    {/* Support Queue */}
-                    <div className="relative bg-gradient-to-br from-pink-500/10 to-purple-600/10 border border-pink-500/30 rounded-2xl p-6 overflow-hidden">
-                      <div className="absolute top-0 right-0 p-4 opacity-10">
-                        <span className="material-symbols-outlined text-6xl text-pink-400">support_agent</span>
-                      </div>
-                      <h3 className="text-white font-bold mb-1 relative z-10">Support Queue</h3>
-                      <p className="text-xs text-gray-400 mb-4 relative z-10">12 unread tickets</p>
-                      <div className="flex -space-x-2 mb-4 relative z-10">
-                        <div className="size-8 rounded-full border-2 border-[#1E293B] bg-gradient-to-br from-pink-500 to-purple-600"></div>
-                        <div className="size-8 rounded-full border-2 border-[#1E293B] bg-gradient-to-br from-purple-500 to-pink-600"></div>
-                        <div className="size-8 rounded-full border-2 border-[#1E293B] bg-gradient-to-br from-pink-600 to-purple-500"></div>
-                        <div className="size-8 rounded-full border-2 border-[#1E293B] bg-[#0B1116] flex items-center justify-center text-[10px] text-pink-400 font-bold">+9</div>
-                      </div>
-                      <button className="w-full py-2 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 rounded-lg text-xs font-bold text-white transition-all relative z-10 shadow-lg">
-                        Go to Support Portal
-                      </button>
                     </div>
                   </div>
                 </div>
