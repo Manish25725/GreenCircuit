@@ -18,7 +18,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ activePage }) => {
       return;
     }
 
-    if (file.size > 5 * 1024 * 1024) {
+    if (file.size > 10 * 1024 * 1024) {
       alert('Image size should be less than 5MB');
       return;
     }

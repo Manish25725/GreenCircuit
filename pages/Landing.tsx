@@ -9,11 +9,13 @@ gsap.registerPlugin(ScrollTrigger);
 const Landing = () => {
   const navbarRef = useRef<HTMLDivElement>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [user, setUser] = useState<any>(null);
   
   useEffect(() => {
     // Check if user is logged in
-    const user = getCurrentUser();
-    setIsLoggedIn(!!user);
+    const currentUser = getCurrentUser();
+    setIsLoggedIn(!!currentUser);
+    setUser(currentUser);
     
     // Navbar Scroll Effect
     const ctx = gsap.context(() => {
@@ -290,69 +292,135 @@ const Landing = () => {
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     {/* Resident Card */}
-                    <div className="group relative h-[420px] rounded-[2.5rem] bg-gradient-to-b from-slate-800/50 to-slate-900/50 border border-white/5 p-8 flex flex-col justify-between overflow-hidden transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_20px_40px_-15px_rgba(52,211,153,0.2)] mode-card cursor-pointer" onClick={() => window.location.hash = '#/search'}>
-                        <div className="absolute inset-0 bg-gradient-to-b from-[#34D399]/0 to-[#34D399]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    <div 
+                        className={`group relative h-[420px] rounded-[2.5rem] border p-8 flex flex-col justify-between overflow-hidden transition-all duration-500 mode-card ${
+                            user?.role === 'user' 
+                                ? 'bg-gradient-to-br from-[#34D399]/30 via-[#10b981]/20 to-[#059669]/30 border-[#34D399] shadow-[0_0_60px_rgba(16,185,129,0.5),inset_0_0_60px_rgba(52,211,153,0.1)] cursor-pointer scale-105' 
+                                : user 
+                                    ? 'bg-gradient-to-b from-slate-800/20 to-slate-900/20 border-white/5 opacity-40 cursor-not-allowed grayscale'
+                                    : 'bg-gradient-to-b from-slate-800/50 to-slate-900/50 border-white/5 cursor-pointer hover:-translate-y-2 hover:shadow-[0_20px_40px_-15px_rgba(52,211,153,0.2)]'
+                        }`}
+                        onClick={() => (!user || user?.role === 'user') && (window.location.hash = '#/search')}
+                    >
+                        <div className={`absolute inset-0 transition-opacity duration-500 ${
+                            user?.role === 'user' 
+                                ? 'bg-gradient-to-br from-[#34D399]/20 via-transparent to-[#10b981]/10 opacity-100' 
+                                : 'bg-gradient-to-b from-[#34D399]/0 to-[#34D399]/5 opacity-0 group-hover:opacity-100'
+                        }`}></div>
+                        {user?.role === 'user' && (
+                            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(52,211,153,0.15),transparent_70%)] animate-pulse"></div>
+                        )}
                         <div className="absolute top-0 right-0 p-8 opacity-0 group-hover:opacity-10 transition-opacity duration-500 transform translate-x-4 -translate-y-4 group-hover:translate-x-0 group-hover:translate-y-0">
                             <span className="material-symbols-outlined text-9xl text-[#34D399]">home</span>
                         </div>
                         
                         <div className="relative z-10">
-                            <div className="size-16 rounded-2xl bg-[#34D399]/10 border border-[#34D399]/20 flex items-center justify-center text-[#34D399] mb-8 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500 shadow-[0_0_20px_rgba(52,211,153,0.15)]">
-                                <span className="material-symbols-outlined text-3xl">person</span>
+                            <div className={`size-16 rounded-2xl flex items-center justify-center mb-8 transition-all duration-500 ${
+                                user?.role === 'user'
+                                    ? 'bg-gradient-to-br from-[#34D399] to-[#10b981] text-slate-900 shadow-[0_0_40px_rgba(52,211,153,0.6),0_0_20px_rgba(16,185,129,0.4)] scale-125 rotate-6'
+                                    : 'bg-[#34D399]/10 border border-[#34D399]/20 text-[#34D399] shadow-[0_0_20px_rgba(52,211,153,0.15)] group-hover:scale-110 group-hover:rotate-3'
+                            }`}>
+                                <span className="material-symbols-outlined text-3xl font-bold">person</span>
                             </div>
-                            <h3 className="text-3xl font-bold text-white mb-3">Residents</h3>
-                            <p className="text-slate-400 leading-relaxed">
+                            <h3 className={`text-3xl font-bold mb-3 transition-colors ${user?.role === 'user' ? 'text-[#34D399]' : 'text-white'}`}>Residents</h3>
+                            <p className={`leading-relaxed ${user?.role === 'user' ? 'text-slate-300' : 'text-slate-400'}`}>
                                 Recycling made effortless. Book a doorstep pickup for your old gadgets and earn eco-rewards instantly.
                             </p>
                         </div>
 
-                        <div className="relative z-10 flex items-center gap-3 text-[#34D399] font-bold tracking-wide group-hover:gap-5 transition-all">
+                        <div className={`relative z-10 flex items-center gap-3 font-bold tracking-wide group-hover:gap-5 transition-all ${
+                            user?.role === 'user' ? 'text-[#34D399] animate-pulse' : 'text-[#34D399]'
+                        }`}>
                             <span>Start Recycling</span>
                             <span className="material-symbols-outlined">arrow_forward</span>
                         </div>
                     </div>
 
                     {/* Business Card */}
-                    <div className="group relative h-[420px] rounded-[2.5rem] bg-gradient-to-b from-slate-800/50 to-slate-900/50 border border-white/5 p-8 flex flex-col justify-between overflow-hidden transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_20px_40px_-15px_rgba(59,130,246,0.2)] mode-card cursor-pointer" onClick={() => window.location.hash = '#/contact'}>
-                         <div className="absolute inset-0 bg-gradient-to-b from-[#3B82F6]/0 to-[#3B82F6]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    <div 
+                        className={`group relative h-[420px] rounded-[2.5rem] border p-8 flex flex-col justify-between overflow-hidden transition-all duration-500 mode-card ${
+                            user?.role === 'business' 
+                                ? 'bg-gradient-to-br from-[#3B82F6]/30 via-[#2563eb]/20 to-[#1d4ed8]/30 border-[#3B82F6] shadow-[0_0_60px_rgba(59,130,246,0.5),inset_0_0_60px_rgba(59,130,246,0.1)] cursor-pointer scale-105' 
+                                : user 
+                                    ? 'bg-gradient-to-b from-slate-800/20 to-slate-900/20 border-white/5 opacity-40 cursor-not-allowed grayscale'
+                                    : 'bg-gradient-to-b from-slate-800/50 to-slate-900/50 border-white/5 cursor-pointer hover:-translate-y-2 hover:shadow-[0_20px_40px_-15px_rgba(59,130,246,0.2)]'
+                        }`}
+                        onClick={() => (!user || user?.role === 'business') && (window.location.hash = '#/contact')}
+                    >
+                         <div className={`absolute inset-0 transition-opacity duration-500 ${
+                            user?.role === 'business' 
+                                ? 'bg-gradient-to-br from-[#3B82F6]/20 via-transparent to-[#2563eb]/10 opacity-100' 
+                                : 'bg-gradient-to-b from-[#3B82F6]/0 to-[#3B82F6]/5 opacity-0 group-hover:opacity-100'
+                        }`}></div>
+                        {user?.role === 'business' && (
+                            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(59,130,246,0.15),transparent_70%)] animate-pulse"></div>
+                        )}
                          <div className="absolute top-0 right-0 p-8 opacity-0 group-hover:opacity-10 transition-opacity duration-500 transform translate-x-4 -translate-y-4 group-hover:translate-x-0 group-hover:translate-y-0">
                             <span className="material-symbols-outlined text-9xl text-[#3B82F6]">domain</span>
                         </div>
 
                         <div className="relative z-10">
-                            <div className="size-16 rounded-2xl bg-[#3B82F6]/10 border border-[#3B82F6]/20 flex items-center justify-center text-[#3B82F6] mb-8 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500 shadow-[0_0_20px_rgba(59,130,246,0.15)]">
-                                <span className="material-symbols-outlined text-3xl">apartment</span>
+                            <div className={`size-16 rounded-2xl flex items-center justify-center mb-8 transition-all duration-500 ${
+                                user?.role === 'business'
+                                    ? 'bg-gradient-to-br from-[#3B82F6] to-[#2563eb] text-white shadow-[0_0_40px_rgba(59,130,246,0.6),0_0_20px_rgba(37,99,235,0.4)] scale-125 rotate-6'
+                                    : 'bg-[#3B82F6]/10 border border-[#3B82F6]/20 text-[#3B82F6] shadow-[0_0_20px_rgba(59,130,246,0.15)] group-hover:scale-110 group-hover:rotate-3'
+                            }`}>
+                                <span className="material-symbols-outlined text-3xl font-bold">apartment</span>
                             </div>
-                            <h3 className="text-3xl font-bold text-white mb-3">Businesses</h3>
-                            <p className="text-slate-400 leading-relaxed">
+                            <h3 className={`text-3xl font-bold mb-3 transition-colors ${user?.role === 'business' ? 'text-[#60A5FA]' : 'text-white'}`}>Businesses</h3>
+                            <p className={`leading-relaxed ${user?.role === 'business' ? 'text-slate-300' : 'text-slate-400'}`}>
                                 Corporate e-waste solutions. Secure data destruction, compliance certificates, and bulk pickup logistics.
                             </p>
                         </div>
 
-                        <div className="relative z-10 flex items-center gap-3 text-[#3B82F6] font-bold tracking-wide group-hover:gap-5 transition-all">
+                        <div className={`relative z-10 flex items-center gap-3 font-bold tracking-wide group-hover:gap-5 transition-all ${
+                            user?.role === 'business' ? 'text-[#60A5FA] animate-pulse' : 'text-[#3B82F6]'
+                        }`}>
                             <span>Business Solutions</span>
                             <span className="material-symbols-outlined">arrow_forward</span>
                         </div>
                     </div>
 
                     {/* Partner Card */}
-                    <div className="group relative h-[420px] rounded-[2.5rem] bg-gradient-to-b from-slate-800/50 to-slate-900/50 border border-white/5 p-8 flex flex-col justify-between overflow-hidden transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_20px_40px_-15px_rgba(168,85,247,0.2)] mode-card cursor-pointer" onClick={() => window.location.hash = '#/agency'}>
-                        <div className="absolute inset-0 bg-gradient-to-b from-[#A855F7]/0 to-[#A855F7]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    <div 
+                        className={`group relative h-[420px] rounded-[2.5rem] border p-8 flex flex-col justify-between overflow-hidden transition-all duration-500 mode-card ${
+                            user?.role === 'agency' 
+                                ? 'bg-gradient-to-br from-[#F59E0B]/30 via-[#D97706]/20 to-[#B45309]/30 border-[#F59E0B] shadow-[0_0_60px_rgba(245,158,11,0.5),inset_0_0_60px_rgba(245,158,11,0.1)] cursor-pointer scale-105' 
+                                : user 
+                                    ? 'bg-gradient-to-b from-slate-800/20 to-slate-900/20 border-white/5 opacity-40 cursor-not-allowed grayscale'
+                                    : 'bg-gradient-to-b from-slate-800/50 to-slate-900/50 border-white/5 cursor-pointer hover:-translate-y-2 hover:shadow-[0_20px_40px_-15px_rgba(168,85,247,0.2)]'
+                        }`}
+                        onClick={() => (!user || user?.role === 'agency') && (window.location.hash = '#/agency')}
+                    >
+                        <div className={`absolute inset-0 transition-opacity duration-500 ${
+                            user?.role === 'agency' 
+                                ? 'bg-gradient-to-br from-[#F59E0B]/20 via-transparent to-[#D97706]/10 opacity-100' 
+                                : 'bg-gradient-to-b from-[#A855F7]/0 to-[#A855F7]/5 opacity-0 group-hover:opacity-100'
+                        }`}></div>
+                        {user?.role === 'agency' && (
+                            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(245,158,11,0.15),transparent_70%)] animate-pulse"></div>
+                        )}
                         <div className="absolute top-0 right-0 p-8 opacity-0 group-hover:opacity-10 transition-opacity duration-500 transform translate-x-4 -translate-y-4 group-hover:translate-x-0 group-hover:translate-y-0">
-                            <span className="material-symbols-outlined text-9xl text-[#A855F7]">handshake</span>
+                            <span className={`material-symbols-outlined text-9xl ${user?.role === 'agency' ? 'text-[#F59E0B]' : 'text-[#A855F7]'}`}>handshake</span>
                         </div>
 
                         <div className="relative z-10">
-                            <div className="size-16 rounded-2xl bg-[#A855F7]/10 border border-[#A855F7]/20 flex items-center justify-center text-[#A855F7] mb-8 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500 shadow-[0_0_20px_rgba(168,85,247,0.15)]">
-                                <span className="material-symbols-outlined text-3xl">recycling</span>
+                            <div className={`size-16 rounded-2xl flex items-center justify-center mb-8 transition-all duration-500 ${
+                                user?.role === 'agency'
+                                    ? 'bg-gradient-to-br from-[#F59E0B] to-[#D97706] text-slate-900 shadow-[0_0_40px_rgba(245,158,11,0.6),0_0_20px_rgba(217,119,6,0.4)] scale-125 rotate-6'
+                                    : 'bg-[#A855F7]/10 border border-[#A855F7]/20 text-[#A855F7] shadow-[0_0_20px_rgba(168,85,247,0.15)] group-hover:scale-110 group-hover:rotate-3'
+                            }`}>
+                                <span className="material-symbols-outlined text-3xl font-bold">recycling</span>
                             </div>
-                            <h3 className="text-3xl font-bold text-white mb-3">Partners</h3>
-                            <p className="text-slate-400 leading-relaxed">
+                            <h3 className={`text-3xl font-bold mb-3 transition-colors ${user?.role === 'agency' ? 'text-[#FBBF24]' : 'text-white'}`}>Partners</h3>
+                            <p className={`leading-relaxed ${user?.role === 'agency' ? 'text-slate-300' : 'text-slate-400'}`}>
                                 Grow your recycling business. Access our booking stream, manage fleet logistics, and track inventory.
                             </p>
                         </div>
 
-                        <div className="relative z-10 flex items-center gap-3 text-[#A855F7] font-bold tracking-wide group-hover:gap-5 transition-all">
+                        <div className={`relative z-10 flex items-center gap-3 font-bold tracking-wide group-hover:gap-5 transition-all ${
+                            user?.role === 'agency' ? 'text-[#FBBF24] animate-pulse' : 'text-[#A855F7]'
+                        }`}>
                             <span>Join Network</span>
                             <span className="material-symbols-outlined">arrow_forward</span>
                         </div>
