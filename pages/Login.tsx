@@ -227,8 +227,8 @@ const Login = () => {
                     <span className="material-symbols-outlined text-slate-500 text-[18px]">admin_panel_settings</span>
                     <p className="text-xs text-slate-500">
                     Are you an Administrator? 
-                    <a className="font-medium text-[#34D399] hover:underline hover:text-[#34D399]/80 ml-1 cursor-pointer" onClick={() => window.location.hash = '#/admin'}>
-                        Log in here
+                    <a className="font-medium text-[#34D399] hover:underline hover:text-[#34D399]/80 ml-1 cursor-pointer" onClick={() => window.location.hash = '#/admin-login'}>
+                        Click here
                     </a>
                     </p>
                 </div>
