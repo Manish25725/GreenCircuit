@@ -25,7 +25,8 @@ const AdminLogin = () => {
         localStorage.setItem('token', data.token);
         localStorage.setItem('user', JSON.stringify(data.user));
         localStorage.setItem('isLoggedIn', 'true');
-        window.location.hash = '#/admin/dashboard';
+        window.location.hash = '#/admin';
+        window.location.reload();
       } else {
         setError(data.message || 'Invalid admin key');
       }

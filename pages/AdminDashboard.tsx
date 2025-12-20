@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
 import { api, getCurrentUser } from '../services/api';
+import NotificationBell from '../components/NotificationBell';
 
 const AdminDashboard = () => {
   const [user, setUser] = useState(getCurrentUser());
@@ -63,22 +64,18 @@ const AdminDashboard = () => {
               </div>
               
               <div className="flex items-center gap-4">
-                <button 
-                  onClick={() => window.location.hash = '#/notifications'}
-                  className="hidden sm:flex items-center justify-center size-10 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors relative"
-                >
-                  <span className="material-symbols-outlined text-gray-300">notifications</span>
-                  <span className="absolute top-2 right-2 size-2 rounded-full bg-pink-500 ring-2 ring-[#0B1116]"></span>
-                </button>
+                <div className="hidden sm:block">
+                  <NotificationBell />
+                </div>
                 
                 <button 
                   onClick={() => window.location.hash = '#/profile'}
                   className="hidden sm:flex items-center gap-3 pl-1 pr-4 py-1 rounded-full bg-gradient-to-r from-pink-500/20 to-purple-600/20 border border-pink-500/30 hover:border-pink-500/50 transition-colors group cursor-pointer"
                 >
                   <div className="size-8 rounded-full bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center ring-2 ring-pink-500/50 group-hover:ring-pink-500 transition-all text-white font-bold text-sm">
-                    {user?.name?.charAt(0) || 'A'}
+                    A
                   </div>
-                  <span className="text-sm font-medium text-white">{user?.name || 'Admin'}</span>
+                  <span className="text-sm font-medium text-white">Admin</span>
                 </button>
 
                 <button

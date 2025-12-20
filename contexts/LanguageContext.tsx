@@ -41,8 +41,8 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     setLanguageState(lang);
     localStorage.setItem('appLanguage', lang);
     try {
-      await api.updatePreferences({
-        app: { language: lang }
+      await api.updateAppSettings({
+        language: lang
       });
     } catch (error) {
       console.error('Failed to save language preference:', error);

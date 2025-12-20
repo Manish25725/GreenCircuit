@@ -363,38 +363,6 @@ export const updateUser = async (req: Request, res: Response) => {
 };
 
 // Suspend user
-export const suspendUser = async (req: Request, res: Response) => {
-  try {
-    const { reason } = req.body;
-
-    const user = await User.findByIdAndUpdate(
-      req.params.id,
-      { 
-        isVerified: false,
-        suspendedAt: new Date(),
-        suspendReason: reason
-      },
-      { new: true }
-    ).select('-password');
-
-    if (!user) {
-      return sendError(res, 'User not found', 404);
-    }
-
-    // Create notification
-    await Notification.create({
-      userId: user._id,
-      type: 'account',
-      title: 'Account Suspended',
-      message: `Your account has been suspended. Reason: ${reason || 'Policy violation'}`
-    });
-
-    sendSuccess(res, { message: 'User suspended successfully', user });
-  } catch (error: any) {
-    sendError(res, error.message);
-  }
-};
-
 // Reactivate user
 export const reactivateUser = async (req: Request, res: Response) => {
   try {
@@ -690,42 +658,6 @@ export const getAgencyDetails = async (req: Request, res: Response) => {
 };
 
 // Suspend agency
-export const suspendAgency = async (req: Request, res: Response) => {
-  try {
-    const { reason } = req.body;
-
-    const agency = await Agency.findByIdAndUpdate(
-      req.params.id,
-      { 
-        isVerified: false,
-        verificationStatus: 'suspended',
-        suspendReason: reason,
-        suspendedAt: new Date()
-      },
-      { new: true }
-    );
-
-    if (!agency) {
-      return sendError(res, 'Agency not found', 404);
-    }
-
-    // Update user
-    await User.findByIdAndUpdate(agency.userId, { isVerified: false });
-
-    // Create notification
-    await Notification.create({
-      userId: agency.userId,
-      type: 'account',
-      title: 'Agency Suspended',
-      message: `Your agency has been suspended. Reason: ${reason || 'Compliance issues'}`
-    });
-
-    sendSuccess(res, { message: 'Agency suspended successfully', agency });
-  } catch (error: any) {
-    sendError(res, error.message);
-  }
-};
-
 // Reactivate agency
 export const reactivateAgency = async (req: Request, res: Response) => {
   try {
@@ -962,6 +894,246 @@ export const sendSystemNotification = async (req: Request, res: Response) => {
     sendSuccess(res, { 
       message: `Notification sent to ${users.length} users`,
       recipientCount: users.length
+    });
+  } catch (error: any) {
+    sendError(res, error.message);
+  }
+};
+
+// Suspend user
+export const suspendUser = async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.params;
+    const { reason } = req.body;
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return sendError(res, 'User not found', 404);
+    }
+
+    if (user.role === 'admin') {
+      return sendError(res, 'Cannot suspend admin users', 403);
+    }
+
+    user.suspended = true;
+    user.suspendedAt = new Date();
+    user.suspendedReason = reason || 'Account suspended by administrator';
+    await user.save();
+
+    // Send notification to user
+    await Notification.create({
+      userId: user._id,
+      title: 'Account Suspended',
+      message: `Your account has been suspended. Reason: ${user.suspendedReason}`,
+      type: 'alert',
+      priority: 'high'
+    });
+
+    sendSuccess(res, {
+      message: 'User suspended successfully',
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        suspended: user.suspended,
+        suspendedReason: user.suspendedReason
+      }
+    });
+  } catch (error: any) {
+    sendError(res, error.message);
+  }
+};
+
+// Unsuspend user
+export const unsuspendUser = async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.params;
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return sendError(res, 'User not found', 404);
+    }
+
+    user.suspended = false;
+    user.suspendedAt = undefined;
+    user.suspendedReason = undefined;
+    await user.save();
+
+    // Send notification to user
+    await Notification.create({
+      userId: user._id,
+      title: 'Account Restored',
+      message: 'Your account has been restored. You can now access all features.',
+      type: 'success',
+      priority: 'normal'
+    });
+
+    sendSuccess(res, {
+      message: 'User unsuspended successfully',
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        suspended: user.suspended
+      }
+    });
+  } catch (error: any) {
+    sendError(res, error.message);
+  }
+};
+
+// Suspend agency
+export const suspendAgency = async (req: Request, res: Response) => {
+  try {
+    const { agencyId } = req.params;
+    const { reason } = req.body;
+
+    const agency = await Agency.findById(agencyId);
+    if (!agency) {
+      return sendError(res, 'Agency not found', 404);
+    }
+
+    agency.suspended = true;
+    agency.suspendedAt = new Date();
+    agency.suspendedReason = reason || 'Agency suspended by administrator';
+    await agency.save();
+
+    // Send notification to agency owner
+    await Notification.create({
+      userId: agency.userId,
+      title: 'Agency Suspended',
+      message: `Your agency "${agency.name}" has been suspended. Reason: ${agency.suspendedReason}`,
+      type: 'alert',
+      priority: 'high'
+    });
+
+    sendSuccess(res, {
+      message: 'Agency suspended successfully',
+      agency: {
+        _id: agency._id,
+        name: agency.name,
+        suspended: agency.suspended,
+        suspendedReason: agency.suspendedReason
+      }
+    });
+  } catch (error: any) {
+    sendError(res, error.message);
+  }
+};
+
+// Unsuspend agency
+export const unsuspendAgency = async (req: Request, res: Response) => {
+  try {
+    const { agencyId } = req.params;
+
+    const agency = await Agency.findById(agencyId);
+    if (!agency) {
+      return sendError(res, 'Agency not found', 404);
+    }
+
+    agency.suspended = false;
+    agency.suspendedAt = undefined;
+    agency.suspendedReason = undefined;
+    await agency.save();
+
+    // Send notification to agency owner
+    await Notification.create({
+      userId: agency.userId,
+      title: 'Agency Restored',
+      message: `Your agency "${agency.name}" has been restored. You can now access all features.`,
+      type: 'success',
+      priority: 'normal'
+    });
+
+    sendSuccess(res, {
+      message: 'Agency unsuspended successfully',
+      agency: {
+        _id: agency._id,
+        name: agency.name,
+        suspended: agency.suspended
+      }
+    });
+  } catch (error: any) {
+    sendError(res, error.message);
+  }
+};
+
+// Send message to user
+export const sendMessageToUser = async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.params;
+    const { title, message, priority } = req.body;
+
+    if (!title || !message) {
+      return sendError(res, 'Title and message are required', 400);
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return sendError(res, 'User not found', 404);
+    }
+
+    const notification = await Notification.create({
+      userId: user._id,
+      title,
+      message,
+      type: 'info',
+      priority: priority || 'normal'
+    });
+
+    sendSuccess(res, {
+      message: 'Message sent successfully',
+      notification: {
+        _id: notification._id,
+        title: notification.title,
+        message: notification.message,
+        recipient: {
+          _id: user._id,
+          name: user.name,
+          email: user.email
+        }
+      }
+    });
+  } catch (error: any) {
+    sendError(res, error.message);
+  }
+};
+
+// Send message to agency
+export const sendMessageToAgency = async (req: Request, res: Response) => {
+  try {
+    const { agencyId } = req.params;
+    const { title, message, priority } = req.body;
+
+    if (!title || !message) {
+      return sendError(res, 'Title and message are required', 400);
+    }
+
+    const agency = await Agency.findById(agencyId);
+    if (!agency) {
+      return sendError(res, 'Agency not found', 404);
+    }
+
+    const notification = await Notification.create({
+      userId: agency.userId,
+      title,
+      message,
+      type: 'info',
+      priority: priority || 'normal'
+    });
+
+    sendSuccess(res, {
+      message: 'Message sent successfully',
+      notification: {
+        _id: notification._id,
+        title: notification.title,
+        message: notification.message,
+        recipient: {
+          _id: agency._id,
+          name: agency.name,
+          email: agency.email
+        }
+      }
     });
   } catch (error: any) {
     sendError(res, error.message);

@@ -13,6 +13,9 @@ export interface IUser extends mongoose.Document {
   totalWasteRecycled: number;
   totalPickups: number;
   isVerified: boolean;
+  suspended: boolean;
+  suspendedAt?: Date;
+  suspendedReason?: string;
   preferences?: {
     notifications: {
       pickupReminders: boolean;
@@ -58,6 +61,9 @@ const userSchema = new mongoose.Schema({
   totalWasteRecycled: { type: Number, default: 0 },
   totalPickups: { type: Number, default: 0 },
   isVerified: { type: Boolean, default: false },
+  suspended: { type: Boolean, default: false },
+  suspendedAt: { type: Date },
+  suspendedReason: { type: String },
   preferences: {
     notifications: {
       pickupReminders: { type: Boolean, default: true },

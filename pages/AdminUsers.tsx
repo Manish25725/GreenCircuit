@@ -216,10 +216,7 @@ const AdminUsers: React.FC = () => {
                             </td>
                             <td className="px-6 py-4">
                               <button
-                                onClick={() => {
-                                  setSelectedUser(user);
-                                  setShowModal(true);
-                                }}
+                                onClick={() => window.location.hash = `#/admin/users/${user._id}`}
                                 className="px-3 py-1.5 bg-pink-500/10 text-pink-400 rounded-lg hover:bg-pink-500/20 transition-colors text-sm font-medium"
                               >
                                 View Details

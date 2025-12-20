@@ -38,6 +38,8 @@ import PartnerRegistration from './pages/PartnerRegistration';
 import PartnerPending from './pages/PartnerPending';
 import Services from './pages/Services';
 import AdminLogin from './pages/AdminLogin';
+import AdminUserDetail from './pages/AdminUserDetail';
+import AdminAgencyDetail from './pages/AdminAgencyDetail';
 
 const App = () => {
   const [route, setRoute] = useState(window.location.hash || '#/');
@@ -204,6 +206,17 @@ const App = () => {
         return <AdminAgencies />;
       case '#/admin/partners':
         return <AdminPartnerApproval />;
+    }
+    
+    // Dynamic routes - check if path matches pattern
+    if (basePath.startsWith('#/admin/users/')) {
+      return <AdminUserDetail />;
+    }
+    if (basePath.startsWith('#/admin/agencies/')) {
+      return <AdminAgencyDetail />;
+    }
+    
+    switch (basePath) {
       case '#/admin/reports':
         return <AdminReports />;
       case '#/admin-login':

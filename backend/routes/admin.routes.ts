@@ -6,19 +6,23 @@ import {
   getAllUsers,
   getUserById,
   updateUser,
-  suspendUser,
+  suspendUser as adminSuspendUser,
+  unsuspendUser,
   reactivateUser,
   deleteUser,
+  sendMessageToUser,
   // Agencies
   getAllAgencies,
   getAgencyForVerification,
   getPendingAgencies,
   updateAgencyVerification,
   getAgencyDetails,
-  suspendAgency,
+  suspendAgency as adminSuspendAgency,
+  unsuspendAgency,
   reactivateAgency,
   approvePartnerRegistration,
   rejectPartnerRegistration,
+  sendMessageToAgency,
   // Vetting
   getVettingRequests,
   getVettingRequest,
@@ -51,9 +55,11 @@ router.get('/dashboard', getDashboardStats);
 router.get('/users', getAllUsers);
 router.get('/users/:id', getUserById);
 router.put('/users/:id', updateUser);
-router.post('/users/:id/suspend', suspendUser);
+router.post('/users/:userId/suspend', adminSuspendUser);
+router.post('/users/:userId/unsuspend', unsuspendUser);
 router.post('/users/:id/reactivate', reactivateUser);
 router.delete('/users/:id', deleteUser);
+router.post('/users/:userId/message', sendMessageToUser);
 
 // ==========================================
 // AGENCY MANAGEMENT
@@ -65,8 +71,10 @@ router.get('/agencies/:id/verify', getAgencyForVerification);
 router.put('/agencies/:id/verify', updateAgencyVerification);
 router.post('/agencies/:id/approve', approvePartnerRegistration);
 router.post('/agencies/:id/reject', rejectPartnerRegistration);
-router.post('/agencies/:id/suspend', suspendAgency);
+router.post('/agencies/:agencyId/suspend', adminSuspendAgency);
+router.post('/agencies/:agencyId/unsuspend', unsuspendAgency);
 router.post('/agencies/:id/reactivate', reactivateAgency);
+router.post('/agencies/:agencyId/message', sendMessageToAgency);
 
 // ==========================================
 // VETTING / VERIFICATION

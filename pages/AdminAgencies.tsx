@@ -191,10 +191,7 @@ const AdminAgencies: React.FC = () => {
                       <div
                         key={agency._id}
                         className="bg-[#1E293B]/60 backdrop-blur-sm border border-pink-500/20 rounded-2xl p-6 hover:border-pink-500/40 transition-all cursor-pointer"
-                        onClick={() => {
-                          setSelectedAgency(agency);
-                          setShowModal(true);
-                        }}
+                        onClick={() => window.location.hash = `#/admin/agencies/${agency._id}`}
                       >
                         <div className="flex items-start justify-between mb-4">
                           <div className="flex-1">

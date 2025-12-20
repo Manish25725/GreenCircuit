@@ -726,7 +726,16 @@ export const getCurrentUser = (): User | null => {
   }
   
   const userStr = localStorage.getItem('user');
-  return userStr ? JSON.parse(userStr) : null;
+  if (!userStr || userStr === 'undefined' || userStr === 'null') {
+    return null;
+  }
+  
+  try {
+    return JSON.parse(userStr);
+  } catch (e) {
+    console.error('Error parsing user from localStorage:', e);
+    return null;
+  }
 };
 
 export const saveUser = (user: User) => {

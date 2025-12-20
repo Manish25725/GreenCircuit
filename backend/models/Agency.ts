@@ -36,6 +36,9 @@ export interface IAgency extends Document {
   totalBookings: number;
   earnings: number;
   isVerified: boolean;
+  suspended: boolean;
+  suspendedAt?: Date;
+  suspendedReason?: string;
   verificationStatus: 'pending' | 'approved' | 'rejected';
   verificationDocuments: string[];
   rejectionReason?: string;
@@ -142,6 +145,16 @@ const AgencySchema = new Schema<IAgency>({
   isVerified: {
     type: Boolean,
     default: false
+  },
+  suspended: {
+    type: Boolean,
+    default: false
+  },
+  suspendedAt: {
+    type: Date
+  },
+  suspendedReason: {
+    type: String
   },
   verificationStatus: {
     type: String,
