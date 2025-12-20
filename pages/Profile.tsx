@@ -79,8 +79,7 @@ const Profile = () => {
       setUploadingAvatar(true);
       const formData = new FormData();
       formData.append('file', file);
-      formData.append('upload_preset', 'ml_default'); // You may need to create this in Cloudinary
-      formData.append('cloud_name', 'dideet7oz');
+      formData.append('upload_preset', 'ecocycle_uploads');
 
       const response = await fetch(
         'https://api.cloudinary.com/v1_1/dideet7oz/image/upload',
@@ -90,6 +89,10 @@ const Profile = () => {
         }
       );
 
+      if (!response.ok) {
+        throw new Error('Cloudinary upload failed');
+      }
+
       const data = await response.json();
       
       if (data.secure_url) {
@@ -97,20 +100,14 @@ const Profile = () => {
         setFormData(prev => ({ ...prev, avatar: data.secure_url }));
         
         // Immediately save the avatar
-        const updateResponse = await api.auth.updateProfile({ avatar: data.secure_url });
-        if (updateResponse.data) {
-          setUser(updateResponse.data);
-          // Update localStorage
-          const storedUser = localStorage.getItem('user');
-          if (storedUser) {
-            const userData = JSON.parse(storedUser);
-            localStorage.setItem('user', JSON.stringify({ ...userData, ...updateResponse.data }));
-          }
+        const updatedUser = await api.updateProfile({ avatar: data.secure_url });
+        if (updatedUser) {
+          setUser(updatedUser);
         }
       }
     } catch (error) {
       console.error('Failed to upload avatar:', error);
-      alert('Failed to upload avatar. Please try again.');
+      alert('Failed to upload avatar. Please check your Cloudinary settings and try again.');
     } finally {
       setUploadingAvatar(false);
     }

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../services/api';
+import Loader from './Loader';
 
 interface Notification {
   _id: string;
@@ -108,7 +109,7 @@ const NotificationPanel = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#34D399]"></div>
+        <Loader size="md" />
       </div>
     );
   }

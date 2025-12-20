@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import Layout from '../components/Layout';
 import { api, getCurrentUser, isAuthenticated } from '../services/api';
 import gsap from 'gsap';
+import Loader from '../components/Loader';
 
 // Helper to get user role
 const getUserRole = (): 'User' | 'Business' | 'Agency' | 'Admin' => {
@@ -504,8 +505,8 @@ const SchedulePickup = () => {
       ) : (checkingLimit || loadingAgency) ? (
         <div className="bg-[#0B1116] min-h-screen flex items-center justify-center">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-2 border-[#10b981] border-t-transparent mx-auto mb-4"></div>
-            <p className="text-[#94a3b8]">{checkingLimit ? 'Checking availability...' : 'Loading agency details...'}</p>
+            <Loader size="md" color="#10b981" />
+            <p className="text-[#94a3b8] mt-4">{checkingLimit ? 'Checking availability...' : 'Loading agency details...'}</p>
           </div>
         </div>
       ) : (

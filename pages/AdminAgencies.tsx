@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { api } from '../services/api';
 import Layout from '../components/Layout';
+import Loader from '../components/Loader';
 
 interface Agency {
   _id: string;
@@ -24,8 +25,6 @@ const AdminAgencies: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
-  const [selectedAgency, setSelectedAgency] = useState<Agency | null>(null);
-  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     fetchAgencies();
@@ -123,7 +122,7 @@ const AdminAgencies: React.FC = () => {
           <div className="p-6">
             {loading ? (
               <div className="flex items-center justify-center py-20">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-pink-500"></div>
+                <Loader size="md" color="#ec4899" />
               </div>
             ) : (
               <>
@@ -249,111 +248,6 @@ const AdminAgencies: React.FC = () => {
             )}
           </div>
         </div>
-
-        {/* Agency Details Modal */}
-        {showModal && selectedAgency && (
-          <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-            <div className="bg-[#1E293B] border border-pink-500/20 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-              <div className="sticky top-0 bg-[#1E293B] border-b border-white/10 px-6 py-4 flex justify-between items-center">
-                <h2 className="text-2xl font-bold text-white">Agency Details</h2>
-                <button
-                  onClick={() => setShowModal(false)}
-                  className="text-gray-400 hover:text-white"
-                >
-                  <span className="material-symbols-outlined">close</span>
-                </button>
-              </div>
-
-              <div className="p-6 space-y-6">
-                {/* Agency Header */}
-                <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-2xl font-bold text-white">{selectedAgency.name}</h3>
-                    <span className={`px-3 py-1 rounded-full text-xs font-bold border ${getStatusBadge(selectedAgency.verificationStatus, selectedAgency.isVerified)}`}>
-                      {selectedAgency.isVerified ? 'Active' : selectedAgency.verificationStatus}
-                    </span>
-                  </div>
-                  <p className="text-gray-400">{selectedAgency.email}</p>
-                </div>
-
-                {/* Stats */}
-                <div className="grid grid-cols-3 gap-4">
-                  <div className="bg-white/5 p-4 rounded-lg">
-                    <p className="text-sm text-gray-400">Total Bookings</p>
-                    <p className="text-2xl font-bold text-pink-400">{selectedAgency.totalBookings || 0}</p>
-                  </div>
-                  <div className="bg-white/5 p-4 rounded-lg">
-                    <p className="text-sm text-gray-400">Rating</p>
-                    <p className="text-2xl font-bold text-yellow-400">{selectedAgency.rating?.toFixed(1) || 'N/A'}</p>
-                  </div>
-                  <div className="bg-white/5 p-4 rounded-lg">
-                    <p className="text-sm text-gray-400">Services</p>
-                    <p className="text-2xl font-bold text-purple-400">{selectedAgency.services.length}</p>
-                  </div>
-                </div>
-
-                {/* Contact Info */}
-                <div className="bg-white/5 p-4 rounded-lg">
-                  <h4 className="font-bold text-white mb-3">Contact Information</h4>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex items-center gap-2">
-                      <span className="material-symbols-outlined text-pink-400 text-[18px]">mail</span>
-                      <span className="text-gray-300">{selectedAgency.email}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="material-symbols-outlined text-pink-400 text-[18px]">phone</span>
-                      <span className="text-gray-300">{selectedAgency.phone}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="material-symbols-outlined text-pink-400 text-[18px]">location_on</span>
-                      <span className="text-gray-300">{selectedAgency.address.city}, {selectedAgency.address.state}</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Services */}
-                <div>
-                  <h4 className="font-bold text-white mb-3">Services Offered</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {selectedAgency.services.map((service, idx) => (
-                      <span key={idx} className="px-3 py-1.5 bg-purple-500/10 text-purple-400 rounded-lg text-sm border border-purple-500/20">
-                        {service}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Additional Info */}
-                <div className="bg-white/5 p-4 rounded-lg">
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-gray-400">Agency ID:</span>
-                      <span className="text-white font-mono">{selectedAgency._id}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-400">Joined:</span>
-                      <span className="text-white">{new Date(selectedAgency.createdAt).toLocaleDateString()}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-400">Verification Status:</span>
-                      <span className="text-white">{selectedAgency.verificationStatus}</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Actions */}
-                <div className="flex gap-3 pt-4 border-t border-white/10">
-                  <button className="flex-1 px-4 py-2 bg-pink-500/10 text-pink-400 rounded-lg hover:bg-pink-500/20 transition-colors border border-pink-500/20">
-                    View Bookings
-                  </button>
-                  <button className="flex-1 px-4 py-2 bg-purple-500/10 text-purple-400 rounded-lg hover:bg-purple-500/20 transition-colors border border-purple-500/20">
-                    Send Message
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
     </Layout>
   );

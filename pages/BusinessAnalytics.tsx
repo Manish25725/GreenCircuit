@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
 import { getCurrentUser } from '../services/api';
+import Loader from '../components/Loader';
 
 interface AnalyticsData {
   summary: {
@@ -274,8 +275,8 @@ const BusinessAnalytics = () => {
                 {loading ? (
                   <div className="flex items-center justify-center py-20">
                     <div className="text-center">
-                      <div className="animate-spin w-12 h-12 border-4 border-[#06b6d4] border-t-transparent rounded-full mx-auto mb-4"></div>
-                      <p className="text-gray-400">Loading analytics...</p>
+                      <Loader size="md" color="#06b6d4" />
+                      <p className="text-gray-400 mt-4">Loading analytics...</p>
                     </div>
                   </div>
                 ) : (

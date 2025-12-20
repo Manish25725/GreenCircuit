@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import User from '../models/User';
 import jwt from 'jsonwebtoken';
 import { sendSuccess, sendError } from '../utils/response';
+import { deleteImageByUrl } from '../utils/cloudinary';
 
 const generateToken = (id: string, role: string) => {
   return jwt.sign({ id, role }, process.env.JWT_SECRET || 'fallback_secret', {
@@ -87,11 +88,27 @@ export const getMe = async (req: Request, res: Response) => {
 export const updateProfile = async (req: Request, res: Response) => {
   try {
     const { name, phone, address, avatar } = req.body;
+    
+    // Get current user to check for existing avatar
+    const currentUser = await User.findById((req as any).user.id);
+    if (!currentUser) {
+      return sendError(res, 'User not found', 404);
+    }
+
+    // If updating avatar and user has an old avatar, delete the old one from Cloudinary
+    if (avatar && currentUser.avatar && currentUser.avatar !== avatar) {
+      if (currentUser.avatar.includes('cloudinary.com')) {
+        await deleteImageByUrl(currentUser.avatar);
+        console.log('Deleted old avatar from Cloudinary');
+      }
+    }
+
     const user = await User.findByIdAndUpdate(
       (req as any).user.id,
       { name, phone, address, avatar },
       { new: true, runValidators: true }
     );
+    
     if (!user) {
       return sendError(res, 'User not found', 404);
     }

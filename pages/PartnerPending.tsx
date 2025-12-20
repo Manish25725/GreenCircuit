@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { api } from '../services/api';
+import Loader from '../components/Loader';
 
 const PartnerPending: React.FC = () => {
   const [loading, setLoading] = useState(true);

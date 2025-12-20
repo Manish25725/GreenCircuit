@@ -1,5 +1,6 @@
 import React from 'react';
 import { getCurrentUser } from '../services/api';
+import Loader from './Loader';
 
 interface ProfileSidebarProps {
   activePage: 'profile' | 'notifications' | 'security' | 'settings';
@@ -27,9 +28,8 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ activePage }) => {
       setUploadingAvatar(true);
       const formData = new FormData();
       formData.append('file', file);
-      formData.append('upload_preset', 'ml_default');
-      formData.append('cloud_name', 'dideet7oz');
-
+      formData.append('upload_preset', 'ecocycle_uploads');
+      
       const response = await fetch(
         'https://api.cloudinary.com/v1_1/dideet7oz/image/upload',
         {
@@ -38,24 +38,24 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ activePage }) => {
         }
       );
 
+      if (!response.ok) {
+        throw new Error('Cloudinary upload failed');
+      }
+
       const data = await response.json();
       
       if (data.secure_url) {
         // Update avatar in API and localStorage
         const { api } = await import('../services/api');
-        const updateResponse = await api.auth.updateProfile({ avatar: data.secure_url });
-        if (updateResponse.data) {
-          const storedUser = localStorage.getItem('user');
-          if (storedUser) {
-            const userData = JSON.parse(storedUser);
-            localStorage.setItem('user', JSON.stringify({ ...userData, ...updateResponse.data }));
-          }
+        const updatedUser = await api.updateProfile({ avatar: data.secure_url });
+        if (updatedUser) {
+          // User is already saved by the API function
           window.location.reload(); // Refresh to show new avatar
         }
       }
     } catch (error) {
       console.error('Failed to upload avatar:', error);
-      alert('Failed to upload avatar. Please try again.');
+      alert('Failed to upload avatar. Please check your Cloudinary settings and try again.');
     } finally {
       setUploadingAvatar(false);
     }
@@ -80,7 +80,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ activePage }) => {
               ></div>
               <label className="absolute -bottom-1 -right-1 flex items-center justify-center size-7 bg-[#10b981] rounded-full text-[#0B1116] hover:bg-[#059669] cursor-pointer transition-colors shadow-lg">
                 {uploadingAvatar ? (
-                  <div className="w-4 h-4 border-2 border-[#0B1116] border-t-transparent rounded-full animate-spin"></div>
+                  <Loader size="sm" color="#0B1116" className="w-4 h-4" />
                 ) : (
                   <span className="material-symbols-outlined text-base">photo_camera</span>
                 )}

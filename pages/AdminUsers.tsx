@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { api } from '../services/api';
 import Layout from '../components/Layout';
+import Loader from '../components/Loader';
 
 interface User {
   _id: string;
@@ -17,8 +18,7 @@ const AdminUsers: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [roleFilter, setRoleFilter] = useState<string>('all');
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
-  const [showModal, setShowModal] = useState(false);
+
 
   useEffect(() => {
     fetchUsers();
@@ -116,7 +116,7 @@ const AdminUsers: React.FC = () => {
           <div className="p-6">
             {loading ? (
               <div className="flex items-center justify-center py-20">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-pink-500"></div>
+                <Loader size="md" color="#ec4899" />
               </div>
             ) : (
               <>
@@ -232,78 +232,6 @@ const AdminUsers: React.FC = () => {
             )}
           </div>
         </div>
-
-        {/* User Details Modal */}
-        {showModal && selectedUser && (
-          <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-            <div className="bg-[#1E293B] border border-pink-500/20 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-              <div className="sticky top-0 bg-[#1E293B] border-b border-white/10 px-6 py-4 flex justify-between items-center">
-                <h2 className="text-2xl font-bold text-white">User Details</h2>
-                <button
-                  onClick={() => setShowModal(false)}
-                  className="text-gray-400 hover:text-white"
-                >
-                  <span className="material-symbols-outlined">close</span>
-                </button>
-              </div>
-
-              <div className="p-6 space-y-6">
-                {/* User Info */}
-                <div className="flex items-center gap-4">
-                  <div className="size-20 rounded-full bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center text-white text-3xl font-bold">
-                    {selectedUser.name.charAt(0).toUpperCase()}
-                  </div>
-                  <div>
-                    <h3 className="text-2xl font-bold text-white">{selectedUser.name}</h3>
-                    <p className="text-gray-400">{selectedUser.email}</p>
-                    <span className={`inline-block mt-2 px-3 py-1 rounded-full text-xs font-bold border ${getRoleBadge(selectedUser.role)}`}>
-                      {selectedUser.role}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Stats */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-white/5 p-4 rounded-lg">
-                    <p className="text-sm text-gray-400">Eco Points</p>
-                    <p className="text-2xl font-bold text-pink-400">{selectedUser.ecoPoints || 0}</p>
-                  </div>
-                  <div className="bg-white/5 p-4 rounded-lg">
-                    <p className="text-sm text-gray-400">Member Since</p>
-                    <p className="text-lg font-bold text-white">{new Date(selectedUser.createdAt).toLocaleDateString()}</p>
-                  </div>
-                </div>
-
-                {/* Additional Info */}
-                <div className="bg-white/5 p-4 rounded-lg">
-                  <h4 className="font-bold text-white mb-2">Account Information</h4>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-gray-400">User ID:</span>
-                      <span className="text-white font-mono">{selectedUser._id}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-400">Verified:</span>
-                      <span className={selectedUser.isVerified ? 'text-green-400' : 'text-gray-400'}>
-                        {selectedUser.isVerified ? 'Yes' : 'No'}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Actions */}
-                <div className="flex gap-3 pt-4 border-t border-white/10">
-                  <button className="flex-1 px-4 py-2 bg-blue-500/10 text-blue-400 rounded-lg hover:bg-blue-500/20 transition-colors border border-blue-500/20">
-                    Send Message
-                  </button>
-                  <button className="flex-1 px-4 py-2 bg-red-500/10 text-red-400 rounded-lg hover:bg-red-500/20 transition-colors border border-red-500/20">
-                    Suspend User
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
     </Layout>
   );

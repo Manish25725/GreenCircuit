@@ -5,6 +5,7 @@ import ProfileSidebar from '../components/ProfileSidebar';
 import { api, getCurrentUser } from '../services/api';
 import { useLanguage } from '../contexts/LanguageContext';
 import { Language } from '../i18n/translations';
+import Loader from '../components/Loader';
 
 const AppSettings = () => {
   const [loading, setLoading] = useState(true);
@@ -151,8 +152,8 @@ const AppSettings = () => {
       <Layout title="" role="User" fullWidth hideSidebar>
         <div className="bg-[#0B1116] min-h-screen flex items-center justify-center">
           <div className="text-center">
-            <div className="w-12 h-12 border-4 border-[#10b981] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-gray-400">Loading settings...</p>
+            <Loader size="md" color="#10b981" />
+            <p className="text-gray-400 mt-4">Loading settings...</p>
           </div>
         </div>
       </Layout>

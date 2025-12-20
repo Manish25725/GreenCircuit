@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { api } from '../services/api';
 import Layout from '../components/Layout';
+import Loader from '../components/Loader';
 
 interface Agency {
   _id: string;
@@ -189,7 +190,7 @@ const AdminAgencyDetail = () => {
     return (
       <Layout title="" role="Admin" fullWidth hideSidebar>
         <div className="flex items-center justify-center min-h-screen">
-          <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-pink-500"></div>
+          <Loader size="lg" color="#ec4899" />
         </div>
       </Layout>
     );

@@ -4,18 +4,6 @@ const AboutUs = () => {
   return (
     <div className="relative flex h-auto min-h-screen w-full flex-col bg-[#0B1120] text-slate-300 font-sans group/design-root overflow-x-hidden selection:bg-[#34D399] selection:text-[#0B1120]">
       <div className="layout-container flex h-full grow flex-col">
-        {/* Header - Logo Only */}
-        <header className="sticky top-0 z-50 flex items-center justify-center border-b border-white/5 bg-[#0B1120]/80 backdrop-blur-md px-6 py-4">
-            <div className="flex items-center gap-3 cursor-pointer" onClick={() => window.location.hash = '#/'}>
-                <div className="size-8 text-[#34D399] flex items-center justify-center">
-                    <svg className="w-full h-full drop-shadow-[0_0_8px_rgba(52,211,153,0.5)]" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M42.4379 44C42.4379 44 36.0744 33.9038 41.1692 24C46.8624 12.9336 42.2078 4 42.2078 4L7.01134 4C7.01134 4 11.6577 12.932 5.96912 23.9969C0.876273 33.9029 7.27094 44 7.27094 44L42.4379 44Z" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="3"></path>
-                    </svg>
-                </div>
-                <h2 className="text-white text-xl font-black tracking-tight">EcoCycle</h2>
-            </div>
-        </header>
-
         {/* Back Button */}
         <div className="w-full max-w-[960px] mx-auto px-4 sm:px-10 lg:px-0 pt-6">
             <button 
@@ -29,10 +17,10 @@ const AboutUs = () => {
             </button>
         </div>
 
-        <main className="flex-1 px-4 py-6 sm:px-10 lg:px-40 lg:py-14">
-          <div className="mx-auto flex max-w-[960px] flex-col gap-10">
+        <main className="flex-1 flex items-center justify-center px-4 py-6 sm:px-10 lg:px-40 lg:py-14">
+          <div className="w-full max-w-[960px] flex flex-col gap-10">
             {/* Page Header */}
-            <div className="flex min-w-72 flex-col gap-3">
+            <div className="flex min-w-72 flex-col gap-3 text-center">
               <p className="text-white text-4xl font-black leading-tight tracking-tight md:text-5xl">About EcoCycle</p>
               <p className="text-slate-400 text-base font-normal leading-normal md:text-lg">Transforming the global e-waste crisis into a sustainable opportunity.</p>
             </div>
