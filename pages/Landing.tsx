@@ -289,7 +289,7 @@ const Landing = () => {
                                 <span className="material-symbols-outlined">recycling</span>
                             </div>
                             <div>
-                                <p className="text-white font-bold text-lg">12,450+ {t('itemsRecycled')}</p>
+                                <p className="text-white font-bold text-lg">12,450+ {t('totalItemsRecycled')}</p>
                                 <p className="text-[#6EE7B7] text-sm font-medium">{t('recycledResponsibly')}</p>
                             </div>
                         </div>

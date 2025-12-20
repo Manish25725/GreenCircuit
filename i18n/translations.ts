@@ -179,7 +179,7 @@ export const translations = {
     heroTitle3: 'into Opportunity.',
     heroSubtitle: "Don't let your old electronics go to waste. Join thousands of users recycling responsibly. Select your e-waste type and schedule a pickup instantly.",
     startRecycling: 'Start Recycling',
-    itemsRecycled: 'Items',
+    totalItemsRecycled: 'Items',
     recycledResponsibly: 'Recycled Responsibly',
     
     // Landing Modes
@@ -453,7 +453,7 @@ export const translations = {
     heroTitle3: 'en Oportunidad.',
     heroSubtitle: 'No dejes que tus electrónicos viejos se desperdicien. Únete a miles de usuarios que reciclan responsablemente. Selecciona tu tipo de e-waste y programa una recogida instantáneamente.',
     startRecycling: 'Comenzar a Reciclar',
-    itemsRecycled: 'Artículos',
+    totalItemsRecycled: 'Artículos',
     recycledResponsibly: 'Reciclados Responsablemente',
     
     // Landing Modes
@@ -727,7 +727,7 @@ export const translations = {
     heroTitle3: 'en Opportunité.',
     heroSubtitle: 'Ne laissez pas vos anciens appareils électroniques se perdre. Rejoignez des milliers d\'utilisateurs qui recyclent de manière responsable. Sélectionnez votre type d\'e-déchet et planifiez un ramassage instantanément.',
     startRecycling: 'Commencer à Recycler',
-    itemsRecycled: 'Articles',
+    totalItemsRecycled: 'Articles',
     recycledResponsibly: 'Recyclés de Manière Responsable',
     
     // Landing Modes
@@ -1001,7 +1001,7 @@ export const translations = {
     heroTitle3: 'in Chance.',
     heroSubtitle: 'Lassen Sie Ihre alten Elektronikgeräte nicht verschwenden. Schließen Sie sich Tausenden von Nutzern an, die verantwortungsvoll recyceln. Wählen Sie Ihren E-Waste-Typ und planen Sie sofort eine Abholung.',
     startRecycling: 'Recycling Starten',
-    itemsRecycled: 'Artikel',
+    totalItemsRecycled: 'Artikel',
     recycledResponsibly: 'Verantwortungsvoll Recycelt',
     
     // Landing Modes
