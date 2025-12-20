@@ -222,26 +222,6 @@ const Login = () => {
                 >
                     {loading ? 'Please wait...' : (mode === 'Login' ? 'Sign In' : 'Create Account')}
                 </button>
-
-                {mode === 'Login' && (
-                    <>
-                        <div className="relative my-2">
-                            <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-white/10"></div></div>
-                            <div className="relative flex justify-center text-xs">
-                                <span className="bg-[#15202e] px-2 text-slate-500 rounded backdrop-blur">Or continue with</span>
-                            </div>
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-3">
-                            <button type="button" className="flex items-center justify-center py-2.5 border border-white/10 rounded-xl hover:bg-white/5 transition-colors bg-transparent cursor-pointer">
-                                <img src="https://www.svgrepo.com/show/475656/google-color.svg" className="h-5 w-5" alt="Google" />
-                            </button>
-                            <button type="button" className="flex items-center justify-center py-2.5 border border-white/10 rounded-xl hover:bg-white/5 transition-colors bg-transparent cursor-pointer">
-                                <img src="https://www.svgrepo.com/show/475647/apple-color.svg" className="h-5 w-5 invert" alt="Apple" />
-                            </button>
-                        </div>
-                    </>
-                )}
                 
                 <div className="mt-2 flex items-center justify-center gap-2 border-t border-white/5 pt-6">
                     <span className="material-symbols-outlined text-slate-500 text-[18px]">admin_panel_settings</span>

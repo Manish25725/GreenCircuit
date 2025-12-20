@@ -3,6 +3,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { getCurrentUser } from '../services/api';
 import * as api from '../services/api';
+import { useLanguage } from '../contexts/LanguageContext';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -10,6 +11,7 @@ const Landing = () => {
   const navbarRef = useRef<HTMLDivElement>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState<any>(null);
+  const { t } = useLanguage();
   
   useEffect(() => {
     // Check if user is logged in
@@ -191,12 +193,12 @@ const Landing = () => {
                         <span className="text-slate-50 text-xl sm:text-2xl font-black tracking-tight">EcoCycle</span>
                     </div>
                     <nav className="hidden md:flex items-center gap-8">
-                        <button className="text-slate-400 hover:text-[#34D399] text-sm font-medium transition-colors bg-transparent border-none cursor-pointer" onClick={() => window.location.hash = '#/how-it-works'}>How It Works</button>
+                        <button className="text-slate-400 hover:text-[#34D399] text-sm font-medium transition-colors bg-transparent border-none cursor-pointer" onClick={() => window.location.hash = '#/how-it-works'}>{t('howItWorks')}</button>
                         {isLoggedIn && (
-                          <button className="text-slate-400 hover:text-[#34D399] text-sm font-medium transition-colors bg-transparent border-none cursor-pointer" onClick={() => window.location.hash = '#/dashboard'}>Dashboard</button>
+                          <button className="text-slate-400 hover:text-[#34D399] text-sm font-medium transition-colors bg-transparent border-none cursor-pointer" onClick={() => window.location.hash = '#/dashboard'}>{t('dashboard')}</button>
                         )}
-                        <button className="text-slate-400 hover:text-[#34D399] text-sm font-medium transition-colors bg-transparent border-none cursor-pointer" onClick={() => window.location.hash = '#/about'}>About Us</button>
-                        <button className="text-slate-400 hover:text-[#34D399] text-sm font-medium transition-colors bg-transparent border-none cursor-pointer" onClick={() => window.location.hash = '#/contact'}>Contact</button>
+                        <button className="text-slate-400 hover:text-[#34D399] text-sm font-medium transition-colors bg-transparent border-none cursor-pointer" onClick={() => window.location.hash = '#/about'}>{t('about')}</button>
+                        <button className="text-slate-400 hover:text-[#34D399] text-sm font-medium transition-colors bg-transparent border-none cursor-pointer" onClick={() => window.location.hash = '#/contact'}>{t('contact')}</button>
                     </nav>
                     <div className="flex items-center gap-4">
                         {!isLoggedIn && (
@@ -205,27 +207,39 @@ const Landing = () => {
                                 onClick={() => window.location.hash = '#/login'}
                                 className="hidden sm:flex h-10 px-5 items-center justify-center rounded-full bg-white/5 text-white hover:bg-white/10 border border-white/10 text-sm font-bold transition-all duration-300 cursor-pointer"
                             >
-                                Log In
+                                {t('logIn')}
                             </button>
                             <button 
                                 onClick={() => window.location.hash = '#/search'}
                                 className="h-10 px-6 flex items-center justify-center rounded-full bg-[#34D399] text-slate-900 hover:bg-[#6EE7B7] shadow-[0_0_15px_rgba(52,211,153,0.3)] hover:shadow-[0_0_25px_rgba(52,211,153,0.5)] text-sm font-bold transition-all duration-300 transform hover:scale-105 cursor-pointer"
                             >
-                                Get Started
+                                {t('getStarted')}
                             </button>
                           </>
                         )}
                         {isLoggedIn && (
                           <button 
-                              onClick={async () => {
-                                await api.logout();
-                                setIsLoggedIn(false);
-                                window.location.hash = '#/';
+                              onClick={() => {
+                                // Clear all auth data
+                                localStorage.removeItem('user');
+                                localStorage.removeItem('token');
+                                localStorage.removeItem('isLoggedIn');
+                                localStorage.removeItem('appLanguage');
+                                
+                                // Clear cookies
+                                document.cookie.split(";").forEach((c) => {
+                                  document.cookie = c
+                                    .replace(/^ +/, "")
+                                    .replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+                                });
+                                
+                                // Redirect to home
+                                window.location.href = '/';
                               }}
                               className="flex items-center gap-2 h-10 px-5 rounded-full bg-white/5 text-white hover:bg-white/10 border border-white/10 text-sm font-bold transition-all duration-300 cursor-pointer"
                           >
                               <span className="material-symbols-outlined text-[#34D399]">logout</span>
-                              <span className="hidden sm:inline">Log Out</span>
+                              <span className="hidden sm:inline">{t('logOut')}</span>
                           </button>
                         )}
                     </div>
@@ -250,18 +264,18 @@ const Landing = () => {
                             <span className="text-xs font-bold uppercase tracking-wider">Sustainable Future</span>
                         </div>
                         <h1 className="hero-heading text-4xl sm:text-5xl lg:text-6xl font-black text-white leading-[1.1] tracking-tight">
-                            <span className="block overflow-hidden"><span className="block translate-y-full">Transforming</span></span>
-                            <span className="block overflow-hidden"><span className="block translate-y-full text-transparent bg-clip-text bg-gradient-to-r from-[#34D399] via-[#6EE7B7] to-[#34D399]">E-Waste</span></span>
-                            <span className="block overflow-hidden"><span className="block translate-y-full">into Opportunity.</span></span>
+                            <span className="block overflow-hidden"><span className="block translate-y-full">{t('heroTitle1')}</span></span>
+                            <span className="block overflow-hidden"><span className="block translate-y-full text-transparent bg-clip-text bg-gradient-to-r from-[#34D399] via-[#6EE7B7] to-[#34D399]">{t('heroTitle2')}</span></span>
+                            <span className="block overflow-hidden"><span className="block translate-y-full">{t('heroTitle3')}</span></span>
                         </h1>
                         <p className="hero-desc opacity-0 translate-y-8 text-lg sm:text-xl text-slate-400 max-w-2xl mx-auto lg:mx-0 leading-relaxed font-light">
-                            Don't let your old electronics go to waste. Join thousands of users recycling responsibly. Select your e-waste type and schedule a pickup instantly.
+                            {t('heroSubtitle')}
                         </p>
                         <div className="hero-actions opacity-0 translate-y-8 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mt-4">
                             <div className="relative group w-full sm:w-auto">
                                 <div className="absolute -inset-0.5 bg-gradient-to-r from-[#34D399] to-[#3B82F6] rounded-full blur opacity-30 group-hover:opacity-60 transition duration-1000 group-hover:duration-200"></div>
                                 <button onClick={() => window.location.hash = '#/search'} className="relative w-full sm:w-auto flex items-center justify-center gap-2 h-12 px-8 rounded-full bg-[#1E293B] border border-white/10 text-white font-bold hover:bg-[#1E293B]/80 transition-all group-hover:translate-x-1 cursor-pointer">
-                                    <span>Start Recycling</span>
+                                    <span>{t('startRecycling')}</span>
                                     <span className="material-symbols-outlined text-[#34D399] text-xl transition-transform group-hover:translate-x-1">arrow_forward</span>
                                 </button>
                             </div>
@@ -275,8 +289,8 @@ const Landing = () => {
                                 <span className="material-symbols-outlined">recycling</span>
                             </div>
                             <div>
-                                <p className="text-white font-bold text-lg">12,450+ Items</p>
-                                <p className="text-[#6EE7B7] text-sm font-medium">Recycled Responsibly</p>
+                                <p className="text-white font-bold text-lg">12,450+ {t('itemsRecycled')}</p>
+                                <p className="text-[#6EE7B7] text-sm font-medium">{t('recycledResponsibly')}</p>
                             </div>
                         </div>
                     </div>
@@ -286,8 +300,8 @@ const Landing = () => {
             {/* Premium 3-Mode Section - Fixed Visibility */}
             <div className="w-full max-w-7xl px-4 sm:px-6 relative z-10 mb-32">
                 <div className="text-center mb-16 space-y-4">
-                    <h2 className="text-3xl sm:text-4xl font-bold text-white">Tailored Solutions for Everyone</h2>
-                    <p className="text-slate-400 max-w-2xl mx-auto">Whether you're an individual, a corporation, or a recycler, we have a dedicated path for you.</p>
+                    <h2 className="text-3xl sm:text-4xl font-bold text-white">{t('tailoredSolutions')}</h2>
+                    <p className="text-slate-400 max-w-2xl mx-auto">{t('tailoredSolutionsDesc')}</p>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -322,16 +336,16 @@ const Landing = () => {
                             }`}>
                                 <span className="material-symbols-outlined text-3xl font-bold">person</span>
                             </div>
-                            <h3 className={`text-3xl font-bold mb-3 transition-colors ${user?.role === 'user' ? 'text-[#34D399]' : 'text-white'}`}>Residents</h3>
+                            <h3 className={`text-3xl font-bold mb-3 transition-colors ${user?.role === 'user' ? 'text-[#34D399]' : 'text-white'}`}>{t('residents')}</h3>
                             <p className={`leading-relaxed ${user?.role === 'user' ? 'text-slate-300' : 'text-slate-400'}`}>
-                                Recycling made effortless. Book a doorstep pickup for your old gadgets and earn eco-rewards instantly.
+                                {t('residentsDesc')}
                             </p>
                         </div>
 
                         <div className={`relative z-10 flex items-center gap-3 font-bold tracking-wide group-hover:gap-5 transition-all ${
                             user?.role === 'user' ? 'text-[#34D399] animate-pulse' : 'text-[#34D399]'
                         }`}>
-                            <span>Start Recycling</span>
+                            <span>{t('startRecycling')}</span>
                             <span className="material-symbols-outlined">arrow_forward</span>
                         </div>
                     </div>
@@ -367,16 +381,16 @@ const Landing = () => {
                             }`}>
                                 <span className="material-symbols-outlined text-3xl font-bold">apartment</span>
                             </div>
-                            <h3 className={`text-3xl font-bold mb-3 transition-colors ${user?.role === 'business' ? 'text-[#60A5FA]' : 'text-white'}`}>Businesses</h3>
+                            <h3 className={`text-3xl font-bold mb-3 transition-colors ${user?.role === 'business' ? 'text-[#60A5FA]' : 'text-white'}`}>{t('businesses')}</h3>
                             <p className={`leading-relaxed ${user?.role === 'business' ? 'text-slate-300' : 'text-slate-400'}`}>
-                                Corporate e-waste solutions. Secure data destruction, compliance certificates, and bulk pickup logistics.
+                                {t('businessesDesc')}
                             </p>
                         </div>
 
                         <div className={`relative z-10 flex items-center gap-3 font-bold tracking-wide group-hover:gap-5 transition-all ${
                             user?.role === 'business' ? 'text-[#60A5FA] animate-pulse' : 'text-[#3B82F6]'
                         }`}>
-                            <span>Business Solutions</span>
+                            <span>{t('businessSolutions')}</span>
                             <span className="material-symbols-outlined">arrow_forward</span>
                         </div>
                     </div>
@@ -412,16 +426,16 @@ const Landing = () => {
                             }`}>
                                 <span className="material-symbols-outlined text-3xl font-bold">recycling</span>
                             </div>
-                            <h3 className={`text-3xl font-bold mb-3 transition-colors ${user?.role === 'agency' ? 'text-[#FBBF24]' : 'text-white'}`}>Partners</h3>
+                            <h3 className={`text-3xl font-bold mb-3 transition-colors ${user?.role === 'agency' ? 'text-[#FBBF24]' : 'text-white'}`}>{t('partners')}</h3>
                             <p className={`leading-relaxed ${user?.role === 'agency' ? 'text-slate-300' : 'text-slate-400'}`}>
-                                Grow your recycling business. Access our booking stream, manage fleet logistics, and track inventory.
+                                {t('partnersDesc')}
                             </p>
                         </div>
 
                         <div className={`relative z-10 flex items-center gap-3 font-bold tracking-wide group-hover:gap-5 transition-all ${
                             user?.role === 'agency' ? 'text-[#FBBF24] animate-pulse' : 'text-[#A855F7]'
                         }`}>
-                            <span>Join Network</span>
+                            <span>{t('joinNetwork')}</span>
                             <span className="material-symbols-outlined">arrow_forward</span>
                         </div>
                     </div>

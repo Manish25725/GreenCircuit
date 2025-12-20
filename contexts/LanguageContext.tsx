@@ -14,28 +14,39 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [language, setLanguageState] = useState<Language>('en');
 
   useEffect(() => {
-    // Load language preference from API on mount
     loadLanguagePreference();
   }, []);
 
   const loadLanguagePreference = async () => {
     try {
-      const response = await api.getPreferences();
-      if (response.data?.preferences?.app?.language) {
-        setLanguageState(response.data.preferences.app.language as Language);
-      }
-    } catch (error) {
-      // If API fails, try localStorage
+      // First, load from localStorage for instant display
       const savedLang = localStorage.getItem('appLanguage');
       if (savedLang) {
         setLanguageState(savedLang as Language);
       }
+
+      // Then sync with MongoDB
+      const response = await api.getPreferences();
+      if (response.data?.preferences?.app?.language) {
+        const dbLang = response.data.preferences.app.language as Language;
+        setLanguageState(dbLang);
+        localStorage.setItem('appLanguage', dbLang);
+      }
+    } catch (error) {
+      // Keep localStorage value if API fails
     }
   };
 
-  const setLanguage = (lang: Language) => {
+  const setLanguage = async (lang: Language) => {
     setLanguageState(lang);
     localStorage.setItem('appLanguage', lang);
+    try {
+      await api.updatePreferences({
+        app: { language: lang }
+      });
+    } catch (error) {
+      console.error('Failed to save language preference:', error);
+    }
   };
 
   const t = (key: string): string => {
