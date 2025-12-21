@@ -2,6 +2,13 @@
 
 A comprehensive platform for managing electronic waste collection, recycling, and disposal with role-based access for residents, agencies, businesses, and administrators.
 
+## 🚀 Live Demo
+
+**Frontend**: [https://e-waste-frontened.onrender.com](https://e-waste-frontened.onrender.com)  
+**Backend API**: [https://e-waste-7ios.onrender.com](https://e-waste-7ios.onrender.com)
+
+> **Note**: First request may take 30-60 seconds (free tier cold start)
+
 ## Features
 
 - 👤 **Multi-Role System**: Resident, Agency, Business, and Admin roles
