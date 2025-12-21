@@ -19,6 +19,7 @@ A comprehensive platform for managing electronic waste collection, recycling, an
 - 📱 **Contact System**: Integrated messaging and support
 - 🔒 **Secure Authentication**: JWT-based auth with role-based access control
 - 📱 **Fully Responsive**: Mobile-first design works on all devices (phone, tablet, desktop)
+- 🛡️ **Enterprise Security**: Rate limiting, input validation, XSS/injection protection, and pagination
 
 ## Tech Stack
 
@@ -197,11 +198,25 @@ e-waste/
 
 ## Security Notes
 
+**The application implements enterprise-grade security:**
+- ✅ Rate limiting on all endpoints (prevents brute force & DoS attacks)
+- ✅ Helmet.js security headers (XSS, clickjacking protection)
+- ✅ Input validation & sanitization (prevents injection attacks)
+- ✅ NoSQL injection prevention
+- ✅ Request size limits (10MB max)
+- ✅ Data pagination (max 100 items per page)
+- ✅ CORS configuration with whitelist
+- ✅ MongoDB operator sanitization
+- ✅ HTTP Parameter Pollution prevention
+
+**Best practices:**
 - Never commit `.env` file to version control
-- Use strong JWT secrets in production
+- Use strong JWT secrets in production (32+ characters)
 - Rotate API keys regularly
 - Enable MongoDB IP whitelist for production
 - Use HTTPS in production
+- Regular security audits with `npm audit`
+- See [SECURITY.md](SECURITY.md) for detailed security documentation
 
 ## Support
 
