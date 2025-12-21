@@ -14,14 +14,25 @@ Prevents brute force attacks and API abuse by limiting requests per IP address.
 - **Purpose**: Prevent brute force login attacks
 
 #### Admin Endpoints
-- **Limit**: 10 requests per hour
-- **Applies to**: `/api/auth/admin-login`
+- **Limit**: 10 requests per hour (login), 50 requests per hour (operations)
+- **Applies to**: `/api/auth/admin-login`, `/api/admin/*`
 - **Purpose**: Stricter protection for admin access
+
+#### Protected Routes (Authenticated)
+- **Limit**: 200 requests per 15 minutes
+- **Applies to**: All authenticated user requests
+- **Purpose**: Prevent abuse from authenticated users
 
 #### General API Endpoints
 - **Limit**: 100 requests per 15 minutes
 - **Applies to**: All `/api/*` routes
 - **Purpose**: Prevent API abuse and DoS attacks
+
+#### Auth Middleware Rate Limiting
+- **Failed Auth Attempts**: 10 per 15 minutes per IP
+- **Applies to**: JWT token validation failures
+- **Purpose**: Prevent token brute forcing
+- **Auto-cleanup**: Failed attempts reset after 15 minutes
 
 ### 2. **Input Validation & Sanitization**
 
@@ -105,6 +116,9 @@ Prevents loading excessive data that could cause server overload.
 - Tokens stored with HttpOnly flag (if using cookies)
 - Token expiration: Configurable
 - Refresh token mechanism recommended
+- **IP-based rate limiting**: 10 failed attempts per 15 minutes
+- **Automatic cleanup**: Failed auth attempts cleared hourly
+- **Smart tracking**: Successful auth clears failed attempt counter
 
 #### Password Security
 - Bcrypt hashing with salt rounds
@@ -112,10 +126,17 @@ Prevents loading excessive data that could cause server overload.
 - Password reset with time-limited tokens
 
 #### Protected Routes
-All sensitive endpoints require authentication via JWT middleware:
+All sensitive endpoints require authentication via JWT middleware with built-in rate limiting:
 ```typescript
 router.get('/profile', protect, getProfile);
 ```
+
+#### Rate Limiting Layers
+1. **Global API rate limit**: 100 req/15min (all endpoints)
+2. **Auth endpoint limit**: 5 req/15min (login/register)
+3. **Auth middleware limit**: 10 failed attempts/15min (token validation)
+4. **Admin endpoint limit**: 50 req/hour (admin operations)
+5. **Protected route limit**: 200 req/15min (authenticated users)
 
 ## 🛡️ Attack Prevention
 
