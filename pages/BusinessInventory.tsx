@@ -105,7 +105,7 @@ const cityCoordinates: Record<string, [number, number]> = {
   'Moscow': [55.7558, 37.6173],
 };
 
-const API_BASE = 'http://localhost:3001/api';
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 
 const BusinessInventory = () => {
   const user = getCurrentUser();

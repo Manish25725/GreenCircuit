@@ -77,8 +77,9 @@ const BusinessCertificates = () => {
 
   const handleDownloadCertificate = async (certId: string, certNumber: string) => {
     try {
+      const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:3001/api/business/certificates/${certId}/download`, {
+      const response = await fetch(`${API_BASE}/business/certificates/${certId}/download`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
