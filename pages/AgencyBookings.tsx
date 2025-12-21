@@ -27,9 +27,12 @@ const AgencyBookings = () => {
     const fetchBookings = async () => {
       try {
         const response = await api.getAgencyBookings() as any;
-        setBookings(response.data || response || []);
+        const bookingsData = response.data || response || [];
+        // Ensure bookingsData is an array
+        setBookings(Array.isArray(bookingsData) ? bookingsData : []);
       } catch (error) {
         console.error('Failed to fetch bookings:', error);
+        setBookings([]); // Set empty array on error
       } finally {
         setLoading(false);
       }
@@ -52,7 +55,7 @@ const AgencyBookings = () => {
     }
   };
 
-  const filteredBookings = bookings.filter(booking => {
+  const filteredBookings = Array.isArray(bookings) ? bookings.filter(booking => {
     const matchesFilter = activeFilter === 'all' || 
       (activeFilter === 'upcoming' && booking.status === 'confirmed') ||
       (activeFilter === 'in-progress' && booking.status === 'in-progress') ||
@@ -64,7 +67,7 @@ const AgencyBookings = () => {
       booking.id.toString().includes(searchQuery);
     
     return matchesFilter && matchesSearch;
-  });
+  }) : [];
 
   const getStatusBadge = (status: string) => {
     const styles: Record<string, { bg: string; text: string; border: string }> = {

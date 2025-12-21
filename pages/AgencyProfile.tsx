@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Layout from '../components/Layout';
 import { api, getCurrentUser, User } from '../services/api';
+import Loader from '../components/Loader';
 
 const AgencyProfile = () => {
   const [user, setUser] = useState<User | null>(getCurrentUser());
@@ -21,6 +22,26 @@ const AgencyProfile = () => {
   const [wasteTypes, setWasteTypes] = useState<string[]>([]);
   const [certifications, setCertifications] = useState<any[]>([]);
   const [agencyData, setAgencyData] = useState<any>(null);
+  const [uploading, setUploading] = useState(false);
+  const [agencyLogo, setAgencyLogo] = useState<string>('');
+  const logoInputRef = useRef<HTMLInputElement>(null);
+  const certInputRef = useRef<HTMLInputElement>(null);
+  const [showCertModal, setShowCertModal] = useState(false);
+  const [newCert, setNewCert] = useState({ name: '', type: '', file: null as File | null });
+  const [showRegionInput, setShowRegionInput] = useState(false);
+  const [newRegion, setNewRegion] = useState('');
+  const [operatingHours, setOperatingHours] = useState<any[]>([
+    { day: 'Monday - Friday', open: '08:00', close: '18:00', isOpen: true },
+    { day: 'Saturday', open: '09:00', close: '14:00', isOpen: true },
+    { day: 'Sunday', open: '00:00', close: '00:00', isOpen: false }
+  ]);
+  const [showRegionInput, setShowRegionInput] = useState(false);
+  const [newRegion, setNewRegion] = useState('');
+  const [operatingHours, setOperatingHours] = useState<any[]>([
+    { day: 'Monday - Friday', open: '08:00', close: '18:00', isOpen: true },
+    { day: 'Saturday', open: '09:00', close: '14:00', isOpen: true },
+    { day: 'Sunday', open: '00:00', close: '00:00', isOpen: false }
+  ]);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -29,6 +50,7 @@ const AgencyProfile = () => {
         const agency = response.data || response;
         
         setAgencyData(agency);
+        setAgencyLogo(agency.logo || '');
         setFormData({
           companyName: agency.name || '',
           registrationNumber: agency.registrationNumber || '',
@@ -39,8 +61,16 @@ const AgencyProfile = () => {
           city: agency.address?.city || '',
           zipCode: agency.address?.zipCode || ''
         });
-        setRegions(agency.address?.city ? [agency.address.city] : []);
+        setRegions(agency.operatingRegions || (agency.address?.city ? [agency.address.city] : []));
         setWasteTypes(agency.services || []);
+        
+        if (agency.operatingHours && agency.operatingHours.length > 0) {
+          setOperatingHours(agency.operatingHours);
+        }
+        
+        if (agency.operatingHours && agency.operatingHours.length > 0) {
+          setOperatingHours(agency.operatingHours);
+        }
         
         // Parse certifications if stored as JSON strings
         const parsedCerts = agency.certifications?.map((cert: string) => {
@@ -60,15 +90,133 @@ const AgencyProfile = () => {
     fetchProfile();
   }, []);
 
+  const uploadToCloudinary = async (file: File): Promise<string> => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', 'ml_default');
+    
+    try {
+      const response = await fetch(
+        `https://api.cloudinary.com/v1_1/dideet7oz/image/upload`,
+        {
+          method: 'POST',
+          body: formData,
+        }
+      );
+      const data = await response.json();
+      return data.secure_url;
+    } catch (error) {
+      console.error('Cloudinary upload failed:', error);
+      throw error;
+    }
+  };
+
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    setUploading(true);
+    try {
+      const imageUrl = await uploadToCloudinary(file);
+      setAgencyLogo(imageUrl);
+      
+      // Update in backend
+      await api.updateAgencyProfile({ logo: imageUrl });
+      
+      alert('Logo updated successfully!');
+    } catch (error) {
+      console.error('Failed to upload logo:', error);
+      alert('Failed to upload logo');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleAddCertification = async () => {
+    if (!newCert.name || !newCert.type || !newCert.file) {
+      alert('Please fill all fields and select a file');
+      return;
+    }
+    
+    setUploading(true);
+    try {
+      const certUrl = await uploadToCloudinary(newCert.file);
+      
+      const newCertification = {
+        name: newCert.name,
+        type: newCert.type,
+        icon: 'verified',
+        color: 'text-green-400',
+        url: certUrl
+      };
+      
+      const updatedCerts = [...certifications, newCertification];
+      setCertifications(updatedCerts);
+      
+      // Update in backend
+      await api.updateAgencyProfile({
+        certifications: updatedCerts.map(cert => JSON.stringify(cert))
+      });
+      
+      setShowCertModal(false);
+      setNewCert({ name: '', type: '', file: null });
+      alert('Certification added successfully!');
+    } catch (error) {
+      console.error('Failed to add certification:', error);
+      alert('Failed to add certification');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleRemoveCertification = async (index: number) => {
+    if (!confirm('Are you sure you want to remove this certification?')) return;
+    
+    try {
+      const updatedCerts = certifications.filter((_, i) => i !== index);
+      setCertifications(updatedCerts);
+      
+      await api.updateAgencyProfile({
+        certifications: updatedCerts.map(cert => JSON.stringify(cert))
+      });
+      
+      alert('Certification removed successfully!');
+    } catch (error) {
+      console.error('Failed to remove certification:', error);
+      alert('Failed to remove certification');
+    }
+  };
+
+  const handleAddRegion = () => {
+    if (newRegion.trim() && !regions.includes(newRegion.trim())) {
+      setRegions([...regions, newRegion.trim()]);
+      setNewRegion('');
+      setShowRegionInput(false);
+    }
+  };
+
+  const handleRemoveRegion = (index: number) => {
+    setRegions(regions.filter((_, i) => i !== index));
+  };
+
+  const handleAddRegion = () => {
+    if (newRegion.trim() && !regions.includes(newRegion.trim())) {
+      setRegions([...regions, newRegion.trim()]);
+      setNewRegion('');
+      setShowRegionInput(false);
+    }
+  };
+
   const handleSave = async () => {
     setSaving(true);
     try {
-      await api.updateAgencyProfile({
+      console.log('Saving agency profile with data:', {
         name: formData.companyName,
         registrationNumber: formData.registrationNumber,
         description: formData.description,
         email: formData.email,
         phone: formData.phone,
+        logo: agencyLogo,
         address: {
           street: formData.address,
           city: formData.city,
@@ -76,13 +224,36 @@ const AgencyProfile = () => {
           zipCode: formData.zipCode
         },
         services: wasteTypes,
-        certifications: certifications.map(cert => JSON.stringify(cert))
+        certifications: certifications.map(cert => JSON.stringify(cert)),
+        operatingRegions: regions,
+        operatingHours: operatingHours
       });
-      // Show success notification
+
+      const response = await api.updateAgencyProfile({
+        name: formData.companyName,
+        registrationNumber: formData.registrationNumber,
+        description: formData.description,
+        email: formData.email,
+        phone: formData.phone,
+        logo: agencyLogo,
+        address: {
+          street: formData.address,
+          city: formData.city,
+          state: 'NY',
+          zipCode: formData.zipCode
+        },
+        services: wasteTypes,
+        certifications: certifications.map(cert => JSON.stringify(cert)),
+        operatingRegions: regions,
+        operatingHours: operatingHours
+      });
+      
+      console.log('Profile update response:', response);
       alert('Profile updated successfully!');
-    } catch (error) {
-      console.error('Failed to save:', error);
-      alert('Failed to update profile');
+    } catch (error: any) {
+      console.error('Failed to save profile:', error);
+      console.error('Error details:', error.response || error.message);
+      alert(`Failed to update profile: ${error.response?.data?.message || error.message || 'Unknown error'}`);
     } finally {
       setSaving(false);
     }
@@ -171,9 +342,26 @@ const AgencyProfile = () => {
                       <div className="flex flex-col items-center text-center gap-4">
                         <div className="relative group">
                           <div className="w-32 h-32 rounded-2xl overflow-hidden border-4 border-[#f59e0b]/20 shadow-xl bg-gradient-to-br from-[#f59e0b]/20 to-orange-600/20 flex items-center justify-center">
-                            <span className="material-symbols-outlined text-6xl text-[#f59e0b]">corporate_fare</span>
+                            {uploading && !agencyLogo ? (
+                              <Loader size="md" />
+                            ) : agencyLogo ? (
+                              <img src={agencyLogo} alt="Agency Logo" className="w-full h-full object-cover" />
+                            ) : (
+                              <span className="material-symbols-outlined text-6xl text-[#f59e0b]">corporate_fare</span>
+                            )}
                           </div>
-                          <button className="absolute -bottom-2 -right-2 bg-[#f59e0b] text-white rounded-xl p-2.5 hover:bg-[#d97706] transition shadow-[0_0_15px_rgba(245,158,11,0.5)] cursor-pointer">
+                          <input
+                            type="file"
+                            ref={logoInputRef}
+                            onChange={handleLogoUpload}
+                            accept="image/*"
+                            className="hidden"
+                          />
+                          <button 
+                            onClick={() => logoInputRef.current?.click()}
+                            disabled={uploading}
+                            className="absolute -bottom-2 -right-2 bg-[#f59e0b] text-white rounded-xl p-2.5 hover:bg-[#d97706] transition shadow-[0_0_15px_rgba(245,158,11,0.5)] cursor-pointer disabled:opacity-50"
+                          >
                             <span className="material-symbols-outlined text-lg">edit</span>
                           </button>
                         </div>
@@ -222,10 +410,18 @@ const AgencyProfile = () => {
                                 <p className="text-xs text-slate-500">{cert.type}</p>
                               </div>
                             </div>
-                            <span className="material-symbols-outlined text-slate-600 group-hover:text-slate-400 cursor-pointer transition-colors">more_vert</span>
+                            <button 
+                              onClick={() => handleRemoveCertification(i)}
+                              className="material-symbols-outlined text-slate-600 group-hover:text-red-400 cursor-pointer transition-colors"
+                            >
+                              delete
+                            </button>
                           </div>
                         ))}
-                        <button className="w-full py-3 text-sm font-medium text-[#f59e0b] border border-[#f59e0b]/30 rounded-xl hover:bg-[#f59e0b]/10 transition-all flex items-center justify-center gap-2 cursor-pointer">
+                        <button 
+                          onClick={() => setShowCertModal(true)}
+                          className="w-full py-3 text-sm font-medium text-[#f59e0b] border border-[#f59e0b]/30 rounded-xl hover:bg-[#f59e0b]/10 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                        >
                           <span className="material-symbols-outlined text-lg">add</span>
                           Add Certification
                         </button>
@@ -413,17 +609,40 @@ const AgencyProfile = () => {
                               <div key={i} className="bg-[#f59e0b]/10 text-[#f59e0b] border border-[#f59e0b]/30 px-3 py-2 rounded-xl text-sm font-medium flex items-center gap-2 hover:bg-[#f59e0b]/20 transition-colors">
                                 {region}
                                 <button 
-                                  onClick={() => setRegions(regions.filter((_, idx) => idx !== i))}
+                                  onClick={() => handleRemoveRegion(i)}
                                   className="hover:text-white cursor-pointer bg-transparent border-none flex items-center"
                                 >
                                   <span className="material-symbols-outlined text-base">close</span>
                                 </button>
                               </div>
                             ))}
-                            <button className="bg-[#0B1116] border-2 border-dashed border-white/10 hover:border-[#f59e0b]/50 hover:text-[#f59e0b] text-slate-500 px-3 py-2 rounded-xl text-sm font-medium flex items-center gap-2 transition-all cursor-pointer">
-                              <span className="material-symbols-outlined text-base">add</span>
-                              Add Region
-                            </button>
+                            {showRegionInput ? (
+                              <div className="flex items-center gap-2">
+                                <input
+                                  type="text"
+                                  value={newRegion}
+                                  onChange={(e) => setNewRegion(e.target.value)}
+                                  onKeyPress={(e) => e.key === 'Enter' && handleAddRegion()}
+                                  placeholder="Enter city name"
+                                  className="bg-[#0B1116] border border-[#f59e0b]/50 text-white px-3 py-2 rounded-xl text-sm outline-none focus:ring-2 focus:ring-[#f59e0b]/50"
+                                  autoFocus
+                                />
+                                <button onClick={handleAddRegion} className="bg-[#f59e0b] text-white px-3 py-2 rounded-xl text-sm hover:bg-[#d97706] transition-colors">
+                                  Add
+                                </button>
+                                <button onClick={() => { setShowRegionInput(false); setNewRegion(''); }} className="text-slate-400 hover:text-white">
+                                  <span className="material-symbols-outlined text-base">close</span>
+                                </button>
+                              </div>
+                            ) : (
+                              <button 
+                                onClick={() => setShowRegionInput(true)}
+                                className="bg-[#0B1116] border-2 border-dashed border-white/10 hover:border-[#f59e0b]/50 hover:text-[#f59e0b] text-slate-500 px-3 py-2 rounded-xl text-sm font-medium flex items-center gap-2 transition-all cursor-pointer"
+                              >
+                                <span className="material-symbols-outlined text-base">add</span>
+                                Add Region
+                              </button>
+                            )}
                           </div>
                         </div>
 
@@ -456,20 +675,37 @@ const AgencyProfile = () => {
                         <div className="bg-[#151F26] rounded-2xl p-6 shadow-[0_10px_15px_-3px_rgba(0,0,0,0.3)] border border-white/5">
                           <h3 className="text-lg font-bold text-white mb-4">Operating Hours</h3>
                           <div className="grid grid-cols-1 gap-3">
-                            {[
-                              { day: 'Monday - Friday', time: '8:00 AM - 6:00 PM' },
-                              { day: 'Saturday', time: '9:00 AM - 2:00 PM' },
-                              { day: 'Sunday', time: 'Closed' }
-                            ].map((schedule, i) => (
+                            {operatingHours.map((schedule, i) => (
                               <div key={i} className="flex items-center justify-between p-4 bg-[#0B1116] rounded-xl border border-white/5 hover:border-white/10 transition-colors group">
-                                <span className="text-sm text-white font-medium">{schedule.day}</span>
-                                <div className="flex items-center gap-2">
-                                  <input 
-                                    type="text" 
-                                    defaultValue={schedule.time}
-                                    className="w-40 bg-transparent text-right text-sm text-slate-400 outline-none group-hover:text-white transition-colors focus:text-[#f59e0b]"
+                                <div className="flex items-center gap-3">
+                                  <input
+                                    type="checkbox"
+                                    checked={schedule.isOpen}
+                                    onChange={(e) => handleUpdateOperatingHours(i, 'isOpen', e.target.checked)}
+                                    className="h-4 w-4 cursor-pointer appearance-none rounded border border-white/10 bg-[#0B1116] transition-all checked:border-[#f59e0b] checked:bg-[#f59e0b]"
                                   />
-                                  <span className="material-symbols-outlined text-slate-600 group-hover:text-slate-400 text-lg cursor-pointer">edit</span>
+                                  <span className="text-sm text-white font-medium">{schedule.day}</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  {schedule.isOpen ? (
+                                    <>
+                                      <input 
+                                        type="time" 
+                                        value={schedule.open}
+                                        onChange={(e) => handleUpdateOperatingHours(i, 'open', e.target.value)}
+                                        className="bg-[#0B1116] border border-white/10 rounded-lg px-2 py-1 text-sm text-white outline-none focus:border-[#f59e0b]"
+                                      />
+                                      <span className="text-slate-500">-</span>
+                                      <input 
+                                        type="time" 
+                                        value={schedule.close}
+                                        onChange={(e) => handleUpdateOperatingHours(i, 'close', e.target.value)}
+                                        className="bg-[#0B1116] border border-white/10 rounded-lg px-2 py-1 text-sm text-white outline-none focus:border-[#f59e0b]"
+                                      />
+                                    </>
+                                  ) : (
+                                    <span className="text-slate-500 text-sm">Closed</span>
+                                  )}
                                 </div>
                               </div>
                             ))}
@@ -484,6 +720,95 @@ const AgencyProfile = () => {
             </main>
           </div>
         </div>
+
+        {/* Certification Modal */}
+        {showCertModal && (
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="bg-[#151F26] rounded-2xl p-6 max-w-md w-full border border-white/10 shadow-2xl">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-xl font-bold text-white">Add Certification</h3>
+                <button 
+                  onClick={() => setShowCertModal(false)}
+                  className="p-2 rounded-lg hover:bg-white/5 transition-colors"
+                >
+                  <span className="material-symbols-outlined text-slate-400">close</span>
+                </button>
+              </div>
+              
+              <div className="space-y-4">
+                <div>
+                  <label className="text-sm font-medium text-slate-400 mb-2 block">Certification Name</label>
+                  <input
+                    type="text"
+                    value={newCert.name}
+                    onChange={(e) => setNewCert({ ...newCert, name: e.target.value })}
+                    placeholder="e.g., ISO 14001"
+                    className="w-full bg-[#0B1116] border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-[#f59e0b]/50 focus:border-[#f59e0b] outline-none transition-all placeholder-slate-600"
+                  />
+                </div>
+                
+                <div>
+                  <label className="text-sm font-medium text-slate-400 mb-2 block">Certification Type</label>
+                  <select
+                    value={newCert.type}
+                    onChange={(e) => setNewCert({ ...newCert, type: e.target.value })}
+                    className="w-full bg-[#0B1116] border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-[#f59e0b]/50 focus:border-[#f59e0b] outline-none transition-all"
+                  >
+                    <option value="">Select type</option>
+                    <option value="Environmental">Environmental</option>
+                    <option value="Quality">Quality</option>
+                    <option value="Safety">Safety</option>
+                    <option value="Industry">Industry Standard</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="text-sm font-medium text-slate-400 mb-2 block">Certificate Document</label>
+                  <input
+                    type="file"
+                    ref={certInputRef}
+                    onChange={(e) => setNewCert({ ...newCert, file: e.target.files?.[0] || null })}
+                    accept="image/*,.pdf"
+                    className="hidden"
+                  />
+                  <button
+                    onClick={() => certInputRef.current?.click()}
+                    className="w-full bg-[#0B1116] border border-white/10 rounded-xl px-4 py-3 text-slate-400 hover:border-[#f59e0b]/50 transition-all flex items-center justify-center gap-2"
+                  >
+                    <span className="material-symbols-outlined">upload_file</span>
+                    {newCert.file ? newCert.file.name : 'Choose file'}
+                  </button>
+                </div>
+                
+                <div className="flex gap-3 pt-4">
+                  <button
+                    onClick={() => setShowCertModal(false)}
+                    className="flex-1 px-4 py-3 rounded-xl border border-white/10 text-slate-400 hover:bg-white/5 transition-all"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleAddCertification}
+                    disabled={uploading}
+                    className="flex-1 px-4 py-3 rounded-xl bg-[#f59e0b] text-white hover:bg-[#d97706] transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                  >
+                    {uploading ? (
+                      <>
+                        <Loader size="sm" />
+                        Uploading...
+                      </>
+                    ) : (
+                      <>
+                        <span className="material-symbols-outlined">add</span>
+                        Add
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </Layout>
   );

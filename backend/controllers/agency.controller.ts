@@ -611,39 +611,72 @@ export const updateAgencyProfile = async (req: Request, res: Response) => {
     const userId = (req as any).user.id;
     const {
       name,
+      registrationNumber,
       description,
       email,
       phone,
       address,
       services,
       certifications,
-      operatingHours
+      operatingHours,
+      operatingRegions,
+      logo,
+      coverImage,
+      gstNumber,
+      udyamCertificate,
+      headName,
+      businessType,
+      establishedYear
     } = req.body;
+
+    console.log('Updating agency profile for userId:', userId);
+    console.log('Request body:', req.body);
 
     const agency = await Agency.findOne({ userId });
     if (!agency) {
+      console.log('Agency not found for userId:', userId);
       return sendError(res, 'Agency not found', 404);
     }
 
-    // Update fields
-    if (name) agency.name = name;
-    if (description) agency.description = description;
-    if (email) agency.email = email;
-    if (phone) agency.phone = phone;
+    console.log('Current agency:', agency);
+
+    // Update fields if provided
+    if (name !== undefined) agency.name = name;
+    if (registrationNumber !== undefined) agency.registrationNumber = registrationNumber;
+    if (description !== undefined) agency.description = description;
+    if (email !== undefined) agency.email = email;
+    if (phone !== undefined) agency.phone = phone;
+    if (logo !== undefined) agency.logo = logo;
+    if (coverImage !== undefined) agency.coverImage = coverImage;
+    if (gstNumber !== undefined) agency.gstNumber = gstNumber;
+    if (udyamCertificate !== undefined) agency.udyamCertificate = udyamCertificate;
+    if (headName !== undefined) agency.headName = headName;
+    if (businessType !== undefined) agency.businessType = businessType;
+    if (establishedYear !== undefined) agency.establishedYear = establishedYear;
+    
     if (address) {
       agency.address = {
-        ...agency.address,
-        ...address
+        street: address.street || agency.address.street,
+        city: address.city || agency.address.city,
+        state: address.state || agency.address.state,
+        country: address.country || agency.address.country || '',
+        zipCode: address.zipCode || agency.address.zipCode,
+        ...(address.coordinates && { coordinates: address.coordinates }),
+        ...(!address.coordinates && agency.address.coordinates && { coordinates: agency.address.coordinates })
       };
     }
-    if (services) agency.services = services;
-    if (certifications) agency.certifications = certifications;
-    if (operatingHours) agency.operatingHours = operatingHours;
+    
+    if (services !== undefined) agency.services = services;
+    if (certifications !== undefined) agency.certifications = certifications;
+    if (operatingHours !== undefined) agency.operatingHours = operatingHours;
+    if (operatingRegions !== undefined) agency.operatingRegions = operatingRegions;
 
     await agency.save();
 
+    console.log('Agency profile updated successfully:', agency);
     sendSuccess(res, agency);
   } catch (error: any) {
+    console.error('Update agency profile error:', error);
     sendError(res, error.message);
   }
 };

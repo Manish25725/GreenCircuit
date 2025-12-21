@@ -30,6 +30,7 @@ export interface IAgency extends Document {
   // End Partner Registration Details
   services: string[];
   certifications: string[];
+  operatingRegions: string[];
   rating: number;
   totalReviews: number;
   totalWasteCollected: number;
@@ -120,6 +121,9 @@ const AgencySchema = new Schema<IAgency>({
     type: String,
   }],
   certifications: [String],
+  operatingRegions: [{
+    type: String
+  }],
   rating: {
     type: Number,
     default: 0,
