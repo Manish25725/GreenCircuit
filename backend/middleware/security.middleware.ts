@@ -262,7 +262,7 @@ export const securityHeaders = (req: Request, res: Response, next: NextFunction)
   next();
 };
 
-// SQL Injection prevention for MongoDB
+// NoSQL Injection prevention for MongoDB (Enhanced)
 export const sanitizeMongoOperators = (req: Request, res: Response, next: NextFunction) => {
   const sanitize = (obj: any): any => {
     if (typeof obj !== 'object' || obj === null) return obj;
@@ -273,16 +273,23 @@ export const sanitizeMongoOperators = (req: Request, res: Response, next: NextFu
     
     const sanitized: any = {};
     for (const key in obj) {
-      // Remove $ operators from user input
-      if (key.startsWith('$')) {
+      // Remove MongoDB operators ($ne, $gt, etc.) and other dangerous patterns
+      if (key.startsWith('$') || key.startsWith('__proto__') || key === 'constructor' || key === 'prototype') {
+        console.warn(`Sanitized dangerous key: ${key} from request ${req.ip}`);
         continue;
       }
-      sanitized[key] = sanitize(obj[key]);
+      
+      // Also sanitize string values that contain MongoDB operators
+      if (typeof obj[key] === 'string') {
+        sanitized[key] = obj[key].replace(/\$/g, '_');
+      } else {
+        sanitized[key] = sanitize(obj[key]);
+      }
     }
     return sanitized;
   };
 
-  // Only sanitize body (query and params are handled by express-mongo-sanitize)
+  // Sanitize body only (query/params are read-only in newer Express)
   if (req.body) {
     req.body = sanitize(req.body);
   }
