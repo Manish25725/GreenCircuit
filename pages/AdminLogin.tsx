@@ -12,15 +12,24 @@ const AdminLogin = () => {
     setLoading(true);
 
     try {
-      const data = await api.adminLogin(adminKey);
+      const response = await api.adminLogin(adminKey);
+      
+      // Handle different response formats
+      const token = response.token || response.data?.token;
+      const user = response.user || response.data?.user || response;
+      
+      if (!token) {
+        throw new Error('No token received from server');
+      }
       
       // Store admin session
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('user', JSON.stringify(data.user || data));
+      localStorage.setItem('token', token);
+      localStorage.setItem('user', JSON.stringify(user));
       localStorage.setItem('isLoggedIn', 'true');
       window.location.hash = '#/admin';
       window.location.reload();
     } catch (err: any) {
+      console.error('Admin login error:', err);
       setError(err.message || 'Failed to authenticate. Please try again.');
     } finally {
       setLoading(false);
