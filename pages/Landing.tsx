@@ -11,6 +11,7 @@ const Landing = () => {
   const navbarRef = useRef<HTMLDivElement>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState<any>(null);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { t } = useLanguage();
   
   useEffect(() => {
@@ -200,7 +201,18 @@ const Landing = () => {
                         <button className="text-slate-400 hover:text-[#34D399] text-sm font-medium transition-colors bg-transparent border-none cursor-pointer" onClick={() => window.location.hash = '#/about'}>{t('about')}</button>
                         <button className="text-slate-400 hover:text-[#34D399] text-sm font-medium transition-colors bg-transparent border-none cursor-pointer" onClick={() => window.location.hash = '#/contact'}>{t('contact')}</button>
                     </nav>
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2 sm:gap-4">
+                        {/* Mobile Menu Button */}
+                        <button
+                          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                          className="md:hidden p-2 text-white hover:bg-white/5 rounded-lg transition-colors"
+                          aria-label="Toggle menu"
+                        >
+                          <span className="material-symbols-outlined">
+                            {isMobileMenuOpen ? 'close' : 'menu'}
+                          </span>
+                        </button>
+                        
                         {!isLoggedIn && (
                           <>
                             <button 
@@ -211,9 +223,10 @@ const Landing = () => {
                             </button>
                             <button 
                                 onClick={() => window.location.hash = '#/search'}
-                                className="h-10 px-6 flex items-center justify-center rounded-full bg-[#34D399] text-slate-900 hover:bg-[#6EE7B7] shadow-[0_0_15px_rgba(52,211,153,0.3)] hover:shadow-[0_0_25px_rgba(52,211,153,0.5)] text-sm font-bold transition-all duration-300 transform hover:scale-105 cursor-pointer"
+                                className="h-10 px-4 sm:px-6 flex items-center justify-center rounded-full bg-[#34D399] text-slate-900 hover:bg-[#6EE7B7] shadow-[0_0_15px_rgba(52,211,153,0.3)] hover:shadow-[0_0_25px_rgba(52,211,153,0.5)] text-sm font-bold transition-all duration-300 transform hover:scale-105 cursor-pointer"
                             >
-                                {t('getStarted')}
+                                <span className="hidden sm:inline">{t('getStarted')}</span>
+                                <span className="sm:hidden">Start</span>
                             </button>
                           </>
                         )}
@@ -246,6 +259,48 @@ const Landing = () => {
                 </header>
             </div>
         </div>
+
+        {/* Mobile Menu */}
+        {isMobileMenuOpen && (
+          <div className="md:hidden fixed top-16 sm:top-20 left-0 right-0 z-40 bg-[#0B1120]/95 backdrop-blur-lg border-b border-white/5 shadow-2xl">
+            <nav className="flex flex-col p-4 gap-2">
+              <button 
+                className="text-left text-slate-300 hover:text-[#34D399] hover:bg-white/5 px-4 py-3 rounded-lg text-sm font-medium transition-colors" 
+                onClick={() => { window.location.hash = '#/how-it-works'; setIsMobileMenuOpen(false); }}
+              >
+                {t('howItWorks')}
+              </button>
+              {isLoggedIn && (
+                <button 
+                  className="text-left text-slate-300 hover:text-[#34D399] hover:bg-white/5 px-4 py-3 rounded-lg text-sm font-medium transition-colors" 
+                  onClick={() => { window.location.hash = '#/dashboard'; setIsMobileMenuOpen(false); }}
+                >
+                  {t('dashboard')}
+                </button>
+              )}
+              <button 
+                className="text-left text-slate-300 hover:text-[#34D399] hover:bg-white/5 px-4 py-3 rounded-lg text-sm font-medium transition-colors" 
+                onClick={() => { window.location.hash = '#/about'; setIsMobileMenuOpen(false); }}
+              >
+                {t('about')}
+              </button>
+              <button 
+                className="text-left text-slate-300 hover:text-[#34D399] hover:bg-white/5 px-4 py-3 rounded-lg text-sm font-medium transition-colors" 
+                onClick={() => { window.location.hash = '#/contact'; setIsMobileMenuOpen(false); }}
+              >
+                {t('contact')}
+              </button>
+              {!isLoggedIn && (
+                <button 
+                  className="text-left text-slate-300 hover:text-[#34D399] hover:bg-white/5 px-4 py-3 rounded-lg text-sm font-medium transition-colors sm:hidden" 
+                  onClick={() => { window.location.hash = '#/login'; setIsMobileMenuOpen(false); }}
+                >
+                  {t('logIn')}
+                </button>
+              )}
+            </nav>
+          </div>
+        )}
 
         <main className="w-full flex flex-col items-center pt-24 sm:pt-32 pb-20 relative">
             <div className="absolute inset-0 bg-hero-pattern opacity-20 pointer-events-none"></div>

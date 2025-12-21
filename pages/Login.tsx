@@ -82,34 +82,35 @@ const Login = () => {
 
   return (
     <div className="relative flex min-h-screen w-full flex-col items-center justify-center bg-[#0B1120] font-sans text-slate-300 selection:bg-[#34D399] selection:text-slate-900 overflow-hidden">
-      {/* Background Effects */}
+      {/* Background Effects - Hidden on small screens */}
       <div className="absolute inset-0 bg-hero-pattern opacity-20 pointer-events-none"></div>
-      <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-[#34D399]/10 rounded-full blur-[120px] pointer-events-none"></div>
-      <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-[#3B82F6]/5 rounded-full blur-[120px] pointer-events-none"></div>
+      <div className="absolute top-[-10%] left-[-10%] w-[300px] sm:w-[500px] h-[300px] sm:h-[500px] bg-[#34D399]/10 rounded-full blur-[120px] pointer-events-none"></div>
+      <div className="absolute bottom-[-10%] right-[-10%] w-[300px] sm:w-[500px] h-[300px] sm:h-[500px] bg-[#3B82F6]/5 rounded-full blur-[120px] pointer-events-none"></div>
 
       {/* Header */}
-      <header className="absolute top-0 left-0 w-full p-6 z-20">
+      <header className="absolute top-0 left-0 w-full p-4 sm:p-6 z-20">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
-            <div className="flex items-center gap-3 cursor-pointer" onClick={() => window.location.hash = '#/'}>
-                <div className="size-10 text-[#34D399] flex items-center justify-center">
+            <div className="flex items-center gap-2 sm:gap-3 cursor-pointer" onClick={() => window.location.hash = '#/'}>
+                <div className="size-8 sm:size-10 text-[#34D399] flex items-center justify-center">
                     <svg className="w-full h-full drop-shadow-[0_0_8px_rgba(52,211,153,0.5)]" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
                         <path d="M42.4379 44C42.4379 44 36.0744 33.9038 41.1692 24C46.8624 12.9336 42.2078 4 42.2078 4L7.01134 4C7.01134 4 11.6577 12.932 5.96912 23.9969C0.876273 33.9029 7.27094 44 7.27094 44L42.4379 44Z" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="3"></path>
                     </svg>
                 </div>
-                <span className="text-white text-2xl font-black tracking-tight hidden sm:block">EcoCycle</span>
+                <span className="text-white text-xl sm:text-2xl font-black tracking-tight">EcoCycle</span>
             </div>
-            <button onClick={() => window.location.hash = '#/'} className="text-sm font-bold text-slate-400 hover:text-white transition-colors bg-transparent border-none cursor-pointer">
-                Back to Home
+            <button onClick={() => window.location.hash = '#/'} className="text-xs sm:text-sm font-bold text-slate-400 hover:text-white transition-colors bg-transparent border-none cursor-pointer">
+                <span className="hidden sm:inline">Back to Home</span>
+                <span className="sm:hidden">Back</span>
             </button>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="relative z-10 w-full max-w-md p-6 animate-fade-in-up">
-        <div className="bg-[#1E293B]/30 backdrop-blur-xl border border-white/10 rounded-3xl p-8 shadow-2xl">
-            <div className="text-center mb-8">
-                <h1 className="text-3xl font-bold text-white mb-2 tracking-tight">{mode} to EcoCycle</h1>
-                <p className="text-slate-400">Welcome back! Please select your role to continue.</p>
+      <main className="relative z-10 w-full max-w-md mx-4 sm:mx-0 p-4 sm:p-6 animate-fade-in-up">
+        <div className="bg-[#1E293B]/30 backdrop-blur-xl border border-white/10 rounded-3xl p-6 sm:p-8 shadow-2xl">
+            <div className="text-center mb-6 sm:mb-8">
+                <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2 tracking-tight">{mode} to EcoCycle</h1>
+                <p className="text-sm sm:text-base text-slate-400">Welcome back! Please select your role to continue.</p>
             </div>
 
             {/* Toggle */}
