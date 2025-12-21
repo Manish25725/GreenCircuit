@@ -219,9 +219,12 @@ const AgencyProfile = () => {
         zipCode: formData.zipCode
       };
       
-      // Only include coordinates if they exist in agency data
-      if (agencyData?.address?.coordinates) {
-        addressData.coordinates = agencyData.address.coordinates;
+      // Only include coordinates if they exist and are valid
+      if (agencyData?.address?.coordinates?.lat && agencyData?.address?.coordinates?.lng) {
+        addressData.coordinates = {
+          lat: agencyData.address.coordinates.lat,
+          lng: agencyData.address.coordinates.lng
+        };
       }
       
       console.log('Saving agency profile with data:', {

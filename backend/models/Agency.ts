@@ -92,8 +92,11 @@ const AgencySchema = new Schema<IAgency>({
     country: { type: String, default: '' },
     zipCode: { type: String, required: true },
     coordinates: {
-      lat: Number,
-      lng: Number
+      type: {
+        lat: Number,
+        lng: Number
+      },
+      required: false
     }
   },
   // Partner Registration Details
