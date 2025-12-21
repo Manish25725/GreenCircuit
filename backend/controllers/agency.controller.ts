@@ -343,12 +343,11 @@ export const updateBookingStatus = async (req: Request, res: Response) => {
         }
       });
 
-      // Update user stats
+      // Update user stats (points awarded in booking.controller when status changes to completed)
       await User.findByIdAndUpdate(booking.userId, {
         $inc: {
-          totalPickups: 1,
-          totalWasteRecycled: booking.totalWeight || 0,
-          ecoPoints: Math.floor((booking.totalWeight || 0) * 10)
+          totalWasteRecycled: booking.totalWeight || 0
+          // Note: totalPickups and ecoPoints are incremented in booking.controller.ts when completed
         }
       });
 

@@ -51,8 +51,7 @@ export const createBooking = async (req: Request, res: Response) => {
     const bookingCount = await Booking.countDocuments();
     const bookingId = `ECO-${String(bookingCount + 1).padStart(6, '0')}`;
 
-    // Create booking
-    const ecoPoints = items.reduce((acc: number, item: any) => acc + (item.quantity * 10), 0);
+    // Create booking (points awarded only when completed, not at creation)
     const booking = await Booking.create({
       userId,
       agencyId,
@@ -69,7 +68,7 @@ export const createBooking = async (req: Request, res: Response) => {
       },
       notes: notes || '',
       status: 'pending',
-      ecoPointsEarned: ecoPoints,
+      ecoPointsEarned: 0, // Points awarded only when completed
       trackingHistory: [{
         status: 'pending',
         message: 'Booking request placed',
@@ -82,12 +81,11 @@ export const createBooking = async (req: Request, res: Response) => {
       await Slot.findByIdAndUpdate(validSlotId, { bookingId: booking._id });
     }
 
-    // Update user's total pickups and eco points
+    // Update user's total bookings (pickups counted when completed)
     await User.findByIdAndUpdate(userId, { 
       $inc: { 
-        totalPickups: 1,
-        totalBookings: 1,
-        ecoPoints: ecoPoints
+        totalBookings: 1
+        // Note: ecoPoints and totalPickups incremented only when status becomes 'completed'
       } 
     });
 
@@ -176,15 +174,17 @@ export const updateBookingStatus = async (req: Request, res: Response) => {
       timestamp: new Date()
     });
 
-    // If completed, award eco points
-    if (status === 'completed') {
-      const totalItems = booking.items.reduce((acc, item) => acc + item.quantity, 0);
-      const pointsEarned = totalItems * 50; // 50 points per item
+    // If completed, award eco points (5 points per pickup)
+    if (status === 'completed' && booking.ecoPointsEarned === 0) {
+      const pointsEarned = 5; // Fixed 5 points per completed pickup
       
       booking.ecoPointsEarned = pointsEarned;
       
       await User.findByIdAndUpdate(booking.userId, {
-        $inc: { ecoPoints: pointsEarned }
+        $inc: { 
+          ecoPoints: pointsEarned,
+          totalPickups: 1 // Increment pickups only when completed
+        }
       });
 
       // Create notification
@@ -230,6 +230,17 @@ export const cancelBooking = async (req: Request, res: Response) => {
       bookedBy: null,
       bookingId: null
     });
+
+    // Refund eco points if they were awarded (i.e., booking was completed then cancelled)
+    if (booking.ecoPointsEarned > 0) {
+      await User.findByIdAndUpdate(booking.userId, {
+        $inc: { 
+          ecoPoints: -booking.ecoPointsEarned,
+          totalPickups: -1 // Decrement pickup count if it was completed
+        }
+      });
+      booking.ecoPointsEarned = 0; // Reset points
+    }
 
     await booking.save();
     sendSuccess(res, booking);
