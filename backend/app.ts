@@ -64,8 +64,14 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // Validate request size before processing
 app.use(validateRequestSize);
 
-// Data sanitization against NoSQL query injection (handles query, params automatically)
-app.use(mongoSanitize());
+// Data sanitization against NoSQL query injection
+// Use replaceWith option to avoid modifying read-only properties
+app.use(mongoSanitize({
+  replaceWith: '_',
+  onSanitize: ({ req, key }) => {
+    console.warn(`Sanitized key: ${key} in request from ${req.ip}`);
+  }
+}));
 
 // Prevent parameter pollution (must be after body parsing)
 app.use(hpp());
