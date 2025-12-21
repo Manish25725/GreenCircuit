@@ -80,37 +80,75 @@ A comprehensive platform for managing electronic waste collection, recycling, an
 
 ## Deployment
 
+### Environment Configuration
+
+This project uses Vite environment variables for API configuration across different environments.
+
+**Local Development:**
+- Uses `.env` or `.env.development`
+- API URL: `http://localhost:3001/api`
+
+**Production (Render.com):**
+- Uses `.env.production` (committed to git)
+- API URL: `https://e-waste-7ios.onrender.com/api`
+
 ### Deploy to Render
 
-1. **Push your code to GitHub**
+The project includes a `render.yaml` for automatic deployment configuration.
+
+**Prerequisites:**
+1. GitHub repository connected to Render
+2. MongoDB Atlas connection string
+3. Cloudinary account credentials
+
+**Deployment Steps:**
+
+1. **Commit and push your code**
    ```bash
    git add .
    git commit -m "Deploy to Render"
    git push origin main
    ```
 
-2. **Create Web Service on Render**
-   - Go to https://render.com/dashboard
-   - Click "New +" → "Web Service"
-   - Connect your GitHub repository
-   - Configure:
-     - **Name**: your-app-backend
-     - **Build Command**: `npm install`
-     - **Start Command**: `npm run start`
-     - **Environment**: Node
+2. **Render Auto-Deployment**
+   - Connect your GitHub repository on Render
+   - Render will detect `render.yaml` and create both services:
+     - **Backend** (Node.js Web Service)
+     - **Frontend** (Static Site)
 
-3. **Add Environment Variables**
-   - Add all variables from your `.env` file in Render dashboard
-   - Do NOT commit sensitive keys to Git
+3. **Configure Backend Environment Variables**
+   
+   Set these in Render Dashboard for the backend service:
+   ```
+   MONGODB_URI=your_mongodb_connection_string
+   JWT_SECRET=your_jwt_secret_key
+   CLOUDINARY_CLOUD_NAME=your_cloudinary_cloud_name
+   CLOUDINARY_API_KEY=your_cloudinary_api_key
+   CLOUDINARY_API_SECRET=your_cloudinary_api_secret
+   ADMIN_KEY=your_admin_registration_key
+   NODE_ENV=production
+   PORT=3001
+   ```
 
-4. **Create Static Site for Frontend**
-   - Click "New +" → "Static Site"
-   - Build Command: `npm install && npm run build`
-   - Publish Directory: `dist`
+4. **Frontend Environment Variables**
+   
+   Already configured in `render.yaml`:
+   ```
+   VITE_API_URL=https://e-waste-7ios.onrender.com/api
+   ```
+   
+   This is automatically set during build and tells the frontend where to find the backend API.
 
-5. **Update API URL**
-   - After backend deployment, update `services/api.ts` with your backend URL
-   - Commit and push to trigger frontend redeploy
+5. **Verify Deployment**
+   - Backend health check: `https://e-waste-7ios.onrender.com/api/health`
+   - Frontend: `https://e-waste-frontened.onrender.com`
+
+**Troubleshooting:**
+
+- **CORS Errors**: Ensure backend `app.ts` includes your frontend URL in CORS origins
+- **Connection Refused**: Verify `VITE_API_URL` is set correctly in Render frontend environment
+- **Cold Starts**: Free tier services sleep after inactivity (30-60s first request)
+- **Build Failures**: Check Render build logs for missing dependencies or env variables
 
 ## Project Structure
 

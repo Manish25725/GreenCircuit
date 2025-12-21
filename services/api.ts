@@ -1,9 +1,8 @@
 // Configuration
-// For deployment: Replace RENDER_BACKEND_URL with your actual Render backend URL
-const RENDER_BACKEND_URL = 'https://e-waste-7ios.onrender.com';
-const API_BASE_URL = import.meta.env.PROD 
-  ? `${RENDER_BACKEND_URL}/api`
-  : 'http://localhost:3001/api';
+// API URL is set via environment variables:
+// - Development: VITE_API_URL in .env.development (defaults to localhost:3001)
+// - Production: VITE_API_URL in .env.production (set to Render backend URL)
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 
 console.log('Environment:', import.meta.env.MODE);
 console.log('Production:', import.meta.env.PROD);
