@@ -42,11 +42,9 @@ import { bulkOperationLimiter } from '../middleware/security.middleware';
 
 const router = Router();
 
-// Apply admin rate limiting to all admin routes
+// Apply admin rate limiting and authentication to all admin routes
 router.use(adminRateLimit);
-
-// Admin routes - currently open for development (no authentication required)
-// TODO: Add back authentication for production: router.use(protect, authorize('admin'));
+router.use(protect, authorize('admin'));
 
 // ==========================================
 // DASHBOARD

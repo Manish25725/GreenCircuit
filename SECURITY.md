@@ -169,7 +169,97 @@ router.get('/profile', protect, getProfile);
 4. **Admin endpoint limit**: 50 req/hour (admin operations)
 5. **Protected route limit**: 200 req/15min (authenticated users)
 
-## 🛡️ Attack Prevention
+## � Comprehensive API Security Coverage
+
+Every API endpoint in the application is now secured with appropriate authentication, authorization, and rate limiting:
+
+### Public Endpoints (Rate Limited)
+- **Agency Search**: `/api/agencies/search` - apiLimiter (100 req/15min)
+- **Agency Listing**: `/api/agencies` - apiLimiter (100 req/15min)
+- **Agency Public Profile**: `/api/agencies/public/:id` - apiLimiter (100 req/15min)
+- **Certificate Verification**: `/api/certificates/verify/:code` - apiLimiter (100 req/15min)
+- **Reward Listing**: `/api/rewards` - apiLimiter (100 req/15min)
+- **Slot Viewing**: `/api/slots` - apiLimiter (100 req/15min)
+- **Slot Indicators**: `/api/slots/indicators` - apiLimiter (100 req/15min)
+- **Contact Form**: `/api/contact` - strictLimiter (10 req/hour)
+
+### Authentication Endpoints (Strict Rate Limiting)
+- **Login**: `/api/auth/login` - authLimiter (5 req/15min)
+- **Register**: `/api/auth/register` - authLimiter (5 req/15min)
+- **Admin Login**: `/api/auth/admin-login` - strictLimiter (10 req/hour)
+
+### User Protected Endpoints (Authenticated + Rate Limited)
+- **Profile Management**: `/api/auth/me`, `/api/auth/profile` - protect + apiLimiter
+- **User Preferences**: `/api/auth/preferences/*` - protect + apiLimiter
+- **Security Settings**: `/api/auth/security/*` - protect + apiLimiter
+- **Bookings**: `/api/bookings/*` - protect + apiLimiter/strictLimiter
+  - Booking creation: strictLimiter (10 req/hour)
+  - Booking viewing: apiLimiter (100 req/15min)
+- **Certificates**: `/api/certificates/*` - protect + apiLimiter
+  - Certificate generation: strictLimiter (10 req/hour)
+- **Notifications**: `/api/notifications/*` - protect + apiLimiter
+- **Rewards**: `/api/rewards/redeem` - protect + strictLimiter (10 req/hour)
+- **Reward History**: `/api/rewards/history` - protect + apiLimiter
+- **Slot Booking**: `/api/slots/:id/book` - protect + strictLimiter (10 req/hour)
+
+### Agency Protected Endpoints (Role: agency)
+- **Agency Profile**: `/api/agency/profile/me` - protect + authorize('agency') + apiLimiter
+- **Agency Dashboard**: `/api/agency/dashboard/me` - protect + authorize('agency') + apiLimiter
+- **Agency Bookings**: `/api/agency/bookings/me` - protect + authorize('agency') + apiLimiter
+- **Agency Analytics**: `/api/agency/analytics/me` - protect + authorize('agency') + apiLimiter
+- **Vetting Requests**: `/api/agency/vetting/*` - protect + authorize('agency') + apiLimiter
+- **Slot Management**: `/api/slots` (POST/PUT/DELETE) - protect + authorize('agency', 'admin') + apiLimiter
+
+### Business Protected Endpoints (Role: business)
+- **Business Dashboard**: `/api/business/dashboard` - protect + authorize('business', 'admin') + apiLimiter
+- **Business Profile**: `/api/business/profile` - protect + authorize('business', 'admin') + apiLimiter
+- **Inventory Management**: `/api/business/inventory/*` - protect + authorize('business', 'admin') + apiLimiter
+  - Bulk operations: bulkOperationLimiter (5 req/hour)
+- **Business Certificates**: `/api/business/certificates/*` - protect + authorize('business', 'admin') + apiLimiter
+- **Business Analytics**: `/api/business/analytics` - protect + authorize('business', 'admin') + apiLimiter
+- **Report Export**: `/api/business/reports/export` - protect + authorize('business', 'admin') + bulkOperationLimiter (5 req/hour)
+- **Business Bookings**: `/api/business/bookings` - protect + authorize('business', 'admin') + apiLimiter
+
+### Admin Protected Endpoints (Role: admin) 🔒
+**ALL admin endpoints require authentication and admin role authorization**:
+- **Dashboard**: `/api/admin/dashboard` - protect + authorize('admin') + adminRateLimit (50 req/hour)
+- **User Management**: `/api/admin/users/*` - protect + authorize('admin') + adminRateLimit
+- **Agency Management**: `/api/admin/agencies/*` - protect + authorize('admin') + adminRateLimit
+- **Vetting Management**: `/api/admin/vetting/*` - protect + authorize('admin') + adminRateLimit
+- **Reports & Analytics**: `/api/admin/reports/*` - protect + authorize('admin') + adminRateLimit
+  - Platform export: bulkOperationLimiter (5 req/hour)
+- **System Management**: `/api/admin/system/*` - protect + authorize('admin') + adminRateLimit
+- **Contact Management**: `/api/contact` (GET/PUT/DELETE) - protect + authorize('admin') + apiLimiter
+
+### Analytics Endpoints (Protected)
+- **Platform Analytics**: `/api/analytics` - protect + authorize('admin', 'agency', 'business') + apiLimiter
+
+### Security Middleware Stack Order
+All API requests pass through these security layers in order:
+1. **Helmet** - Security headers
+2. **CORS** - Origin validation
+3. **Request Size Validation** - 10MB max
+4. **Anti-Data Flood** - 100MB/hour per IP
+5. **Data Structure Validation** - Depth, size, key limits
+6. **String Length Validation** - Field-specific limits
+7. **MongoDB Sanitization** - NoSQL injection prevention
+8. **HPP** - Parameter pollution prevention
+9. **XSS Validation** - Script injection prevention
+10. **Route-specific Rate Limiters** - Per-endpoint limits
+11. **Authentication Middleware** (if required) - JWT validation + IP tracking
+12. **Authorization Middleware** (if required) - Role-based access control
+
+### Rate Limiting Summary by Endpoint Type
+| Endpoint Type | Rate Limit | Window | Purpose |
+|--------------|------------|---------|----------|
+| Authentication | 5 requests | 15 min | Prevent brute force |
+| Admin Operations | 50 requests | 1 hour | Protect admin access |
+| Bulk Operations | 5 requests | 1 hour | Prevent resource exhaustion |
+| Strict Actions | 10 requests | 1 hour | High-value operations |
+| General API | 100 requests | 15 min | Normal usage protection |
+| Failed Auth | 10 attempts | 15 min | Token brute force prevention |
+
+## �🛡️ Attack Prevention
 
 ### SQL/NoSQL Injection
 **Protection**: 
