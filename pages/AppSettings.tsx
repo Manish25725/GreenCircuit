@@ -4,6 +4,7 @@ import ProfileHeader from '../components/ProfileHeader';
 import ProfileSidebar from '../components/ProfileSidebar';
 import { api, getCurrentUser } from '../services/api';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useTheme } from '../contexts/ThemeContext';
 import { Language } from '../i18n/translations';
 import Loader from '../components/Loader';
 
@@ -11,9 +12,10 @@ const AppSettings = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const { language, setLanguage, t } = useLanguage();
+  const { theme, setTheme } = useTheme();
   const [settings, setSettings] = useState({
     language: language,
-    theme: 'dark',
+    theme: theme,
     locationAccess: true,
     notificationsPermission: true
   });
@@ -27,6 +29,11 @@ const AppSettings = () => {
     // Update local settings when global language changes
     setSettings(prev => ({ ...prev, language }));
   }, [language]);
+
+  useEffect(() => {
+    // Update local settings when global theme changes
+    setSettings(prev => ({ ...prev, theme }));
+  }, [theme]);
 
   const loadSettings = async () => {
     try {
@@ -92,15 +99,15 @@ const AppSettings = () => {
   };
 
   const handleThemeToggle = async (isDark: boolean) => {
-    const previousTheme = settings.theme;
+    const previousTheme = theme;
     try {
       setSaving(true);
-      const theme = isDark ? 'dark' : 'light';
-      setSettings(prev => ({ ...prev, theme }));
+      const newTheme = isDark ? 'dark' : 'light';
+      setTheme(newTheme);
       
       const appSettings = {
         language: settings.language,
-        theme,
+        theme: newTheme,
         emailDigest: preferences?.app?.emailDigest || 'weekly',
         autoBackup: preferences?.app?.autoBackup !== false
       };
@@ -109,12 +116,6 @@ const AppSettings = () => {
       
       if (response.data?.preferences?.app) {
         setPreferences(response.data.preferences);
-        // Update settings state with saved values
-        setSettings(prev => ({
-          ...prev,
-          language: response.data.preferences.app.language,
-          theme: response.data.preferences.app.theme
-        }));
       }
       
       // Show success feedback
@@ -125,7 +126,7 @@ const AppSettings = () => {
       setTimeout(() => notification.remove(), 3000);
     } catch (error) {
       console.error('Failed to update theme:', error);
-      setSettings(prev => ({ ...prev, theme: previousTheme }));
+      setTheme(previousTheme);
       alert(t('updateFailed'));
     } finally {
       setSaving(false);

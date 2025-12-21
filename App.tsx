@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { api, getCurrentUser } from './services/api';
 import { LanguageProvider } from './contexts/LanguageContext';
+import { ThemeProvider } from './contexts/ThemeContext';
 import AgencyDashboard from './pages/AgencyDashboard';
 import AgencyAnalytics from './pages/AgencyAnalytics';
 import ManageSlots from './pages/ManageSlots';
@@ -255,9 +256,11 @@ const App = () => {
 
   // Loading screen removed - go directly to content
   return (
-    <LanguageProvider>
-      {renderRoute()}
-    </LanguageProvider>
+    <ThemeProvider>
+      <LanguageProvider>
+        {renderRoute()}
+      </LanguageProvider>
+    </ThemeProvider>
   );
 };
 
