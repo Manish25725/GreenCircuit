@@ -1,5 +1,17 @@
 import express from 'express';
 import cors from 'cors';
+import helmet from 'helmet';
+import mongoSanitize from 'express-mongo-sanitize';
+import hpp from 'hpp';
+
+// Import security middleware
+import { 
+  apiLimiter, 
+  validateInput, 
+  validateRequestSize,
+  securityHeaders,
+  sanitizeMongoOperators
+} from './middleware/security.middleware';
 
 // Import routes
 import authRoutes from './routes/auth.routes';
@@ -16,15 +28,53 @@ import contactRoutes from './routes/contact.routes';
 
 const app = express();
 
-// Middleware
+// Security Middleware
+// Helmet - Set security headers
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      scriptSrc: ["'self'"],
+      imgSrc: ["'self'", "data:", "https:"],
+    },
+  },
+  crossOriginEmbedderPolicy: false,
+}));
+
+// Custom security headers
+app.use(securityHeaders);
+
+// CORS configuration
 app.use(cors({
   origin: ['http://localhost:3000', 'http://127.0.0.1:3000', 'https://e-waste-frontened.onrender.com'],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  maxAge: 86400, // 24 hours
 }));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+
+// Body parsing with size limits
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Data sanitization against NoSQL query injection
+app.use(mongoSanitize());
+
+// Prevent parameter pollution
+app.use(hpp());
+
+// Validate request size
+app.use(validateRequestSize);
+
+// Sanitize MongoDB operators
+app.use(sanitizeMongoOperators);
+
+// Input validation
+app.use(validateInput);
+
+// Rate limiting for all API routes
+app.use('/api/', apiLimiter);
 
 // API Routes
 app.use('/api/auth', authRoutes);

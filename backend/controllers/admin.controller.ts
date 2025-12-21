@@ -7,6 +7,7 @@ import VettingRequest from '../models/VettingRequest';
 import Certificate from '../models/Certificate';
 import Notification from '../models/Notification';
 import { sendSuccess, sendError } from '../utils/response';
+import { parsePagination, addPaginationMeta } from '../middleware/security.middleware';
 import mongoose from 'mongoose';
 
 // Get admin dashboard stats
@@ -65,10 +66,11 @@ export const getDashboardStats = async (req: Request, res: Response) => {
 // Get all users (admin)
 export const getAllUsers = async (req: Request, res: Response) => {
   try {
-    const { role, page = 1, limit = 20, search } = req.query;
+    const { role, search } = req.query;
+    const { page, limit, skip } = parsePagination(req);
 
     const query: any = {};
-    if (role) query.role = role;
+    if (role && role !== 'all') query.role = role;
     if (search) {
       query.$or = [
         { name: new RegExp(search as string, 'i') },
@@ -76,22 +78,18 @@ export const getAllUsers = async (req: Request, res: Response) => {
       ];
     }
 
-    const users = await User.find(query)
-      .select('-password')
-      .sort({ createdAt: -1 })
-      .skip((Number(page) - 1) * Number(limit))
-      .limit(Number(limit));
-
-    const total = await User.countDocuments(query);
+    const [users, total] = await Promise.all([
+      User.find(query)
+        .select('-password')
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit),
+      User.countDocuments(query)
+    ]);
 
     sendSuccess(res, {
       users,
-      pagination: {
-        page: Number(page),
-        limit: Number(limit),
-        total,
-        pages: Math.ceil(total / Number(limit))
-      }
+      pagination: addPaginationMeta(total, page, limit)
     });
   } catch (error: any) {
     sendError(res, error.message);
@@ -101,11 +99,21 @@ export const getAllUsers = async (req: Request, res: Response) => {
 // Get pending agency verifications
 export const getPendingAgencies = async (req: Request, res: Response) => {
   try {
-    const agencies = await Agency.find({ verificationStatus: 'pending' })
-      .populate('userId', 'name email')
-      .sort({ createdAt: -1 });
+    const { page, limit, skip } = parsePagination(req);
 
-    sendSuccess(res, agencies);
+    const [agencies, total] = await Promise.all([
+      Agency.find({ verificationStatus: 'pending' })
+        .populate('userId', 'name email')
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit),
+      Agency.countDocuments({ verificationStatus: 'pending' })
+    ]);
+
+    sendSuccess(res, {
+      agencies,
+      pagination: addPaginationMeta(total, page, limit)
+    });
   } catch (error: any) {
     sendError(res, error.message);
   }
