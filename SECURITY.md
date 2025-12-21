@@ -63,11 +63,42 @@ Implemented using Helmet.js:
 ```
 
 ### 4. **Request Size Limits**
-- **Maximum request size**: 10MB
+- **Maximum request size**: 10MB per request
 - **Applies to**: All POST/PUT requests
 - **Purpose**: Prevent payload flooding attacks
 
-### 5. **CORS Configuration**
+### 5. **Data Flooding Protection** ✨ NEW
+Comprehensive protection against data flooding attacks:
+
+#### Cumulative Volume Tracking
+- **Limit**: 100MB per hour per IP address
+- **Purpose**: Prevent sustained data flooding
+- **Tracking**: Cumulative data sent across all requests
+- **Auto-reset**: Counters reset after 1 hour
+- **Response**: 429 error with retry-after header
+
+#### Data Structure Validation
+- **Max object depth**: 10 levels
+- **Max array length**: 1000 items per array
+- **Max object keys**: 100 keys per object
+- **Purpose**: Prevent deep nesting attacks and memory exhaustion
+
+#### String Length Validation
+- **Standard fields**: Max 10KB per string (10,000 characters)
+- **Text fields** (description, content, body, message, notes): Max 100KB (100,000 characters)
+- **Purpose**: Prevent buffer overflow and memory attacks
+- **Validation**: Field-specific limits based on usage
+
+#### Bulk Operation Rate Limiting
+- **Limit**: 5 bulk operations per hour
+- **Applies to**: 
+  - `/api/business/inventory/bulk-update`
+  - `/api/business/inventory/mark-pickup`
+  - `/api/business/reports/export`
+  - `/api/admin/reports/export`
+- **Purpose**: Prevent resource exhaustion from large batch operations
+
+### 6. **CORS Configuration**
 ```typescript
 {
   origin: Whitelist of allowed domains
@@ -78,7 +109,7 @@ Implemented using Helmet.js:
 }
 ```
 
-### 6. **Data Pagination**
+### 7. **Data Pagination**
 Prevents loading excessive data that could cause server overload.
 
 #### Default Pagination Settings
@@ -110,7 +141,7 @@ Prevents loading excessive data that could cause server overload.
 - ✅ GET `/api/business/inventory` - Inventory items
 - ✅ GET `/api/certificates` - Certificate history
 
-### 7. **Authentication Security**
+### 8. **Authentication Security**
 
 #### JWT Token Protection
 - Tokens stored with HttpOnly flag (if using cookies)

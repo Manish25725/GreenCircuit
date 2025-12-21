@@ -10,7 +10,10 @@ import {
   validateInput, 
   validateRequestSize,
   securityHeaders,
-  sanitizeMongoOperators
+  sanitizeMongoOperators,
+  antiDataFlood,
+  validateDataStructure,
+  validateStringLengths
 } from './middleware/security.middleware';
 
 // Import routes
@@ -66,6 +69,15 @@ app.use(hpp());
 
 // Validate request size
 app.use(validateRequestSize);
+
+// Anti data flooding - track cumulative data volume
+app.use(antiDataFlood);
+
+// Validate data structure complexity
+app.use(validateDataStructure);
+
+// Validate string field lengths
+app.use(validateStringLengths);
 
 // Sanitize MongoDB operators
 app.use(sanitizeMongoOperators);
