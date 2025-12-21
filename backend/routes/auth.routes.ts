@@ -13,14 +13,13 @@ import {
   adminLogin
 } from '../controllers/auth.controller';
 import { protect } from '../middleware/auth.middleware';
-import { authLimiter, strictLimiter } from '../middleware/security.middleware';
 
 const router = Router();
 
-// Authentication routes with rate limiting
-router.post('/register', authLimiter, registerUser);
-router.post('/login', authLimiter, authUser);
-router.post('/admin-login', strictLimiter, adminLogin);
+// Authentication routes
+router.post('/register', registerUser);
+router.post('/login', authUser);
+router.post('/admin-login', adminLogin);
 router.get('/me', protect, getMe);
 router.put('/profile', protect, updateProfile);
 

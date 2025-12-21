@@ -37,13 +37,12 @@ import {
   getSystemHealth,
   sendSystemNotification
 } from '../controllers/admin.controller';
-import { protect, authorize, adminRateLimit } from '../middleware/auth.middleware';
+import { protect, authorize } from '../middleware/auth.middleware';
 import { bulkOperationLimiter } from '../middleware/security.middleware';
 
 const router = Router();
 
-// Apply admin rate limiting and authentication to all admin routes
-router.use(adminRateLimit);
+// Apply authentication to all admin routes
 router.use(protect, authorize('admin'));
 
 // ==========================================
@@ -92,9 +91,7 @@ router.put('/vetting/:id/checklist', updateChecklistItem);
 // ==========================================
 router.get('/reports', getReports);
 router.get('/analytics', getPlatformAnalytics);
-
-// Export with bulk operation limiter (large data export)
-router.get('/reports/export', bulkOperationLimiter, exportPlatformReport);
+router.get('/reports/export', exportPlatformReport);
 
 // ==========================================
 // SYSTEM

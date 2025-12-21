@@ -25,7 +25,6 @@ import {
   getBusinessBookings
 } from '../controllers/business.controller';
 import { protect, authorize } from '../middleware/auth.middleware';
-import { bulkOperationLimiter } from '../middleware/security.middleware';
 
 const router = Router();
 
@@ -49,9 +48,9 @@ router.post('/inventory', addInventoryItem);
 router.put('/inventory/:id', updateInventoryItem);
 router.delete('/inventory/:id', deleteInventoryItem);
 
-// Bulk operations with stricter rate limiting
-router.post('/inventory/bulk-update', bulkOperationLimiter, bulkUpdateInventoryStatus);
-router.post('/inventory/mark-pickup', bulkOperationLimiter, markItemsForPickup);
+// Bulk operations
+router.post('/inventory/bulk-update', bulkUpdateInventoryStatus);
+router.post('/inventory/mark-pickup', markItemsForPickup);
 
 // ==========================================
 // CERTIFICATE ROUTES
@@ -64,9 +63,7 @@ router.get('/certificates/:id/download', downloadCertificate);
 // ANALYTICS ROUTES
 // ==========================================
 router.get('/analytics', getBusinessAnalytics);
-
-// Export operations with bulk limiter (large data operations)
-router.get('/reports/export', bulkOperationLimiter, exportReport);
+router.get('/reports/export', exportReport);
 
 // ==========================================
 // BOOKING ROUTES

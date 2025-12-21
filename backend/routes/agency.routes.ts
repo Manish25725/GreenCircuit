@@ -20,14 +20,13 @@ import {
   updateAgencyLogo
 } from '../controllers/agency.controller';
 import { protect, authorize, optionalAuth } from '../middleware/auth.middleware';
-import { apiLimiter } from '../middleware/security.middleware';
 
 const router = Router();
 
-// Public routes with rate limiting
-router.get('/', apiLimiter, optionalAuth, getAgencies);
-router.get('/search', apiLimiter, searchAgencies);
-router.get('/public/:id', apiLimiter, getAgencyPublicProfile);
+// Public routes
+router.get('/', optionalAuth, getAgencies);
+router.get('/search', searchAgencies);
+router.get('/public/:id', getAgencyPublicProfile);
 
 // Protected agency routes - MUST be before /:id to avoid conflicts
 router.post('/', protect, createAgency);

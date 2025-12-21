@@ -8,10 +8,15 @@ import BusinessCertificate from '../models/BusinessCertificate';
 import VettingRequest from '../models/VettingRequest';
 import Booking from '../models/Booking';
 
-const MONGO_URI = 'mongodb+srv://manish:manish25@cluster0.n4rjlbq.mongodb.net/ewaste?retryWrites=true&w=majority';
+const MONGO_URI = process.env.MONGO_URI || process.env.DATABASE_URL || '';
 
 const seedAdminAndBusiness = async () => {
   try {
+    if (!MONGO_URI) {
+      console.error('❌ Error: MONGO_URI or DATABASE_URL environment variable is not set');
+      process.exit(1);
+    }
+    
     await mongoose.connect(MONGO_URI);
     console.log('Connected to MongoDB');
 

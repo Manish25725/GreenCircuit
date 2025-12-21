@@ -5,7 +5,6 @@ import hpp from 'hpp';
 
 // Import security middleware
 import { 
-  apiLimiter, 
   validateInput, 
   validateRequestSize,
   securityHeaders,
@@ -80,9 +79,6 @@ app.use(sanitizeMongoOperators);
 
 // Input validation
 app.use(validateInput);
-
-// Rate limiting for all API routes
-app.use('/api/', apiLimiter);
 
 // API Routes
 app.use('/api/auth', authRoutes);
