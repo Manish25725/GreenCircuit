@@ -359,7 +359,7 @@ const Landing = () => {
                                     ? 'bg-gradient-to-b from-slate-800/20 to-slate-900/20 border-white/5 opacity-40 cursor-not-allowed grayscale'
                                     : 'bg-gradient-to-b from-slate-800/50 to-slate-900/50 border-white/5 cursor-pointer hover:-translate-y-2 hover:shadow-[0_20px_40px_-15px_rgba(59,130,246,0.2)]'
                         }`}
-                        onClick={() => (!user || user?.role === 'business') && (window.location.hash = '#/contact')}
+                        onClick={() => (!user || user?.role === 'business') && (window.location.hash = '#/business-dashboard')}
                     >
                          <div className={`absolute inset-0 transition-opacity duration-500 ${
                             user?.role === 'business' 

@@ -35,6 +35,8 @@ const AgencyProfile = () => {
     { day: 'Saturday', open: '09:00', close: '14:00', isOpen: true },
     { day: 'Sunday', open: '00:00', close: '00:00', isOpen: false }
   ]);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [notifications, setNotifications] = useState<any[]>([]);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -61,10 +63,6 @@ const AgencyProfile = () => {
           setOperatingHours(agency.operatingHours);
         }
         
-        if (agency.operatingHours && agency.operatingHours.length > 0) {
-          setOperatingHours(agency.operatingHours);
-        }
-        
         // Parse certifications if stored as JSON strings
         const parsedCerts = agency.certifications?.map((cert: string) => {
           try {
@@ -80,7 +78,20 @@ const AgencyProfile = () => {
         setLoading(false);
       }
     };
+    
+    const fetchNotifications = async () => {
+      try {
+        const response = await api.getNotifications() as any;
+        const notifData = response.data || response || [];
+        setNotifications(Array.isArray(notifData) ? notifData : []);
+      } catch (error) {
+        console.error('Failed to fetch notifications:', error);
+        setNotifications([]);
+      }
+    };
+    
     fetchProfile();
+    fetchNotifications();
   }, []);
 
   const uploadToCloudinary = async (file: File): Promise<string> => {
@@ -201,6 +212,18 @@ const AgencyProfile = () => {
   const handleSave = async () => {
     setSaving(true);
     try {
+      const addressData: any = {
+        street: formData.address,
+        city: formData.city,
+        state: 'NY',
+        zipCode: formData.zipCode
+      };
+      
+      // Only include coordinates if they exist in agency data
+      if (agencyData?.address?.coordinates) {
+        addressData.coordinates = agencyData.address.coordinates;
+      }
+      
       console.log('Saving agency profile with data:', {
         name: formData.companyName,
         registrationNumber: formData.registrationNumber,
@@ -208,12 +231,7 @@ const AgencyProfile = () => {
         email: formData.email,
         phone: formData.phone,
         logo: agencyLogo,
-        address: {
-          street: formData.address,
-          city: formData.city,
-          state: 'NY',
-          zipCode: formData.zipCode
-        },
+        address: addressData,
         services: wasteTypes,
         certifications: certifications.map(cert => JSON.stringify(cert)),
         operatingRegions: regions,
@@ -227,12 +245,7 @@ const AgencyProfile = () => {
         email: formData.email,
         phone: formData.phone,
         logo: agencyLogo,
-        address: {
-          street: formData.address,
-          city: formData.city,
-          state: 'NY',
-          zipCode: formData.zipCode
-        },
+        address: addressData,
         services: wasteTypes,
         certifications: certifications.map(cert => JSON.stringify(cert)),
         operatingRegions: regions,
@@ -278,6 +291,77 @@ const AgencyProfile = () => {
               <nav className="hidden md:flex flex-1 justify-center gap-1">
               </nav>
               <div className="flex items-center gap-4">
+                {/* Notification Icon */}
+                <div className="relative">
+                  <button 
+                    onClick={() => setShowNotifications(!showNotifications)}
+                    className="p-2.5 rounded-full bg-[#151F26] border border-white/5 text-gray-400 hover:text-[#f59e0b] hover:bg-[#f59e0b]/10 transition-colors relative"
+                    title="Notifications"
+                  >
+                    <span className="material-symbols-outlined text-[20px]">notifications</span>
+                    {Array.isArray(notifications) && notifications.filter(n => !n.isRead).length > 0 && (
+                      <span className="absolute top-1 right-1 w-2 h-2 bg-[#f59e0b] rounded-full"></span>
+                    )}
+                  </button>
+                  
+                  {/* Notifications Panel */}
+                  {showNotifications && (
+                    <div className="absolute right-0 top-14 w-96 bg-[#151F26] rounded-2xl border border-white/10 shadow-2xl z-50 max-h-[500px] overflow-hidden flex flex-col">
+                      <div className="p-4 border-b border-white/5 flex justify-between items-center">
+                        <h3 className="text-white font-bold text-lg">Notifications</h3>
+                        <button 
+                          onClick={() => setShowNotifications(false)}
+                          className="text-slate-400 hover:text-white"
+                        >
+                          <span className="material-symbols-outlined text-xl">close</span>
+                        </button>
+                      </div>
+                      <div className="overflow-y-auto flex-1">
+                        {!Array.isArray(notifications) || notifications.length === 0 ? (
+                          <div className="p-8 text-center">
+                            <span className="material-symbols-outlined text-6xl text-slate-600 mb-4 block">notifications_off</span>
+                            <p className="text-slate-400">No notifications</p>
+                          </div>
+                        ) : (
+                          <div className="divide-y divide-white/5">
+                            {notifications.map((notif, idx) => (
+                              <div 
+                                key={idx} 
+                                className={`p-4 hover:bg-white/5 transition-colors cursor-pointer ${!notif.isRead ? 'bg-[#f59e0b]/5' : ''}`}
+                              >
+                                <div className="flex gap-3">
+                                  <div className={`p-2 rounded-lg ${notif.type === 'booking' ? 'bg-blue-500/10 text-blue-400' : notif.type === 'payment' ? 'bg-green-500/10 text-green-400' : 'bg-[#f59e0b]/10 text-[#f59e0b]'}`}>
+                                    <span className="material-symbols-outlined text-xl">
+                                      {notif.icon || (notif.type === 'booking' ? 'event' : notif.type === 'payment' ? 'payments' : 'notifications')}
+                                    </span>
+                                  </div>
+                                  <div className="flex-1 min-w-0">
+                                    <p className="text-white font-medium text-sm mb-1">{notif.title}</p>
+                                    <p className="text-slate-400 text-xs line-clamp-2">{notif.message}</p>
+                                    <p className="text-slate-500 text-xs mt-2">
+                                      {new Date(notif.createdAt).toLocaleString()}
+                                    </p>
+                                  </div>
+                                  {!notif.isRead && (
+                                    <div className="w-2 h-2 bg-[#f59e0b] rounded-full mt-2"></div>
+                                  )}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                      {Array.isArray(notifications) && notifications.length > 0 && (
+                        <div className="p-3 border-t border-white/5">
+                          <button className="w-full text-center text-[#f59e0b] text-sm font-medium hover:text-[#d97706] transition-colors">
+                            Mark all as read
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+                
                 <button 
                     onClick={() => window.location.hash = '#/agency/profile'}
                     className="hidden sm:flex items-center gap-3 pl-1 pr-4 py-1 rounded-full bg-[#151F26] border border-white/5 hover:bg-white/5 transition-colors group cursor-pointer"

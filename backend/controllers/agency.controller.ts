@@ -655,15 +655,22 @@ export const updateAgencyProfile = async (req: Request, res: Response) => {
     if (establishedYear !== undefined) agency.establishedYear = establishedYear;
     
     if (address) {
-      agency.address = {
+      const updatedAddress: any = {
         street: address.street || agency.address.street,
         city: address.city || agency.address.city,
         state: address.state || agency.address.state,
         country: address.country || agency.address.country || '',
-        zipCode: address.zipCode || agency.address.zipCode,
-        ...(address.coordinates && { coordinates: address.coordinates }),
-        ...(!address.coordinates && agency.address.coordinates && { coordinates: agency.address.coordinates })
+        zipCode: address.zipCode || agency.address.zipCode
       };
+      
+      // Only include coordinates if they exist
+      if (address.coordinates) {
+        updatedAddress.coordinates = address.coordinates;
+      } else if (agency.address.coordinates) {
+        updatedAddress.coordinates = agency.address.coordinates;
+      }
+      
+      agency.address = updatedAddress;
     }
     
     if (services !== undefined) agency.services = services;
