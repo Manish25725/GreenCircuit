@@ -1,5 +1,10 @@
 // Configuration
-const API_BASE_URL = 'http://localhost:3001/api';
+// For deployment: Replace RENDER_BACKEND_URL with your actual Render backend URL
+const RENDER_BACKEND_URL = 'https://ecocycle-backend.onrender.com'; // Update this after deploying backend
+const API_BASE_URL = import.meta.env.PROD && RENDER_BACKEND_URL
+  ? `${RENDER_BACKEND_URL}/api`
+  : 'http://localhost:3001/api';
+
 // Set this to false to use real API calls to the backend server
 // Set to true to use internal mock data (useful for frontend preview without running server)
 const USE_MOCK_FALLBACK = false; 
