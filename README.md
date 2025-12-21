@@ -4,8 +4,7 @@ A comprehensive platform for managing electronic waste collection, recycling, an
 
 ## 🚀 Live Demo
 
-**Frontend**: [https://e-waste-frontened.onrender.com](https://e-waste-frontened.onrender.com)  
-**Backend API**: [https://e-waste-7ios.onrender.com](https://e-waste-7ios.onrender.com)
+[https://e-waste-frontened.onrender.com](https://e-waste-frontened.onrender.com)
 
 > **Note**: First request may take 30-60 seconds (free tier cold start)
 
