@@ -97,14 +97,8 @@ export const updateProfile = async (req: Request, res: Response) => {
 
     // If updating avatar and user has an old avatar, delete the old one from Cloudinary
     if (avatar && currentUser.avatar && currentUser.avatar !== avatar) {
-      console.log('Attempting to delete old avatar:', currentUser.avatar);
       if (currentUser.avatar.includes('cloudinary.com')) {
-        const deleted = await deleteImageByUrl(currentUser.avatar);
-        if (deleted) {
-          console.log('✓ Successfully deleted old avatar from Cloudinary');
-        } else {
-          console.log('✗ Failed to delete old avatar from Cloudinary');
-        }
+        await deleteImageByUrl(currentUser.avatar);
       }
     }
 
@@ -119,7 +113,6 @@ export const updateProfile = async (req: Request, res: Response) => {
     }
     sendSuccess(res, user);
   } catch (error: any) {
-    console.error('Error in updateProfile:', error);
     sendError(res, error.message);
   }
 };

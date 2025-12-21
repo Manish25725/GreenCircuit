@@ -629,16 +629,10 @@ export const updateAgencyProfile = async (req: Request, res: Response) => {
       establishedYear
     } = req.body;
 
-    console.log('Updating agency profile for userId:', userId);
-    console.log('Request body:', req.body);
-
     const agency = await Agency.findOne({ userId });
     if (!agency) {
-      console.log('Agency not found for userId:', userId);
       return sendError(res, 'Agency not found', 404);
     }
-
-    console.log('Current agency:', agency);
 
     // Update fields if provided
     if (name !== undefined) agency.name = name;
@@ -680,10 +674,8 @@ export const updateAgencyProfile = async (req: Request, res: Response) => {
 
     await agency.save();
 
-    console.log('Agency profile updated successfully:', agency);
     sendSuccess(res, agency);
   } catch (error: any) {
-    console.error('Update agency profile error:', error);
     sendError(res, error.message);
   }
 };

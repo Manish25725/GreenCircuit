@@ -208,12 +208,9 @@ export const getInventory = async (req: Request, res: Response) => {
     const userId = (req as any).user._id || (req as any).user.id;
     const { category, status, search, page = 1, limit = 50 } = req.query;
 
-    console.log('getInventory called for userId:', userId);
-
     // Find or create business profile
     let business = await Business.findOne({ userId });
     if (!business) {
-      console.log('No business found, creating new one...');
       const user = await User.findById(userId);
       if (!user) {
         return sendError(res, 'User not found', 404);
@@ -233,7 +230,6 @@ export const getInventory = async (req: Request, res: Response) => {
             zipCode: user.address?.zipCode || '000000'
           }
         });
-        console.log('Business created:', business._id);
       } catch (createError: any) {
         console.error('Error creating business:', createError);
         return sendError(res, 'Failed to create business profile: ' + createError.message, 500);
@@ -273,7 +269,6 @@ export const getInventory = async (req: Request, res: Response) => {
         }
       ]);
     } catch (aggError) {
-      console.error('Aggregate error:', aggError);
     }
 
     sendSuccess(res, {
@@ -287,7 +282,6 @@ export const getInventory = async (req: Request, res: Response) => {
       categoryStats
     });
   } catch (error: any) {
-    console.error('getInventory error:', error);
     sendError(res, error.message || 'Failed to fetch inventory');
   }
 };
@@ -321,8 +315,6 @@ export const addInventoryItem = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).user._id || (req as any).user.id;
     const itemData = req.body;
-
-    console.log('addInventoryItem called for userId:', userId, 'data:', itemData);
 
     // Find or create business profile
     let business = await Business.findOne({ userId });
@@ -371,15 +363,10 @@ export const addInventoryItem = async (req: Request, res: Response) => {
       notes: itemData.notes || ''
     };
 
-    console.log('Creating inventory with data:', inventoryData);
-
     const item = await Inventory.create(inventoryData);
-
-    console.log('Inventory item created:', item._id);
 
     return sendSuccess(res, item, 201);
   } catch (error: any) {
-    console.error('Add inventory error:', error);
     return sendError(res, error.message);
   }
 };

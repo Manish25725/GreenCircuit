@@ -64,12 +64,9 @@ export const createSlot = async (req: Request, res: Response) => {
       }
     }
     
-    console.log('Creating slot with data:', slotData);
     const slot = await Slot.create(slotData);
-    console.log('Slot created successfully:', slot);
     sendSuccess(res, slot, 201);
   } catch (error: any) {
-    console.error('Create slot error:', error);
     sendError(res, error.message || 'Failed to create slot', 400);
   }
 };

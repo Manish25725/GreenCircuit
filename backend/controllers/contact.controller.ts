@@ -19,15 +19,12 @@ export const createContact = async (req: Request, res: Response) => {
       message,
       status: 'new'
     });
-
-    console.log('Contact message created:', contact);
     
     sendSuccess(res, { 
       message: 'Your message has been sent successfully! We will get back to you soon.',
       contact 
     }, 201);
   } catch (error: any) {
-    console.error('Create contact error:', error);
     sendError(res, error.message || 'Failed to send message', 400);
   }
 };
