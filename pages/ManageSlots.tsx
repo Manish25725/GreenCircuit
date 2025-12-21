@@ -71,14 +71,24 @@ const ManageSlots = () => {
   const handleAddSlot = async () => {
     setAddingSlot(true);
     try {
-      // Create slot with proper data structure
-      await api.addSlot({
+      console.log('Adding slot with data:', {
         date: selectedDate,
         startTime: newSlot.startTime,
         endTime: newSlot.endTime,
         capacity: newSlot.capacity,
         status: 'Available'
       });
+      
+      // Create slot with proper data structure
+      const result = await api.addSlot({
+        date: selectedDate,
+        startTime: newSlot.startTime,
+        endTime: newSlot.endTime,
+        capacity: newSlot.capacity,
+        status: 'Available'
+      });
+      
+      console.log('Slot added successfully:', result);
       
       // Close modal and reset form
       setShowAddModal(false);
@@ -91,9 +101,12 @@ const ManageSlots = () => {
       ]);
       setSlots(slotsData);
       setIndicators(indicatorsData as any);
+      
+      alert('Slot added successfully!');
     } catch (error: any) {
       console.error('Failed to add slot:', error);
-      alert(`Failed to add slot: ${error.message || 'Unknown error'}`);
+      console.error('Error details:', error.response || error.message);
+      alert(`Failed to add slot: ${error.response?.data?.message || error.message || 'Unknown error'}`);
     } finally {
       setAddingSlot(false);
     }

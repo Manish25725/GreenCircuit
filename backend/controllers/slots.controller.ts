@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import Slot from '../models/Slot';
+import Agency from '../models/Agency';
 import { sendSuccess, sendError } from '../utils/response';
 
 export const getSlots = async (req: Request, res: Response) => {
@@ -10,7 +11,6 @@ export const getSlots = async (req: Request, res: Response) => {
     
     // If user is an agency, auto-filter by their agency
     if (userId && (req as any).user?.role === 'agency') {
-      const Agency = require('../models/Agency').default;
       const agency = await Agency.findOne({ userId });
       if (agency) {
         query.agencyId = agency._id;
@@ -52,13 +52,24 @@ export const getSlotIndicators = async (req: Request, res: Response) => {
 export const createSlot = async (req: Request, res: Response) => {
   try {
     const slotData = req.body;
-    // If user is an agency, auto-assign their agency ID
-    if ((req as any).user?.agencyId) {
-      slotData.agencyId = (req as any).user.agencyId;
+    const userId = (req as any).user?.id;
+    
+    // If user is an agency, find and auto-assign their agency ID
+    if (userId && (req as any).user?.role === 'agency') {
+      const agency = await Agency.findOne({ userId });
+      if (agency) {
+        slotData.agencyId = agency._id;
+      } else {
+        return sendError(res, 'Agency profile not found', 404);
+      }
     }
+    
+    console.log('Creating slot with data:', slotData);
     const slot = await Slot.create(slotData);
+    console.log('Slot created successfully:', slot);
     sendSuccess(res, slot, 201);
   } catch (error: any) {
+    console.error('Create slot error:', error);
     sendError(res, error.message || 'Failed to create slot', 400);
   }
 };
