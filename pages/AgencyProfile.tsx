@@ -4,6 +4,7 @@ import { api, getCurrentUser, User } from '../services/api';
 import Loader from '../components/Loader';
 
 const AgencyProfile = () => {
+  // Agency profile management component
   const [user, setUser] = useState<User | null>(getCurrentUser());
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
