@@ -197,18 +197,17 @@ async function fetchWithFallback<T>(endpoint: string, mockData: T, options?: Req
     return new Promise((resolve) => setTimeout(() => resolve(mockData), 600));
   }
 
-  try {
-    const res = await fetch(`${API_BASE_URL}${endpoint}`, {
-      headers: getHeaders(),
-      ...options,
-    });
-    if (!res.ok) throw new Error('Network response was not ok');
-    const data = await res.json();
-    return data.data || data;
-  } catch (error) {
-    console.warn(`API Error on ${endpoint}, falling back to mock data.`, error);
-    return mockData;
+  const res = await fetch(`${API_BASE_URL}${endpoint}`, {
+    headers: getHeaders(),
+    ...options,
+  });
+  
+  if (!res.ok) {
+    throw new Error(`API Error: ${res.status} ${res.statusText}`);
   }
+  
+  const data = await res.json();
+  return data.data || data;
 }
 
 async function apiRequest<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
@@ -234,31 +233,44 @@ async function apiRequest<T>(endpoint: string, options: RequestInit = {}): Promi
 // --- API METHODS ---
 export const api = {
   // Analytics
-  getAnalytics: () => fetchWithFallback<AnalyticsData>('/analytics', MOCK_ANALYTICS),
+  getAnalytics: () => {
+    if (USE_MOCK_FALLBACK) {
+      return Promise.resolve(MOCK_ANALYTICS);
+    }
+    return apiRequest<AnalyticsData>('/analytics');
+  },
 
   // Slots
   getSlots: async (date?: number, agencyId?: string) => {
-    let mock = MOCK_SLOTS;
-    if (date) {
-      mock = MOCK_SLOTS.filter(s => s.date === date);
+    if (USE_MOCK_FALLBACK) {
+      let mock = MOCK_SLOTS;
+      if (date) {
+        mock = MOCK_SLOTS.filter(s => s.date === date);
+      }
+      return Promise.resolve(mock);
     }
+    
     let url = '/slots';
     const params = new URLSearchParams();
     if (date) params.append('date', date.toString());
     if (agencyId) params.append('agencyId', agencyId);
     if (params.toString()) url += `?${params.toString()}`;
-    return fetchWithFallback<Slot[]>(url, mock);
+    return apiRequest<Slot[]>(url);
   },
 
   getSlotIndicators: async (agencyId?: string) => {
-    const indicators = MOCK_SLOTS.reduce((acc: any, slot) => {
-      if (!acc[slot.date]) acc[slot.date] = { hasAvailable: false, hasBooked: false };
-      if (slot.status === 'Available') acc[slot.date].hasAvailable = true;
-      if (slot.status === 'Booked') acc[slot.date].hasBooked = true;
-      return acc;
-    }, {});
+    if (USE_MOCK_FALLBACK) {
+      const indicators = MOCK_SLOTS.reduce((acc: any, slot) => {
+        if (!acc[slot.date]) acc[slot.date] = { hasAvailable: false, hasBooked: false };
+        if (slot.status === 'Available') acc[slot.date].hasAvailable = true;
+        if (slot.status === 'Booked') acc[slot.date].hasBooked = true;
+        return acc;
+      }, {});
+      return Promise.resolve(indicators);
+    }
+    
     const url = agencyId ? `/slots/indicators?agencyId=${agencyId}` : '/slots/indicators';
-    return fetchWithFallback(url, indicators);
+    return apiRequest(url);
   },
 
   createSlot: async (slotData: Partial<Slot>) => {

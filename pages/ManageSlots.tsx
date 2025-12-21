@@ -7,7 +7,6 @@ const ManageSlots = () => {
   const [selectedDate, setSelectedDate] = useState(new Date().getDate());
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
-  const [view, setView] = useState('Month');
   
   // State for API data
   const [loading, setLoading] = useState(true);
@@ -44,10 +43,15 @@ const ManageSlots = () => {
           api.getSlots(selectedDate),
           api.getSlotIndicators()
         ]);
-        setSlots(slotsData);
-        setIndicators(indicatorsData as any);
+        console.log('Fetched slots:', slotsData);
+        console.log('Fetched indicators:', indicatorsData);
+        setSlots(Array.isArray(slotsData) ? slotsData : []);
+        setIndicators(indicatorsData || {});
       } catch (error) {
         console.error("Failed to load dashboard data", error);
+        // Clear data on error to prevent showing stale/mock data
+        setSlots([]);
+        setIndicators({});
       } finally {
         setLoading(false);
       }
@@ -259,19 +263,10 @@ const ManageSlots = () => {
                     {/* View Controls */}
                     <div className="flex flex-wrap items-center justify-between gap-4">
                       <div className="flex h-10 items-center justify-center rounded-xl bg-[#151F26] border border-white/5 p-1">
-                        {['Month', 'Week', 'Day'].map((v) => (
-                          <label key={v} className={`flex cursor-pointer h-full items-center justify-center overflow-hidden rounded-lg px-4 text-sm font-medium leading-normal transition-all ${view === v ? 'bg-[#f59e0b] text-white shadow-sm' : 'text-slate-400 hover:text-white'}`}>
-                            <span className="truncate">{v}</span>
-                            <input 
-                              type="radio" 
-                              name="view-toggle" 
-                              value={v} 
-                              checked={view === v} 
-                              onChange={() => setView(v)} 
-                              className="invisible w-0 absolute"
-                            />
-                          </label>
-                        ))}
+                        <div className="flex cursor-default h-full items-center justify-center overflow-hidden rounded-lg px-4 text-sm font-medium leading-normal bg-[#f59e0b] text-white shadow-sm">
+                          <span className="material-symbols-outlined mr-2 text-lg">calendar_month</span>
+                          <span className="truncate">Month View</span>
+                        </div>
                       </div>
                       <button 
                         onClick={() => {
@@ -283,7 +278,7 @@ const ManageSlots = () => {
                         className="flex items-center justify-center h-10 px-4 text-sm font-medium leading-normal transition-colors bg-[#8b5cf6] text-white rounded-xl hover:bg-[#7c3aed]"
                       >
                         <span className="material-symbols-outlined mr-2 text-lg">today</span>
-                        <span className="truncate">Today's Slots</span>
+                        <span className="truncate">Jump to Today</span>
                       </button>
                     </div>
 

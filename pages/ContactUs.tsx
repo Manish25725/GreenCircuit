@@ -1,6 +1,55 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { api } from '../services/api';
 
 const ContactUs = () => {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    subject: '',
+    message: ''
+  });
+  const [submitting, setSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<{ type: 'success' | 'error', message: string } | null>(null);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmitting(true);
+    setSubmitStatus(null);
+
+    try {
+      const response = await api.post('/contact', formData);
+      console.log('Contact form submitted:', response);
+      
+      setSubmitStatus({
+        type: 'success',
+        message: 'Your message has been sent successfully! We will get back to you soon.'
+      });
+      
+      // Reset form
+      setFormData({
+        name: '',
+        email: '',
+        subject: '',
+        message: ''
+      });
+    } catch (error: any) {
+      console.error('Failed to submit contact form:', error);
+      setSubmitStatus({
+        type: 'error',
+        message: error.response?.data?.message || 'Failed to send message. Please try again.'
+      });
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   return (
     <div className="relative flex h-auto min-h-screen w-full flex-col bg-[#0B1120] text-slate-300 font-sans group/design-root overflow-x-hidden selection:bg-[#34D399] selection:text-[#0B1120]">
       <div className="layout-container flex h-full grow flex-col">
@@ -38,27 +87,79 @@ const ContactUs = () => {
             <div className="grid grid-cols-1 gap-12 lg:grid-cols-5">
               <div className="flex flex-col gap-8 lg:col-span-3">
                 <h2 className="text-white text-[22px] font-bold leading-tight tracking-tight">Send us a Message</h2>
-                <form className="flex flex-col gap-6" onSubmit={(e) => e.preventDefault()}>
+                {submitStatus && (
+                  <div className={`p-4 rounded-xl border ${
+                    submitStatus.type === 'success' 
+                      ? 'bg-green-500/10 border-green-500/30 text-green-400' 
+                      : 'bg-red-500/10 border-red-500/30 text-red-400'
+                  }`}>
+                    {submitStatus.message}
+                  </div>
+                )}
+                <form className="flex flex-col gap-6" onSubmit={handleSubmit}>
                   <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                     <label className="flex flex-col flex-1">
                       <p className="text-slate-300 text-base font-medium leading-normal pb-2">Full Name</p>
-                      <input className="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-white focus:outline-none focus:ring-1 focus:ring-[#34D399] border border-white/10 bg-[#1E293B]/50 h-14 placeholder:text-slate-500 p-[15px] text-base font-normal leading-normal transition-all" placeholder="Enter your full name" type="text" />
+                      <input 
+                        name="name"
+                        value={formData.name}
+                        onChange={handleChange}
+                        required
+                        className="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-white focus:outline-none focus:ring-1 focus:ring-[#34D399] border border-white/10 bg-[#1E293B]/50 h-14 placeholder:text-slate-500 p-[15px] text-base font-normal leading-normal transition-all" 
+                        placeholder="Enter your full name" 
+                        type="text" 
+                      />
                     </label>
                     <label className="flex flex-col flex-1">
                       <p className="text-slate-300 text-base font-medium leading-normal pb-2">Email Address</p>
-                      <input className="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-white focus:outline-none focus:ring-1 focus:ring-[#34D399] border border-white/10 bg-[#1E293B]/50 h-14 placeholder:text-slate-500 p-[15px] text-base font-normal leading-normal transition-all" placeholder="Enter your email address" type="email" />
+                      <input 
+                        name="email"
+                        value={formData.email}
+                        onChange={handleChange}
+                        required
+                        className="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-white focus:outline-none focus:ring-1 focus:ring-[#34D399] border border-white/10 bg-[#1E293B]/50 h-14 placeholder:text-slate-500 p-[15px] text-base font-normal leading-normal transition-all" 
+                        placeholder="Enter your email address" 
+                        type="email" 
+                      />
                     </label>
                   </div>
                   <label className="flex flex-col">
                     <p className="text-slate-300 text-base font-medium leading-normal pb-2">Subject</p>
-                    <input className="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-white focus:outline-none focus:ring-1 focus:ring-[#34D399] border border-white/10 bg-[#1E293B]/50 h-14 placeholder:text-slate-500 p-[15px] text-base font-normal leading-normal transition-all" placeholder="Enter the subject of your message" type="text" />
+                    <input 
+                      name="subject"
+                      value={formData.subject}
+                      onChange={handleChange}
+                      required
+                      className="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-white focus:outline-none focus:ring-1 focus:ring-[#34D399] border border-white/10 bg-[#1E293B]/50 h-14 placeholder:text-slate-500 p-[15px] text-base font-normal leading-normal transition-all" 
+                      placeholder="Enter the subject of your message" 
+                      type="text" 
+                    />
                   </label>
                   <label className="flex flex-col">
                     <p className="text-slate-300 text-base font-medium leading-normal pb-2">Your Message</p>
-                    <textarea className="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-white focus:outline-none focus:ring-1 focus:ring-[#34D399] border border-white/10 bg-[#1E293B]/50 placeholder:text-slate-500 p-[15px] text-base font-normal leading-normal transition-all" placeholder="Type your message here..." rows={6}></textarea>
+                    <textarea 
+                      name="message"
+                      value={formData.message}
+                      onChange={handleChange}
+                      required
+                      className="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-white focus:outline-none focus:ring-1 focus:ring-[#34D399] border border-white/10 bg-[#1E293B]/50 placeholder:text-slate-500 p-[15px] text-base font-normal leading-normal transition-all" 
+                      placeholder="Type your message here..." 
+                      rows={6}
+                    ></textarea>
                   </label>
-                  <button className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-12 px-8 bg-[#34D399] text-[#0B1120] text-base font-bold leading-normal tracking-[0.015em] hover:bg-[#6EE7B7] shadow-[0_0_15px_rgba(52,211,153,0.3)] transition-all transform hover:scale-105 w-full sm:w-auto">
-                    <span className="truncate">Send Message</span>
+                  <button 
+                    type="submit"
+                    disabled={submitting}
+                    className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-12 px-8 bg-[#34D399] text-[#0B1120] text-base font-bold leading-normal tracking-[0.015em] hover:bg-[#6EE7B7] shadow-[0_0_15px_rgba(52,211,153,0.3)] transition-all transform hover:scale-105 w-full sm:w-auto disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                  >
+                    {submitting ? (
+                      <>
+                        <div className="w-5 h-5 border-2 border-[#0B1120]/30 border-t-[#0B1120] rounded-full animate-spin mr-2"></div>
+                        <span className="truncate">Sending...</span>
+                      </>
+                    ) : (
+                      <span className="truncate">Send Message</span>
+                    )}
                   </button>
                 </form>
               </div>
