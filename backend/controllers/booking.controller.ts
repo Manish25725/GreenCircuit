@@ -174,9 +174,11 @@ export const updateBookingStatus = async (req: Request, res: Response) => {
       timestamp: new Date()
     });
 
-    // If completed, award eco points (5 points per pickup)
+    // If completed, award eco points based on weight (5 points per 20kg)
     if (status === 'completed' && booking.ecoPointsEarned === 0) {
-      const pointsEarned = 5; // Fixed 5 points per completed pickup
+      const totalWeight = booking.totalWeight || 0;
+      // Formula: 5 points per 20kg = weight * 0.25, rounded to nearest integer
+      const pointsEarned = Math.max(1, Math.round(totalWeight * 0.25)); // Minimum 1 point
       
       booking.ecoPointsEarned = pointsEarned;
       
@@ -192,7 +194,7 @@ export const updateBookingStatus = async (req: Request, res: Response) => {
         userId: booking.userId,
         type: 'reward',
         title: 'Points Earned!',
-        message: `You earned ${pointsEarned} eco points for your recycling pickup!`,
+        message: `You earned ${pointsEarned} eco points for recycling ${totalWeight}kg of e-waste!`,
         icon: 'stars'
       });
     }
