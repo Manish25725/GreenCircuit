@@ -35,13 +35,6 @@ const AgencyProfile = () => {
     { day: 'Saturday', open: '09:00', close: '14:00', isOpen: true },
     { day: 'Sunday', open: '00:00', close: '00:00', isOpen: false }
   ]);
-  const [showRegionInput, setShowRegionInput] = useState(false);
-  const [newRegion, setNewRegion] = useState('');
-  const [operatingHours, setOperatingHours] = useState<any[]>([
-    { day: 'Monday - Friday', open: '08:00', close: '18:00', isOpen: true },
-    { day: 'Saturday', open: '09:00', close: '14:00', isOpen: true },
-    { day: 'Sunday', open: '00:00', close: '00:00', isOpen: false }
-  ]);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -199,12 +192,10 @@ const AgencyProfile = () => {
     setRegions(regions.filter((_, i) => i !== index));
   };
 
-  const handleAddRegion = () => {
-    if (newRegion.trim() && !regions.includes(newRegion.trim())) {
-      setRegions([...regions, newRegion.trim()]);
-      setNewRegion('');
-      setShowRegionInput(false);
-    }
+  const handleUpdateOperatingHours = (index: number, field: string, value: any) => {
+    const updated = [...operatingHours];
+    updated[index] = { ...updated[index], [field]: value };
+    setOperatingHours(updated);
   };
 
   const handleSave = async () => {
