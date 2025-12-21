@@ -61,14 +61,14 @@ app.use(cors({
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Data sanitization against NoSQL query injection
+// Validate request size before processing
+app.use(validateRequestSize);
+
+// Data sanitization against NoSQL query injection (handles query, params automatically)
 app.use(mongoSanitize());
 
-// Prevent parameter pollution
+// Prevent parameter pollution (must be after body parsing)
 app.use(hpp());
-
-// Validate request size
-app.use(validateRequestSize);
 
 // Anti data flooding - track cumulative data volume
 app.use(antiDataFlood);
@@ -79,7 +79,7 @@ app.use(validateDataStructure);
 // Validate string field lengths
 app.use(validateStringLengths);
 
-// Sanitize MongoDB operators
+// Sanitize MongoDB operators in body only (query/params handled by mongoSanitize)
 app.use(sanitizeMongoOperators);
 
 // Input validation

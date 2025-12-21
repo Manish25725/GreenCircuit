@@ -282,9 +282,10 @@ export const sanitizeMongoOperators = (req: Request, res: Response, next: NextFu
     return sanitized;
   };
 
-  req.body = sanitize(req.body);
-  req.query = sanitize(req.query);
-  req.params = sanitize(req.params);
+  // Only sanitize body (query and params are handled by express-mongo-sanitize)
+  if (req.body) {
+    req.body = sanitize(req.body);
+  }
   
   next();
 };
