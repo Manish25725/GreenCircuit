@@ -79,10 +79,18 @@ export const updateSlot = async (req: Request, res: Response) => {
 export const deleteSlot = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const slot = await Slot.findByIdAndDelete(id);
+    const slot = await Slot.findById(id);
+    
     if (!slot) {
       return sendError(res, 'Slot not found', 404);
     }
+    
+    // Prevent deleting booked slots
+    if (slot.status === 'Booked') {
+      return sendError(res, 'Cannot delete a booked slot. Please cancel the booking first.', 400);
+    }
+    
+    await Slot.findByIdAndDelete(id);
     sendSuccess(res, { success: true });
   } catch (error) {
     sendError(res, 'Failed to delete slot', 500);

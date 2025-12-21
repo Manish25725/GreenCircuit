@@ -56,8 +56,13 @@ const ManageSlots = () => {
     try {
       await api.deleteSlot(String(id));
       setSlots(prev => prev.filter(s => s.id !== id));
-    } catch (error) {
+      
+      // Refresh indicators after deletion
+      const indicatorsData = await api.getSlotIndicators();
+      setIndicators(indicatorsData as any);
+    } catch (error: any) {
       console.error('Failed to delete slot:', error);
+      alert(error.response?.data?.message || 'Failed to delete slot');
     } finally {
       setDeletingSlot(null);
     }
@@ -66,16 +71,29 @@ const ManageSlots = () => {
   const handleAddSlot = async () => {
     setAddingSlot(true);
     try {
-      // API call to add slot would go here
-      // await api.addSlot({ date: selectedDate, ...newSlot });
-      // For now, just close modal and refresh
+      // Create slot with proper data structure
+      await api.addSlot({
+        date: selectedDate,
+        startTime: newSlot.startTime,
+        endTime: newSlot.endTime,
+        capacity: newSlot.capacity,
+        status: 'Available'
+      });
+      
+      // Close modal and reset form
       setShowAddModal(false);
       setNewSlot({ startTime: '09:00', endTime: '11:00', capacity: 5 });
-      // Refresh slots
-      const slotsData = await api.getSlots(selectedDate);
+      
+      // Refresh slots and indicators
+      const [slotsData, indicatorsData] = await Promise.all([
+        api.getSlots(selectedDate),
+        api.getSlotIndicators()
+      ]);
       setSlots(slotsData);
-    } catch (error) {
+      setIndicators(indicatorsData as any);
+    } catch (error: any) {
       console.error('Failed to add slot:', error);
+      alert(`Failed to add slot: ${error.message || 'Unknown error'}`);
     } finally {
       setAddingSlot(false);
     }
