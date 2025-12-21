@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { NavItem } from '../types';
 
 interface LayoutProps {
@@ -25,6 +25,7 @@ const getStoredUser = () => {
 
 const Layout: React.FC<LayoutProps> = ({ children, title, subtitle, role, fullWidth = false, hideSidebar = false }) => {
   const storedUser = getStoredUser();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   
   const agencyNav: NavItem[] = [
     { label: 'Dashboard', icon: 'dashboard', path: '#/agency' },
@@ -73,9 +74,41 @@ const Layout: React.FC<LayoutProps> = ({ children, title, subtitle, role, fullWi
 
   return (
     <div className="flex min-h-screen w-full bg-[#0B1120] text-slate-300 font-sans selection:bg-[#34D399] selection:text-[#0B1120]">
+      {/* Mobile Header */}
+      {!hideSidebar && (
+        <header className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-[#0B1120] border-b border-white/5 flex items-center justify-between px-4 z-50">
+          <div className="flex items-center gap-2" onClick={() => window.location.hash = '#/'}>
+            <div className="h-8 w-8 rounded-full bg-[#34D399]/10 text-[#34D399] flex items-center justify-center font-bold text-sm border border-[#34D399]/20">
+              <span className="material-symbols-outlined text-lg">recycling</span>
+            </div>
+            <div className="flex flex-col">
+              <h1 className="text-sm font-bold text-white tracking-tight">{userName}</h1>
+            </div>
+          </div>
+          <button
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="p-2 text-white hover:bg-white/5 rounded-lg transition-colors"
+          >
+            <span className="material-symbols-outlined">
+              {isMobileMenuOpen ? 'close' : 'menu'}
+            </span>
+          </button>
+        </header>
+      )}
+
+      {/* Mobile Menu Overlay */}
+      {!hideSidebar && isMobileMenuOpen && (
+        <div 
+          className="lg:hidden fixed inset-0 bg-black/50 z-40 backdrop-blur-sm"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
       {!hideSidebar && (
-        <aside className="fixed top-0 left-0 h-screen w-64 border-r border-white/5 bg-[#0B1120] flex flex-col z-20">
+        <aside className={`fixed top-0 left-0 h-screen w-64 border-r border-white/5 bg-[#0B1120] flex flex-col z-50 transition-transform duration-300 ${
+          isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
+        } lg:translate-x-0`}>
           <div className="p-6">
             <div className="flex items-center gap-3 mb-8 cursor-pointer" onClick={() => window.location.hash = '#/'}>
               <div className="h-10 w-10 rounded-full bg-[#34D399]/10 text-[#34D399] flex items-center justify-center font-bold text-lg border border-[#34D399]/20 shadow-[0_0_15px_rgba(52,211,153,0.2)]">
@@ -92,7 +125,11 @@ const Layout: React.FC<LayoutProps> = ({ children, title, subtitle, role, fullWi
                 <a
                   key={item.label}
                   href={item.path}
-                  onClick={(e) => { e.preventDefault(); window.location.hash = item.path; }}
+                  onClick={(e) => { 
+                    e.preventDefault(); 
+                    window.location.hash = item.path;
+                    setIsMobileMenuOpen(false); // Close mobile menu on navigation
+                  }}
                   className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all cursor-pointer ${
                     item.active || window.location.hash === item.path
                       ? 'bg-[#34D399]/10 text-[#34D399] border border-[#34D399]/10'
@@ -121,14 +158,14 @@ const Layout: React.FC<LayoutProps> = ({ children, title, subtitle, role, fullWi
       )}
 
       {/* Main Content */}
-      <main className={`flex-1 ${!hideSidebar ? 'ml-64' : ''} overflow-y-auto ${fullWidth ? 'p-0' : 'p-8'}`}>
+      <main className={`flex-1 ${!hideSidebar ? 'lg:ml-64 pt-16 lg:pt-0' : ''} overflow-y-auto ${fullWidth ? 'p-0' : 'p-4 sm:p-6 lg:p-8'}`}>
         <div className={fullWidth ? 'w-full' : 'max-w-7xl mx-auto'}>
-          <div className={`flex flex-col gap-1 ${fullWidth ? 'hidden' : 'mb-8'}`}>
+          <div className={`flex flex-col gap-1 ${fullWidth ? 'hidden' : 'mb-6 lg:mb-8'}`}>
              {/* Only show header if title is present */}
              {title && (
                  <div className="animate-fade-in-up">
-                    <h1 className="text-3xl font-black tracking-tight text-white">{title}</h1>
-                    {subtitle && <p className="text-slate-400 mt-1">{subtitle}</p>}
+                    <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white">{title}</h1>
+                    {subtitle && <p className="text-slate-400 mt-1 text-sm sm:text-base">{subtitle}</p>}
                  </div>
              )}
           </div>
