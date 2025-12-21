@@ -18,6 +18,7 @@ A comprehensive platform for managing electronic waste collection, recycling, an
 - 📊 **Analytics Dashboard**: Comprehensive insights for all user types
 - 📱 **Contact System**: Integrated messaging and support
 - 🔒 **Secure Authentication**: JWT-based auth with role-based access control
+- 📱 **Fully Responsive**: Mobile-first design works on all devices (phone, tablet, desktop)
 
 ## Tech Stack
 
