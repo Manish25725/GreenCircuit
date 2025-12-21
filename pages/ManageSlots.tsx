@@ -16,8 +16,12 @@ const ManageSlots = () => {
   
   // Modal states
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
   const [newSlot, setNewSlot] = useState({ startTime: '09:00', endTime: '11:00', capacity: 5 });
+  const [editingSlot, setEditingSlot] = useState<Slot | null>(null);
+  const [editSlotData, setEditSlotData] = useState({ startTime: '09:00', endTime: '11:00', capacity: 5 });
   const [addingSlot, setAddingSlot] = useState(false);
+  const [updatingSlot, setUpdatingSlot] = useState(false);
   const [deletingSlot, setDeletingSlot] = useState<number | null>(null);
 
   const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
@@ -50,6 +54,49 @@ const ManageSlots = () => {
     };
     fetchData();
   }, [selectedDate, currentMonth]);
+
+  const handleEditSlot = (slot: Slot) => {
+    setEditingSlot(slot);
+    setEditSlotData({
+      startTime: slot.startTime,
+      endTime: slot.endTime,
+      capacity: slot.capacity || 5
+    });
+    setShowEditModal(true);
+  };
+
+  const handleUpdateSlot = async () => {
+    if (!editingSlot) return;
+    
+    setUpdatingSlot(true);
+    try {
+      console.log('Updating slot with data:', {
+        id: editingSlot.id,
+        ...editSlotData
+      });
+      
+      await api.updateSlot(String(editingSlot.id), editSlotData);
+      
+      console.log('Slot updated successfully');
+      
+      // Close modal and reset form
+      setShowEditModal(false);
+      setEditingSlot(null);
+      setEditSlotData({ startTime: '09:00', endTime: '11:00', capacity: 5 });
+      
+      // Refresh slots
+      const slotsData = await api.getSlots(selectedDate);
+      setSlots(slotsData);
+      
+      alert('Slot updated successfully!');
+    } catch (error: any) {
+      console.error('Failed to update slot:', error);
+      console.error('Error details:', error.response || error.message);
+      alert(`Failed to update slot: ${error.response?.data?.message || error.message || 'Unknown error'}`);
+    } finally {
+      setUpdatingSlot(false);
+    }
+  };
 
   const handleDelete = async (id: number) => {
     setDeletingSlot(id);
@@ -387,7 +434,10 @@ const ManageSlots = () => {
                                   </button>
                                 ) : (
                                   <>
-                                    <button className="p-2 rounded-lg text-slate-400 hover:text-[#f59e0b] hover:bg-[#f59e0b]/10 transition-colors">
+                                    <button 
+                                      onClick={() => handleEditSlot(slot)}
+                                      className="p-2 rounded-lg text-slate-400 hover:text-[#f59e0b] hover:bg-[#f59e0b]/10 transition-colors"
+                                    >
                                       <span className="material-symbols-outlined text-xl">edit</span>
                                     </button>
                                     <button 
@@ -525,6 +575,91 @@ const ManageSlots = () => {
                   <>
                     <span className="material-symbols-outlined text-lg">add</span>
                     Add Slot
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Slot Modal */}
+      {showEditModal && editingSlot && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div 
+            className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+            onClick={() => !updatingSlot && setShowEditModal(false)}
+          ></div>
+          
+          <div className="relative bg-[#151F26] rounded-2xl p-6 sm:p-8 max-w-md w-full border border-white/10 shadow-2xl">
+            <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-[#f59e0b]/20 flex items-center justify-center">
+              <span className="material-symbols-outlined text-4xl text-[#f59e0b]">edit_calendar</span>
+            </div>
+            
+            <h3 className="text-2xl font-bold text-white text-center mb-2">Edit Slot</h3>
+            <p className="text-gray-400 text-center mb-6">
+              Modify the pickup slot for {formatSelectedDate()}
+            </p>
+            
+            <div className="space-y-4 mb-6">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex flex-col gap-2">
+                  <label className="text-sm font-medium text-slate-400">Start Time</label>
+                  <input 
+                    type="time" 
+                    value={editSlotData.startTime}
+                    onChange={(e) => setEditSlotData({ ...editSlotData, startTime: e.target.value })}
+                    className="w-full bg-[#0B1116] border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-1 focus:ring-[#f59e0b] focus:border-[#f59e0b] outline-none transition-all"
+                  />
+                </div>
+                <div className="flex flex-col gap-2">
+                  <label className="text-sm font-medium text-slate-400">End Time</label>
+                  <input 
+                    type="time" 
+                    value={editSlotData.endTime}
+                    onChange={(e) => setEditSlotData({ ...editSlotData, endTime: e.target.value })}
+                    className="w-full bg-[#0B1116] border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-1 focus:ring-[#f59e0b] focus:border-[#f59e0b] outline-none transition-all"
+                  />
+                </div>
+              </div>
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-medium text-slate-400">Capacity (pickups per slot)</label>
+                <input 
+                  type="number" 
+                  min="1"
+                  max="20"
+                  value={editSlotData.capacity}
+                  onChange={(e) => setEditSlotData({ ...editSlotData, capacity: parseInt(e.target.value) || 1 })}
+                  className="w-full bg-[#0B1116] border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-1 focus:ring-[#f59e0b] focus:border-[#f59e0b] outline-none transition-all"
+                />
+              </div>
+            </div>
+            
+            <div className="flex flex-col sm:flex-row gap-3">
+              <button
+                onClick={() => {
+                  setShowEditModal(false);
+                  setEditingSlot(null);
+                }}
+                disabled={updatingSlot}
+                className="flex-1 py-3 px-6 rounded-xl bg-white/5 text-white font-medium border border-white/10 hover:bg-white/10 transition-all disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleUpdateSlot}
+                disabled={updatingSlot}
+                className="flex-1 py-3 px-6 rounded-xl bg-[#f59e0b] text-white font-bold hover:bg-[#d97706] transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+              >
+                {updatingSlot ? (
+                  <>
+                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                    Updating...
+                  </>
+                ) : (
+                  <>
+                    <span className="material-symbols-outlined text-lg">save</span>
+                    Update Slot
                   </>
                 )}
               </button>

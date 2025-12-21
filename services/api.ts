@@ -275,6 +275,13 @@ export const api = {
     });
   },
 
+  updateSlot: async (id: string, slotData: Partial<Slot>) => {
+    return apiRequest<Slot>(`/slots/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(slotData),
+    });
+  },
+
   deleteSlot: async (id: string) => {
     if (USE_MOCK_FALLBACK) {
       const index = MOCK_SLOTS.findIndex(s => s.id === id);
