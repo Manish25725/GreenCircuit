@@ -1,9 +1,13 @@
 // Configuration
 // For deployment: Replace RENDER_BACKEND_URL with your actual Render backend URL
-const RENDER_BACKEND_URL = 'https://e-waste-7ios.onrender.com'; // Update this after deploying backend
-const API_BASE_URL = import.meta.env.PROD && RENDER_BACKEND_URL
+const RENDER_BACKEND_URL = 'https://e-waste-7ios.onrender.com';
+const API_BASE_URL = import.meta.env.PROD 
   ? `${RENDER_BACKEND_URL}/api`
   : 'http://localhost:3001/api';
+
+console.log('Environment:', import.meta.env.MODE);
+console.log('Production:', import.meta.env.PROD);
+console.log('API Base URL:', API_BASE_URL);
 
 // Set this to false to use real API calls to the backend server
 // Set to true to use internal mock data (useful for frontend preview without running server)
