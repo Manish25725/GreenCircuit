@@ -1,6 +1,6 @@
 // Configuration
 // For deployment: Replace RENDER_BACKEND_URL with your actual Render backend URL
-const RENDER_BACKEND_URL = 'https://ecocycle-backend.onrender.com'; // Update this after deploying backend
+const RENDER_BACKEND_URL = 'https://e-waste-7ios.onrender.com'; // Update this after deploying backend
 const API_BASE_URL = import.meta.env.PROD && RENDER_BACKEND_URL
   ? `${RENDER_BACKEND_URL}/api`
   : 'http://localhost:3001/api';
