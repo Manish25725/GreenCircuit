@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { api } from '../services/api';
 
 const AdminLogin = () => {
   const [adminKey, setAdminKey] = useState('');
@@ -11,27 +12,16 @@ const AdminLogin = () => {
     setLoading(true);
 
     try {
-      // Validate against the admin key from environment
-      const response = await fetch('/api/auth/admin-login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ adminKey })
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        // Store admin token
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('user', JSON.stringify(data.user));
-        localStorage.setItem('isLoggedIn', 'true');
-        window.location.hash = '#/admin';
-        window.location.reload();
-      } else {
-        setError(data.message || 'Invalid admin key');
-      }
-    } catch (err) {
-      setError('Failed to authenticate. Please try again.');
+      const data = await api.adminLogin(adminKey);
+      
+      // Store admin session
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user || data));
+      localStorage.setItem('isLoggedIn', 'true');
+      window.location.hash = '#/admin';
+      window.location.reload();
+    } catch (err: any) {
+      setError(err.message || 'Failed to authenticate. Please try again.');
     } finally {
       setLoading(false);
     }

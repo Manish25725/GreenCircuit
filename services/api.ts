@@ -337,6 +337,18 @@ export const api = {
     return data;
   },
 
+  adminLogin: async (adminKey: string): Promise<any> => {
+    const data = await apiRequest<any>('/auth/admin-login', {
+      method: 'POST',
+      body: JSON.stringify({ adminKey }),
+    });
+    if (data.token) {
+      saveToken(data.token);
+      saveUser(data);
+    }
+    return data;
+  },
+
   logout: () => {
     removeToken();
     clearUser();
