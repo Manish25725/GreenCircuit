@@ -1,5 +1,6 @@
 import React from 'react';
 import { getCurrentUser } from '../services/api';
+import NotificationBell from './NotificationBell';
 
 const ProfileHeader: React.FC = () => {
   const user = getCurrentUser();
@@ -32,13 +33,7 @@ const ProfileHeader: React.FC = () => {
           ></div>
           <span className="text-sm font-medium text-gray-200">{user?.name || 'User'}</span>
         </button>
-        <button 
-          onClick={() => window.location.hash = '#/notifications'}
-          className="relative p-2.5 rounded-full bg-[#151F26] border border-white/5 text-gray-400 hover:text-white hover:bg-white/10 transition-colors"
-        >
-          <span className="absolute top-2.5 right-3 size-2 bg-red-500 rounded-full border-2 border-[#151F26]"></span>
-          <span className="material-symbols-outlined text-[20px]">notifications</span>
-        </button>
+        <NotificationBell />
       </div>
     </header>
   );

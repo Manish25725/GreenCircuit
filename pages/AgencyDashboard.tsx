@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
 import Loader from '../components/Loader';
+import NotificationBell from '../components/NotificationBell';
 import { api, getCurrentUser, User, Booking } from '../services/api';
 
 const AgencyDashboard = () => {
@@ -50,15 +51,16 @@ const AgencyDashboard = () => {
       }
     } catch (error: any) {
       console.error('Failed to check agency status:', error);
-      // If agency not found, redirect to registration
+      // If agency not found (404), redirect to registration form
       if (error.response?.status === 404) {
         window.location.hash = '#/partner/register';
       } else if (error.response?.status === 401 || error.response?.status === 403) {
-        // Not authenticated
+        // Not authenticated, redirect to login
         window.location.hash = '#/login';
       } else {
-        // Other error - show pending page
-        window.location.hash = '#/partner/pending';
+        // For other errors (network issues, etc), also redirect to registration
+        // User can start fresh if there's an unexpected error
+        window.location.hash = '#/partner/register';
       }
     }
   };
@@ -208,14 +210,7 @@ const AgencyDashboard = () => {
               <nav className="hidden md:flex flex-1 justify-center gap-1">
               </nav>
               <div className="flex items-center gap-4">
-                <button 
-                  onClick={() => window.location.hash = '#/notifications'}
-                  className="p-2.5 rounded-full bg-[#151F26] border border-white/5 text-gray-400 hover:text-[#f59e0b] hover:bg-[#f59e0b]/10 transition-colors relative"
-                  title="Notifications"
-                >
-                  <span className="material-symbols-outlined text-[20px]">notifications</span>
-                  <span className="absolute top-1 right-1 w-2 h-2 bg-[#f59e0b] rounded-full"></span>
-                </button>
+                <NotificationBell />
                 <button 
                     onClick={() => window.location.hash = '#/agency/profile'}
                     className="hidden sm:flex items-center gap-3 pl-1 pr-4 py-1 rounded-full bg-[#151F26] border border-white/5 hover:bg-white/5 transition-colors group cursor-pointer"
