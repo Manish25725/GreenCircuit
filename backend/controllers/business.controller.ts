@@ -125,10 +125,39 @@ export const getBusinessDashboard = async (req: Request, res: Response) => {
 export const getBusinessProfile = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).user._id || (req as any).user.id;
-    const business = await Business.findOne({ userId }).populate('userId', 'name email avatar');
+    let business = await Business.findOne({ userId }).populate('userId', 'name email avatar');
 
+    // Auto-create business profile if it doesn't exist
     if (!business) {
-      return sendError(res, 'Business profile not found', 404);
+      const user = await User.findById(userId);
+      if (!user) {
+        return sendError(res, 'User not found', 404);
+      }
+      
+      business = await Business.create({
+        userId,
+        companyName: user.name || 'My Business',
+        email: user.email,
+        phone: user.phone || '',
+        industry: 'Technology',
+        description: '',
+        address: {
+          street: '',
+          city: '',
+          state: '',
+          country: 'India',
+          zipCode: ''
+        },
+        contactPerson: {
+          name: user.name || '',
+          email: user.email,
+          phone: user.phone || '',
+          role: ''
+        }
+      });
+      
+      // Populate the userId field
+      business = await Business.findById(business._id).populate('userId', 'name email avatar');
     }
 
     sendSuccess(res, business);

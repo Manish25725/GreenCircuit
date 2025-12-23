@@ -35,6 +35,7 @@ import BusinessInventory from './pages/BusinessInventory';
 import BusinessCertificates from './pages/BusinessCertificates';
 import BusinessDashboard from './pages/BusinessDashboard';
 import BusinessAnalytics from './pages/BusinessAnalytics';
+import BusinessProfile from './pages/BusinessProfile';
 import PartnerRegistration from './pages/PartnerRegistration';
 import PartnerPending from './pages/PartnerPending';
 import Services from './pages/Services';
@@ -233,6 +234,12 @@ const App = () => {
       case '#/services':
         return <Services />;
       case '#/profile':
+        // Route to appropriate profile based on user role
+        if (userRole === 'business') {
+          return <BusinessProfile />;
+        } else if (userRole === 'agency') {
+          return <AgencyProfile />;
+        }
         return <Profile />;
       case '#/notifications':
         return <Notifications />;

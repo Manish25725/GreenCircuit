@@ -49,6 +49,14 @@ const Notifications = () => {
               {/* Main Content */}
               <main className="flex flex-1 justify-center py-5 px-4 sm:px-6 lg:px-10">
                 <div className="layout-content-container flex flex-col w-full max-w-5xl">
+                  {/* Back Button */}
+                  <button 
+                    onClick={() => window.history.back()}
+                    className="flex items-center gap-2 text-[#f59e0b] hover:text-[#d97706] transition-colors mb-6 group"
+                  >
+                    <span className="material-symbols-outlined text-[20px]">arrow_back</span>
+                    <span className="text-sm font-medium">Back</span>
+                  </button>
                   <NotificationPanel />
                 </div>
               </main>
@@ -95,6 +103,14 @@ const Notifications = () => {
               {/* Main Content */}
               <main className="flex flex-1 justify-center py-5 px-4 sm:px-6 lg:px-10">
                 <div className="layout-content-container flex flex-col w-full max-w-5xl">
+                  {/* Back Button */}
+                  <button 
+                    onClick={() => window.history.back()}
+                    className="flex items-center gap-2 text-[#3b82f6] hover:text-[#2563eb] transition-colors mb-6 group"
+                  >
+                    <span className="material-symbols-outlined text-[20px]">arrow_back</span>
+                    <span className="text-sm font-medium">Back</span>
+                  </button>
                   <NotificationPanel />
                 </div>
               </main>

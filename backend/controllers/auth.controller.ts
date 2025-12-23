@@ -14,10 +14,19 @@ export const registerUser = async (req: Request, res: Response) => {
   const { name, email, password, role } = req.body;
 
   try {
-    const userExists = await User.findOne({ email: email.toLowerCase() });
+    // Validate required fields
+    if (!name || !email || !password) {
+      return sendError(res, 'Please provide all required fields', 400);
+    }
+
+    // Normalize email to lowercase and trim
+    const normalizedEmail = email.toLowerCase().trim();
+
+    // Check if user already exists
+    const userExists = await User.findOne({ email: normalizedEmail });
 
     if (userExists) {
-      return sendError(res, 'User already exists', 400);
+      return sendError(res, 'An account with this email already exists. Please login or use a different email.', 400);
     }
 
     // Map frontend roles to backend roles
@@ -25,7 +34,7 @@ export const registerUser = async (req: Request, res: Response) => {
 
     const user = await User.create({ 
       name, 
-      email: email.toLowerCase(), 
+      email: normalizedEmail, 
       password, 
       role: mappedRole 
     });
@@ -51,7 +60,15 @@ export const authUser = async (req: Request, res: Response) => {
   const { email, password } = req.body;
 
   try {
-    const user: any = await User.findOne({ email: email.toLowerCase() }).select('+password');
+    // Validate required fields
+    if (!email || !password) {
+      return sendError(res, 'Please provide email and password', 400);
+    }
+
+    // Normalize email to lowercase and trim
+    const normalizedEmail = email.toLowerCase().trim();
+
+    const user: any = await User.findOne({ email: normalizedEmail }).select('+password');
 
     if (user && (await user.matchPassword(password))) {
       sendSuccess(res, {
