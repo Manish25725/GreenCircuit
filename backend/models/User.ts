@@ -42,6 +42,7 @@ export interface IUser extends mongoose.Document {
   };
   twoFactorEnabled?: boolean;
   twoFactorSecret?: string;
+  sustainabilityGoals?: string;
   matchPassword(enteredPassword: string): Promise<boolean>;
 }
 
@@ -89,7 +90,8 @@ const userSchema = new mongoose.Schema({
     }
   },
   twoFactorEnabled: { type: Boolean, default: false },
-  twoFactorSecret: { type: String, select: false }
+  twoFactorSecret: { type: String, select: false },
+  sustainabilityGoals: { type: String, default: '' }
 }, {
   timestamps: true,
 });

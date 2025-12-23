@@ -104,7 +104,7 @@ export const getMe = async (req: Request, res: Response) => {
 
 export const updateProfile = async (req: Request, res: Response) => {
   try {
-    const { name, phone, address, avatar } = req.body;
+    const { name, phone, address, city, state, zipCode, country, avatar, sustainabilityGoals } = req.body;
     
     // Get current user to check for existing avatar
     const currentUser = await User.findById((req as any).user.id);
@@ -119,9 +119,25 @@ export const updateProfile = async (req: Request, res: Response) => {
       }
     }
 
+    // Handle address - can accept flat fields or nested object
+    let addressData = address;
+    if (city || state || zipCode || country) {
+      addressData = {
+        street: address || '',
+        city: city || '',
+        state: state || '',
+        zipCode: zipCode || '',
+        country: country || 'India'
+      };
+    }
+
+    const updateData: any = { name, phone, avatar };
+    if (addressData) updateData.address = addressData;
+    if (sustainabilityGoals !== undefined) updateData.sustainabilityGoals = sustainabilityGoals;
+
     const user = await User.findByIdAndUpdate(
       (req as any).user.id,
-      { name, phone, address, avatar },
+      updateData,
       { new: true, runValidators: true }
     );
     

@@ -45,6 +45,12 @@ import BusinessAddress from './pages/BusinessAddress';
 import BusinessContact from './pages/BusinessContact';
 import BusinessEditProfile from './pages/BusinessEditProfile';
 import ActiveSessions from './pages/ActiveSessions';
+import ResidentProfileSettings from './pages/ResidentProfileSettings';
+import EditResidentProfile from './pages/EditResidentProfile';
+import ResidentNotifications from './pages/ResidentNotifications';
+import ResidentSecurity from './pages/ResidentSecurity';
+import ResidentAppSettings from './pages/ResidentAppSettings';
+import ResidentActiveSessions from './pages/ResidentActiveSessions';
 import PartnerRegistration from './pages/PartnerRegistration';
 import PartnerPending from './pages/PartnerPending';
 import Services from './pages/Services';
@@ -91,6 +97,11 @@ const App = () => {
     // Business routes - only business can access
     if (path.startsWith('#/business')) {
       return userRole === 'business';
+    }
+
+    // Resident routes - only residents/users can access
+    if (path.startsWith('#/resident')) {
+      return userRole === 'user';
     }
 
     // Common routes accessible by all logged-in users (user, business, agency, admin)
@@ -248,8 +259,14 @@ const App = () => {
           return <BusinessProfileSettings />;
         } else if (userRole === 'agency') {
           return <AgencyProfile />;
+        } else if (userRole === 'user') {
+          return <ResidentProfileSettings />;
         }
         return <Profile />;
+      case '#/resident/profile':
+        return <EditResidentProfile />;
+      case '#/resident/sessions':
+        return <ResidentActiveSessions />;
       case '#/business/profile':
         return <EditBusinessProfile />;
       case '#/business/edit-profile':
@@ -261,21 +278,27 @@ const App = () => {
       case '#/business/sessions':
         return <ActiveSessions />;
       case '#/notifications':
-        // Route to business-specific notifications if business user
+        // Route to role-specific notifications
         if (userRole === 'business') {
           return <BusinessNotifications />;
+        } else if (userRole === 'user') {
+          return <ResidentNotifications />;
         }
         return <Notifications />;
       case '#/security':
-        // Route to business-specific security if business user
+        // Route to role-specific security
         if (userRole === 'business') {
           return <BusinessSecurity />;
+        } else if (userRole === 'user') {
+          return <ResidentSecurity />;
         }
         return <Security />;
       case '#/settings':
-        // Route to business-specific settings if business user
+        // Route to role-specific settings
         if (userRole === 'business') {
           return <BusinessAppSettings />;
+        } else if (userRole === 'user') {
+          return <ResidentAppSettings />;
         }
         return <AppSettings />;
       case '#/business':
