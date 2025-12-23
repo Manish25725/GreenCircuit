@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
+import Loader from '../components/Loader';
 import { api, getCurrentUser } from '../services/api';
 
 interface UserProfile {
@@ -153,7 +154,7 @@ const Profile = () => {
       <Layout title="" role="User" fullWidth hideSidebar>
         <div className="bg-[#0B1116] min-h-screen flex items-center justify-center">
           <div className="text-center">
-            <div className="w-12 h-12 border-4 border-[#10b981] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <Loader size="md" color="#10b981" className="mb-4" />
             <p className="text-gray-400">Loading profile...</p>
           </div>
         </div>
@@ -177,7 +178,7 @@ const Profile = () => {
                     <path d="M42.4379 44C42.4379 44 36.0744 33.9038 41.1692 24C46.8624 12.9336 42.2078 4 42.2078 4L7.01134 4C7.01134 4 11.6577 12.932 5.96912 23.9969C0.876273 33.9029 7.27094 44 7.27094 44L42.4379 44Z"></path>
                     </svg>
                 </div>
-                <h2 className="text-xl font-bold tracking-tight text-white">EcoCycle <span className="text-[#10b981]">Resident</span></h2>
+                <h2 className="text-xl font-bold tracking-tight text-white">EcoCycle <span className="text-[#10b981] font-semibold">Resident</span></h2>
             </div>
             <nav className="hidden md:flex flex-1 justify-center gap-1">
                 <a className="text-sm font-medium px-5 py-2.5 rounded-full text-[#94a3b8] hover:text-white hover:bg-white/5 transition-all cursor-pointer" onClick={() => window.location.hash = '#/dashboard'}>Dashboard</a>
@@ -217,7 +218,7 @@ const Profile = () => {
                         ></div>
                         <label className="absolute -bottom-1 -right-1 flex items-center justify-center size-7 bg-[#10b981] rounded-full text-[#0B1116] hover:bg-[#059669] cursor-pointer transition-colors shadow-lg">
                           {uploadingAvatar ? (
-                            <div className="w-4 h-4 border-2 border-[#0B1116] border-t-transparent rounded-full animate-spin"></div>
+                            <Loader size="sm" color="#0B1116" />
                           ) : (
                             <span className="material-symbols-outlined text-base">photo_camera</span>
                           )}

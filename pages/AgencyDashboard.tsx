@@ -10,6 +10,7 @@ const AgencyDashboard = () => {
   const [showAllBookings, setShowAllBookings] = useState(false);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [showActionModal, setShowActionModal] = useState<{booking: Booking, action: string} | null>(null);
+  const [checkingStatus, setCheckingStatus] = useState(true);
   const [stats, setStats] = useState({
     totalPickups: 0,
     pendingPickups: 0,
@@ -23,6 +24,7 @@ const AgencyDashboard = () => {
 
   const checkAgencyStatus = async () => {
     try {
+      setCheckingStatus(true);
       // First check if agency registration is approved
       const dashboardData = await api.get('/agencies/dashboard/me');
       const responseData = dashboardData.data?.data || dashboardData.data;
@@ -39,6 +41,7 @@ const AgencyDashboard = () => {
       
       // If approved, load agency data
       if (status === 'approved') {
+        setCheckingStatus(false);
         await loadAgencyData();
       } else {
         // Unknown status, redirect to pending
@@ -168,6 +171,23 @@ const AgencyDashboard = () => {
       pending: index > currentIndex
     }));
   };
+
+  // Show loading screen while checking status
+  if (checkingStatus) {
+    return (
+      <Layout title="" role="Agency" fullWidth hideSidebar>
+        <div className="min-h-screen bg-[#0B1116] flex items-center justify-center">
+          <div className="flex flex-col items-center gap-4">
+            <div className="relative flex items-center justify-center">
+              <div className="w-16 h-16 rounded-full border-4 border-cyan-500/20 border-t-cyan-500 animate-spin"></div>
+              <div className="absolute w-10 h-10 rounded-full border-4 border-blue-500/20 border-b-blue-500 animate-spin" style={{ animationDirection: 'reverse', animationDuration: '0.8s' }}></div>
+            </div>
+            <p className="text-gray-400">Checking agency status...</p>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout title="" role="Agency" fullWidth hideSidebar>

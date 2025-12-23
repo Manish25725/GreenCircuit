@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
+import Loader from '../components/Loader';
 import { api, getCurrentUser } from '../services/api';
 
 interface BusinessProfile {
@@ -219,7 +220,7 @@ const BusinessProfile = () => {
       <Layout title="" role="Business" fullWidth hideSidebar>
         <div className="bg-[#0B1116] min-h-screen flex items-center justify-center">
           <div className="text-center">
-            <div className="w-12 h-12 border-4 border-[#3b82f6] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <Loader size="md" color="#3b82f6" className="mb-4" />
             <p className="text-gray-400">Loading profile...</p>
           </div>
         </div>
@@ -285,7 +286,7 @@ const BusinessProfile = () => {
                         ></div>
                         <label className="absolute -bottom-1 -right-1 flex items-center justify-center size-7 bg-[#3b82f6] rounded-full text-[#0B1116] hover:bg-[#2563eb] cursor-pointer transition-colors shadow-lg">
                           {uploadingLogo ? (
-                            <div className="w-4 h-4 border-2 border-[#0B1116] border-t-transparent rounded-full animate-spin"></div>
+                            <Loader size="sm" color="#0B1116" />
                           ) : (
                             <span className="material-symbols-outlined text-base">photo_camera</span>
                           )}

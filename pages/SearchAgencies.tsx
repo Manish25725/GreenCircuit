@@ -401,20 +401,38 @@ const SearchAgencies = () => {
                     <path d="M42.4379 44C42.4379 44 36.0744 33.9038 41.1692 24C46.8624 12.9336 42.2078 4 42.2078 4L7.01134 4C7.01134 4 11.6577 12.932 5.96912 23.9969C0.876273 33.9029 7.27094 44 7.27094 44L42.4379 44Z"></path>
                     </svg>
                 </div>
-                <h2 className="text-xl font-bold tracking-tight text-white">{brandName}</h2>
+                <h2 className="text-xl font-bold tracking-tight text-white">
+                  EcoCycle <span className={`font-semibold ${isBusiness ? 'text-blue-500' : 'text-[#10b981]'}`}>
+                    {isBusiness ? 'Business' : 'Resident'}
+                  </span>
+                </h2>
             </div>
             <nav className="hidden md:flex flex-1 justify-center gap-1">
             </nav>
             <div className="flex items-center gap-4">
-                <button 
-                    onClick={() => window.location.hash = '#/profile'}
-                    className="hidden sm:flex items-center gap-3 pl-1 pr-4 py-1 rounded-full bg-[#151F26] border border-white/5 hover:bg-white/5 transition-colors group cursor-pointer"
-                >
-                    <div className={`size-8 rounded-full flex items-center justify-center ring-2 ring-white/10 transition-all text-white font-bold text-sm ${isBusiness ? 'bg-blue-500 group-hover:ring-blue-500/50' : 'bg-[#10b981] group-hover:ring-[#10b981]/50'}`}>
-                      {user?.name?.charAt(0) || 'U'}
+                <div className="relative group">
+                  <button 
+                      onClick={() => window.location.hash = '#/profile'}
+                      className="hidden sm:flex items-center gap-3 pl-1 pr-4 py-1 rounded-full bg-[#151F26] border border-white/5 hover:bg-white/5 transition-colors cursor-pointer"
+                  >
+                      <div 
+                        className="size-8 rounded-full bg-cover bg-center ring-2 ring-white/10 group-hover:ring-[#10b981]/50 transition-all"
+                        style={{ 
+                          backgroundImage: `url("${user?.avatar || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user?.name || 'User') + '&background=' + (isBusiness ? '3b82f6' : '10b981') + '&color=fff'}")`
+                        }}
+                      ></div>
+                      <span className="text-sm font-medium text-white">{user?.name || 'User'}</span>
+                  </button>
+                  {/* Hover Preview */}
+                  <div className="absolute top-14 right-0 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-[100]">
+                    <div className="bg-[#151F26] border border-white/10 rounded-2xl p-4 shadow-2xl">
+                      <div 
+                        className="size-32 rounded-xl bg-cover bg-center ring-4 ring-[#10b981]/30" 
+                        style={{ backgroundImage: `url("${user?.avatar || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user?.name || 'User') + '&background=' + (isBusiness ? '3b82f6' : '10b981') + '&color=fff'}")`}}
+                      ></div>
                     </div>
-                    <span className="text-sm font-medium text-white">{user?.name || 'User'}</span>
-                </button>
+                  </div>
+                </div>
                 <button className="relative p-2.5 rounded-full bg-[#151F26] border border-white/5 text-[#3b82f6] hover:text-[#3b82f6] hover:bg-[#3b82f6]/10 transition-colors">
                     <span className="absolute top-2.5 right-3 size-2 bg-red-500 rounded-full border-2 border-[#151F26]"></span>
                     <span className="material-symbols-outlined text-[20px]">notifications</span>

@@ -98,7 +98,7 @@ const PickupLimitReached = () => {
                   <path d="M42.4379 44C42.4379 44 36.0744 33.9038 41.1692 24C46.8624 12.9336 42.2078 4 42.2078 4L7.01134 4C7.01134 4 11.6577 12.932 5.96912 23.9969C0.876273 33.9029 7.27094 44 7.27094 44L42.4379 44Z"></path>
                 </svg>
               </div>
-              <span className="text-xl font-bold text-white tracking-tight">EcoCycle <span className="text-[#10b981]">Resident</span></span>
+              <span className="text-xl font-bold text-white tracking-tight">EcoCycle <span className="text-[#10b981] font-semibold">Resident</span></span>
             </div>
           </header>
         </div>
