@@ -122,6 +122,50 @@ const BusinessProfileSettings = () => {
 
                 {/* Settings Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {/* Edit Business Profile Card */}
+                  <div 
+                    onClick={() => window.location.hash = '#/business/profile'}
+                    className="group bg-[#151F26] border border-white/5 hover:border-[#10b981]/30 rounded-xl p-6 cursor-pointer transition-all hover:bg-[#151F26]/80"
+                  >
+                    <div className="flex items-start gap-4">
+                      <div className="p-3 bg-[#10b981]/10 rounded-lg group-hover:bg-[#10b981]/20 transition-colors">
+                        <span className="material-symbols-outlined text-[#10b981] text-[32px]">business</span>
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="text-lg font-bold text-white mb-1 group-hover:text-[#10b981] transition-colors">Edit Business Profile</h3>
+                        <p className="text-gray-400 text-sm leading-relaxed mb-3">
+                          Update company info, address, and details
+                        </p>
+                        <div className="flex items-center gap-1 text-[#10b981] text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+                          <span>Edit</span>
+                          <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Contact Information Card */}
+                  <div 
+                    onClick={() => window.location.hash = '#/business/contact'}
+                    className="group bg-[#151F26] border border-white/5 hover:border-[#06b6d4]/30 rounded-xl p-6 cursor-pointer transition-all hover:bg-[#151F26]/80"
+                  >
+                    <div className="flex items-start gap-4">
+                      <div className="p-3 bg-[#06b6d4]/10 rounded-lg group-hover:bg-[#06b6d4]/20 transition-colors">
+                        <span className="material-symbols-outlined text-[#06b6d4] text-[32px]">contact_page</span>
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="text-lg font-bold text-white mb-1 group-hover:text-[#06b6d4] transition-colors">Contact Information</h3>
+                        <p className="text-gray-400 text-sm leading-relaxed mb-3">
+                          Update contact person and details
+                        </p>
+                        <div className="flex items-center gap-1 text-[#06b6d4] text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+                          <span>Manage</span>
+                          <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
                   {/* Notifications Card */}
                   <div 
                     onClick={() => window.location.hash = '#/notifications'}
@@ -187,6 +231,17 @@ const BusinessProfileSettings = () => {
                       </div>
                     </div>
                   </div>
+                </div>
+
+                {/* Dashboard Button */}
+                <div className="mt-8 flex justify-center">
+                  <button
+                    onClick={() => window.location.hash = '#/business'}
+                    className="flex items-center gap-3 px-8 py-4 rounded-xl bg-[#06b6d4] hover:bg-[#0891b2] text-white font-semibold transition-all shadow-lg shadow-[#06b6d4]/20 hover:shadow-[#06b6d4]/40"
+                  >
+                    <span className="material-symbols-outlined text-[24px]">dashboard</span>
+                    <span>Go to Dashboard</span>
+                  </button>
                 </div>
               </div>
             </main>

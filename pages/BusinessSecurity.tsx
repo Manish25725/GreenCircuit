@@ -176,6 +176,26 @@ const BusinessSecurity = () => {
                     </div>
                   </div>
                 </div>
+
+                {/* Active Sessions Section */}
+                <div className="bg-[#151F26] p-6 md:p-8 rounded-xl border border-white/5 mt-6">
+                  <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
+                    <div className="flex flex-col gap-1 max-w-2xl">
+                      <div className="flex items-center gap-2">
+                        <span className="material-symbols-outlined text-[#06b6d4]">devices</span>
+                        <h3 className="text-white text-lg font-bold leading-tight">Active Sessions</h3>
+                      </div>
+                      <p className="text-[#94a3b8] text-sm">View and manage all devices currently logged into your account. Log out sessions you don't recognize.</p>
+                    </div>
+                    <button 
+                      onClick={() => window.location.hash = '#/business/sessions'}
+                      className="flex whitespace-nowrap min-w-[84px] cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg h-10 px-4 bg-[#06b6d4] text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-[#0891b2] transition-colors"
+                    >
+                      <span className="material-symbols-outlined text-[18px]">devices</span>
+                      <span>View Sessions</span>
+                    </button>
+                  </div>
+                </div>
               </div>
             </main>
           </div>

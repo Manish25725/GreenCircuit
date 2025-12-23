@@ -40,6 +40,10 @@ import BusinessProfileSettings from './pages/BusinessProfileSettings';
 import BusinessNotifications from './pages/BusinessNotifications';
 import BusinessSecurity from './pages/BusinessSecurity';
 import BusinessAppSettings from './pages/BusinessAppSettings';
+import BusinessAddress from './pages/BusinessAddress';
+import BusinessContact from './pages/BusinessContact';
+import BusinessEditProfile from './pages/BusinessEditProfile';
+import ActiveSessions from './pages/ActiveSessions';
 import PartnerRegistration from './pages/PartnerRegistration';
 import PartnerPending from './pages/PartnerPending';
 import Services from './pages/Services';
@@ -247,6 +251,14 @@ const App = () => {
         return <Profile />;
       case '#/business/profile':
         return <BusinessProfile />;
+      case '#/business/edit-profile':
+        return <BusinessEditProfile />;
+      case '#/business/address':
+        return <BusinessAddress />;
+      case '#/business/contact':
+        return <BusinessContact />;
+      case '#/business/sessions':
+        return <ActiveSessions />;
       case '#/notifications':
         // Route to business-specific notifications if business user
         if (userRole === 'business') {
