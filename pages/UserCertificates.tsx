@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
+import Loader from '../components/Loader';
 import { api, getCurrentUser } from '../services/api';
 
 interface Certificate {
@@ -204,7 +205,7 @@ const UserCertificates = () => {
             {loading ? (
               <div className="flex items-center justify-center py-20">
                 <div className="text-center">
-                  <div className="w-12 h-12 border-4 border-[#10b981] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                  <Loader size="md" color="#10b981" className="mb-4" />
                   <p className="text-gray-400">Loading certificates...</p>
                 </div>
               </div>

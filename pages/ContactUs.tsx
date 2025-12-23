@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Loader from '../components/Loader';
 import { api } from '../services/api';
 
 const ContactUs = () => {
@@ -154,8 +155,8 @@ const ContactUs = () => {
                   >
                     {submitting ? (
                       <>
-                        <div className="w-5 h-5 border-2 border-[#0B1120]/30 border-t-[#0B1120] rounded-full animate-spin mr-2"></div>
-                        <span className="truncate">Sending...</span>
+                        <Loader size="sm" color="#0B1120" />
+                        <span className="truncate ml-2">Sending...</span>
                       </>
                     ) : (
                       <span className="truncate">Send Message</span>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
+import Loader from '../components/Loader';
 import { getCurrentUser, api } from '../services/api';
 
 interface CertificateItem {
@@ -306,7 +307,7 @@ const BusinessCertificates = () => {
                   {/* Loading State */}
                   {loading ? (
                     <div className="p-12 text-center">
-                      <div className="animate-spin w-8 h-8 border-2 border-[#06b6d4] border-t-transparent rounded-full mx-auto mb-4"></div>
+                      <Loader size="md" color="#06b6d4" className="mb-4" />
                       <p className="text-gray-400">Loading certificates...</p>
                     </div>
                   ) : filteredCertificates.length === 0 ? (

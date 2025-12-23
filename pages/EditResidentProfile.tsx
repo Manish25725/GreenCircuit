@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
+import Loader from '../components/Loader';
 import { api, getCurrentUser, User } from '../services/api';
 
 interface UserProfile {
@@ -230,7 +231,7 @@ const EditResidentProfile = () => {
     return (
       <Layout title="" role="User" fullWidth hideSidebar>
         <div className="flex items-center justify-center min-h-screen bg-[#0B1116]">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#10b981]"></div>
+          <Loader size="md" color="#10b981" />
         </div>
       </Layout>
     );
@@ -353,7 +354,7 @@ const EditResidentProfile = () => {
                             className="absolute bottom-2 right-2 size-12 rounded-xl bg-[#10b981] border-4 border-[#0B1116] flex items-center justify-center cursor-pointer hover:bg-[#059669] transition-all shadow-lg hover:scale-110 group"
                           >
                             {uploadingAvatar ? (
-                              <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white"></div>
+                              <Loader size="sm" color="white" />
                             ) : (
                               <span className="material-symbols-outlined text-white text-[24px]">photo_camera</span>
                             )}
@@ -587,7 +588,7 @@ const EditResidentProfile = () => {
                     >
                       {saving ? (
                         <>
-                          <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white"></div>
+                          <Loader size="sm" color="white" />
                           <span>Saving...</span>
                         </>
                       ) : (

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
+import Loader from '../components/Loader';
 import { api, Slot, getCurrentUser, User } from '../services/api';
 
 const ManageSlots = () => {
@@ -381,7 +382,7 @@ const ManageSlots = () => {
                       <div className="flex flex-col gap-3 max-h-[500px] overflow-y-auto">
                         {loading ? (
                           <div className="flex flex-col items-center justify-center py-12 gap-3 text-slate-500">
-                            <div className="animate-spin rounded-full h-10 w-10 border-2 border-[#f59e0b] border-t-transparent"></div>
+                            <Loader size="md" color="#f59e0b" />
                             <p>Loading slots...</p>
                           </div>
                         ) : slots.length === 0 ? (
@@ -441,7 +442,7 @@ const ManageSlots = () => {
                                       className="p-2 rounded-lg text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-colors disabled:opacity-50"
                                     >
                                       {deletingSlot === slot.id ? (
-                                        <div className="w-5 h-5 border-2 border-red-400/30 border-t-red-400 rounded-full animate-spin"></div>
+                                        <Loader size="sm" color="#ef4444" />
                                       ) : (
                                         <span className="material-symbols-outlined text-xl">delete</span>
                                       )}
@@ -563,7 +564,7 @@ const ManageSlots = () => {
               >
                 {addingSlot ? (
                   <>
-                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                    <Loader size="sm" color="white" />
                     Adding...
                   </>
                 ) : (
@@ -648,7 +649,7 @@ const ManageSlots = () => {
               >
                 {updatingSlot ? (
                   <>
-                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                    <Loader size="sm" color="white" />
                     Updating...
                   </>
                 ) : (

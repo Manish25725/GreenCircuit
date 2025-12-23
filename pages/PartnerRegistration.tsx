@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Loader from '../components/Loader';
 import { api } from '../services/api';
 
 const PartnerRegistration: React.FC = () => {
@@ -383,7 +384,7 @@ const PartnerRegistration: React.FC = () => {
               >
                 {loading ? (
                   <span className="flex items-center gap-2">
-                    <span className="animate-spin material-symbols-outlined text-sm">progress_activity</span>
+                    <Loader size="sm" color="white" />
                     Submitting...
                   </span>
                 ) : (

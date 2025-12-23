@@ -575,7 +575,7 @@ const BusinessAnalytics = () => {
                   >
                     {savingTarget ? (
                       <>
-                        <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full"></div>
+                        <Loader size="sm" color="white" />
                         Saving...
                       </>
                     ) : (

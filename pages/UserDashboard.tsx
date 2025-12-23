@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
+import Loader from '../components/Loader';
 import { api, getCurrentUser, User, Booking } from '../services/api';
 import { useLanguage } from '../contexts/LanguageContext';
 
@@ -212,7 +213,7 @@ const UserDashboard = () => {
                         
                         {loading ? (
                           <div className="flex items-center justify-center py-12">
-                            <div className="animate-spin rounded-full h-10 w-10 border-2 border-[#10b981] border-t-transparent"></div>
+                            <Loader size="md" color="#10b981" />
                           </div>
                         ) : activeBookings.length > 0 ? (
                           <div className="space-y-6">
@@ -559,7 +560,7 @@ const UserDashboard = () => {
               >
                 {cancelling === showCancelModal ? (
                   <>
-                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                    <Loader size="sm" color="white" />
                     Cancelling...
                   </>
                 ) : (

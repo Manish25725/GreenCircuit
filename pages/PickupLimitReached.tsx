@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Layout from '../components/Layout';
+import Loader from '../components/Loader';
 import { api, getCurrentUser } from '../services/api';
 import gsap from 'gsap';
 
@@ -70,10 +71,7 @@ const PickupLimitReached = () => {
     return (
       <Layout title="" role="User" fullWidth hideSidebar>
         <div className="min-h-screen bg-[#0B1120] flex items-center justify-center">
-          <div className="relative flex items-center justify-center">
-            <div className="w-16 h-16 rounded-full border-4 border-[#f59e0b]/20 border-t-[#f59e0b] animate-spin"></div>
-            <div className="absolute w-10 h-10 rounded-full border-4 border-[#ef4444]/20 border-b-[#ef4444] animate-spin" style={{ animationDirection: 'reverse', animationDuration: '0.8s' }}></div>
-          </div>
+          <Loader size="lg" color="#f59e0b" />
         </div>
       </Layout>
     );

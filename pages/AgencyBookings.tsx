@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
+import Loader from '../components/Loader';
 import { api, getCurrentUser, User } from '../services/api';
 
 interface Booking {
@@ -285,7 +286,7 @@ const AgencyBookings = () => {
                 <div className="bg-[#151F26] rounded-2xl shadow-[0_10px_15px_-3px_rgba(0,0,0,0.3)] border border-white/5 overflow-hidden">
                   {loading ? (
                     <div className="flex flex-col items-center justify-center py-20 gap-3 text-slate-500">
-                      <div className="animate-spin rounded-full h-10 w-10 border-2 border-[#f59e0b] border-t-transparent"></div>
+                      <Loader size="md" color="#f59e0b" />
                       <p>Loading bookings...</p>
                     </div>
                   ) : filteredBookings.length === 0 ? (

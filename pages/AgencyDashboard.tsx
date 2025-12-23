@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
+import Loader from '../components/Loader';
 import { api, getCurrentUser, User, Booking } from '../services/api';
 
 const AgencyDashboard = () => {
@@ -178,10 +179,7 @@ const AgencyDashboard = () => {
       <Layout title="" role="Agency" fullWidth hideSidebar>
         <div className="min-h-screen bg-[#0B1116] flex items-center justify-center">
           <div className="flex flex-col items-center gap-4">
-            <div className="relative flex items-center justify-center">
-              <div className="w-16 h-16 rounded-full border-4 border-cyan-500/20 border-t-cyan-500 animate-spin"></div>
-              <div className="absolute w-10 h-10 rounded-full border-4 border-blue-500/20 border-b-blue-500 animate-spin" style={{ animationDirection: 'reverse', animationDuration: '0.8s' }}></div>
-            </div>
+            <Loader size="lg" color="#06b6d4" />
             <p className="text-gray-400">Checking agency status...</p>
           </div>
         </div>
@@ -276,7 +274,7 @@ const AgencyDashboard = () => {
                         
                         {loading ? (
                           <div className="flex items-center justify-center py-12">
-                            <div className="animate-spin rounded-full h-10 w-10 border-2 border-[#f59e0b] border-t-transparent"></div>
+                            <Loader size="md" color="#f59e0b" />
                           </div>
                         ) : activeBookings.length > 0 ? (
                           <div className="space-y-6">
@@ -644,7 +642,7 @@ const AgencyDashboard = () => {
               >
                 {actionLoading === showActionModal.booking._id ? (
                   <>
-                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                    <Loader size="sm" color="white" />
                     Updating...
                   </>
                 ) : (

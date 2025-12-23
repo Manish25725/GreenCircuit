@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Layout from '../components/Layout';
+import Loader from '../components/Loader';
 import { getCurrentUser } from '../services/api';
 
 // Declare Leaflet types
@@ -815,7 +816,7 @@ const BusinessInventory = () => {
                 <div className="bg-[#151F26] rounded-2xl border border-white/5 overflow-hidden">
                   {loading ? (
                     <div className="p-12 text-center">
-                      <div className="animate-spin w-8 h-8 border-2 border-[#06b6d4] border-t-transparent rounded-full mx-auto mb-4"></div>
+                      <Loader size="md" color="#06b6d4" className="mb-4" />
                       <p className="text-gray-400">Loading inventory...</p>
                     </div>
                   ) : (
@@ -932,7 +933,7 @@ const BusinessInventory = () => {
                                 title="Delete"
                               >
                                 {deleting === item._id ? (
-                                  <div className="animate-spin w-5 h-5 border-2 border-red-400 border-t-transparent rounded-full"></div>
+                                  <Loader size="sm" color="#ef4444" />
                                 ) : (
                                   <span className="material-symbols-outlined text-lg">delete</span>
                                 )}
@@ -1057,7 +1058,7 @@ const BusinessInventory = () => {
                 >
                   {saving ? (
                     <>
-                      <div className="animate-spin w-5 h-5 border-2 border-white border-t-transparent rounded-full"></div>
+                      <Loader size="sm" color="white" />
                       Adding...
                     </>
                   ) : (
@@ -1191,7 +1192,7 @@ const BusinessInventory = () => {
                 >
                   {saving ? (
                     <>
-                      <div className="animate-spin w-5 h-5 border-2 border-white border-t-transparent rounded-full"></div>
+                      <Loader size="sm" color="white" />
                       Saving...
                     </>
                   ) : (
@@ -1236,7 +1237,7 @@ const BusinessInventory = () => {
                   <label className="block text-sm font-medium text-gray-400 mb-2">Select Recycling Agency *</label>
                   {loadingAgencies ? (
                     <div className="bg-white/5 border border-white/10 rounded-xl p-4 text-center">
-                      <div className="animate-spin w-6 h-6 border-2 border-[#06b6d4] border-t-transparent rounded-full mx-auto"></div>
+                      <Loader size="sm" color="#06b6d4" className="mb-2" />
                       <p className="text-gray-500 text-sm mt-2">Loading agencies...</p>
                     </div>
                   ) : agencies.length === 0 ? (
@@ -1349,7 +1350,7 @@ const BusinessInventory = () => {
                 >
                   {bookingPickup ? (
                     <>
-                      <div className="animate-spin w-5 h-5 border-2 border-white border-t-transparent rounded-full"></div>
+                      <Loader size="sm" color="white" />
                       Scheduling...
                     </>
                   ) : (

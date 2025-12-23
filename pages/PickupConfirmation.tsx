@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Layout from '../components/Layout';
+import Loader from '../components/Loader';
 import { api, getCurrentUser } from '../services/api';
 import gsap from 'gsap';
 
@@ -154,10 +155,7 @@ const PickupConfirmation = () => {
     return (
       <Layout title="" role={userRole} fullWidth hideSidebar>
         <div className="min-h-screen bg-[#0B1120] flex items-center justify-center">
-          <div className="relative flex items-center justify-center">
-            <div className="w-16 h-16 rounded-full border-4 border-[#34D399]/20 border-t-[#34D399] animate-spin"></div>
-            <div className="absolute w-10 h-10 rounded-full border-4 border-[#6EE7B7]/20 border-b-[#6EE7B7] animate-spin" style={{ animationDirection: 'reverse', animationDuration: '0.8s' }}></div>
-          </div>
+          <Loader size="lg" color="#34D399" />
         </div>
       </Layout>
     );

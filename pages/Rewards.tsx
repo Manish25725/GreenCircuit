@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
+import Loader from '../components/Loader';
 import { api, getCurrentUser, Reward } from '../services/api';
 
 const Rewards = () => {
@@ -172,7 +173,7 @@ const Rewards = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
              {loading ? (
                <div className="col-span-4 flex items-center justify-center py-12">
-                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#10b981]"></div>
+                 <Loader size="md" color="#10b981" />
                </div>
              ) : rewards.length === 0 ? (
                <div className="col-span-4 text-center py-12 text-gray-500">

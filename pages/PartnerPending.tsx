@@ -92,7 +92,7 @@ const PartnerPending: React.FC = () => {
         <div className="fixed top-0 left-0 w-full h-[500px] bg-cyan-500/10 rounded-full blur-[120px] -translate-y-1/2 pointer-events-none"></div>
         <div className="fixed bottom-0 right-0 w-full h-[500px] bg-blue-500/10 rounded-full blur-[120px] translate-y-1/2 pointer-events-none"></div>
         <div className="text-center relative z-10">
-          <div className="animate-spin rounded-full h-16 w-16 border-4 border-cyan-500/30 border-t-cyan-500 mx-auto mb-4"></div>
+          <Loader size="lg" color="#06b6d4" className="mb-4" />
           <p className="text-gray-300">Loading application status...</p>
         </div>
       </div>

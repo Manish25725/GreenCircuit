@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
+import Loader from '../components/Loader';
 import { api, getCurrentUser, Booking } from '../services/api';
 
 const History = () => {
@@ -220,7 +221,7 @@ const History = () => {
                 <div className="bg-[#151F26] rounded-2xl border border-white/5 overflow-hidden">
                   {loading ? (
                     <div className="flex items-center justify-center py-20">
-                      <div className="animate-spin rounded-full h-10 w-10 border-2 border-[#10b981] border-t-transparent"></div>
+                      <Loader size="md" color="#10b981" />
                     </div>
                   ) : filteredBookings.length === 0 ? (
                     <div className="text-center py-20">

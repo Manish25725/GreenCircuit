@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
+import Loader from '../components/Loader';
 import { api, getCurrentUser, User } from '../services/api';
 
 const BusinessEditProfile = () => {
@@ -89,7 +90,7 @@ const BusinessEditProfile = () => {
     return (
       <Layout title="" role="Business" fullWidth hideSidebar>
         <div className="flex items-center justify-center min-h-screen bg-[#0B1116]">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#10b981]"></div>
+          <Loader size="md" color="#10b981" />
         </div>
       </Layout>
     );

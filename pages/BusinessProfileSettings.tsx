@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
+import Loader from '../components/Loader';
 import { api, getCurrentUser } from '../services/api';
 
 interface BusinessProfile {
@@ -55,7 +56,7 @@ const BusinessProfileSettings = () => {
       <Layout title="" role="Business" fullWidth hideSidebar>
         <div className="bg-[#0B1116] min-h-screen flex items-center justify-center">
           <div className="text-center">
-            <div className="w-12 h-12 border-4 border-[#3b82f6] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <Loader size="md" color="#3b82f6" className="mb-4" />
             <p className="text-gray-400">Loading profile...</p>
           </div>
         </div>
