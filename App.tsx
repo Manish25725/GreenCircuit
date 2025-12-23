@@ -37,6 +37,7 @@ import BusinessDashboard from './pages/BusinessDashboard';
 import BusinessAnalytics from './pages/BusinessAnalytics';
 import BusinessProfile from './pages/BusinessProfile';
 import BusinessProfileSettings from './pages/BusinessProfileSettings';
+import EditBusinessProfile from './pages/EditBusinessProfile';
 import BusinessNotifications from './pages/BusinessNotifications';
 import BusinessSecurity from './pages/BusinessSecurity';
 import BusinessAppSettings from './pages/BusinessAppSettings';
@@ -250,7 +251,7 @@ const App = () => {
         }
         return <Profile />;
       case '#/business/profile':
-        return <BusinessProfile />;
+        return <EditBusinessProfile />;
       case '#/business/edit-profile':
         return <BusinessEditProfile />;
       case '#/business/address':

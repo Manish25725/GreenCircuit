@@ -35,6 +35,7 @@ export interface IBusiness extends Document {
     email: string;
     phone: string;
   };
+  sustainabilityGoals?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -118,6 +119,10 @@ const BusinessSchema = new Schema<IBusiness>({
     role: { type: String, default: '' },
     email: { type: String, default: '' },
     phone: { type: String, default: '' }
+  },
+  sustainabilityGoals: {
+    type: String,
+    default: ''
   }
 }, {
   timestamps: true

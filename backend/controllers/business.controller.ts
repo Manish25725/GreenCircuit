@@ -160,7 +160,21 @@ export const getBusinessProfile = async (req: Request, res: Response) => {
       business = await Business.findById(business._id).populate('userId', 'name email avatar');
     }
 
-    sendSuccess(res, business);
+    // Flatten nested objects for frontend compatibility
+    const flattenedBusiness = {
+      ...business.toObject(),
+      address: business.address?.street || '',
+      city: business.address?.city || '',
+      state: business.address?.state || '',
+      zipCode: business.address?.zipCode || '',
+      country: business.address?.country || 'India',
+      contactPersonName: business.contactPerson?.name || '',
+      contactPersonRole: business.contactPerson?.role || '',
+      contactPersonEmail: business.contactPerson?.email || '',
+      contactPersonPhone: business.contactPerson?.phone || ''
+    };
+
+    sendSuccess(res, flattenedBusiness);
   } catch (error: any) {
     sendError(res, error.message);
   }
@@ -211,6 +225,37 @@ export const updateBusinessProfile = async (req: Request, res: Response) => {
     delete updates.co2Saved;
     delete updates.totalPickups;
 
+    // Handle nested address object
+    if (updates.address || updates.city || updates.state || updates.zipCode || updates.country) {
+      updates.address = {
+        street: updates.address || '',
+        city: updates.city || '',
+        state: updates.state || '',
+        zipCode: updates.zipCode || '',
+        country: updates.country || 'India'
+      };
+      // Remove flattened fields
+      delete updates.city;
+      delete updates.state;
+      delete updates.zipCode;
+      delete updates.country;
+    }
+
+    // Handle nested contactPerson object
+    if (updates.contactPersonName || updates.contactPersonRole || updates.contactPersonEmail || updates.contactPersonPhone) {
+      updates.contactPerson = {
+        name: updates.contactPersonName || '',
+        role: updates.contactPersonRole || '',
+        email: updates.contactPersonEmail || '',
+        phone: updates.contactPersonPhone || ''
+      };
+      // Remove flattened fields
+      delete updates.contactPersonName;
+      delete updates.contactPersonRole;
+      delete updates.contactPersonEmail;
+      delete updates.contactPersonPhone;
+    }
+
     const business = await Business.findOneAndUpdate(
       { userId },
       updates,
@@ -221,7 +266,21 @@ export const updateBusinessProfile = async (req: Request, res: Response) => {
       return sendError(res, 'Business profile not found', 404);
     }
 
-    sendSuccess(res, business);
+    // Flatten nested objects for frontend compatibility
+    const flattenedBusiness = {
+      ...business.toObject(),
+      address: business.address?.street || '',
+      city: business.address?.city || '',
+      state: business.address?.state || '',
+      zipCode: business.address?.zipCode || '',
+      country: business.address?.country || 'India',
+      contactPersonName: business.contactPerson?.name || '',
+      contactPersonRole: business.contactPerson?.role || '',
+      contactPersonEmail: business.contactPerson?.email || '',
+      contactPersonPhone: business.contactPerson?.phone || ''
+    };
+
+    sendSuccess(res, flattenedBusiness);
   } catch (error: any) {
     sendError(res, error.message);
   }
