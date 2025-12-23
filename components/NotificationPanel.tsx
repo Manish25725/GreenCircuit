@@ -116,14 +116,10 @@ const NotificationPanel = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
+      {/* Action Buttons */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-white flex items-center gap-3">
-            <span className="material-symbols-outlined text-4xl text-[#34D399]">notifications</span>
-            Notifications
-          </h1>
-          <p className="text-slate-400 mt-1">
+          <p className="text-slate-400">
             {unreadCount > 0 ? `You have ${unreadCount} unread notification${unreadCount !== 1 ? 's' : ''}` : 'All caught up!'}
           </p>
         </div>

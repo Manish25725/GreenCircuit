@@ -120,6 +120,9 @@ const EditResidentProfile = () => {
     try {
       setUploadingAvatar(true);
       
+      // Store the old avatar URL before uploading new one
+      const oldAvatar = profile?.avatar || avatarPreview;
+      
       // Preview the image locally first
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -151,6 +154,7 @@ const EditResidentProfile = () => {
         setAvatarPreview(data.secure_url);
         
         // Immediately save the avatar to profile
+        // The backend will automatically delete the old avatar if it exists
         try {
           const updatedUser = await api.updateProfile({ avatar: data.secure_url });
           setProfile({ ...profile, avatar: data.secure_url });
@@ -187,10 +191,8 @@ const EditResidentProfile = () => {
       setSaving(true);
       const updateData: any = { ...formData };
       
-      // Include avatar if changed
-      if (avatarPreview && avatarPreview !== profile?.avatar) {
-        updateData.avatar = avatarPreview;
-      }
+      // Avatar is already uploaded via Cloudinary in handleAvatarChange
+      // No need to include it here as it's saved immediately on upload
       
       const response = await api.updateProfile(updateData);
       console.log('Profile updated successfully:', response);
@@ -328,8 +330,6 @@ const EditResidentProfile = () => {
                             htmlFor="avatar" 
                             className="absolute bottom-2 right-2 size-12 rounded-xl bg-[#10b981] border-4 border-[#0B1116] flex items-center justify-center cursor-pointer hover:bg-[#059669] transition-all shadow-lg hover:scale-110 group"
                           >
-                            <span className="material-symbols-outlined text-white text-[24px]">photo_camera</span>
-                            <input
                             {uploadingAvatar ? (
                               <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white"></div>
                             ) : (
@@ -342,6 +342,8 @@ const EditResidentProfile = () => {
                               onChange={handleAvatarChange}
                               className="hidden"
                               disabled={uploadingAvatar}
+                            />
+                          </label>
                         </div>
                         <div className="text-center">
                           <p className="text-white text-sm font-medium mb-1">Upload Profile Picture</p>

@@ -138,7 +138,7 @@ const UserDashboard = () => {
                     <path d="M42.4379 44C42.4379 44 36.0744 33.9038 41.1692 24C46.8624 12.9336 42.2078 4 42.2078 4L7.01134 4C7.01134 4 11.6577 12.932 5.96912 23.9969C0.876273 33.9029 7.27094 44 7.27094 44L42.4379 44Z"></path>
                   </svg>
                 </div>
-                <h2 className="text-xl font-bold tracking-tight text-white">EcoCycle</h2>
+                <h2 className="text-xl font-bold tracking-tight text-white">EcoCycle <span className="text-[#10b981]">Resident</span></h2>
               </div>
               <nav className="hidden md:flex flex-1 justify-center gap-1">
               </nav>
@@ -471,6 +471,15 @@ const UserDashboard = () => {
                               <span className="material-symbols-outlined text-xl">add</span>
                             </div>
                             <span className="font-medium">New Request</span>
+                          </div>
+                          <span className="material-symbols-outlined text-gray-500 group-hover:text-white transition-colors">chevron_right</span>
+                        </button>
+                        <button onClick={() => window.location.hash = '#/certificates'} className="flex w-full group cursor-pointer items-center justify-between overflow-hidden rounded-xl h-14 px-4 bg-white/5 text-gray-200 border border-white/5 hover:bg-white/10 hover:border-white/10 transition-all">
+                          <div className="flex items-center gap-3">
+                            <div className="size-8 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center">
+                              <span className="material-symbols-outlined text-xl">workspace_premium</span>
+                            </div>
+                            <span className="font-medium">Certificates</span>
                           </div>
                           <span className="material-symbols-outlined text-gray-500 group-hover:text-white transition-colors">chevron_right</span>
                         </button>

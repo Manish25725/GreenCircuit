@@ -6,6 +6,7 @@ import Booking from '../models/Booking';
 import User from '../models/User';
 import Agency from '../models/Agency';
 import { sendSuccess, sendError } from '../utils/response';
+import { deleteImageByUrl } from '../utils/cloudinary';
 import mongoose from 'mongoose';
 import PDFDocument from 'pdfkit';
 
@@ -218,6 +219,19 @@ export const updateBusinessProfile = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).user._id || (req as any).user.id;
     const updates = req.body;
+
+    // Get current business to check for existing logo
+    const currentBusiness = await Business.findOne({ userId });
+    if (!currentBusiness) {
+      return sendError(res, 'Business not found', 404);
+    }
+
+    // If updating logo and business has an old logo, delete the old one from Cloudinary
+    if (updates.logo && currentBusiness.logo && currentBusiness.logo !== updates.logo) {
+      if (currentBusiness.logo.includes('cloudinary.com')) {
+        await deleteImageByUrl(currentBusiness.logo);
+      }
+    }
 
     // Prevent updating certain fields
     delete updates.userId;

@@ -51,6 +51,7 @@ import ResidentNotifications from './pages/ResidentNotifications';
 import ResidentSecurity from './pages/ResidentSecurity';
 import ResidentAppSettings from './pages/ResidentAppSettings';
 import ResidentActiveSessions from './pages/ResidentActiveSessions';
+import UserCertificates from './pages/UserCertificates';
 import PartnerRegistration from './pages/PartnerRegistration';
 import PartnerPending from './pages/PartnerPending';
 import Services from './pages/Services';
@@ -111,7 +112,7 @@ const App = () => {
     }
 
     // User-only routes (dashboard, rewards, etc.)
-    const userOnlyRoutes = ['#/dashboard', '#/rewards', '#/certificate', '#/history'];
+    const userOnlyRoutes = ['#/dashboard', '#/rewards', '#/certificate', '#/certificates', '#/history'];
     if (userOnlyRoutes.some(r => path.startsWith(r))) {
       return userRole === 'user';
     }
@@ -208,6 +209,8 @@ const App = () => {
         return <Rewards />;
       case '#/certificate':
         return <Certificate />;
+      case '#/certificates':
+        return <UserCertificates />;
       case '#/search':
         return <SearchAgencies />;
       case '#/schedule':

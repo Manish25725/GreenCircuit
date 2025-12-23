@@ -76,31 +76,29 @@ const Rewards = () => {
 
         {/* Header */}
         <header className="flex items-center justify-between whitespace-nowrap border-b border-white/5 px-4 sm:px-6 lg:px-10 py-4 bg-[#0B1116]/80 backdrop-blur-md fixed top-0 left-0 right-0 z-50 transition-all duration-300">
-            <div className="flex items-center gap-3 text-white cursor-pointer" onClick={() => window.location.hash = '#/'}>
+            <div className="flex items-center gap-3 text-white cursor-pointer" onClick={() => window.location.hash = '#/dashboard'}>
                 <div className="p-2 bg-[#10b981]/10 rounded-lg">
                     <svg className="h-6 w-6 text-[#10b981]" fill="currentColor" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
                     <path d="M42.4379 44C42.4379 44 36.0744 33.9038 41.1692 24C46.8624 12.9336 42.2078 4 42.2078 4L7.01134 4C7.01134 4 11.6577 12.932 5.96912 23.9969C0.876273 33.9029 7.27094 44 7.27094 44L42.4379 44Z"></path>
                     </svg>
                 </div>
-                <h2 className="text-xl font-bold tracking-tight text-white">EcoCycle</h2>
+                <h2 className="text-xl font-bold tracking-tight text-white">EcoCycle <span className="text-[#10b981]">Resident</span></h2>
             </div>
-            <nav className="hidden md:flex flex-1 justify-center gap-1">
-                <a className="text-sm font-medium px-5 py-2.5 rounded-full text-[#94a3b8] hover:text-white hover:bg-white/5 transition-all cursor-pointer" onClick={() => window.location.hash = '#/dashboard'}>Dashboard</a>
-                <a className="text-sm font-medium px-5 py-2.5 rounded-full text-[#94a3b8] hover:text-white hover:bg-white/5 transition-all cursor-pointer" onClick={() => window.location.hash = '#/search'}>New Request</a>
-                <a className="text-sm font-semibold px-5 py-2.5 rounded-full text-white bg-white/10 shadow-inner border border-white/5 cursor-pointer" onClick={() => window.location.hash = '#/rewards'}>Rewards</a>
-                <a className="text-sm font-medium px-5 py-2.5 rounded-full text-[#94a3b8] hover:text-white hover:bg-white/5 transition-all cursor-pointer" onClick={() => window.location.hash = '#/certificate'}>Certificate</a>
-            </nav>
             <div className="flex items-center gap-4">
                 <button 
                     onClick={() => window.location.hash = '#/profile'}
                     className="hidden sm:flex items-center gap-3 pl-1 pr-4 py-1 rounded-full bg-[#151F26] border border-white/5 hover:bg-white/5 transition-colors group cursor-pointer"
                 >
-                    <div className="size-8 rounded-full bg-[#10b981] flex items-center justify-center ring-2 ring-white/10 group-hover:ring-[#10b981]/50 transition-all text-white font-bold text-sm">
-                      {user?.name?.charAt(0) || 'U'}
-                    </div>
+                    <div 
+                      className="size-8 rounded-full bg-cover bg-center ring-2 ring-white/10 group-hover:ring-[#10b981]/50 transition-all" 
+                      style={{ backgroundImage: `url("${user?.avatar || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user?.name || 'User') + '&background=10b981&color=fff'}")` }}
+                    ></div>
                     <span className="text-sm font-medium text-gray-200">{user?.name || 'User'}</span>
                 </button>
-                <button className="relative p-2.5 rounded-full bg-[#151F26] border border-white/5 text-[#3b82f6] hover:text-[#3b82f6] hover:bg-[#3b82f6]/10 transition-colors">
+                <button 
+                  onClick={() => window.location.hash = '#/notifications'}
+                  className="relative p-2.5 rounded-full bg-[#151F26] border border-white/5 text-[#3b82f6] hover:text-[#3b82f6] hover:bg-[#3b82f6]/10 transition-colors"
+                >
                     <span className="absolute top-2.5 right-3 size-2 bg-red-500 rounded-full border-2 border-[#151F26]"></span>
                     <span className="material-symbols-outlined text-[20px]">notifications</span>
                 </button>
@@ -109,6 +107,15 @@ const Rewards = () => {
 
         {/* Main Content */}
         <main className="flex-1 w-full max-w-7xl mx-auto p-4 sm:p-6 lg:p-10 mt-20 relative z-10">
+          {/* Back Button */}
+          <button 
+            onClick={() => window.history.back()}
+            className="flex items-center gap-2 text-[#10b981] hover:text-[#059669] transition-colors mb-6 group w-fit"
+          >
+            <span className="material-symbols-outlined text-[20px]">arrow_back</span>
+            <span className="text-sm font-medium">Back to Dashboard</span>
+          </button>
+
           <div className="mb-8">
              <h1 className="text-3xl font-bold text-white mb-2">Rewards Marketplace</h1>
              <p className="text-[#94a3b8]">Redeem your Eco Points for exciting rewards.</p>

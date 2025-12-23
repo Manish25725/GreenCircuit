@@ -96,7 +96,7 @@ const SearchAgencies = () => {
   const isBusiness = userRole === 'Business';
   const primaryColor = isBusiness ? '#3b82f6' : '#10b981';
   const primaryColorRgb = isBusiness ? '59, 130, 246' : '16, 185, 129';
-  const brandName = isBusiness ? 'EcoCycle Business' : 'EcoCycle';
+  const brandName = isBusiness ? 'EcoCycle Business' : 'EcoCycle Resident';
 
   useEffect(() => {
     loadAgencies();

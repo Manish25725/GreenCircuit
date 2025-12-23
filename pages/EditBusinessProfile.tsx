@@ -49,6 +49,7 @@ const EditBusinessProfile = () => {
     sustainabilityGoals: ''
   });
   const [logoPreview, setLogoPreview] = useState<string>('');
+  const [uploadingLogo, setUploadingLogo] = useState(false);
 
   useEffect(() => {
     const currentUser = getCurrentUser();
@@ -95,15 +96,82 @@ const EditBusinessProfile = () => {
     });
   };
 
-  const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleLogoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      setErrorMessage('Please select an image file');
+      setTimeout(() => setErrorMessage(''), 3000);
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      setErrorMessage('Image size should be less than 5MB');
+      setTimeout(() => setErrorMessage(''), 3000);
+      return;
+    }
+
+    try {
+      setUploadingLogo(true);
+      
+      // Store the old logo URL before uploading new one
+      const oldLogo = business?.logo || logoPreview;
+      
+      // Preview the image locally first
       const reader = new FileReader();
       reader.onloadend = () => {
-        const result = reader.result as string;
-        setLogoPreview(result);
+        setLogoPreview(reader.result as string);
       };
       reader.readAsDataURL(file);
+
+      // Upload to Cloudinary
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('upload_preset', 'ecocycle_uploads');
+
+      const response = await fetch(
+        'https://api.cloudinary.com/v1_1/dideet7oz/image/upload',
+        {
+          method: 'POST',
+          body: formData
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('Cloudinary upload failed');
+      }
+
+      const data = await response.json();
+      
+      if (data.secure_url) {
+        // Update the logo preview with Cloudinary URL
+        setLogoPreview(data.secure_url);
+        
+        // Immediately save the logo to profile
+        // The backend will automatically delete the old logo if it exists
+        try {
+          const updatedBusiness = await api.updateBusinessProfile({ logo: data.secure_url });
+          
+          setShowSuccess(true);
+          setTimeout(() => setShowSuccess(false), 3000);
+          
+          // Reload profile data
+          await loadBusinessProfile();
+        } catch (apiError) {
+          console.error('Failed to save logo to profile:', apiError);
+          setErrorMessage('Logo uploaded but failed to save to profile. Please try saving your profile.');
+          setTimeout(() => setErrorMessage(''), 5000);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to upload logo:', error);
+      setErrorMessage('Failed to upload logo. Please try again.');
+      setTimeout(() => setErrorMessage(''), 5000);
+    } finally {
+      setUploadingLogo(false);
     }
   };
 

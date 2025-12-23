@@ -68,7 +68,7 @@ const SchedulePickup = () => {
   const isBusiness = userRole === 'Business';
   const primaryColor = isBusiness ? '#3b82f6' : '#10b981';
   const primaryColorLight = isBusiness ? 'blue-500' : '[#10b981]';
-  const brandName = isBusiness ? 'EcoCycle Business' : 'EcoCycle';
+  const brandName = isBusiness ? 'EcoCycle Business' : 'EcoCycle Resident';
 
   useEffect(() => {
     // Check if user is logged in
