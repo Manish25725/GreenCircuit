@@ -36,6 +36,7 @@ import BusinessCertificates from './pages/BusinessCertificates';
 import BusinessDashboard from './pages/BusinessDashboard';
 import BusinessAnalytics from './pages/BusinessAnalytics';
 import BusinessProfile from './pages/BusinessProfile';
+import BusinessProfileSettings from './pages/BusinessProfileSettings';
 import PartnerRegistration from './pages/PartnerRegistration';
 import PartnerPending from './pages/PartnerPending';
 import Services from './pages/Services';
@@ -236,11 +237,13 @@ const App = () => {
       case '#/profile':
         // Route to appropriate profile based on user role
         if (userRole === 'business') {
-          return <BusinessProfile />;
+          return <BusinessProfileSettings />;
         } else if (userRole === 'agency') {
           return <AgencyProfile />;
         }
         return <Profile />;
+      case '#/business/profile':
+        return <BusinessProfile />;
       case '#/notifications':
         return <Notifications />;
       case '#/security':
