@@ -106,11 +106,9 @@ const BusinessProfileSettings = () => {
 
             {/* Main Content */}
             <main className="px-4 sm:px-6 lg:px-10 pt-24 pb-10">
-            {/* Main Content */}
-            <main className="px-4 sm:px-6 lg:px-10 pt-24 pb-10">
-              <div className="max-w-7xl mx-auto space-y-8">
+              <div className="max-w-6xl mx-auto">
                 {/* Page Header */}
-                <div className="mb-6">
+                <div className="mb-8">
                   <div className="flex items-center gap-3 mb-2">
                     <div className="p-2 bg-[#06b6d4]/10 rounded-lg">
                       <span className="material-symbols-outlined text-[#06b6d4] text-[28px]">settings</span>
@@ -188,44 +186,6 @@ const BusinessProfileSettings = () => {
                         </div>
                       </div>
                     </div>
-                  </div>
-                </div>
-
-                {/* Quick Access Section */}
-                <div className="mt-8">
-                  <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                    <span className="material-symbols-outlined text-[#06b6d4]">bolt</span>
-                    Quick Access
-                  </h2>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <button 
-                      onClick={() => window.location.hash = '#/business/inventory'}
-                      className="flex items-center gap-3 p-4 rounded-xl bg-[#151F26] border border-white/5 hover:border-[#06b6d4]/30 hover:bg-[#151F26]/80 text-gray-300 hover:text-white transition-all"
-                    >
-                      <span className="material-symbols-outlined text-[#06b6d4] text-[24px]">inventory_2</span>
-                      <span className="text-sm font-medium">Inventory</span>
-                    </button>
-                    <button 
-                      onClick={() => window.location.hash = '#/business/certificates'}
-                      className="flex items-center gap-3 p-4 rounded-xl bg-[#151F26] border border-white/5 hover:border-[#8b5cf6]/30 hover:bg-[#151F26]/80 text-gray-300 hover:text-white transition-all"
-                    >
-                      <span className="material-symbols-outlined text-[#8b5cf6] text-[24px]">workspace_premium</span>
-                      <span className="text-sm font-medium">Certificates</span>
-                    </button>
-                    <button 
-                      onClick={() => window.location.hash = '#/business/analytics'}
-                      className="flex items-center gap-3 p-4 rounded-xl bg-[#151F26] border border-white/5 hover:border-[#06b6d4]/30 hover:bg-[#151F26]/80 text-gray-300 hover:text-white transition-all"
-                    >
-                      <span className="material-symbols-outlined text-[#06b6d4] text-[24px]">analytics</span>
-                      <span className="text-sm font-medium">Analytics</span>
-                    </button>
-                    <button 
-                      onClick={() => window.location.hash = '#/business/profile'}
-                      className="flex items-center gap-3 p-4 rounded-xl bg-[#151F26] border border-white/5 hover:border-[#10b981]/30 hover:bg-[#151F26]/80 text-gray-300 hover:text-white transition-all"
-                    >
-                      <span className="material-symbols-outlined text-[#10b981] text-[24px]">business</span>
-                      <span className="text-sm font-medium">Edit Profile</span>
-                    </button>
                   </div>
                 </div>
               </div>

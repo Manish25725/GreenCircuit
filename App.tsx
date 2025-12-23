@@ -37,6 +37,9 @@ import BusinessDashboard from './pages/BusinessDashboard';
 import BusinessAnalytics from './pages/BusinessAnalytics';
 import BusinessProfile from './pages/BusinessProfile';
 import BusinessProfileSettings from './pages/BusinessProfileSettings';
+import BusinessNotifications from './pages/BusinessNotifications';
+import BusinessSecurity from './pages/BusinessSecurity';
+import BusinessAppSettings from './pages/BusinessAppSettings';
 import PartnerRegistration from './pages/PartnerRegistration';
 import PartnerPending from './pages/PartnerPending';
 import Services from './pages/Services';
@@ -245,10 +248,22 @@ const App = () => {
       case '#/business/profile':
         return <BusinessProfile />;
       case '#/notifications':
+        // Route to business-specific notifications if business user
+        if (userRole === 'business') {
+          return <BusinessNotifications />;
+        }
         return <Notifications />;
       case '#/security':
+        // Route to business-specific security if business user
+        if (userRole === 'business') {
+          return <BusinessSecurity />;
+        }
         return <Security />;
       case '#/settings':
+        // Route to business-specific settings if business user
+        if (userRole === 'business') {
+          return <BusinessAppSettings />;
+        }
         return <AppSettings />;
       case '#/business':
         return <BusinessDashboard />;
