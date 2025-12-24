@@ -5,7 +5,7 @@ import { World } from './GlobeThreeD';
 export default function GlobeDemo() {
   const globeConfig = {
     pointSize: 4,
-    globeColor: "#0B1120",
+    globeColor: "#001a4d",
     showAtmosphere: true,
     atmosphereColor: "#FFFFFF",
     atmosphereAltitude: 0.25,
