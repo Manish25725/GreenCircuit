@@ -89,6 +89,7 @@ const SearchAgencies = () => {
   const mapInstanceRef = useRef<any>(null);
   const markersRef = useRef<any[]>([]);
   const user = getCurrentUser();
+  const [avatarKey, setAvatarKey] = useState(Date.now());
   const userRole = getUserRole();
   const dashboardPath = getDashboardPath(userRole);
 
@@ -451,30 +452,49 @@ const SearchAgencies = () => {
             <div className="flex items-center gap-4">
                 <div className="relative group">
                   <button 
-                      onClick={() => window.location.hash = '#/profile'}
+                      onClick={() => window.location.hash = dashboardPath}
                       className="hidden sm:flex items-center gap-3 pl-1 pr-4 py-1 rounded-full bg-[#151F26] border border-white/5 hover:bg-white/5 transition-colors cursor-pointer"
                   >
-                      <div 
-                        className="size-8 rounded-full bg-cover bg-center ring-2 ring-white/10 group-hover:ring-[#10b981]/50 transition-all"
-                        style={{ 
-                          backgroundImage: `url("${user?.avatar || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user?.name || 'User') + '&background=' + (isBusiness ? '3b82f6' : '10b981') + '&color=fff'}")`
-                        }}
-                      ></div>
-                      <span className="text-sm font-medium text-white">{user?.name || 'User'}</span>
+                    <div className="size-8 rounded-full ring-2 ring-white/10 group-hover:ring-[#06b6d4]/50 transition-all overflow-hidden bg-[#06b6d4] flex items-center justify-center">
+                      {user?.logo || user?.avatar ? (
+                        <img 
+                          src={`${user?.logo || user?.avatar}?t=${avatarKey}`} 
+                          alt="Profile"
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.currentTarget.style.display = 'none';
+                            e.currentTarget.parentElement!.innerHTML = `<span class="text-white text-xs font-bold">${(user?.name || user?.companyName || 'U').charAt(0).toUpperCase()}</span>`;
+                          }}
+                        />
+                      ) : (
+                        <span className="text-white text-xs font-bold">{(user?.name || user?.companyName || 'U').charAt(0).toUpperCase()}</span>
+                      )}
+                    </div>
+                    <span className="text-sm font-medium text-gray-200">{user?.name || user?.companyName || (isBusiness ? 'Business' : 'User')}</span>
                   </button>
                   {/* Hover Preview */}
                   <div className="absolute top-14 right-0 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-[100]">
                     <div className="bg-[#151F26] border border-white/10 rounded-2xl p-4 shadow-2xl">
-                      <div 
-                        className="size-32 rounded-xl bg-cover bg-center ring-4 ring-[#10b981]/30" 
-                        style={{ backgroundImage: `url("${user?.avatar || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user?.name || 'User') + '&background=' + (isBusiness ? '3b82f6' : '10b981') + '&color=fff'}")`}}
-                      ></div>
+                      <div className="size-32 rounded-xl ring-4 ring-[#06b6d4]/30 overflow-hidden bg-[#06b6d4] flex items-center justify-center">
+                        {user?.logo || user?.avatar ? (
+                          <img 
+                            src={`${user?.logo || user?.avatar}?t=${avatarKey}`} 
+                            alt="Profile"
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <span className="text-white text-4xl font-bold">{(user?.name || user?.companyName || 'U').charAt(0).toUpperCase()}</span>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
-                <button className="relative p-2.5 rounded-full bg-[#151F26] border border-white/5 text-[#3b82f6] hover:text-[#3b82f6] hover:bg-[#3b82f6]/10 transition-colors">
-                    <span className="absolute top-2.5 right-3 size-2 bg-red-500 rounded-full border-2 border-[#151F26]"></span>
-                    <span className="material-symbols-outlined text-[20px]">notifications</span>
+                <button 
+                  onClick={() => window.location.hash = isBusiness ? '#/business/notifications' : '#/notifications'}
+                  className="p-2.5 rounded-full bg-[#151F26] border border-white/5 text-gray-400 hover:text-white hover:bg-white/5 transition-colors"
+                  title="Notifications"
+                >
+                  <span className="material-symbols-outlined text-[20px]">notifications</span>
                 </button>
             </div>
         </header>

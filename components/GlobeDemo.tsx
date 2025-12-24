@@ -2,15 +2,17 @@ import React, { Suspense } from 'react';
 import { motion } from 'framer-motion';
 import { World } from './GlobeThreeD';
 
+
+
 export default function GlobeDemo() {
   const globeConfig = {
     pointSize: 4,
     globeColor: "#001a4d",
     showAtmosphere: true,
     atmosphereColor: "#FFFFFF",
-    atmosphereAltitude: 0.15,
+    atmosphereAltitude: 0.08,
     emissive: "#0B1120",
-    emissiveIntensity: 0.1,
+    emissiveIntensity: 0.05,
     shininess: 0.9,
     polygonColor: "rgba(255,255,255,0.7)",
     ambientLight: "#38bdf8",
@@ -392,11 +394,11 @@ export default function GlobeDemo() {
   ];
 
   return (
-    <div className="flex flex-row items-center justify-center h-full w-full relative bg-[#0B1120]">
-      <div className="max-w-7xl mx-auto w-full relative overflow-hidden h-full px-4 bg-[#0B1120]">
-        <div className="absolute w-full bottom-0 inset-x-0 h-40 bg-gradient-to-b pointer-events-none select-none from-transparent to-[#0B1120] z-40" />
-        <div className="absolute w-full h-full z-10">
-          <Suspense fallback={<div className="flex items-center justify-center h-full"><div className="text-[#34D399]">Loading globe...</div></div>}>
+    <div className="flex flex-row items-center justify-center h-full w-full relative" style={{ backgroundColor: '#0B1120' }}>
+      <div className="max-w-7xl mx-auto w-full relative overflow-hidden h-full px-4" style={{ backgroundColor: '#0B1120' }}>
+        <div className="absolute w-full bottom-0 inset-x-0 h-40 pointer-events-none select-none z-40" style={{ background: 'linear-gradient(to bottom, transparent, #0B1120)' }} />
+        <div className="absolute w-full h-full z-10" style={{ backgroundColor: '#0B1120' }}>
+          <Suspense fallback={<div className="flex items-center justify-center h-full" style={{ backgroundColor: '#0B1120' }}><div className="text-[#34D399]">Loading globe...</div></div>}>
             <World data={sampleArcs} globeConfig={globeConfig} />
           </Suspense>
         </div>

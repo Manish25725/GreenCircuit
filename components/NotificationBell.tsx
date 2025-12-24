@@ -112,8 +112,7 @@ const NotificationBell = () => {
           {/* Header */}
           <div className="p-4 border-b border-white/10 bg-gradient-to-r from-[#34D399]/5 to-[#059669]/5">
             <div className="flex items-center justify-between">
-              <h3 className="text-white font-semibold text-lg flex items-center gap-2">
-                <span className="material-symbols-outlined text-[#34D399]">notifications</span>
+              <h3 className="text-white font-semibold text-lg">
                 Notifications
               </h3>
               {unreadCount > 0 && (

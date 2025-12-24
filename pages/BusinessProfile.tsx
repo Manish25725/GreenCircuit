@@ -164,6 +164,10 @@ const BusinessProfile = () => {
             const result = await updateResponse.json();
             const updated = result.data || result;
             setBusiness(updated);
+            
+            // Trigger userUpdated event to refresh other components
+            window.dispatchEvent(new Event('userUpdated'));
+            
             alert('Logo updated successfully!');
           }
         } catch (apiError) {
@@ -315,9 +319,13 @@ const BusinessProfile = () => {
                         <span className="material-symbols-outlined fill text-[20px]">business</span>
                         <p className="text-sm font-medium leading-normal">Business Profile</p>
                     </button>
-                    <div className="w-full">
-                        <NotificationBell />
-                    </div>
+                    <button 
+                        onClick={() => window.location.hash = '#/business/notifications'}
+                        className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/5 text-[#94a3b8] hover:text-white transition-colors w-full text-left cursor-pointer"
+                    >
+                        <span className="material-symbols-outlined text-[20px]">notifications</span>
+                        <p className="text-sm font-medium leading-normal">Notifications</p>
+                    </button>
                     <button 
                         onClick={() => window.location.hash = '#/security'}
                         className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/5 text-[#94a3b8] hover:text-white transition-colors w-full text-left cursor-pointer"

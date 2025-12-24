@@ -21,6 +21,8 @@ export interface User {
   email: string;
   role: 'user' | 'agency' | 'business' | 'admin';
   avatar?: string;
+  logo?: string;
+  companyName?: string;
   phone?: string;
   address?: string | {
     street: string;

@@ -17,9 +17,24 @@ interface BusinessProfile {
 const BusinessProfileSettings = () => {
   const [business, setBusiness] = useState<BusinessProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [avatarKey, setAvatarKey] = useState(Date.now());
+  const user = getCurrentUser();
 
   useEffect(() => {
     loadBusinessProfile();
+    
+    // Listen for user updates (avatar/logo changes)
+    const handleUserUpdate = () => {
+      setAvatarKey(Date.now());
+    };
+    
+    window.addEventListener('userUpdated', handleUserUpdate);
+    window.addEventListener('storage', handleUserUpdate);
+    
+    return () => {
+      window.removeEventListener('userUpdated', handleUserUpdate);
+      window.removeEventListener('storage', handleUserUpdate);
+    };
   }, []);
 
   const loadBusinessProfile = async () => {
@@ -50,7 +65,32 @@ const BusinessProfileSettings = () => {
     window.location.hash = '#/';
   };
 
-  const user = getCurrentUser();
+  const settingsCards = [
+    {
+      id: 1,
+      title: 'Edit Profile',
+      description: 'Update company information and logo',
+      icon: 'business',
+      color: '#06b6d4',
+      link: '#/business/profile'
+    },
+    {
+      id: 3,
+      title: 'Security & Privacy',
+      description: 'Password, 2FA, and privacy settings',
+      icon: 'lock',
+      color: '#8b5cf6',
+      link: '#/security'
+    },
+    {
+      id: 4,
+      title: 'App Settings',
+      description: 'Language, theme, and app preferences',
+      icon: 'settings',
+      color: '#10b981',
+      link: '#/settings'
+    }
+  ];
 
   if (loading) {
     return (
@@ -87,21 +127,51 @@ const BusinessProfileSettings = () => {
               <nav className="hidden md:flex flex-1 justify-center gap-1">
               </nav>
               <div className="flex items-center gap-4">
-                <button 
-                  onClick={() => window.location.hash = '#/business'}
-                  className="hidden sm:flex items-center gap-3 pl-1 pr-4 py-1 rounded-full bg-[#151F26] border border-white/5 hover:bg-white/5 transition-colors group cursor-pointer"
-                >
-                  <div className="size-8 rounded-full bg-[#06b6d4] flex items-center justify-center ring-2 ring-white/10 group-hover:ring-[#06b6d4]/50 transition-all text-white font-bold text-sm"
-                       style={business?.logo ? { backgroundImage: `url(${business.logo})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}}>
-                    {!business?.logo && (business?.companyName?.charAt(0) || user?.name?.charAt(0) || 'B')}
+                <div className="relative group">
+                  <button 
+                    onClick={() => window.location.hash = '#/business'}
+                    className="hidden sm:flex items-center gap-3 pl-1 pr-4 py-1 rounded-full bg-[#151F26] border border-white/5 hover:bg-white/5 transition-colors cursor-pointer"
+                  >
+                    <div className="size-8 rounded-full ring-2 ring-white/10 group-hover:ring-[#06b6d4]/50 transition-all overflow-hidden bg-[#06b6d4] flex items-center justify-center">
+                      {(business?.logo || user?.avatar) ? (
+                        <img 
+                          src={`${business?.logo || user?.avatar}?t=${avatarKey}`} 
+                          alt="Profile"
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.currentTarget.style.display = 'none';
+                            e.currentTarget.parentElement!.innerHTML = `<span class="text-white text-xs font-bold">${(business?.companyName || user?.name || 'B').charAt(0).toUpperCase()}</span>`;
+                          }}
+                        />
+                      ) : (
+                        <span className="text-white text-xs font-bold">{(business?.companyName || user?.name || 'B').charAt(0).toUpperCase()}</span>
+                      )}
+                    </div>
+                    <span className="text-sm font-medium text-gray-200">{business?.companyName || user?.name}</span>
+                  </button>
+                  {/* Hover Preview */}
+                  <div className="absolute top-14 right-0 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-[100]">
+                    <div className="bg-[#151F26] border border-white/10 rounded-2xl p-4 shadow-2xl">
+                      <div className="size-32 rounded-xl ring-4 ring-[#06b6d4]/30 overflow-hidden bg-[#06b6d4] flex items-center justify-center">
+                        {(business?.logo || user?.avatar) ? (
+                          <img 
+                            src={`${business?.logo || user?.avatar}?t=${avatarKey}`} 
+                            alt="Profile"
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <span className="text-white text-4xl font-bold">{(business?.companyName || user?.name || 'B').charAt(0).toUpperCase()}</span>
+                        )}
+                      </div>
+                    </div>
                   </div>
-                  <span className="text-sm font-medium text-gray-200">{business?.companyName || user?.name || 'Business'}</span>
-                </button>
+                </div>
                 <button
                   onClick={handleLogout}
-                  className="flex items-center justify-center size-10 rounded-xl bg-red-500/10 border border-red-500/30 hover:bg-red-500/20 transition-colors"
+                  className="p-2.5 rounded-full bg-[#151F26] border border-white/5 text-gray-400 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                  title="Logout"
                 >
-                  <span className="material-symbols-outlined text-red-400">logout</span>
+                  <span className="material-symbols-outlined text-[20px]">logout</span>
                 </button>
               </div>
             </header>
@@ -124,113 +194,45 @@ const BusinessProfileSettings = () => {
 
                 {/* Settings Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {/* Edit Business Profile Card */}
-                  <div 
-                    onClick={() => window.location.hash = '#/business/profile'}
-                    className="group bg-[#151F26] border border-white/5 hover:border-[#10b981]/30 rounded-xl p-6 cursor-pointer transition-all hover:bg-[#151F26]/80"
-                  >
-                    <div className="flex items-start gap-4">
-                      <div className="p-3 bg-[#10b981]/10 rounded-lg group-hover:bg-[#10b981]/20 transition-colors">
-                        <span className="material-symbols-outlined text-[#10b981] text-[32px]">business</span>
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="text-lg font-bold text-white mb-1 group-hover:text-[#10b981] transition-colors">Edit Business Profile</h3>
-                        <p className="text-gray-400 text-sm leading-relaxed mb-3">
-                          Update company info, address, and details
-                        </p>
-                        <div className="flex items-center gap-1 text-[#10b981] text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity">
-                          <span>Edit</span>
-                          <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
+                  {settingsCards.map((card) => (
+                    <div 
+                      key={card.id}
+                      onClick={() => window.location.hash = card.link}
+                      className="group bg-[#151F26] border border-white/5 hover:border-white/10 rounded-xl p-6 cursor-pointer transition-all hover:bg-[#1a2730]"
+                    >
+                      <div className="flex items-start gap-4">
+                        <div 
+                          className="p-3 rounded-lg transition-colors"
+                          style={{ backgroundColor: `${card.color}15` }}
+                        >
+                          <span 
+                            className="material-symbols-outlined text-[32px]"
+                            style={{ color: card.color }}
+                          >
+                            {card.icon}
+                          </span>
+                        </div>
+                        <div className="flex-1">
+                          <h3 
+                            className="text-lg font-bold text-white mb-1 transition-colors"
+                            style={{ color: 'white' }}
+                          >
+                            {card.title}
+                          </h3>
+                          <p className="text-gray-400 text-sm leading-relaxed mb-3">
+                            {card.description}
+                          </p>
+                          <div 
+                            className="flex items-center gap-1 text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity"
+                            style={{ color: card.color }}
+                          >
+                            <span>Open</span>
+                            <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-
-                  {/* Contact Information Card */}
-                  <div 
-                    onClick={() => window.location.hash = '#/business/contact'}
-                    className="group bg-[#151F26] border border-white/5 hover:border-[#06b6d4]/30 rounded-xl p-6 cursor-pointer transition-all hover:bg-[#151F26]/80"
-                  >
-                    <div className="flex items-start gap-4">
-                      <div className="p-3 bg-[#06b6d4]/10 rounded-lg group-hover:bg-[#06b6d4]/20 transition-colors">
-                        <span className="material-symbols-outlined text-[#06b6d4] text-[32px]">contact_page</span>
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="text-lg font-bold text-white mb-1 group-hover:text-[#06b6d4] transition-colors">Contact Information</h3>
-                        <p className="text-gray-400 text-sm leading-relaxed mb-3">
-                          Update contact person and details
-                        </p>
-                        <div className="flex items-center gap-1 text-[#06b6d4] text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity">
-                          <span>Manage</span>
-                          <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Notifications Card */}
-                  <div className="group bg-[#151F26] border border-white/5 hover:border-[#06b6d4]/30 rounded-xl p-6 transition-all hover:bg-[#151F26]/80">
-                    <div className="flex items-start gap-4">
-                      <div className="p-3 bg-[#06b6d4]/10 rounded-lg group-hover:bg-[#06b6d4]/20 transition-colors">
-                        <span className="material-symbols-outlined text-[#06b6d4] text-[32px]">notifications</span>
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="text-lg font-bold text-white mb-1 group-hover:text-[#06b6d4] transition-colors">Notifications</h3>
-                        <NotificationBell />
-                        <p className="text-gray-400 text-sm leading-relaxed mb-3">
-                          Manage notification preferences and alerts
-                        </p>
-                        <div className="flex items-center gap-1 text-[#06b6d4] text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity">
-                          <span>Configure</span>
-                          <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Security & Privacy Card */}
-                  <div 
-                    onClick={() => window.location.hash = '#/security'}
-                    className="group bg-[#151F26] border border-white/5 hover:border-[#8b5cf6]/30 rounded-xl p-6 cursor-pointer transition-all hover:bg-[#151F26]/80"
-                  >
-                    <div className="flex items-start gap-4">
-                      <div className="p-3 bg-[#8b5cf6]/10 rounded-lg group-hover:bg-[#8b5cf6]/20 transition-colors">
-                        <span className="material-symbols-outlined text-[#8b5cf6] text-[32px]">lock</span>
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="text-lg font-bold text-white mb-1 group-hover:text-[#8b5cf6] transition-colors">Security & Privacy</h3>
-                        <p className="text-gray-400 text-sm leading-relaxed mb-3">
-                          Password, 2FA, and privacy settings
-                        </p>
-                        <div className="flex items-center gap-1 text-[#8b5cf6] text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity">
-                          <span>Manage</span>
-                          <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* App Settings Card */}
-                  <div 
-                    onClick={() => window.location.hash = '#/settings'}
-                    className="group bg-[#151F26] border border-white/5 hover:border-[#06b6d4]/30 rounded-xl p-6 cursor-pointer transition-all hover:bg-[#151F26]/80"
-                  >
-                    <div className="flex items-start gap-4">
-                      <div className="p-3 bg-[#06b6d4]/10 rounded-lg group-hover:bg-[#06b6d4]/20 transition-colors">
-                        <span className="material-symbols-outlined text-[#06b6d4] text-[32px]">settings</span>
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="text-lg font-bold text-white mb-1 group-hover:text-[#06b6d4] transition-colors">App Settings</h3>
-                        <p className="text-gray-400 text-sm leading-relaxed mb-3">
-                          Theme, language, and display preferences
-                        </p>
-                        <div className="flex items-center gap-1 text-[#06b6d4] text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity">
-                          <span>Customize</span>
-                          <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                  ))}
                 </div>
 
                 {/* Dashboard Button */}

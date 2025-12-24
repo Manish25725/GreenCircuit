@@ -309,36 +309,74 @@ const Landing = () => {
             <div className="absolute bottom-20 right-10 w-96 h-96 bg-[#3B82F6]/5 rounded-full blur-[128px] pointer-events-none"></div>
 
             {/* Hero Section */}
-            <div className="w-full max-w-7xl px-4 sm:px-6 relative z-10 flex flex-col gap-16 lg:gap-24 mb-16">
-                <div className="grid lg:grid-cols-2 gap-12 items-center">
-                    <div className="flex flex-col gap-6 lg:gap-8 text-center lg:text-left order-2 lg:order-1 hero-content">
-                        <div className="hero-badge opacity-0 translate-y-4 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#34D399]/10 border border-[#34D399]/20 text-[#34D399] w-fit mx-auto lg:mx-0">
+            <div className="w-full max-w-7xl px-4 sm:px-6 relative z-10 mb-16">
+                {/* Mobile: Badge + Title only */}
+                <div className="lg:hidden flex flex-col gap-6 text-center mb-8">
+                    <div className="hero-badge opacity-0 translate-y-4 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#34D399]/10 border border-[#34D399]/20 text-[#34D399] w-fit mx-auto">
+                        <span className="relative flex h-2 w-2">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#34D399] opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-2 w-2 bg-[#34D399]"></span>
+                        </span>
+                        <span className="text-xs font-bold uppercase tracking-wider">Sustainable Future</span>
+                    </div>
+                    <h1 className="hero-heading text-4xl sm:text-5xl font-black text-white leading-[1.1] tracking-tight">
+                        <span className="block overflow-hidden"><span className="block translate-y-full">{t('heroTitle1')}</span></span>
+                        <span className="block overflow-hidden"><span className="block translate-y-full text-transparent bg-clip-text bg-gradient-to-r from-[#34D399] via-[#6EE7B7] to-[#34D399]">{t('heroTitle2')}</span></span>
+                        <span className="block overflow-hidden"><span className="block translate-y-full">{t('heroTitle3')}</span></span>
+                    </h1>
+                </div>
+
+                {/* Desktop Layout */}
+                <div className="hidden lg:grid lg:grid-cols-2 gap-12 items-center mb-16">
+                    <div className="flex flex-col gap-8 text-left hero-content">
+                        <div className="hero-badge opacity-0 translate-y-4 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#34D399]/10 border border-[#34D399]/20 text-[#34D399] w-fit">
                             <span className="relative flex h-2 w-2">
                                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#34D399] opacity-75"></span>
                                 <span className="relative inline-flex rounded-full h-2 w-2 bg-[#34D399]"></span>
                             </span>
                             <span className="text-xs font-bold uppercase tracking-wider">Sustainable Future</span>
                         </div>
-                        <h1 className="hero-heading text-4xl sm:text-5xl lg:text-6xl font-black text-white leading-[1.1] tracking-tight">
+                        <h1 className="hero-heading text-6xl font-black text-white leading-[1.1] tracking-tight">
                             <span className="block overflow-hidden"><span className="block translate-y-full">{t('heroTitle1')}</span></span>
                             <span className="block overflow-hidden"><span className="block translate-y-full text-transparent bg-clip-text bg-gradient-to-r from-[#34D399] via-[#6EE7B7] to-[#34D399]">{t('heroTitle2')}</span></span>
                             <span className="block overflow-hidden"><span className="block translate-y-full">{t('heroTitle3')}</span></span>
                         </h1>
-                        <p className="hero-desc opacity-0 translate-y-8 text-lg sm:text-xl text-slate-400 max-w-2xl mx-auto lg:mx-0 leading-relaxed font-light">
+                        <p className="hero-desc opacity-0 translate-y-8 text-xl text-slate-400 max-w-2xl leading-relaxed font-light">
                             {t('heroSubtitle')}
                         </p>
-                        <div className="hero-actions opacity-0 translate-y-8 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mt-4">
-                            <div className="relative group w-full sm:w-auto">
+                        <div className="hero-actions opacity-0 translate-y-8 flex gap-4 mt-4">
+                            <div className="relative group">
                                 <div className="absolute -inset-0.5 bg-gradient-to-r from-[#34D399] to-[#3B82F6] rounded-full blur opacity-30 group-hover:opacity-60 transition duration-1000 group-hover:duration-200"></div>
-                                <button onClick={() => window.location.hash = '#/search'} className="relative w-full sm:w-auto flex items-center justify-center gap-2 h-12 px-8 rounded-full bg-[#1E293B] border border-white/10 text-white font-bold hover:bg-[#1E293B]/80 transition-all group-hover:translate-x-1 cursor-pointer">
+                                <button onClick={() => window.location.hash = '#/search'} className="relative flex items-center justify-center gap-2 h-12 px-8 rounded-full bg-[#1E293B] border border-white/10 text-white font-bold hover:bg-[#1E293B]/80 transition-all group-hover:translate-x-1 cursor-pointer">
                                     <span>{t('startRecycling')}</span>
                                     <span className="material-symbols-outlined text-[#34D399] text-xl transition-transform group-hover:translate-x-1">arrow_forward</span>
                                 </button>
                             </div>
                         </div>
                     </div>
-                    <div className="relative order-1 lg:order-2 h-[400px] lg:h-[500px] rounded-3xl overflow-hidden bg-[#0B1120] hero-image-container opacity-0 scale-95 flex items-center justify-center">
+                    <div className="relative h-[500px] rounded-3xl overflow-hidden bg-[#0B1120] hero-image-container opacity-0 scale-95 flex items-center justify-center">
                         <GlobeDemo />
+                    </div>
+                </div>
+
+                {/* Mobile: Globe */}
+                <div className="lg:hidden relative h-[400px] rounded-3xl overflow-hidden bg-[#0B1120] hero-image-container opacity-0 scale-95 flex items-center justify-center mb-8">
+                    <GlobeDemo />
+                </div>
+
+                {/* Mobile: Description + Button */}
+                <div className="lg:hidden flex flex-col gap-6 text-center">
+                    <p className="hero-desc opacity-0 translate-y-8 text-lg sm:text-xl text-slate-400 max-w-2xl mx-auto leading-relaxed font-light">
+                        {t('heroSubtitle')}
+                    </p>
+                    <div className="hero-actions opacity-0 translate-y-8 flex flex-col sm:flex-row gap-4 justify-center">
+                        <div className="relative group w-full sm:w-auto">
+                            <div className="absolute -inset-0.5 bg-gradient-to-r from-[#34D399] to-[#3B82F6] rounded-full blur opacity-30 group-hover:opacity-60 transition duration-1000 group-hover:duration-200"></div>
+                            <button onClick={() => window.location.hash = '#/search'} className="relative w-full sm:w-auto flex items-center justify-center gap-2 h-12 px-8 rounded-full bg-[#1E293B] border border-white/10 text-white font-bold hover:bg-[#1E293B]/80 transition-all group-hover:translate-x-1 cursor-pointer">
+                                <span>{t('startRecycling')}</span>
+                                <span className="material-symbols-outlined text-[#34D399] text-xl transition-transform group-hover:translate-x-1">arrow_forward</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>

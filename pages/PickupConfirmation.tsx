@@ -48,6 +48,13 @@ const PickupConfirmation = () => {
   const heroRef = useRef<HTMLDivElement>(null);
   const cardsRef = useRef<HTMLDivElement>(null);
 
+  // Business-specific theme colors
+  const isBusiness = userRole === 'Business';
+  const primaryColor = isBusiness ? '#3b82f6' : '#34D399';
+  const primaryColorLight = isBusiness ? '#60a5fa' : '#6EE7B7';
+  const primaryColorDark = isBusiness ? '#2563eb' : '#10b981';
+  const brandName = isBusiness ? 'Business' : 'Resident';
+
   useEffect(() => {
     loadBooking();
   }, []);
@@ -155,7 +162,7 @@ const PickupConfirmation = () => {
     return (
       <Layout title="" role={userRole} fullWidth hideSidebar>
         <div className="min-h-screen bg-[#0B1120] flex items-center justify-center">
-          <Loader size="lg" color="#34D399" />
+          <Loader size="lg" color={primaryColor} />
         </div>
       </Layout>
     );
@@ -167,8 +174,14 @@ const PickupConfirmation = () => {
         
         {/* Background Effects */}
         <div className="fixed inset-0 pointer-events-none">
-          <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-[#34D399]/5 rounded-full blur-[150px]"></div>
-          <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-[#3B82F6]/5 rounded-full blur-[150px]"></div>
+          <div 
+            className="absolute top-0 left-1/4 w-[600px] h-[600px] rounded-full blur-[150px]"
+            style={{ backgroundColor: `${primaryColor}10` }}
+          ></div>
+          <div 
+            className="absolute bottom-0 right-1/4 w-[500px] h-[500px] rounded-full blur-[150px]"
+            style={{ backgroundColor: isBusiness ? '#8b5cf610' : '#3B82F610' }}
+          ></div>
         </div>
 
         {/* Navbar - Matching Homepage */}
@@ -177,18 +190,28 @@ const PickupConfirmation = () => {
           <div className="w-full max-w-7xl px-4 sm:px-6 relative z-10">
             <header className="flex items-center justify-between h-16 sm:h-20">
               <div className="flex items-center gap-3 cursor-pointer" onClick={() => window.location.hash = '#/'}>
-                <div className="size-8 sm:size-10 text-[#34D399] flex items-center justify-center">
-                  <svg className="w-full h-full drop-shadow-[0_0_8px_rgba(52,211,153,0.5)]" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                <div 
+                  className="size-8 sm:size-10 flex items-center justify-center"
+                  style={{ color: primaryColor }}
+                >
+                  <svg 
+                    className="w-full h-full drop-shadow-[0_0_8px_rgba(52,211,153,0.5)]" 
+                    fill="none" 
+                    viewBox="0 0 48 48" 
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
                     <path d="M42.4379 44C42.4379 44 36.0744 33.9038 41.1692 24C46.8624 12.9336 42.2078 4 42.2078 4L7.01134 4C7.01134 4 11.6577 12.932 5.96912 23.9969C0.876273 33.9029 7.27094 44 7.27094 44L42.4379 44Z" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="3"></path>
                   </svg>
                 </div>
-                <span className="text-slate-50 text-xl sm:text-2xl font-black tracking-tight">EcoCycle <span className="text-[#10b981] font-semibold">Resident</span></span>
+                <span className="text-slate-50 text-xl sm:text-2xl font-black tracking-tight">
+                  EcoCycle <span className="font-semibold" style={{ color: primaryColor }}>{brandName}</span>
+                </span>
               </div>
               <nav className="hidden md:flex items-center gap-8">
               </nav>
               <div className="flex items-center gap-4">
                 <button 
-                  onClick={() => window.location.hash = '#/profile'}
+                  onClick={() => window.location.hash = dashboardPath}
                   className="hidden sm:flex h-10 px-5 items-center justify-center rounded-full bg-white/5 text-white hover:bg-white/10 border border-white/10 text-sm font-bold transition-all duration-300 cursor-pointer"
                 >
                   <span className="material-symbols-outlined text-[18px] mr-2">person</span>
@@ -196,7 +219,19 @@ const PickupConfirmation = () => {
                 </button>
                 <button 
                   onClick={() => window.location.hash = '#/search'}
-                  className="h-10 px-6 flex items-center justify-center rounded-full bg-[#34D399] text-slate-900 hover:bg-[#6EE7B7] shadow-[0_0_15px_rgba(52,211,153,0.3)] hover:shadow-[0_0_25px_rgba(52,211,153,0.5)] text-sm font-bold transition-all duration-300 transform hover:scale-105 cursor-pointer"
+                  className="h-10 px-6 flex items-center justify-center rounded-full text-slate-900 text-sm font-bold transition-all duration-300 transform hover:scale-105 cursor-pointer"
+                  style={{
+                    backgroundColor: primaryColor,
+                    boxShadow: `0 0 15px ${primaryColor}50`,
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = primaryColorLight;
+                    e.currentTarget.style.boxShadow = `0 0 25px ${primaryColor}80`;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = primaryColor;
+                    e.currentTarget.style.boxShadow = `0 0 15px ${primaryColor}50`;
+                  }}
                 >
                   New Pickup
                 </button>
@@ -212,17 +247,24 @@ const PickupConfirmation = () => {
             {/* Success Hero Section */}
             <div ref={heroRef} className="flex flex-col items-center gap-6 text-center">
               <div className="relative">
-                <div className="hero-icon relative flex items-center justify-center size-28 rounded-full bg-gradient-to-br from-[#34D399]/20 to-[#34D399]/5 ring-1 ring-[#34D399]/30 shadow-[0_0_50px_rgba(52,211,153,0.2)]">
-                  <span className="material-symbols-outlined text-[#34D399] text-6xl">check_circle</span>
+                <div 
+                  className="hero-icon relative flex items-center justify-center size-28 rounded-full bg-gradient-to-br ring-1 transition-all"
+                  style={{ 
+                    backgroundColor: `${primaryColor}10`,
+                    boxShadow: `0 0 50px ${primaryColor}30`,
+                    borderColor: `${primaryColor}30`
+                  }}
+                >
+                  <span className="material-symbols-outlined text-6xl" style={{ color: primaryColor }}>check_circle</span>
                 </div>
-                <div className="pulse-ring absolute inset-0 rounded-full border-2 border-[#34D399]/50"></div>
+                <div className="pulse-ring absolute inset-0 rounded-full border-2" style={{ borderColor: `${primaryColor}80` }}></div>
               </div>
               <div className="flex flex-col items-center gap-3 max-w-xl">
                 <h1 className="hero-title text-4xl sm:text-5xl font-black text-white leading-tight tracking-tight">
                   {booking?.status === 'completed' ? (
-                    <>Pickup <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#34D399] to-[#6EE7B7]">Complete!</span></>
+                    <>Pickup <span className="text-transparent bg-clip-text bg-gradient-to-r" style={{ backgroundImage: `linear-gradient(to right, ${primaryColor}, ${primaryColorLight})` }}>Complete!</span></>
                   ) : (
-                    <>Booking <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#34D399] to-[#6EE7B7]">Confirmed!</span></>
+                    <>Booking <span className="text-transparent bg-clip-text bg-gradient-to-r" style={{ backgroundImage: `linear-gradient(to right, ${primaryColor}, ${primaryColorLight})` }}>Confirmed!</span></>
                   )}
                 </h1>
                 <p className="hero-subtitle text-slate-400 text-lg sm:text-xl font-light leading-relaxed">
@@ -235,10 +277,14 @@ const PickupConfirmation = () => {
             </div>
 
             {/* Points Earned Card */}
-            <div ref={cardsRef} className="animate-card group relative rounded-[2rem] bg-gradient-to-b from-slate-800/50 to-slate-900/50 border border-white/5 p-8 overflow-hidden transition-all duration-500 hover:shadow-[0_20px_40px_-15px_rgba(52,211,153,0.2)]">
-              <div className="absolute inset-0 bg-gradient-to-br from-[#34D399]/0 to-[#34D399]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div ref={cardsRef} className="animate-card group relative rounded-[2rem] bg-gradient-to-b from-slate-800/50 to-slate-900/50 border border-white/5 p-8 overflow-hidden transition-all duration-500"
+              style={{ boxShadow: `0 20px 40px -15px ${primaryColor}30` }}
+              onMouseEnter={(e) => e.currentTarget.style.boxShadow = `0 20px 40px -15px ${primaryColor}40`}
+              onMouseLeave={(e) => e.currentTarget.style.boxShadow = `0 20px 40px -15px ${primaryColor}30`}
+            >
+              <div className="absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-100 transition-opacity duration-500" style={{ backgroundImage: `linear-gradient(to bottom right, ${primaryColor}00, ${primaryColor}10)` }}></div>
               <div className="absolute top-0 right-0 opacity-5">
-                <span className="material-symbols-outlined text-[200px] text-[#34D399]">eco</span>
+                <span className="material-symbols-outlined text-[200px]" style={{ color: primaryColor }}>eco</span>
               </div>
               
               <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">

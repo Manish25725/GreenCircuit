@@ -26,17 +26,44 @@ const BusinessDashboard = () => {
     loadBusinessData();
     
     // Listen for user updates (avatar/logo changes)
-    const handleUserUpdate = () => {
-      setUser(getCurrentUser());
-      setAvatarKey(Date.now());
+    const handleUserUpdate = async () => {
+      console.log('User updated event received - fetching fresh data from API');
+      // Fetch fresh data from API instead of using localStorage
+      try {
+        const userData = await api.getMe();
+        
+        // Fetch business profile to get logo
+        try {
+          const businessResponse = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000/api'}/business/profile`, {
+            headers: {
+              'Authorization': `Bearer ${localStorage.getItem('token')}`,
+              'Content-Type': 'application/json'
+            }
+          });
+          
+          if (businessResponse.ok) {
+            const result = await businessResponse.json();
+            const businessData = result.data || result;
+            userData.logo = businessData.logo;
+          }
+        } catch (err) {
+          console.error('Failed to fetch business profile:', err);
+        }
+        
+        console.log('Fresh user data from API:', userData);
+        console.log('Fresh logo URL:', userData?.logo);
+        setUser(userData);
+        setAvatarKey(Date.now());
+        localStorage.setItem('user', JSON.stringify(userData));
+      } catch (error) {
+        console.error('Failed to fetch fresh user data:', error);
+      }
     };
     
     window.addEventListener('userUpdated', handleUserUpdate);
-    window.addEventListener('storage', handleUserUpdate);
     
     return () => {
       window.removeEventListener('userUpdated', handleUserUpdate);
-      window.removeEventListener('storage', handleUserUpdate);
     };
   }, []);
 
@@ -44,7 +71,33 @@ const BusinessDashboard = () => {
     try {
       // Try to get fresh user data from API
       const userData = await api.getMe();
+      console.log('Business Dashboard - User Data:', userData);
+      
+      // Fetch business profile to get logo
+      try {
+        const businessResponse = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000/api'}/business/profile`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (businessResponse.ok) {
+          const result = await businessResponse.json();
+          const businessData = result.data || result;
+          console.log('Business Profile Data:', businessData);
+          console.log('Logo URL from business profile:', businessData?.logo);
+          
+          // Merge business logo into user data
+          userData.logo = businessData.logo;
+        }
+      } catch (err) {
+        console.error('Failed to fetch business profile:', err);
+      }
+      
+      console.log('Final user data with logo:', userData);
       setUser(userData);
+      setAvatarKey(Date.now());
       localStorage.setItem('user', JSON.stringify(userData));
       
       setStats({
@@ -208,19 +261,37 @@ const BusinessDashboard = () => {
                       onClick={() => window.location.hash = '#/profile'}
                       className="hidden sm:flex items-center gap-3 pl-1 pr-4 py-1 rounded-full bg-[#151F26] border border-white/5 hover:bg-white/5 transition-colors cursor-pointer"
                   >
-                    <div 
-                      className="size-8 rounded-full bg-cover bg-center ring-2 ring-white/10 group-hover:ring-[#06b6d4]/50 transition-all" 
-                      style={{ backgroundImage: `url("${(user?.logo || user?.avatar || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user?.name || user?.companyName || 'Business') + '&background=06b6d4&color=fff')}${(user?.logo || user?.avatar) ? '?t=' + avatarKey : ''}")` }}
-                    ></div>
-                    <span className="text-sm font-medium text-gray-200">{user?.name || 'Business'}</span>
+                    <div className="size-8 rounded-full ring-2 ring-white/10 group-hover:ring-[#06b6d4]/50 transition-all overflow-hidden bg-[#06b6d4] flex items-center justify-center">
+                      {user?.logo || user?.avatar ? (
+                        <img 
+                          src={`${user?.logo || user?.avatar}?t=${avatarKey}`} 
+                          alt="Profile"
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.currentTarget.style.display = 'none';
+                            e.currentTarget.parentElement!.innerHTML = `<span class="text-white text-xs font-bold">${(user?.name || user?.companyName || 'B').charAt(0).toUpperCase()}</span>`;
+                          }}
+                        />
+                      ) : (
+                        <span className="text-white text-xs font-bold">{(user?.name || user?.companyName || 'B').charAt(0).toUpperCase()}</span>
+                      )}
+                    </div>
+                    <span className="text-sm font-medium text-gray-200">{user?.name || user?.companyName || 'Business'}</span>
                   </button>
                   {/* Hover Preview */}
                   <div className="absolute top-14 right-0 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-[100]">
                     <div className="bg-[#151F26] border border-white/10 rounded-2xl p-4 shadow-2xl">
-                      <div 
-                        className="size-32 rounded-xl bg-cover bg-center ring-4 ring-[#06b6d4]/30" 
-                        style={{ backgroundImage: `url("${(user?.logo || user?.avatar || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user?.name || user?.companyName || 'Business') + '&background=06b6d4&color=fff')}${(user?.logo || user?.avatar) ? '?t=' + avatarKey : ''}")` }}
-                      ></div>
+                      <div className="size-32 rounded-xl ring-4 ring-[#06b6d4]/30 overflow-hidden bg-[#06b6d4] flex items-center justify-center">
+                        {user?.logo || user?.avatar ? (
+                          <img 
+                            src={`${user?.logo || user?.avatar}?t=${avatarKey}`} 
+                            alt="Profile"
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <span className="text-white text-4xl font-bold">{(user?.name || user?.companyName || 'B').charAt(0).toUpperCase()}</span>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -505,81 +576,37 @@ const BusinessDashboard = () => {
                       </div>
                     </section>
 
-                    {/* Recent Certificates Section */}
+                    {/* Certificates Section */}
                     <section className="flex flex-col gap-5">
                       <div className="flex items-center justify-between">
                         <h2 className="text-white text-2xl font-bold tracking-tight flex items-center gap-3">
                           <span className="p-2 bg-amber-500/10 rounded-lg text-amber-400">
                             <span className="material-symbols-outlined">verified_user</span>
                           </span>
-                          Compliance Certificates
+                          Compliance Certificates ({certificates.length})
                         </h2>
-                        <div className="flex items-center gap-2">
-                          <button 
-                            onClick={() => setShowDebug(!showDebug)}
-                            className="text-gray-500 hover:text-gray-300 text-sm font-medium flex items-center gap-1 transition-colors px-2 py-1 rounded-lg hover:bg-white/5"
-                            title="Show debug info"
-                          >
-                            <span className="material-symbols-outlined text-sm">bug_report</span>
-                          </button>
-                          <button 
-                            onClick={() => loadBusinessData()}
-                            className="text-gray-400 hover:text-white text-sm font-medium flex items-center gap-1 transition-colors px-3 py-1.5 rounded-lg hover:bg-white/5"
-                            title="Refresh certificates"
-                          >
-                            <span className="material-symbols-outlined text-sm">refresh</span>
-                            Refresh
-                          </button>
-                          <button 
-                            onClick={() => window.location.hash = '#/business/certificates'}
-                            className="text-[#06b6d4] hover:text-[#0891b2] text-sm font-medium flex items-center gap-1 transition-colors"
-                          >
-                            View All
-                            <span className="material-symbols-outlined text-sm">arrow_forward</span>
-                          </button>
-                        </div>
+                        <button 
+                          onClick={() => window.location.hash = '#/business/certificates'}
+                          className="text-[#06b6d4] hover:text-[#0891b2] text-sm font-medium flex items-center gap-1 transition-colors"
+                        >
+                          View All
+                          <span className="material-symbols-outlined text-sm">arrow_forward</span>
+                        </button>
                       </div>
 
-                      {/* Debug Panel */}
-                      {showDebug && debugInfo && (
-                        <div className="bg-black/50 rounded-xl p-4 border border-amber-500/30 font-mono text-xs">
-                          <div className="flex items-center justify-between mb-2">
-                            <span className="text-amber-400 font-bold">Debug Info</span>
-                            <button onClick={() => setShowDebug(false)} className="text-gray-400 hover:text-white">
-                              <span className="material-symbols-outlined text-sm">close</span>
-                            </button>
-                          </div>
-                          <pre className="text-gray-300 overflow-auto max-h-60 whitespace-pre-wrap break-words">
-                            {JSON.stringify(debugInfo, null, 2)}
-                          </pre>
-                        </div>
-                      )}
-
-                      {loading ? (
-                        <div className="bg-[#151F26] rounded-2xl p-8 text-center border border-white/5">
-                          <Loader size="md" color="#f59e0b" className="mb-4" />
-                          <p className="text-gray-400">Loading certificates...</p>
-                        </div>
-                      ) : certificates.length === 0 ? (
+                      {certificates.length === 0 ? (
                         <div className="bg-[#151F26] rounded-2xl p-8 text-center border border-white/5">
                           <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-amber-500/10 flex items-center justify-center">
                             <span className="material-symbols-outlined text-3xl text-amber-400">verified_user</span>
                           </div>
                           <h3 className="text-white text-lg font-bold mb-2">No Certificates Yet</h3>
-                          <p className="text-gray-400 text-sm mb-4">
-                            Complete your first pickup to receive a compliance certificate. Certificates are automatically generated when pickups are marked as completed by the agency.
+                          <p className="text-gray-400 text-sm">
+                            Complete pickups to receive compliance certificates
                           </p>
-                          <button 
-                            onClick={() => window.location.hash = '#/search'}
-                            className="inline-flex items-center gap-2 px-4 py-2 bg-[#06b6d4] text-white rounded-lg font-medium hover:bg-[#0891b2] transition-colors"
-                          >
-                            <span className="material-symbols-outlined text-sm">add</span>
-                            Schedule Pickup
-                          </button>
                         </div>
                       ) : (
                         <div className="grid grid-cols-1 gap-4">
-                          {certificates.slice(0, 3).map((cert) => (
+                          {certificates.map((cert) => (
                             <div 
                               key={cert._id}
                               className="bg-[#151F26] rounded-xl p-5 border border-white/5 hover:border-amber-500/30 transition-all cursor-pointer group"
@@ -599,7 +626,7 @@ const BusinessDashboard = () => {
                                 </div>
                                 <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border bg-amber-500/10 text-amber-400 border-amber-500/30">
                                   <span className="material-symbols-outlined text-sm">verified_user</span>
-                                  Compliance
+                                  Verified
                                 </span>
                               </div>
                               <div className="grid grid-cols-3 gap-3 mt-3">
@@ -612,11 +639,8 @@ const BusinessDashboard = () => {
                                   <p className="text-[#10b981] font-semibold text-sm">{Math.round(cert.co2Saved || 0)} kg</p>
                                 </div>
                                 <div className="bg-white/5 rounded-lg p-2">
-                                  <p className="text-gray-500 text-xs mb-0.5">Status</p>
-                                  <p className="text-[#10b981] font-semibold text-sm flex items-center gap-1">
-                                    <span className="material-symbols-outlined text-xs">verified</span>
-                                    {cert.status === 'issued' ? 'Verified' : cert.status}
-                                  </p>
+                                  <p className="text-gray-500 text-xs mb-0.5">Items</p>
+                                  <p className="text-white font-semibold text-sm">{cert.totalItems || 0}</p>
                                 </div>
                               </div>
                             </div>
