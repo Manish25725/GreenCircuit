@@ -8,7 +8,10 @@ import ManageSlots from './pages/ManageSlots';
 import AgencyBookings from './pages/AgencyBookings';
 import AgencyProfile from './pages/AgencyProfile';
 import PartnerProfile from './pages/PartnerProfile';
+import PartnerEditProfile from './pages/PartnerEditProfile';
 import PartnerSecurity from './pages/PartnerSecurity';
+import PartnerNotifications from './pages/PartnerNotifications';
+import PartnerAppSettings from './pages/PartnerAppSettings';
 import UserDashboard from './pages/UserDashboard';
 import Certificate from './pages/Certificate';
 import SearchAgencies from './pages/SearchAgencies';
@@ -203,8 +206,14 @@ const App = () => {
         return <PartnerProfile />;
       case '#/partner/profile':
         return <PartnerProfile />;
+      case '#/partner/edit-profile':
+        return <PartnerEditProfile />;
       case '#/partner/security':
         return <PartnerSecurity />;
+      case '#/partner/notifications':
+        return <PartnerNotifications />;
+      case '#/partner/settings':
+        return <PartnerAppSettings />;
       case '#/partner/register':
         return <PartnerRegistration />;
       case '#/partner/pending':

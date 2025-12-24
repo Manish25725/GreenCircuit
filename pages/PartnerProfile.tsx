@@ -52,7 +52,7 @@ const PartnerProfile = () => {
       description: 'Manage notification preferences and alerts',
       icon: 'notifications',
       color: '#8b5cf6',
-      link: '#/notifications'
+      link: '#/partner/notifications'
     },
     {
       id: 4,
@@ -68,360 +68,172 @@ const PartnerProfile = () => {
       description: 'Language, theme, and app preferences',
       icon: 'settings',
       color: '#8b5cf6',
-      link: '#/settings'
+      link: '#/partner/settings'
     }
   ];
 
-  // Helper to get address as string
-  const getAddressString = (address: any): string => {
-    if (!address) return '';
-    if (typeof address === 'string') return address;
-    if (typeof address === 'object') {
-      const { street, city, state, zipCode } = address;
-      return [street, city, state, zipCode].filter(Boolean).join(', ');
-    }
-    return '';
-  };
-
-  useEffect(() => {
-    loadPartnerProfile();
-  }, []);
-
-  const loadPartnerProfile = async () => {
-    try {
-      setLoading(true);
-      const response = await api.getAgencyProfile() as any;
-      const profile = response.data || response;
-      
-      setUser(profile);
-      setFormData({
-        name: profile.name || '',
-        companyName: profile.companyName || '',
-        phone: profile.phone || '',
-        address: getAddressString(profile.address),
-        description: profile.description || '',
-        logo: profile.logo || ''
-      });
-    } catch (error) {
-      console.error('Failed to load partner profile:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    // Validate file type
-    if (!file.type.startsWith('image/')) {
-      alert('Please select an image file');
-      return;
-    }
-
-    // Validate file size (max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      alert('Image size should be less than 5MB');
-      return;
-    }
-
-    try {
-      setUploadingLogo(true);
-      const uploadFormData = new FormData();
-      uploadFormData.append('file', file);
-      uploadFormData.append('upload_preset', 'ecocycle_uploads');
-
-      const response = await fetch(
-        'https://api.cloudinary.com/v1_1/dideet7oz/image/upload',
-        {
-          method: 'POST',
-          body: uploadFormData
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error('Cloudinary upload failed');
-      }
-
-      const data = await response.json();
-      
-      if (data.secure_url) {
-        setFormData({ ...formData, logo: data.secure_url });
-        
-        // Update in backend
-        try {
-          await api.updateAgencyProfile({ logo: data.secure_url });
-          const currentUser = getCurrentUser();
-          if (currentUser) {
-            currentUser.avatar = data.secure_url;
-            localStorage.setItem('user', JSON.stringify(currentUser));
-          }
-        } catch (apiError) {
-          console.error('Failed to save logo to profile:', apiError);
-          alert('Logo uploaded but failed to save to profile. Please try saving your profile.');
-        }
-      }
-    } catch (error) {
-      console.error('Failed to upload logo:', error);
-      alert('Failed to upload logo');
-    } finally {
-      setUploadingLogo(false);
-    }
-  };
-
-  const handleSave = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    try {
-      setSaving(true);
-      
-      await api.updateAgencyProfile({
-        name: formData.name,
-        companyName: formData.companyName,
-        phone: formData.phone,
-        address: formData.address,
-        description: formData.description,
-        logo: formData.logo
-      });
-
-      // Update local storage
-      const currentUser = getCurrentUser();
-      if (currentUser) {
-        currentUser.name = formData.name;
-        currentUser.phone = formData.phone;
-        currentUser.address = formData.address;
-        if (formData.logo) currentUser.avatar = formData.logo;
-        localStorage.setItem('user', JSON.stringify(currentUser));
-        setUser(currentUser as any);
-      }
-
-      alert('Profile updated successfully!');
-    } catch (error) {
-      console.error('Failed to update profile:', error);
-      alert('Failed to update profile');
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const handleLogout = () => {
-    localStorage.clear();
-    window.location.hash = '#/';
-  };
-
-  if (loading) {
-    return (
-      <Layout title="" role="Partner" fullWidth hideSidebar>
-        <div className="bg-[#0B1116] min-h-screen flex items-center justify-center">
-          <div className="text-center">
-            <Loader size="md" color="#10b981" className="mb-4" />
-            <p className="text-gray-400">Loading profile...</p>
-          </div>
-        </div>
-      </Layout>
-    );
-  }
-
   return (
     <Layout title="" role="Partner" fullWidth hideSidebar>
-      <div className="bg-[#0B1116] font-sans text-gray-200 antialiased selection:bg-[#10b981] selection:text-white min-h-screen flex flex-col relative overflow-hidden">
-        
-        {/* Background Ambient Blobs */}
-        <div className="fixed top-0 left-0 w-full h-[500px] bg-[#10b981]/5 rounded-full blur-[120px] -translate-y-1/2 pointer-events-none"></div>
-        <div className="fixed bottom-0 right-0 w-full h-[500px] bg-[#8b5cf6]/5 rounded-full blur-[120px] translate-y-1/2 pointer-events-none"></div>
-
-        {/* Standard Header */}
-        <header className="flex items-center justify-between whitespace-nowrap border-b border-white/5 px-4 sm:px-6 lg:px-10 py-4 bg-[#0B1116]/80 backdrop-blur-md fixed top-0 left-0 right-0 z-50 transition-all duration-300">
-            <div className="flex items-center gap-3 text-white cursor-pointer" onClick={() => window.location.hash = '#/'}>
-                <div className="p-2 bg-[#10b981]/10 rounded-lg">
-                    <svg className="h-6 w-6 text-[#10b981]" fill="currentColor" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+      <div className="bg-[#0B1116] font-sans text-gray-200 antialiased selection:bg-[#8b5cf6] selection:text-white min-h-screen">
+        <div className="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden">
+          <div className="fixed top-0 left-0 w-full h-[500px] bg-[#8b5cf6]/5 rounded-full blur-[120px] -translate-y-1/2 pointer-events-none"></div>
+          <div className="fixed bottom-0 right-0 w-full h-[500px] bg-[#3b82f6]/5 rounded-full blur-[120px] translate-y-1/2 pointer-events-none"></div>
+          
+          <div className="layout-container flex h-full grow flex-col relative z-10">
+            {/* Header */}
+            <header className="flex items-center justify-between whitespace-nowrap border-b border-white/5 px-4 sm:px-6 lg:px-10 py-4 bg-[#0B1116]/80 backdrop-blur-md">
+              <div className="flex items-center gap-3 text-white cursor-pointer" onClick={() => window.location.hash = '#/agency/dashboard'}>
+                <div className="p-2 bg-[#8b5cf6]/10 rounded-lg">
+                  <svg className="h-6 w-6 text-[#8b5cf6]" fill="currentColor" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
                     <path d="M42.4379 44C42.4379 44 36.0744 33.9038 41.1692 24C46.8624 12.9336 42.2078 4 42.2078 4L7.01134 4C7.01134 4 11.6577 12.932 5.96912 23.9969C0.876273 33.9029 7.27094 44 7.27094 44L42.4379 44Z"></path>
-                    </svg>
+                  </svg>
                 </div>
                 <h2 className="text-xl font-bold tracking-tight text-white">EcoCycle <span className="text-[#8b5cf6] font-semibold">Partner</span></h2>
-            </div>
-            <nav className="hidden md:flex flex-1 justify-center gap-1">
-                <a className="text-sm font-medium px-5 py-2.5 rounded-full text-[#94a3b8] hover:text-white hover:bg-white/5 transition-all cursor-pointer" onClick={() => window.location.hash = '#/agency/dashboard'}>Dashboard</a>
-                <a className="text-sm font-medium px-5 py-2.5 rounded-full text-[#94a3b8] hover:text-white hover:bg-white/5 transition-all cursor-pointer" onClick={() => window.location.hash = '#/agency/bookings'}>Bookings</a>
-                <a className="text-sm font-medium px-5 py-2.5 rounded-full text-[#94a3b8] hover:text-white hover:bg-white/5 transition-all cursor-pointer" onClick={() => window.location.hash = '#/agency/analytics'}>Analytics</a>
-            </nav>
-            <div className="flex items-center gap-4">
-                <button 
-                    onClick={() => window.location.hash = '#/partner/profile'}
-                    className="hidden sm:flex items-center gap-3 pl-1 pr-4 py-1 rounded-full bg-[#151F26] border border-white/5 hover:bg-white/5 transition-colors group cursor-pointer"
-                >
+              </div>
+              <div className="flex items-center gap-4">
+                <div className="relative group">
+                  <button 
+                    onClick={() => window.location.hash = '#/profile'}
+                    className="hidden sm:flex items-center gap-3 pl-1 pr-4 py-1 rounded-full bg-[#151F26] border border-white/5 hover:bg-white/5 transition-colors cursor-pointer"
+                  >
                     <div 
                       className="size-8 rounded-full bg-cover bg-center ring-2 ring-white/10 group-hover:ring-[#8b5cf6]/50 transition-all" 
-                      style={{ backgroundImage: `url("${formData.logo || user?.logo || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(formData.companyName || user?.companyName || 'Partner') + '&background=8b5cf6&color=fff'}")` }}
+                      style={{ backgroundImage: `url("${user?.avatar || user?.logo || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user?.name || user?.companyName || 'Partner') + '&background=8b5cf6&color=fff'}")`}}
                     ></div>
-                    <span className="text-sm font-medium text-gray-200">{formData.companyName || user?.companyName || 'Partner'}</span>
-                </button>
-                <button className="relative p-2.5 rounded-full bg-[#151F26] border border-white/5 text-[#8b5cf6] hover:text-[#8b5cf6] hover:bg-[#8b5cf6]/10 transition-colors">
-                    <span className="absolute top-2.5 right-3 size-2 bg-red-500 rounded-full border-2 border-[#151F26]"></span>
-                    <span className="material-symbols-outlined text-[20px]">notifications</span>
-                </button>
-            </div>
-        </header>
+                    <span className="text-sm font-medium text-gray-200">{user?.companyName || user?.name || 'Partner'}</span>
+                  </button>
+                  {/* Hover Preview */}
+                  <div className="absolute top-14 right-0 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-[100]">
+                    <div className="bg-[#151F26] border border-white/10 rounded-2xl p-4 shadow-2xl">
+                      <div 
+                        className="size-32 rounded-xl bg-cover bg-center ring-4 ring-[#8b5cf6]/30" 
+                        style={{ backgroundImage: `url("${user?.avatar || user?.logo || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user?.name || user?.companyName || 'Partner') + '&background=8b5cf6&color=fff'}")`}}
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+                <NotificationBell />
+              </div>
+            </header>
 
-        {/* Main Content */}
-        <main className="flex-1 w-full max-w-7xl mx-auto p-4 sm:p-6 lg:p-10 mt-20 relative z-10">
-            <div className="flex flex-col md:flex-row gap-8">
-            <aside className="w-full md:w-64 lg:w-72 flex-shrink-0">
-                <div className="flex h-full flex-col justify-between bg-[#151F26] p-4 rounded-xl border border-white/5">
-                <div className="flex flex-col gap-4">
-                    <div className="flex items-center gap-3">
-                    <div className="relative">
+            {/* Main Content */}
+            <main className="flex flex-1 justify-center py-5 px-4 sm:px-6 lg:px-10">
+              <div className="layout-content-container flex flex-col w-full max-w-5xl">
+                {/* Back Button */}
+                <button 
+                  onClick={() => window.location.hash = '#/agency/dashboard'}
+                  className="flex items-center gap-2 text-[#8b5cf6] hover:text-[#7c3aed] transition-colors mb-6 group"
+                >
+                  <span className="material-symbols-outlined text-[20px]">arrow_back</span>
+                  <span className="text-sm font-medium">Back to Dashboard</span>
+                </button>
+
+                {/* Page Header */}
+                <div className="mb-8">
+                  <div className="flex items-center gap-4 mb-2">
+                    <div className="size-16 rounded-2xl bg-gradient-to-br from-[#8b5cf6] to-[#3b82f6] flex items-center justify-center text-white font-bold text-2xl overflow-hidden shadow-lg">
+                      {user?.logo || user?.avatar ? (
+                        <img src={user.logo || user.avatar} alt={user.companyName || user.name} className="w-full h-full object-cover" />
+                      ) : (
+                        (user?.companyName || user?.name)?.charAt(0)?.toUpperCase() || 'P'
+                      )}
+                    </div>
+                    <div>
+                      <h1 className="text-2xl sm:text-3xl font-bold text-white">{user?.companyName || user?.name || 'Partner'}</h1>
+                      <p className="text-gray-400 text-sm mt-1">{user?.email || ''}</p>
+                    </div>
+                  </div>
+                  <p className="text-gray-400 text-sm">Manage your profile, security, and preferences</p>
+                </div>
+
+                {/* Settings Cards Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                  {settingsCards.map((card) => (
+                    <div
+                      key={card.id}
+                      onClick={() => window.location.hash = card.link}
+                      className="bg-[#151F26] hover:bg-[#1a2730] p-6 rounded-xl border border-white/5 hover:border-white/10 transition-all cursor-pointer group"
+                    >
+                      <div className="flex items-start gap-4">
                         <div 
-                        className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-14" 
-                        style={{ backgroundImage: `url("${formData.logo || user?.logo || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(formData.companyName || user?.companyName || 'Partner') + '&background=8b5cf6&color=fff'}")` }}
-                        ></div>
-                        <label className="absolute -bottom-1 -right-1 flex items-center justify-center size-7 bg-[#8b5cf6] rounded-full text-white hover:bg-[#7c3aed] cursor-pointer transition-colors shadow-lg">
-                          {uploadingLogo ? (
-                            <Loader size="sm" color="#ffffff" />
-                          ) : (
-                            <span className="material-symbols-outlined text-base">photo_camera</span>
-                          )}
-                          <input 
-                            type="file" 
-                            accept="image/*" 
-                            className="hidden" 
-                            onChange={handleLogoUpload}
-                            disabled={uploadingLogo}
-                          />
-                        </label>
-                    </div>
-                    <div className="flex flex-col">
-                        <h1 className="text-white text-base font-semibold leading-normal">{formData.companyName || user?.companyName || 'Partner'}</h1>
-                        <p className="text-[#94a3b8] text-sm font-normal leading-normal">{user?.email || ''}</p>
-                    </div>
-                    </div>
-                    <div className="flex flex-col gap-1 pt-4">
-                    <button className="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-[#8b5cf6]/10 text-[#8b5cf6] border border-[#8b5cf6]/10 w-full text-left cursor-pointer">
-                        <span className="material-symbols-outlined fill text-[20px]">business</span>
-                        <p className="text-sm font-medium leading-normal">Partner Profile</p>
-                    </button>
-                    <div className="w-full">
-                        <NotificationBell />
-                    </div>
-                    <button 
-                        onClick={() => window.location.hash = '#/partner/security'}
-                        className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/5 text-[#94a3b8] hover:text-white transition-colors w-full text-left cursor-pointer"
-                    >
-                        <span className="material-symbols-outlined text-[20px]">lock</span>
-                        <p className="text-sm font-medium leading-normal">Security & Privacy</p>
-                    </button>
-                    <button 
-                        onClick={() => window.location.hash = '#/settings'}
-                        className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/5 text-[#94a3b8] hover:text-white transition-colors w-full text-left cursor-pointer"
-                    >
-                        <span className="material-symbols-outlined text-[20px]">settings</span>
-                        <p className="text-sm font-medium leading-normal">App Settings</p>
-                    </button>
-                    </div>
-                </div>
-                <div className="flex flex-col gap-4 mt-8 pt-4 border-t border-white/5">
-                    <button 
-                    onClick={handleLogout}
-                    className="flex w-full min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-[#0B1116] text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-white/5 transition-colors border border-white/10"
-                    >
-                    <span className="truncate">Log Out</span>
-                    </button>
-                </div>
-                </div>
-            </aside>
-            <div className="flex-1">
-                <div className="flex flex-col gap-8">
-                <div className="bg-[#151F26] p-6 md:p-8 rounded-xl border border-white/5">
-                    <div className="flex flex-col gap-8">
-                    <div className="flex flex-wrap justify-between gap-3">
-                        <div className="flex flex-col gap-1">
-                        <p className="text-white text-2xl font-bold leading-tight tracking-[-0.033em]">Partner Profile</p>
-                        <p className="text-[#94a3b8] text-base font-normal leading-normal">Manage your agency details and contact information.</p>
+                          className="p-3 rounded-xl transition-all group-hover:scale-110"
+                          style={{ backgroundColor: `${card.color}15` }}
+                        >
+                          <span 
+                            className="material-symbols-outlined text-[28px]"
+                            style={{ color: card.color }}
+                          >
+                            {card.icon}
+                          </span>
                         </div>
-                    </div>
-                    <form className="flex flex-col gap-6" onSubmit={handleSave}>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                        <label className="flex flex-col w-full">
-                            <p className="text-white text-sm font-medium leading-normal pb-2">Contact Name</p>
-                            <input 
-                              className="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-[#8b5cf6] border border-white/10 bg-[#0B1116] h-12 placeholder:text-[#94a3b8] p-3 text-base font-normal leading-normal transition-all" 
-                              value={formData.name}
-                              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                              placeholder="Enter contact name"
-                            />
-                        </label>
-                        <label className="flex flex-col w-full">
-                            <p className="text-white text-sm font-medium leading-normal pb-2">Company Name</p>
-                            <input 
-                              className="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-[#8b5cf6] border border-white/10 bg-[#0B1116] h-12 placeholder:text-[#94a3b8] p-3 text-base font-normal leading-normal transition-all" 
-                              value={formData.companyName}
-                              onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
-                              placeholder="Enter company name"
-                            />
-                        </label>
+                        <div className="flex-1">
+                          <h3 className="text-white font-semibold text-lg mb-1 group-hover:text-[#8b5cf6] transition-colors">
+                            {card.title}
+                          </h3>
+                          <p className="text-gray-400 text-sm">
+                            {card.description}
+                          </p>
                         </div>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                        <label className="flex flex-col w-full">
-                            <p className="text-white text-sm font-medium leading-normal pb-2">Email Address</p>
-                            <input className="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-[#94a3b8] focus:outline-none border border-white/10 bg-[#0B1116]/50 h-12 p-3 text-base font-normal leading-normal cursor-not-allowed" readOnly value={user?.email || ''} />
-                        </label>
-                        <label className="flex flex-col w-full">
-                            <p className="text-white text-sm font-medium leading-normal pb-2">Phone Number</p>
-                            <input 
-                              className="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-[#8b5cf6] border border-white/10 bg-[#0B1116] h-12 placeholder:text-[#94a3b8] p-3 text-base font-normal leading-normal transition-all" 
-                              value={formData.phone}
-                              onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                              placeholder="+1 (555) 123-4567"
-                            />
-                        </label>
+                        <span className="material-symbols-outlined text-gray-500 group-hover:text-[#8b5cf6] transition-colors">
+                          arrow_forward
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Quick Stats */}
+                <div className="bg-[#151F26] p-6 rounded-xl border border-white/5 mb-6">
+                  <h3 className="text-white font-semibold text-lg mb-4">Your Impact</h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div className="bg-[#0B1116] p-4 rounded-xl border border-[#8b5cf6]/20">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 bg-[#8b5cf6]/10 rounded-lg">
+                          <span className="material-symbols-outlined text-[#8b5cf6]">event_available</span>
                         </div>
                         <div>
-                        <label className="flex flex-col w-full">
-                            <p className="text-white text-sm font-medium leading-normal pb-2">Business Address</p>
-                            <textarea 
-                              className="w-full resize-y rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-[#8b5cf6] border border-white/10 bg-[#0B1116] placeholder:text-[#94a3b8] p-3 text-base font-normal leading-normal transition-all" 
-                              rows={3} 
-                              value={formData.address}
-                              onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                              placeholder="Enter your business address"
-                            ></textarea>
-                        </label>
+                          <p className="text-gray-400 text-xs">Total Pickups</p>
+                          <p className="text-white text-2xl font-bold">{user?.totalPickups || 0}</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="bg-[#0B1116] p-4 rounded-xl border border-[#8b5cf6]/20">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 bg-[#8b5cf6]/10 rounded-lg">
+                          <span className="material-symbols-outlined text-[#8b5cf6]">recycling</span>
                         </div>
                         <div>
-                        <label className="flex flex-col w-full">
-                            <p className="text-white text-sm font-medium leading-normal pb-2">Company Description</p>
-                            <textarea 
-                              className="w-full resize-y rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-[#8b5cf6] border border-white/10 bg-[#0B1116] placeholder:text-[#94a3b8] p-3 text-base font-normal leading-normal transition-all" 
-                              rows={4} 
-                              value={formData.description}
-                              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                              placeholder="Describe your agency services..."
-                            ></textarea>
-                        </label>
+                          <p className="text-gray-400 text-xs">Waste Collected</p>
+                          <p className="text-white text-2xl font-bold">{user?.totalWasteCollected || 0} kg</p>
                         </div>
-                        <div className="flex justify-end gap-4 pt-4 border-t border-white/5">
-                        <button 
-                            className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-[#0B1116] text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-white/5 transition-colors border border-white/10" 
-                            type="button"
-                            onClick={() => window.location.hash = '#/agency/dashboard'}
-                        >
-                            <span className="truncate">Cancel</span>
-                        </button>
-                        <button 
-                          className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-[#8b5cf6] text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-[#7c3aed] transition-colors disabled:opacity-50" 
-                          type="submit"
-                          disabled={saving}
-                        >
-                            <span className="truncate">{saving ? 'Saving...' : 'Save Changes'}</span>
-                        </button>
-                        </div>
-                    </form>
+                      </div>
                     </div>
+                    <div className="bg-[#0B1116] p-4 rounded-xl border border-[#8b5cf6]/20">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 bg-[#8b5cf6]/10 rounded-lg">
+                          <span className="material-symbols-outlined text-[#8b5cf6]">schedule</span>
+                        </div>
+                        <div>
+                          <p className="text-gray-400 text-xs">Active Slots</p>
+                          <p className="text-white text-2xl font-bold">{user?.activeSlots || 0}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                </div>
-            </div>
-            </div>
-        </main>
+
+                {/* Dashboard Button */}
+                <button
+                  onClick={() => window.location.hash = '#/agency/dashboard'}
+                  className="w-full h-12 px-6 rounded-xl bg-[#8b5cf6] hover:bg-[#7c3aed] text-white font-semibold transition-all shadow-lg shadow-[#8b5cf6]/20 flex items-center justify-center gap-2"
+                >
+                  <span className="material-symbols-outlined">dashboard</span>
+                  <span>Go to Dashboard</span>
+                </button>
+              </div>
+            </main>
+          </div>
+        </div>
       </div>
     </Layout>
   );

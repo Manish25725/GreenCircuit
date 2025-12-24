@@ -2,48 +2,52 @@ import React, { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
 import Loader from '../components/Loader';
 import NotificationBell from '../components/NotificationBell';
-import { api, getCurrentUser } from '../services/api';
+import { api, getCurrentUser, User } from '../services/api';
 
 interface PartnerProfile {
-  _id: string;
-  userId: string;
-  name: string;
-  email: string;
+  _id?: string;
+  name?: string;
+  email?: string;
   companyName?: string;
   registrationNumber?: string;
   phone?: string;
-  address?: any;
+  address?: string;
+  city?: string;
+  state?: string;
+  zipCode?: string;
+  country?: string;
   logo?: string;
   description?: string;
-  role?: string;
+  services?: string;
 }
 
 const PartnerEditProfile = () => {
-  const [user, setUser] = useState<PartnerProfile | null>(null);
+  const [user, setUser] = useState<User | null>(null);
+  const [profile, setProfile] = useState<PartnerProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [uploadingLogo, setUploadingLogo] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string>('');
   const [formData, setFormData] = useState({
     name: '',
+    email: '',
     companyName: '',
+    registrationNumber: '',
     phone: '',
     address: '',
+    city: '',
+    state: '',
+    zipCode: '',
+    country: 'India',
     description: '',
-    logo: ''
+    services: ''
   });
-
-  // Helper to get address as string
-  const getAddressString = (address: any): string => {
-    if (!address) return '';
-    if (typeof address === 'string') return address;
-    if (typeof address === 'object') {
-      const { street, city, state, zipCode } = address;
-      return [street, city, state, zipCode].filter(Boolean).join(', ');
-    }
-    return '';
-  };
+  const [logoPreview, setLogoPreview] = useState<string>('');
+  const [uploadingLogo, setUploadingLogo] = useState(false);
 
   useEffect(() => {
+    const currentUser = getCurrentUser();
+    setUser(currentUser);
     loadPartnerProfile();
   }, []);
 
@@ -51,17 +55,44 @@ const PartnerEditProfile = () => {
     try {
       setLoading(true);
       const response = await api.getAgencyProfile() as any;
-      const profile = response.data || response;
+      const profileData = response.data || response;
       
-      setUser(profile);
+      setProfile(profileData);
+      
+      // Handle address - can be string or object
+      let addressStr = '';
+      let city = '';
+      let state = '';
+      let zipCode = '';
+      let country = 'India';
+      
+      if (profileData.address) {
+        if (typeof profileData.address === 'string') {
+          addressStr = profileData.address;
+        } else if (typeof profileData.address === 'object') {
+          addressStr = profileData.address.street || '';
+          city = profileData.address.city || '';
+          state = profileData.address.state || '';
+          zipCode = profileData.address.zipCode || '';
+          country = profileData.address.country || 'India';
+        }
+      }
+      
       setFormData({
-        name: profile.name || '',
-        companyName: profile.companyName || '',
-        phone: profile.phone || '',
-        address: getAddressString(profile.address),
-        description: profile.description || '',
-        logo: profile.logo || ''
+        name: profileData.name || '',
+        email: profileData.email || '',
+        companyName: profileData.companyName || '',
+        registrationNumber: profileData.registrationNumber || '',
+        phone: profileData.phone || '',
+        address: addressStr,
+        city: city,
+        state: state,
+        zipCode: zipCode,
+        country: country,
+        description: profileData.description || '',
+        services: profileData.services || ''
       });
+      setLogoPreview(profileData.logo || '');
     } catch (error) {
       console.error('Failed to load partner profile:', error);
     } finally {
@@ -69,24 +100,42 @@ const PartnerEditProfile = () => {
     }
   };
 
-  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleLogoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     // Validate file type
     if (!file.type.startsWith('image/')) {
-      alert('Please select an image file');
+      setErrorMessage('Please select an image file');
+      setTimeout(() => setErrorMessage(''), 3000);
       return;
     }
 
     // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
-      alert('Image size should be less than 5MB');
+      setErrorMessage('Image size should be less than 5MB');
+      setTimeout(() => setErrorMessage(''), 3000);
       return;
     }
 
     try {
       setUploadingLogo(true);
+      
+      // Preview the image locally first
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setLogoPreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+
+      // Upload to Cloudinary
       const uploadFormData = new FormData();
       uploadFormData.append('file', file);
       uploadFormData.append('upload_preset', 'ecocycle_uploads');
@@ -106,59 +155,78 @@ const PartnerEditProfile = () => {
       const data = await response.json();
       
       if (data.secure_url) {
-        setFormData({ ...formData, logo: data.secure_url });
+        // Update logo in backend immediately
+        await api.updateAgencyProfile({ logo: data.secure_url });
         
-        // Update in backend
-        try {
-          await api.updateAgencyProfile({ logo: data.secure_url });
-          const currentUser = getCurrentUser();
-          if (currentUser) {
-            currentUser.avatar = data.secure_url;
-            localStorage.setItem('user', JSON.stringify(currentUser));
-          }
-        } catch (apiError) {
-          console.error('Failed to save logo to profile:', apiError);
-          alert('Logo uploaded but failed to save to profile. Please try saving your profile.');
+        // Update local storage
+        const currentUser = getCurrentUser();
+        if (currentUser) {
+          currentUser.avatar = data.secure_url;
+          localStorage.setItem('user', JSON.stringify(currentUser));
         }
+        
+        setShowSuccess(true);
+        setTimeout(() => setShowSuccess(false), 3000);
       }
     } catch (error) {
       console.error('Failed to upload logo:', error);
-      alert('Failed to upload logo');
+      setErrorMessage('Failed to upload logo. Please try again.');
+      setTimeout(() => setErrorMessage(''), 3000);
     } finally {
       setUploadingLogo(false);
     }
   };
 
-  const handleSave = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (!formData.companyName || !formData.email || !formData.phone) {
+      setErrorMessage('Please fill in all required fields');
+      setTimeout(() => setErrorMessage(''), 3000);
+      return;
+    }
+
     try {
       setSaving(true);
       
-      await api.updateAgencyProfile({
+      const updateData = {
         name: formData.name,
         companyName: formData.companyName,
+        registrationNumber: formData.registrationNumber,
         phone: formData.phone,
-        address: formData.address,
+        address: {
+          street: formData.address,
+          city: formData.city,
+          state: formData.state,
+          zipCode: formData.zipCode,
+          country: formData.country
+        },
         description: formData.description,
-        logo: formData.logo
-      });
+        services: formData.services
+      };
 
-      // Update local storage
-      const currentUser = getCurrentUser();
-      if (currentUser) {
-        currentUser.name = formData.name;
-        currentUser.phone = formData.phone;
-        currentUser.address = formData.address;
-        if (formData.logo) currentUser.avatar = formData.logo;
-        localStorage.setItem('user', JSON.stringify(currentUser));
-        setUser(currentUser as any);
+      const response = await api.updateAgencyProfile(updateData);
+      console.log('Profile updated successfully:', response);
+      
+      // Update localStorage
+      const storedUser = localStorage.getItem('user');
+      if (storedUser) {
+        const userData = JSON.parse(storedUser);
+        const updatedUser = { ...userData, ...response };
+        localStorage.setItem('user', JSON.stringify(updatedUser));
       }
-
-      alert('Profile updated successfully!');
-    } catch (error) {
+      
+      // Show success notification
+      setShowSuccess(true);
+      setTimeout(() => setShowSuccess(false), 3000);
+      
+      // Reload profile data
+      await loadPartnerProfile();
+    } catch (error: any) {
       console.error('Failed to update profile:', error);
-      alert('Failed to update profile');
+      const message = error?.response?.data?.message || error?.message || 'Failed to update profile. Please try again.';
+      setErrorMessage(message);
+      setTimeout(() => setErrorMessage(''), 5000);
     } finally {
       setSaving(false);
     }
@@ -166,17 +234,14 @@ const PartnerEditProfile = () => {
 
   const handleLogout = () => {
     localStorage.clear();
-    window.location.hash = '#/';
+    window.location.hash = '#/login';
   };
 
   if (loading) {
     return (
       <Layout title="" role="Partner" fullWidth hideSidebar>
-        <div className="bg-[#0B1116] min-h-screen flex items-center justify-center">
-          <div className="text-center">
-            <Loader size="md" color="#10b981" className="mb-4" />
-            <p className="text-gray-400">Loading profile...</p>
-          </div>
+        <div className="flex items-center justify-center min-h-screen bg-[#0B1116]">
+          <Loader size="md" color="#8b5cf6" />
         </div>
       </Layout>
     );
@@ -184,204 +249,332 @@ const PartnerEditProfile = () => {
 
   return (
     <Layout title="" role="Partner" fullWidth hideSidebar>
-      <div className="bg-[#0B1116] font-sans text-gray-200 antialiased selection:bg-[#10b981] selection:text-white min-h-screen flex flex-col relative overflow-hidden">
-        
-        {/* Background Ambient Blobs */}
-        <div className="fixed top-0 left-0 w-full h-[500px] bg-[#10b981]/5 rounded-full blur-[120px] -translate-y-1/2 pointer-events-none"></div>
-        <div className="fixed bottom-0 right-0 w-full h-[500px] bg-[#8b5cf6]/5 rounded-full blur-[120px] translate-y-1/2 pointer-events-none"></div>
+      <div className="bg-[#0B1116] font-sans text-gray-200 antialiased selection:bg-[#8b5cf6] selection:text-white min-h-screen">
+        {/* Success Toast */}
+        {showSuccess && (
+          <div className="fixed top-4 right-4 z-50 animate-slide-in-right">
+            <div className="bg-green-500/10 border border-green-500/30 rounded-xl px-4 py-3 flex items-center gap-3 shadow-lg backdrop-blur-sm">
+              <span className="material-symbols-outlined text-green-400">check_circle</span>
+              <span className="text-green-400 font-medium">Profile updated successfully!</span>
+            </div>
+          </div>
+        )}
 
-        {/* Standard Header */}
-        <header className="flex items-center justify-between whitespace-nowrap border-b border-white/5 px-4 sm:px-6 lg:px-10 py-4 bg-[#0B1116]/80 backdrop-blur-md fixed top-0 left-0 right-0 z-50 transition-all duration-300">
-            <div className="flex items-center gap-3 text-white cursor-pointer" onClick={() => window.location.hash = '#/'}>
-                <div className="p-2 bg-[#10b981]/10 rounded-lg">
-                    <svg className="h-6 w-6 text-[#10b981]" fill="currentColor" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+        {/* Error Toast */}
+        {errorMessage && (
+          <div className="fixed top-4 right-4 z-50 animate-slide-in-right">
+            <div className="bg-red-500/10 border border-red-500/30 rounded-xl px-4 py-3 flex items-center gap-3 shadow-lg backdrop-blur-sm max-w-md">
+              <span className="material-symbols-outlined text-red-400">error</span>
+              <span className="text-red-400 font-medium">{errorMessage}</span>
+            </div>
+          </div>
+        )}
+
+        <div className="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden">
+          <div className="fixed top-0 left-0 w-full h-[500px] bg-[#8b5cf6]/5 rounded-full blur-[120px] -translate-y-1/2 pointer-events-none"></div>
+          <div className="fixed bottom-0 right-0 w-full h-[500px] bg-[#3b82f6]/5 rounded-full blur-[120px] translate-y-1/2 pointer-events-none"></div>
+          
+          <div className="layout-container flex h-full grow flex-col relative z-10">
+            {/* Header */}
+            <header className="flex items-center justify-between whitespace-nowrap border-b border-white/5 px-4 sm:px-6 lg:px-10 py-4 bg-[#0B1116]/80 backdrop-blur-md">
+              <div className="flex items-center gap-3 text-white cursor-pointer" onClick={() => window.location.hash = '#/agency/dashboard'}>
+                <div className="p-2 bg-[#8b5cf6]/10 rounded-lg">
+                  <svg className="h-6 w-6 text-[#8b5cf6]" fill="currentColor" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
                     <path d="M42.4379 44C42.4379 44 36.0744 33.9038 41.1692 24C46.8624 12.9336 42.2078 4 42.2078 4L7.01134 4C7.01134 4 11.6577 12.932 5.96912 23.9969C0.876273 33.9029 7.27094 44 7.27094 44L42.4379 44Z"></path>
-                    </svg>
+                  </svg>
                 </div>
                 <h2 className="text-xl font-bold tracking-tight text-white">EcoCycle <span className="text-[#8b5cf6] font-semibold">Partner</span></h2>
-            </div>
-            <nav className="hidden md:flex flex-1 justify-center gap-1">
-                <a className="text-sm font-medium px-5 py-2.5 rounded-full text-[#94a3b8] hover:text-white hover:bg-white/5 transition-all cursor-pointer" onClick={() => window.location.hash = '#/agency/dashboard'}>Dashboard</a>
-                <a className="text-sm font-medium px-5 py-2.5 rounded-full text-[#94a3b8] hover:text-white hover:bg-white/5 transition-all cursor-pointer" onClick={() => window.location.hash = '#/agency/bookings'}>Bookings</a>
-                <a className="text-sm font-medium px-5 py-2.5 rounded-full text-[#94a3b8] hover:text-white hover:bg-white/5 transition-all cursor-pointer" onClick={() => window.location.hash = '#/agency/analytics'}>Analytics</a>
-            </nav>
-            <div className="flex items-center gap-4">
-                <button 
-                    onClick={() => window.location.hash = '#/partner/profile'}
-                    className="hidden sm:flex items-center gap-3 pl-1 pr-4 py-1 rounded-full bg-[#151F26] border border-white/5 hover:bg-white/5 transition-colors group cursor-pointer"
-                >
+              </div>
+              <div className="flex items-center gap-4">
+                <div className="relative group">
+                  <button 
+                    onClick={() => window.location.hash = '#/profile'}
+                    className="hidden sm:flex items-center gap-3 pl-1 pr-4 py-1 rounded-full bg-[#151F26] border border-white/5 hover:bg-white/5 transition-colors cursor-pointer"
+                  >
                     <div 
                       className="size-8 rounded-full bg-cover bg-center ring-2 ring-white/10 group-hover:ring-[#8b5cf6]/50 transition-all" 
-                      style={{ backgroundImage: `url("${formData.logo || user?.logo || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(formData.companyName || user?.companyName || 'Partner') + '&background=8b5cf6&color=fff'}")` }}
+                      style={{ backgroundImage: `url("${profile?.logo || user?.avatar || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user?.name || 'Partner') + '&background=8b5cf6&color=fff'}")`}}
                     ></div>
-                    <span className="text-sm font-medium text-gray-200">{formData.companyName || user?.companyName || 'Partner'}</span>
-                </button>
-                <button className="relative p-2.5 rounded-full bg-[#151F26] border border-white/5 text-[#8b5cf6] hover:text-[#8b5cf6] hover:bg-[#8b5cf6]/10 transition-colors">
-                    <span className="absolute top-2.5 right-3 size-2 bg-red-500 rounded-full border-2 border-[#151F26]"></span>
-                    <span className="material-symbols-outlined text-[20px]">notifications</span>
-                </button>
-            </div>
-        </header>
+                    <span className="text-sm font-medium text-gray-200">{formData.companyName || user?.name || 'Partner'}</span>
+                  </button>
+                  {/* Hover Preview */}
+                  <div className="absolute top-14 right-0 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-[100]">
+                    <div className="bg-[#151F26] border border-white/10 rounded-2xl p-4 shadow-2xl">
+                      <div 
+                        className="size-32 rounded-xl bg-cover bg-center ring-4 ring-[#8b5cf6]/30" 
+                        style={{ backgroundImage: `url("${profile?.logo || user?.avatar || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user?.name || 'Partner') + '&background=8b5cf6&color=fff'}")`}}
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+                <NotificationBell />
+              </div>
+            </header>
 
-        {/* Main Content */}
-        <main className="flex-1 w-full max-w-7xl mx-auto p-4 sm:p-6 lg:p-10 mt-20 relative z-10">
-            <div className="flex flex-col md:flex-row gap-8">
-            <aside className="w-full md:w-64 lg:w-72 flex-shrink-0">
-                <div className="flex h-full flex-col justify-between bg-[#151F26] p-4 rounded-xl border border-white/5">
-                <div className="flex flex-col gap-4">
-                    <div className="flex items-center gap-3">
-                    <div className="relative">
-                        <div 
-                        className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-14" 
-                        style={{ backgroundImage: `url("${formData.logo || user?.logo || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(formData.companyName || user?.companyName || 'Partner') + '&background=8b5cf6&color=fff'}")` }}
-                        ></div>
-                        <label className="absolute -bottom-1 -right-1 flex items-center justify-center size-7 bg-[#8b5cf6] rounded-full text-white hover:bg-[#7c3aed] cursor-pointer transition-colors shadow-lg">
-                          {uploadingLogo ? (
-                            <Loader size="sm" color="#ffffff" />
-                          ) : (
-                            <span className="material-symbols-outlined text-base">photo_camera</span>
-                          )}
-                          <input 
-                            type="file" 
-                            accept="image/*" 
-                            className="hidden" 
-                            onChange={handleLogoUpload}
-                            disabled={uploadingLogo}
+            {/* Main Content */}
+            <main className="flex flex-1 justify-center py-5 px-4 sm:px-6 lg:px-10">
+              <div className="layout-content-container flex flex-col w-full max-w-5xl">
+                {/* Back Button */}
+                <button 
+                  onClick={() => window.history.back()}
+                  className="flex items-center gap-2 text-[#8b5cf6] hover:text-[#7c3aed] transition-colors mb-6 group"
+                >
+                  <span className="material-symbols-outlined text-[20px]">arrow_back</span>
+                  <span className="text-sm font-medium">Back to Settings</span>
+                </button>
+
+                {/* Page Header */}
+                <div className="mb-8">
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="p-2 bg-[#8b5cf6]/10 rounded-lg">
+                      <span className="material-symbols-outlined text-[#8b5cf6] text-[28px]">business</span>
+                    </div>
+                    <div>
+                      <h1 className="text-2xl sm:text-3xl font-bold text-white">Edit Company Profile</h1>
+                      <p className="text-gray-400 text-sm mt-1">Update your company information and details</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Profile Form */}
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  {/* Logo Section */}
+                  <div className="bg-[#151F26] p-6 md:p-8 rounded-xl border border-white/5">
+                    <div className="flex flex-col gap-6">
+                      <div className="flex items-center gap-2">
+                        <span className="material-symbols-outlined text-[#8b5cf6]">business_center</span>
+                        <h3 className="text-white text-lg font-bold">Company Logo</h3>
+                      </div>
+                      <div className="flex flex-col items-center gap-6 p-6 bg-[#0B1116] rounded-xl border border-white/5">
+                        <div className="relative group">
+                          <div 
+                            className="size-40 rounded-2xl bg-gradient-to-br from-[#8b5cf6] to-[#3b82f6] flex items-center justify-center ring-4 ring-[#8b5cf6]/20 text-white font-bold text-5xl overflow-hidden shadow-lg shadow-[#8b5cf6]/20 transition-all group-hover:ring-[#8b5cf6]/40"
+                            style={logoPreview ? { backgroundImage: `url(${logoPreview})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}}
+                          >
+                            {!logoPreview && (formData.companyName?.charAt(0)?.toUpperCase() || 'P')}
+                          </div>
+                          <label 
+                            htmlFor="logo" 
+                            className="absolute bottom-2 right-2 size-12 rounded-xl bg-[#8b5cf6] border-4 border-[#0B1116] flex items-center justify-center cursor-pointer hover:bg-[#7c3aed] transition-all shadow-lg hover:scale-110 group"
+                          >
+                            {uploadingLogo ? (
+                              <Loader size="sm" color="white" />
+                            ) : (
+                              <span className="material-symbols-outlined text-white text-[24px]">photo_camera</span>
+                            )}
+                            <input
+                              type="file"
+                              id="logo"
+                              accept="image/*"
+                              onChange={handleLogoChange}
+                              className="hidden"
+                              disabled={uploadingLogo}
+                            />
+                          </label>
+                        </div>
+                        <div className="text-center">
+                          <p className="text-white text-sm font-medium mb-1">Upload Company Logo</p>
+                          <p className="text-gray-400 text-xs">
+                            {uploadingLogo ? 'Uploading to cloud...' : 'Click the camera icon • Square image • Min 256x256px'}
+                          </p>
+                          <div className="flex items-center justify-center gap-2 mt-3">
+                            <span className="px-3 py-1 bg-[#8b5cf6]/10 border border-[#8b5cf6]/30 rounded-full text-[#8b5cf6] text-xs font-medium">JPG</span>
+                            <span className="px-3 py-1 bg-[#8b5cf6]/10 border border-[#8b5cf6]/30 rounded-full text-[#8b5cf6] text-xs font-medium">PNG</span>
+                            <span className="px-3 py-1 bg-[#8b5cf6]/10 border border-[#8b5cf6]/30 rounded-full text-[#8b5cf6] text-xs font-medium">SVG</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Company Information */}
+                  <div className="bg-[#151F26] p-6 md:p-8 rounded-xl border border-white/5">
+                    <div className="flex flex-col gap-6">
+                      <h3 className="text-white text-lg font-bold">Company Information</h3>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <label className="flex flex-col w-full">
+                          <span className="text-white text-sm font-medium pb-2">Company Name *</span>
+                          <input
+                            type="text"
+                            name="companyName"
+                            value={formData.companyName}
+                            onChange={handleInputChange}
+                            required
+                            className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-[#8b5cf6] focus:border-[#8b5cf6] transition-all"
+                            placeholder="Enter company name"
                           />
                         </label>
-                    </div>
-                    <div className="flex flex-col">
-                        <h1 className="text-white text-base font-semibold leading-normal">{formData.companyName || user?.companyName || 'Partner'}</h1>
-                        <p className="text-[#94a3b8] text-sm font-normal leading-normal">{user?.email || ''}</p>
-                    </div>
-                    </div>
-                    <div className="flex flex-col gap-1 pt-4">
-                    <button className="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-[#8b5cf6]/10 text-[#8b5cf6] border border-[#8b5cf6]/10 w-full text-left cursor-pointer">
-                        <span className="material-symbols-outlined fill text-[20px]">business</span>
-                        <p className="text-sm font-medium leading-normal">Partner Profile</p>
-                    </button>
-                    <div className="w-full">
-                        <NotificationBell />
-                    </div>
-                    <button 
-                        onClick={() => window.location.hash = '#/partner/security'}
-                        className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/5 text-[#94a3b8] hover:text-white transition-colors w-full text-left cursor-pointer"
-                    >
-                        <span className="material-symbols-outlined text-[20px]">lock</span>
-                        <p className="text-sm font-medium leading-normal">Security & Privacy</p>
-                    </button>
-                    <button 
-                        onClick={() => window.location.hash = '#/settings'}
-                        className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/5 text-[#94a3b8] hover:text-white transition-colors w-full text-left cursor-pointer"
-                    >
-                        <span className="material-symbols-outlined text-[20px]">settings</span>
-                        <p className="text-sm font-medium leading-normal">App Settings</p>
-                    </button>
-                    </div>
-                </div>
-                <div className="flex flex-col gap-4 mt-8 pt-4 border-t border-white/5">
-                    <button 
-                    onClick={handleLogout}
-                    className="flex w-full min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-[#0B1116] text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-white/5 transition-colors border border-white/10"
-                    >
-                    <span className="truncate">Log Out</span>
-                    </button>
-                </div>
-                </div>
-            </aside>
-            <div className="flex-1">
-                <div className="flex flex-col gap-8">
-                <div className="bg-[#151F26] p-6 md:p-8 rounded-xl border border-white/5">
-                    <div className="flex flex-col gap-8">
-                    <div className="flex flex-wrap justify-between gap-3">
-                        <div className="flex flex-col gap-1">
-                        <p className="text-white text-2xl font-bold leading-tight tracking-[-0.033em]">Partner Profile</p>
-                        <p className="text-[#94a3b8] text-base font-normal leading-normal">Manage your agency details and contact information.</p>
-                        </div>
-                    </div>
-                    <form className="flex flex-col gap-6" onSubmit={handleSave}>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                         <label className="flex flex-col w-full">
-                            <p className="text-white text-sm font-medium leading-normal pb-2">Contact Name</p>
-                            <input 
-                              className="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-[#8b5cf6] border border-white/10 bg-[#0B1116] h-12 placeholder:text-[#94a3b8] p-3 text-base font-normal leading-normal transition-all" 
-                              value={formData.name}
-                              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                              placeholder="Enter contact name"
+                          <span className="text-white text-sm font-medium pb-2">Registration Number</span>
+                          <input
+                            type="text"
+                            name="registrationNumber"
+                            value={formData.registrationNumber}
+                            onChange={handleInputChange}
+                            className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-[#8b5cf6] focus:border-[#8b5cf6] transition-all"
+                            placeholder="Business registration number"
+                          />
+                        </label>
+                        <label className="flex flex-col w-full">
+                          <span className="text-white text-sm font-medium pb-2">Contact Person</span>
+                          <input
+                            type="text"
+                            name="name"
+                            value={formData.name}
+                            onChange={handleInputChange}
+                            className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-[#8b5cf6] focus:border-[#8b5cf6] transition-all"
+                            placeholder="Contact person name"
+                          />
+                        </label>
+                        <label className="flex flex-col w-full">
+                          <span className="text-white text-sm font-medium pb-2">Email *</span>
+                          <input
+                            type="email"
+                            name="email"
+                            value={formData.email}
+                            onChange={handleInputChange}
+                            required
+                            disabled
+                            className="w-full h-12 px-3 py-2 bg-[#0B1116]/50 border rounded-xl border-white/10 text-gray-400 cursor-not-allowed"
+                            placeholder="Email address"
+                          />
+                        </label>
+                        <label className="flex flex-col w-full md:col-span-2">
+                          <span className="text-white text-sm font-medium pb-2">Phone Number *</span>
+                          <input
+                            type="tel"
+                            name="phone"
+                            value={formData.phone}
+                            onChange={handleInputChange}
+                            required
+                            className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-[#8b5cf6] focus:border-[#8b5cf6] transition-all"
+                            placeholder="Contact phone number"
+                          />
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Address Information */}
+                  <div className="bg-[#151F26] p-6 md:p-8 rounded-xl border border-white/5">
+                    <div className="flex flex-col gap-6">
+                      <h3 className="text-white text-lg font-bold">Address</h3>
+                      
+                      <div className="grid grid-cols-1 gap-6">
+                        <label className="flex flex-col w-full">
+                          <span className="text-white text-sm font-medium pb-2">Street Address</span>
+                          <input
+                            type="text"
+                            name="address"
+                            value={formData.address}
+                            onChange={handleInputChange}
+                            className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-[#8b5cf6] focus:border-[#8b5cf6] transition-all"
+                            placeholder="Street address"
+                          />
+                        </label>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                          <label className="flex flex-col w-full">
+                            <span className="text-white text-sm font-medium pb-2">City</span>
+                            <input
+                              type="text"
+                              name="city"
+                              value={formData.city}
+                              onChange={handleInputChange}
+                              className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-[#8b5cf6] focus:border-[#8b5cf6] transition-all"
+                              placeholder="City"
                             />
-                        </label>
-                        <label className="flex flex-col w-full">
-                            <p className="text-white text-sm font-medium leading-normal pb-2">Company Name</p>
-                            <input 
-                              className="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-[#8b5cf6] border border-white/10 bg-[#0B1116] h-12 placeholder:text-[#94a3b8] p-3 text-base font-normal leading-normal transition-all" 
-                              value={formData.companyName}
-                              onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
-                              placeholder="Enter company name"
+                          </label>
+                          <label className="flex flex-col w-full">
+                            <span className="text-white text-sm font-medium pb-2">State</span>
+                            <input
+                              type="text"
+                              name="state"
+                              value={formData.state}
+                              onChange={handleInputChange}
+                              className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-[#8b5cf6] focus:border-[#8b5cf6] transition-all"
+                              placeholder="State"
                             />
-                        </label>
-                        </div>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                        <label className="flex flex-col w-full">
-                            <p className="text-white text-sm font-medium leading-normal pb-2">Email Address</p>
-                            <input className="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-[#94a3b8] focus:outline-none border border-white/10 bg-[#0B1116]/50 h-12 p-3 text-base font-normal leading-normal cursor-not-allowed" readOnly value={user?.email || ''} />
-                        </label>
-                        <label className="flex flex-col w-full">
-                            <p className="text-white text-sm font-medium leading-normal pb-2">Phone Number</p>
-                            <input 
-                              className="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-[#8b5cf6] border border-white/10 bg-[#0B1116] h-12 placeholder:text-[#94a3b8] p-3 text-base font-normal leading-normal transition-all" 
-                              value={formData.phone}
-                              onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                              placeholder="+1 (555) 123-4567"
+                          </label>
+                          <label className="flex flex-col w-full">
+                            <span className="text-white text-sm font-medium pb-2">ZIP Code</span>
+                            <input
+                              type="text"
+                              name="zipCode"
+                              value={formData.zipCode}
+                              onChange={handleInputChange}
+                              className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-[#8b5cf6] focus:border-[#8b5cf6] transition-all"
+                              placeholder="ZIP code"
                             />
-                        </label>
+                          </label>
                         </div>
-                        <div>
-                        <label className="flex flex-col w-full">
-                            <p className="text-white text-sm font-medium leading-normal pb-2">Business Address</p>
-                            <textarea 
-                              className="w-full resize-y rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-[#8b5cf6] border border-white/10 bg-[#0B1116] placeholder:text-[#94a3b8] p-3 text-base font-normal leading-normal transition-all" 
-                              rows={3} 
-                              value={formData.address}
-                              onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                              placeholder="Enter your business address"
-                            ></textarea>
-                        </label>
-                        </div>
-                        <div>
-                        <label className="flex flex-col w-full">
-                            <p className="text-white text-sm font-medium leading-normal pb-2">Company Description</p>
-                            <textarea 
-                              className="w-full resize-y rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-[#8b5cf6] border border-white/10 bg-[#0B1116] placeholder:text-[#94a3b8] p-3 text-base font-normal leading-normal transition-all" 
-                              rows={4} 
-                              value={formData.description}
-                              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                              placeholder="Describe your agency services..."
-                            ></textarea>
-                        </label>
-                        </div>
-                        <div className="flex justify-end gap-4 pt-4 border-t border-white/5">
-                        <button 
-                            className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-[#0B1116] text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-white/5 transition-colors border border-white/10" 
-                            type="button"
-                            onClick={() => window.location.hash = '#/agency/dashboard'}
-                        >
-                            <span className="truncate">Cancel</span>
-                        </button>
-                        <button 
-                          className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-[#8b5cf6] text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-[#7c3aed] transition-colors disabled:opacity-50" 
-                          type="submit"
-                          disabled={saving}
-                        >
-                            <span className="truncate">{saving ? 'Saving...' : 'Save Changes'}</span>
-                        </button>
-                        </div>
-                    </form>
+                      </div>
                     </div>
-                </div>
-                </div>
-            </div>
-            </div>
-        </main>
+                  </div>
+
+                  {/* About Company */}
+                  <div className="bg-[#151F26] p-6 md:p-8 rounded-xl border border-white/5">
+                    <div className="flex flex-col gap-6">
+                      <h3 className="text-white text-lg font-bold">About Company</h3>
+                      
+                      <label className="flex flex-col w-full">
+                        <span className="text-white text-sm font-medium pb-2">Company Description</span>
+                        <textarea
+                          name="description"
+                          value={formData.description}
+                          onChange={handleInputChange}
+                          rows={4}
+                          className="w-full px-3 py-2 bg-[#0B1116] border rounded-xl border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-[#8b5cf6] focus:border-[#8b5cf6] transition-all resize-none"
+                          placeholder="Tell us about your recycling company..."
+                        />
+                      </label>
+
+                      <label className="flex flex-col w-full">
+                        <span className="text-white text-sm font-medium pb-2">Services Offered</span>
+                        <textarea
+                          name="services"
+                          value={formData.services}
+                          onChange={handleInputChange}
+                          rows={3}
+                          className="w-full px-3 py-2 bg-[#0B1116] border rounded-xl border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-[#8b5cf6] focus:border-[#8b5cf6] transition-all resize-none"
+                          placeholder="List the services you provide (e.g., E-waste collection, Electronics recycling...)"
+                        />
+                      </label>
+                    </div>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex flex-col sm:flex-row gap-4 justify-end pt-4">
+                    <button
+                      type="button"
+                      onClick={() => window.history.back()}
+                      className="h-12 px-6 rounded-xl bg-[#151F26] border border-white/10 text-white font-semibold hover:bg-white/5 transition-all"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={saving}
+                      className="h-12 px-8 rounded-xl bg-[#8b5cf6] hover:bg-[#7c3aed] text-white font-semibold transition-all shadow-lg shadow-[#8b5cf6]/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    >
+                      {saving ? (
+                        <>
+                          <Loader size="sm" color="white" />
+                          <span>Saving...</span>
+                        </>
+                      ) : (
+                        <>
+                          <span className="material-symbols-outlined text-[20px]">save</span>
+                          <span>Save Changes</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </main>
+          </div>
+        </div>
       </div>
     </Layout>
   );
