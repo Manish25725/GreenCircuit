@@ -19,6 +19,7 @@ const UserDashboard = () => {
     ecoPoints: 0,
     totalBookings: 0
   });
+  const [completedBookings, setCompletedBookings] = useState<Booking[]>([]);
 
   useEffect(() => {
     loadUserData();
@@ -48,6 +49,10 @@ const UserDashboard = () => {
           b.status === 'pending' || b.status === 'confirmed' || b.status === 'in-progress'
         );
         setActiveBookings(active || []);
+        
+        // Find completed bookings for certificates
+        const completed = bookings.filter((b: Booking) => b.status === 'completed');
+        setCompletedBookings(completed || []);
       } catch (e) {
         console.log('No bookings found');
       }
@@ -487,12 +492,30 @@ const UserDashboard = () => {
                           </div>
                           <span className="material-symbols-outlined text-gray-500 group-hover:text-white transition-colors">chevron_right</span>
                         </button>
-                        <button onClick={() => window.location.hash = '#/certificates'} className="flex w-full group cursor-pointer items-center justify-between overflow-hidden rounded-xl h-14 px-4 bg-white/5 text-gray-200 border border-white/5 hover:bg-white/10 hover:border-white/10 transition-all">
+                        <button 
+                          onClick={() => {
+                            if (completedBookings.length > 0) {
+                              // Go to most recent completed booking's certificate
+                              const mostRecent = completedBookings.sort((a, b) => 
+                                new Date(b.scheduledDate).getTime() - new Date(a.scheduledDate).getTime()
+                              )[0];
+                              window.location.hash = `#/certificate?booking=${mostRecent._id}`;
+                            } else {
+                              window.location.hash = '#/certificate';
+                            }
+                          }} 
+                          className="flex w-full group cursor-pointer items-center justify-between overflow-hidden rounded-xl h-14 px-4 bg-white/5 text-gray-200 border border-white/5 hover:bg-white/10 hover:border-white/10 transition-all"
+                        >
                           <div className="flex items-center gap-3">
                             <div className="size-8 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center">
                               <span className="material-symbols-outlined text-xl">workspace_premium</span>
                             </div>
-                            <span className="font-medium">Certificates</span>
+                            <div className="flex flex-col items-start">
+                              <span className="font-medium">Certificates</span>
+                              {completedBookings.length > 0 && (
+                                <span className="text-xs text-[#10b981]">{completedBookings.length} available</span>
+                              )}
+                            </div>
                           </div>
                           <span className="material-symbols-outlined text-gray-500 group-hover:text-white transition-colors">chevron_right</span>
                         </button>

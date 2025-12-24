@@ -2,33 +2,17 @@ import React, { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
 import Loader from '../components/Loader';
 import NotificationBell from '../components/NotificationBell';
-import { api, getCurrentUser } from '../services/api';
-
-interface Certificate {
-  _id: string;
-  certificateNumber: string;
-  issueDate: string;
-  expiryDate?: string;
-  wasteType: string;
-  quantity: number;
-  agency: {
-    _id: string;
-    companyName: string;
-    logo?: string;
-  };
-  certificateUrl?: string;
-  status: string;
-}
+import { api, getCurrentUser, Booking } from '../services/api';
 
 const UserCertificates = () => {
   const [user, setUser] = useState<any>(null);
-  const [certificates, setCertificates] = useState<Certificate[]>([]);
+  const [completedBookings, setCompletedBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<'all' | 'active' | 'expired'>('all');
 
   useEffect(() => {
     loadUserData();
-    fetchCertificates();
+    fetchCompletedBookings();
   }, []);
 
   const loadUserData = async () => {
@@ -45,13 +29,15 @@ const UserCertificates = () => {
     }
   };
 
-  const fetchCertificates = async () => {
+  const fetchCompletedBookings = async () => {
     try {
       setLoading(true);
-      const response: any = await api.getUserCertificates();
-      setCertificates(response.certificates || []);
+      const response: any = await api.getUserBookings();
+      const bookings = response?.bookings || response || [];
+      const completed = bookings.filter((b: Booking) => b.status === 'completed');
+      setCompletedBookings(completed);
     } catch (error) {
-      console.error('Failed to fetch certificates:', error);
+      console.error('Failed to fetch bookings:', error);
     } finally {
       setLoading(false);
     }
@@ -62,33 +48,49 @@ const UserCertificates = () => {
     window.location.hash = '#/login';
   };
 
-  const getFilteredCertificates = () => {
-    if (filter === 'all') return certificates;
+  const getExpiryDate = (issueDate: string) => {
+    const date = new Date(issueDate);
+    date.setMonth(date.getMonth() + 6);
+    return date;
+  };
+
+  const getFilteredBookings = () => {
+    if (filter === 'all') return completedBookings;
     if (filter === 'active') {
-      return certificates.filter(cert => {
-        if (!cert.expiryDate) return true;
-        return new Date(cert.expiryDate) > new Date();
+      return completedBookings.filter(booking => {
+        const issueDate = booking.completedAt || booking.updatedAt || booking.scheduledDate;
+        const expiryDate = getExpiryDate(issueDate);
+        return expiryDate > new Date();
       });
     }
     if (filter === 'expired') {
-      return certificates.filter(cert => {
-        if (!cert.expiryDate) return false;
-        return new Date(cert.expiryDate) <= new Date();
+      return completedBookings.filter(booking => {
+        const issueDate = booking.completedAt || booking.updatedAt || booking.scheduledDate;
+        const expiryDate = getExpiryDate(issueDate);
+        return expiryDate <= new Date();
       });
     }
-    return certificates;
+    return completedBookings;
   };
 
-  const filteredCertificates = getFilteredCertificates();
+  const filteredBookings = getFilteredBookings();
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
   };
 
-  const isExpired = (expiryDate?: string) => {
-    if (!expiryDate) return false;
-    return new Date(expiryDate) <= new Date();
+  const isExpired = (issueDate: string) => {
+    const expiryDate = getExpiryDate(issueDate);
+    return expiryDate <= new Date();
+  };
+
+  const getTotalWeight = (booking: Booking) => {
+    return booking.items?.reduce((sum, item) => sum + (item.weight || 0), 0) || 0;
+  };
+
+  const getWasteTypes = (booking: Booking) => {
+    return booking.items?.map(item => item.type).join(', ') || 'E-Waste';
   };
 
   return (
@@ -204,105 +206,117 @@ const UserCertificates = () => {
                   <p className="text-gray-400">Loading certificates...</p>
                 </div>
               </div>
-            ) : filteredCertificates.length === 0 ? (
+            ) : filteredBookings.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-20">
                 <div className="w-20 h-20 rounded-full bg-white/5 flex items-center justify-center mb-4">
                   <span className="material-symbols-outlined text-gray-500 text-[48px]">workspace_premium</span>
                 </div>
                 <h3 className="text-xl font-semibold text-white mb-2">No certificates yet</h3>
-                <p className="text-gray-400 text-center max-w-md">
+                <p className="text-gray-400 text-center max-w-md mb-6">
                   Complete e-waste pickups to receive appreciation certificates from agencies
                 </p>
+                <button
+                  onClick={() => window.location.hash = '#/search'}
+                  className="px-6 py-3 rounded-xl bg-[#10b981] hover:bg-[#059669] text-white font-bold transition-colors flex items-center gap-2"
+                >
+                  <span className="material-symbols-outlined">add</span>
+                  Schedule a Pickup
+                </button>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredCertificates.map((certificate) => (
-                  <div
-                    key={certificate._id}
-                    className="bg-gradient-to-br from-[#151F26] to-[#0B1116] rounded-2xl p-6 border border-white/5 hover:border-[#10b981]/30 transition-all shadow-[0_10px_15px_-3px_rgba(0,0,0,0.3)] hover:shadow-[0_20px_25px_-5px_rgba(16,185,129,0.1)] relative overflow-hidden group"
-                  >
-                    {/* Certificate Badge */}
-                    <div className="absolute top-4 right-4 px-3 py-1 rounded-full text-xs font-medium bg-[#10b981]/20 text-[#10b981] border border-[#10b981]/30">
-                      {isExpired(certificate.expiryDate) ? 'Expired' : 'Active'}
-                    </div>
+                {filteredBookings.map((booking) => {
+                  const issueDate = booking.completedAt || booking.updatedAt || booking.scheduledDate;
+                  const expiryDate = getExpiryDate(issueDate);
+                  const agencyName = typeof booking.agencyId === 'object' ? booking.agencyId.name : 'Agency';
+                  const totalWeight = getTotalWeight(booking);
+                  const wasteTypes = getWasteTypes(booking);
+                  
+                  return (
+                    <div
+                      key={booking._id}
+                      className="bg-gradient-to-br from-[#151F26] to-[#0B1116] rounded-2xl p-6 border border-white/5 hover:border-[#10b981]/30 transition-all shadow-[0_10px_15px_-3px_rgba(0,0,0,0.3)] hover:shadow-[0_20px_25px_-5px_rgba(16,185,129,0.1)] relative overflow-hidden group cursor-pointer"
+                      onClick={() => window.location.hash = `#/certificate?booking=${booking._id}`}
+                    >
+                      {/* Certificate Badge */}
+                      <div className="absolute top-4 right-4 px-3 py-1 rounded-full text-xs font-medium bg-[#10b981]/20 text-[#10b981] border border-[#10b981]/30">
+                        {isExpired(issueDate) ? 'Expired' : 'Active'}
+                      </div>
 
-                    {/* Agency Logo */}
-                    <div className="flex items-center gap-3 mb-4">
-                      <div 
-                        className="size-12 rounded-lg bg-white/5 flex items-center justify-center overflow-hidden"
-                        style={
-                          certificate.agency.logo
-                            ? { backgroundImage: `url(${certificate.agency.logo})`, backgroundSize: 'cover', backgroundPosition: 'center' }
-                            : {}
-                        }
-                      >
-                        {!certificate.agency.logo && (
-                          <span className="material-symbols-outlined text-gray-500">business</span>
-                        )}
+                      {/* Agency Info */}
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="size-12 rounded-lg bg-[#10b981]/10 flex items-center justify-center">
+                          <span className="material-symbols-outlined text-[#10b981]">recycling</span>
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-sm text-gray-400">Certified by</p>
+                          <h3 className="font-semibold text-white">{agencyName}</h3>
+                        </div>
                       </div>
-                      <div className="flex-1">
-                        <p className="text-sm text-gray-400">Issued by</p>
-                        <h3 className="font-semibold text-white">{certificate.agency.companyName}</h3>
-                      </div>
-                    </div>
 
-                    {/* Certificate Details */}
-                    <div className="space-y-3 mb-4">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm text-gray-400">Certificate No.</span>
-                        <span className="text-sm font-medium text-white">{certificate.certificateNumber}</span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm text-gray-400">Waste Type</span>
-                        <span className="text-sm font-medium text-white">{certificate.wasteType}</span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm text-gray-400">Quantity</span>
-                        <span className="text-sm font-medium text-white">{certificate.quantity} kg</span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm text-gray-400">Issue Date</span>
-                        <span className="text-sm font-medium text-white">{formatDate(certificate.issueDate)}</span>
-                      </div>
-                      {certificate.expiryDate && (
+                      {/* Certificate Details */}
+                      <div className="space-y-3 mb-4">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-gray-400">Certificate No.</span>
+                          <span className="text-sm font-medium text-white">
+                            {booking.bookingId || `#${booking._id.slice(-6).toUpperCase()}`}
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-gray-400">Waste Items</span>
+                          <span className="text-sm font-medium text-white truncate ml-2" title={wasteTypes}>
+                            {wasteTypes.length > 20 ? wasteTypes.substring(0, 20) + '...' : wasteTypes}
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-gray-400">Total Weight</span>
+                          <span className="text-sm font-medium text-white">{totalWeight.toFixed(1)} kg</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-gray-400">EcoPoints</span>
+                          <span className="text-sm font-bold text-[#10b981]">+{booking.ecoPointsEarned || 0}</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-gray-400">Issue Date</span>
+                          <span className="text-sm font-medium text-white">{formatDate(issueDate)}</span>
+                        </div>
                         <div className="flex items-center justify-between">
                           <span className="text-sm text-gray-400">Expiry Date</span>
-                          <span className={`text-sm font-medium ${isExpired(certificate.expiryDate) ? 'text-red-400' : 'text-white'}`}>
-                            {formatDate(certificate.expiryDate)}
+                          <span className={`text-sm font-medium ${isExpired(issueDate) ? 'text-red-400' : 'text-white'}`}>
+                            {formatDate(expiryDate.toISOString())}
                           </span>
                         </div>
                       )}
-                    </div>
+                      </div>
 
-                    {/* Action Buttons */}
-                    <div className="flex gap-2">
-                      {certificate.certificateUrl ? (
-                        <a
-                          href={certificate.certificateUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
+                      {/* Action Buttons */}
+                      <div className="flex gap-2">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            window.location.hash = `#/certificate?booking=${booking._id}`;
+                          }}
                           className="flex-1 px-4 py-2.5 rounded-xl bg-[#10b981] hover:bg-[#059669] text-white font-medium text-sm flex items-center justify-center gap-2 transition-colors"
                         >
-                          <span className="material-symbols-outlined text-[18px]">download</span>
-                          Download
-                        </a>
-                      ) : (
-                        <button
-                          disabled
-                          className="flex-1 px-4 py-2.5 rounded-xl bg-white/5 text-gray-500 font-medium text-sm flex items-center justify-center gap-2 cursor-not-allowed"
-                        >
-                          <span className="material-symbols-outlined text-[18px]">hourglass_empty</span>
-                          Processing
+                          <span className="material-symbols-outlined text-[18px]">visibility</span>
+                          View
                         </button>
-                      )}
-                      <button
-                        className="px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 font-medium text-sm flex items-center justify-center gap-2 transition-colors border border-white/5"
-                      >
-                        <span className="material-symbols-outlined text-[18px]">share</span>
-                      </button>
-                    </div>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            window.location.hash = `#/certificate?booking=${booking._id}`;
+                          }}
+                          className="px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 font-medium text-sm flex items-center justify-center gap-2 transition-colors border border-white/5"
+                        >
+                          <span className="material-symbols-outlined text-[18px]">download</span>
+                        </button>
+                      </div>
 
-                    {/* Decorative Elements */}
+                      {/* Decorative Elements */}
+                      <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-[#10b981]/5 rounded-full blur-2xl group-hover:bg-[#10b981]/10 transition-all"></div>
+                    </div>
+                  );
+                })}
                     <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-[#10b981]/5 rounded-full blur-2xl group-hover:bg-[#10b981]/10 transition-all"></div>
                   </div>
                 ))}

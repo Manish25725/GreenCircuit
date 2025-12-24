@@ -168,10 +168,14 @@ const SearchAgencies = () => {
     // Add markers for each agency
     agencies.forEach(agency => {
       let coords: [number, number] | null = null;
+      let coordSource = '';
       
       // First try to use exact coordinates from agency
       if (agency.address?.coordinates?.lat && agency.address?.coordinates?.lng) {
         coords = [agency.address.coordinates.lat, agency.address.coordinates.lng];
+        coordSource = 'GPS coordinates';
+        console.log(`${agency.name}: Using GPS coordinates [${coords[0]}, ${coords[1]}] - Lat: ${agency.address.coordinates.lat}, Lng: ${agency.address.coordinates.lng}`);
+        console.log(`  City: ${agency.address?.city}, State: ${agency.address?.state}, Country: ${agency.address?.country}`);
       } else {
         // Fallback to city lookup
         const city = agency.address?.city || '';
@@ -180,6 +184,10 @@ const SearchAgencies = () => {
         );
         if (cityData) {
           coords = cityData[1].coords;
+          coordSource = `City lookup (${city})`;
+          console.log(`${agency.name}: Using city coordinates [${coords[0]}, ${coords[1]}] for ${city}`);
+        } else {
+          console.warn(`${agency.name}: No coordinates or city match found. City: ${city}`);
         }
       }
 
@@ -255,14 +263,32 @@ const SearchAgencies = () => {
       }
     });
 
-    // Fit bounds with animation
-    if (markersRef.current.length > 0 && !selectedAgency) {
-      const group = L.featureGroup(markersRef.current);
-      mapInstanceRef.current.fitBounds(group.getBounds().pad(0.2), { 
-        maxZoom: 6,
-        animate: true,
-        duration: 1
-      });
+    console.log(`Total markers added: ${markersRef.current.length}`);
+
+    // Fit bounds with animation to show all markers
+    if (markersRef.current.length > 0) {
+      setTimeout(() => {
+        if (mapInstanceRef.current && markersRef.current.length > 0) {
+          const group = L.featureGroup(markersRef.current);
+          const bounds = group.getBounds();
+          
+          if (markersRef.current.length === 1) {
+            // Single marker - center and zoom to it
+            const marker = markersRef.current[0];
+            const latlng = marker.getLatLng();
+            mapInstanceRef.current.setView([latlng.lat, latlng.lng], 12, { animate: true });
+            console.log(`Centered map on single marker at [${latlng.lat}, ${latlng.lng}]`);
+          } else {
+            // Multiple markers - fit all in view
+            mapInstanceRef.current.fitBounds(bounds.pad(0.1), { 
+              maxZoom: 12,
+              animate: true,
+              duration: 1
+            });
+            console.log(`Fitted map to ${markersRef.current.length} markers`);
+          }
+        }
+      }, 100);
     }
   }, [agencies, mapReady, selectedAgency, isBusiness]);
 
@@ -270,6 +296,8 @@ const SearchAgencies = () => {
     setLoading(true);
     try {
       const result = await api.getAgencies();
+      console.log('Loaded agencies:', result.agencies?.length || 0, 'agencies');
+      console.log('Agencies data:', result.agencies);
       setAgencies(result.agencies || []);
     } catch (error) {
       console.error('Failed to load agencies:', error);

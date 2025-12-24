@@ -72,12 +72,13 @@ export interface Booking {
   _id: string;
   bookingId: string;
   userId: string;
-  agencyId: Agency;
+  agencyId: Agency | string;
   slotId: string;
   items: {
     type: string;
     quantity: number;
     description: string;
+    weight?: number;
   }[];
   status: 'pending' | 'confirmed' | 'in-progress' | 'completed' | 'cancelled';
   scheduledDate: string;
@@ -94,6 +95,9 @@ export interface Booking {
     message: string;
     timestamp: string;
   }[];
+  createdAt?: string;
+  updatedAt?: string;
+  completedAt?: string;
 }
 
 export interface Reward {

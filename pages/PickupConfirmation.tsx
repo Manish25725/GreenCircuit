@@ -355,7 +355,7 @@ const PickupConfirmation = () => {
             <div className="animate-card flex flex-col sm:flex-row gap-4 pt-4">
               {(booking?.status === 'completed' || booking?.status === 'collected') ? (
                 <button 
-                  onClick={() => window.location.hash = userRole === 'User' ? '#/certificate' : dashboardPath}
+                  onClick={() => window.location.hash = userRole === 'User' ? `#/certificate?booking=${booking._id}` : dashboardPath}
                   className="relative group flex-1 h-14 rounded-full overflow-hidden cursor-pointer"
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-[#34D399] to-[#6EE7B7] transition-transform duration-300 group-hover:scale-105"></div>

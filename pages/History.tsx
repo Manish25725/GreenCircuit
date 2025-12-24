@@ -244,11 +244,13 @@ const History = () => {
                       {filteredBookings.map((booking) => (
                         <div 
                           key={booking._id} 
-                          className="p-6 hover:bg-white/5 transition-colors cursor-pointer"
-                          onClick={() => window.location.hash = `#/pickup-confirmation?booking=${booking._id}`}
+                          className="p-6 hover:bg-white/5 transition-colors"
                         >
                           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                            <div className="flex items-start gap-4">
+                            <div 
+                              className="flex items-start gap-4 flex-1 cursor-pointer"
+                              onClick={() => window.location.hash = `#/pickup-confirmation?booking=${booking._id}`}
+                            >
                               <div className={`p-3 rounded-xl ${getStatusColor(booking.status)}`}>
                                 <span className="material-symbols-outlined">{getStatusIcon(booking.status)}</span>
                               </div>
@@ -270,11 +272,28 @@ const History = () => {
                               </div>
                             </div>
                             <div className="flex items-center gap-4">
+                              {booking.status === 'completed' && (
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    window.location.hash = `#/certificate?booking=${booking._id}`;
+                                  }}
+                                  className="flex items-center gap-2 px-4 py-2 bg-[#10b981]/10 hover:bg-[#10b981]/20 text-[#10b981] rounded-lg transition-colors border border-[#10b981]/20"
+                                >
+                                  <span className="material-symbols-outlined text-sm">verified</span>
+                                  <span className="text-sm font-bold">Certificate</span>
+                                </button>
+                              )}
                               <div className="text-right">
                                 <p className="text-[#10b981] font-bold">+{booking.ecoPointsEarned || 0}</p>
                                 <p className="text-xs text-gray-500">Eco Points</p>
                               </div>
-                              <span className="material-symbols-outlined text-gray-500">chevron_right</span>
+                              <span 
+                                className="material-symbols-outlined text-gray-500 cursor-pointer"
+                                onClick={() => window.location.hash = `#/pickup-confirmation?booking=${booking._id}`}
+                              >
+                                chevron_right
+                              </span>
                             </div>
                           </div>
                           
