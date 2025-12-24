@@ -1,10 +1,31 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { getCurrentUser } from '../services/api';
 import NotificationBell from './NotificationBell';
 
 const ProfileHeader: React.FC = () => {
-  const user = getCurrentUser();
-  const avatarUrl = user?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'User')}&background=10b981&color=fff`;
+  const [user, setUser] = useState(getCurrentUser());
+  const [avatarKey, setAvatarKey] = useState(Date.now());
+  
+  // Add cache busting to avatar URL
+  const avatarUrl = user?.avatar 
+    ? `${user.avatar}?t=${avatarKey}`
+    : `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'User')}&background=10b981&color=fff`;
+  
+  useEffect(() => {
+    // Listen for user updates
+    const handleUserUpdate = () => {
+      setUser(getCurrentUser());
+      setAvatarKey(Date.now()); // Force refresh avatar
+    };
+    
+    window.addEventListener('userUpdated', handleUserUpdate);
+    window.addEventListener('storage', handleUserUpdate);
+    
+    return () => {
+      window.removeEventListener('userUpdated', handleUserUpdate);
+      window.removeEventListener('storage', handleUserUpdate);
+    };
+  }, []);
 
   return (
     <header className="flex items-center justify-between whitespace-nowrap border-b border-white/5 px-4 sm:px-6 lg:px-10 py-4 bg-[#0B1116]/80 backdrop-blur-md fixed top-0 left-0 right-0 z-50 transition-all duration-300">

@@ -105,6 +105,18 @@ const Profile = () => {
         try {
           const updatedUser = await api.updateProfile({ avatar: data.secure_url });
           setUser(updatedUser);
+          
+          // Update localStorage
+          const storedUser = localStorage.getItem('user');
+          if (storedUser) {
+            const userData = JSON.parse(storedUser);
+            localStorage.setItem('user', JSON.stringify({ ...userData, ...updatedUser }));
+          }
+          
+          // Trigger event to update all components
+          window.dispatchEvent(new Event('userUpdated'));
+          window.dispatchEvent(new Event('storage'));
+          
           // Show success message
           alert('Avatar updated successfully!');
         } catch (apiError) {

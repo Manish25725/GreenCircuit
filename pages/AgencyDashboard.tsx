@@ -22,6 +22,17 @@ const AgencyDashboard = () => {
 
   useEffect(() => {
     checkAgencyStatus();
+    
+    // Listen for user updates
+    const handleUserUpdate = () => {
+      const updatedUser = getCurrentUser();
+      setUser(updatedUser);
+    };
+    window.addEventListener('userUpdated', handleUserUpdate);
+    
+    return () => {
+      window.removeEventListener('userUpdated', handleUserUpdate);
+    };
   }, []);
 
   const checkAgencyStatus = async () => {
@@ -211,15 +222,27 @@ const AgencyDashboard = () => {
               </nav>
               <div className="flex items-center gap-4">
                 <NotificationBell />
-                <button 
-                    onClick={() => window.location.hash = '#/agency/profile'}
-                    className="hidden sm:flex items-center gap-3 pl-1 pr-4 py-1 rounded-full bg-[#151F26] border border-white/5 hover:bg-white/5 transition-colors group cursor-pointer"
-                >
-                  <div className="size-8 rounded-full bg-[#f59e0b] flex items-center justify-center ring-2 ring-white/10 group-hover:ring-[#f59e0b]/50 transition-all text-white font-bold text-sm">
-                    {user?.name?.charAt(0) || 'A'}
+                <div className="relative group">
+                  <button 
+                      onClick={() => window.location.hash = '#/agency/profile'}
+                      className="hidden sm:flex items-center gap-3 pl-1 pr-4 py-1 rounded-full bg-[#151F26] border border-white/5 hover:bg-white/5 transition-colors cursor-pointer"
+                  >
+                    <div 
+                      className="size-8 rounded-full bg-cover bg-center ring-2 ring-white/10 group-hover:ring-[#f59e0b]/50 transition-all" 
+                      style={{ backgroundImage: `url("${(user?.logo || user?.avatar || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user?.name || user?.companyName || 'Partner') + '&background=f59e0b&color=fff')}${(user?.logo || user?.avatar) ? '?t=' + avatarKey : ''}")` }}
+                    ></div>
+                    <span className="text-sm font-medium text-gray-200">{user?.name || 'Agency'}</span>
+                  </button>
+                  {/* Hover Preview */}
+                  <div className="absolute top-14 right-0 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-[100]">
+                    <div className="bg-[#151F26] border border-white/10 rounded-2xl p-4 shadow-2xl">
+                      <div 
+                        className="size-32 rounded-xl bg-cover bg-center ring-4 ring-[#f59e0b]/30" 
+                        style={{ backgroundImage: `url("${(user?.logo || user?.avatar || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user?.name || user?.companyName || 'Partner') + '&background=f59e0b&color=fff')}${(user?.logo || user?.avatar) ? '?t=' + avatarKey : ''}")` }}
+                      ></div>
+                    </div>
                   </div>
-                  <span className="text-sm font-medium text-gray-200">{user?.name || 'Agency'}</span>
-                </button>
+                </div>
                 <button 
                   onClick={handleLogout}
                   className="p-2.5 rounded-full bg-[#151F26] border border-white/5 text-gray-400 hover:text-red-400 hover:bg-red-500/10 transition-colors"

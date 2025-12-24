@@ -365,12 +365,34 @@ export const updateBookingStatus = async (req: Request, res: Response) => {
 
       // Get user info for certificate
       const user = await User.findById(booking.userId);
+      console.log('Booking completed for user:', user?.email, 'Role:', user?.role);
       
       // Check if this is a business user and generate BusinessCertificate
-      const business = await Business.findOne({ userId: booking.userId });
+      let business = await Business.findOne({ userId: booking.userId });
+      console.log('Business profile found:', business ? business.companyName : 'None');
+      
+      // If user has business role but no profile, create one automatically
+      if (!business && user?.role === 'business') {
+        console.log('Creating business profile automatically for:', user.email);
+        business = await Business.create({
+          userId: booking.userId,
+          companyName: user.name + "'s Business",
+          email: user.email,
+          phone: user.phone || '',
+          industry: 'Technology',
+          address: user.address || {
+            street: '',
+            city: '',
+            state: '',
+            country: 'India',
+            zipCode: ''
+          }
+        });
+        console.log('Business profile created:', business.companyName, 'ID:', business._id);
+      }
       
       if (business) {
-        // Generate Business Certificate
+        // Generate Business Compliance Certificate
         const items = booking.items?.map((item: any) => ({
           name: item.description || item.type || 'E-Waste Item',
           category: item.type || item.category || 'General',
@@ -378,25 +400,60 @@ export const updateBookingStatus = async (req: Request, res: Response) => {
           weight: item.estimatedWeight || item.weight || 0
         })) || [];
 
-        await BusinessCertificate.create({
+        console.log('Generating Compliance Certificate for business:', business.companyName, 'Business ID:', business._id);
+
+        const totalWeight = booking.totalWeight || 0;
+        const certificate = await BusinessCertificate.create({
           businessId: business._id,
           bookingId: booking._id,
           agencyId: agency._id,
-          type: 'recycling',
-          title: 'E-Waste Disposal Certificate',
+          type: 'compliance',
+          title: 'E-Waste Compliance Certificate',
           items,
-          totalWeight: booking.totalWeight || 0,
+          totalWeight: totalWeight,
           totalItems: items.reduce((sum: number, item: any) => sum + (item.quantity || 1), 0),
-          co2Saved: (booking.totalWeight || 0) * 0.67,
-          complianceStandards: ['EPA', 'E-Waste Guidelines'],
-          disposalMethod: 'Certified Recycling',
+          co2Saved: totalWeight * 2.5, // kg of CO2 saved per kg of e-waste
+          materialsRecovered: [
+            { material: 'Metals', weight: totalWeight * 0.65 },
+            { material: 'Plastics', weight: totalWeight * 0.20 },
+            { material: 'Glass', weight: totalWeight * 0.10 },
+            { material: 'Other Materials', weight: totalWeight * 0.05 }
+          ],
+          complianceStandards: [
+            'EPA - E-Waste Management Guidelines',
+            'ISO 14001 - Environmental Management',
+            'R2 - Responsible Recycling',
+            'e-Stewards Certification',
+            'Ministry of Environment Guidelines'
+          ],
+          disposalMethod: 'Certified E-Waste Recycling - Environmentally Sound Management',
           issuedBy: {
             name: agency.name,
-            designation: 'Authorized Recycling Partner'
+            designation: 'Authorized E-Waste Recycling Partner'
           },
           status: 'issued',
           validUntil: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000), // 1 year validity
           issuedAt: new Date()
+        });
+
+        console.log('Compliance Certificate created successfully!');
+        console.log('Certificate ID:', certificate.certificateId);
+        console.log('Certificate _id:', certificate._id);
+        console.log('Business ID:', certificate.businessId);
+        console.log('Agency ID:', certificate.agencyId);
+        console.log('Status:', certificate.status);
+
+        // Create notification for business user
+        await Notification.create({
+          userId: booking.userId,
+          type: 'certificate',
+          title: 'Compliance Certificate Issued',
+          message: `Your E-Waste Compliance Certificate (${certificate.certificateId}) has been issued for ${totalWeight}kg of recycled e-waste.`,
+          icon: 'verified',
+          metadata: {
+            certificateId: certificate.certificateId,
+            type: 'compliance'
+          }
         });
 
         // Update business stats

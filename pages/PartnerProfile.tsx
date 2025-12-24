@@ -8,11 +8,22 @@ const PartnerProfile = () => {
 
   useEffect(() => {
     loadUserData();
+    
+    // Listen for user updates
+    const handleUserUpdate = () => {
+      loadUserData();
+    };
+    window.addEventListener('userUpdated', handleUserUpdate);
+    
+    return () => {
+      window.removeEventListener('userUpdated', handleUserUpdate);
+    };
   }, []);
 
   const loadUserData = async () => {
     try {
       const { api } = await import('../services/api');
+      // Force fresh data from API
       const userData = await api.getMe();
       setUser(userData);
       localStorage.setItem('user', JSON.stringify(userData));
@@ -98,7 +109,7 @@ const PartnerProfile = () => {
                   >
                     <div 
                       className="size-8 rounded-full bg-cover bg-center ring-2 ring-white/10 group-hover:ring-[#8b5cf6]/50 transition-all" 
-                      style={{ backgroundImage: `url("${user?.avatar || user?.logo || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user?.name || user?.companyName || 'Partner') + '&background=8b5cf6&color=fff'}")`}}
+                      style={{ backgroundImage: `url("${(user?.avatar || user?.logo || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user?.name || user?.companyName || 'Partner') + '&background=8b5cf6&color=fff')}${(user?.avatar || user?.logo) ? '?t=' + new Date().getTime() : ''}")` }}
                     ></div>
                     <span className="text-sm font-medium text-gray-200">{user?.companyName || user?.name || 'Partner'}</span>
                   </button>
@@ -107,7 +118,7 @@ const PartnerProfile = () => {
                     <div className="bg-[#151F26] border border-white/10 rounded-2xl p-4 shadow-2xl">
                       <div 
                         className="size-32 rounded-xl bg-cover bg-center ring-4 ring-[#8b5cf6]/30" 
-                        style={{ backgroundImage: `url("${user?.avatar || user?.logo || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user?.name || user?.companyName || 'Partner') + '&background=8b5cf6&color=fff'}")`}}
+                        style={{ backgroundImage: `url("${(user?.avatar || user?.logo || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user?.name || user?.companyName || 'Partner') + '&background=8b5cf6&color=fff')}${(user?.avatar || user?.logo) ? '?t=' + new Date().getTime() : ''}")` }}
                       ></div>
                     </div>
                   </div>
@@ -133,7 +144,11 @@ const PartnerProfile = () => {
                   <div className="flex items-center gap-4 mb-2">
                     <div className="size-16 rounded-2xl bg-gradient-to-br from-[#8b5cf6] to-[#3b82f6] flex items-center justify-center text-white font-bold text-2xl overflow-hidden shadow-lg">
                       {user?.logo || user?.avatar ? (
-                        <img src={user.logo || user.avatar} alt={user.companyName || user.name} className="w-full h-full object-cover" />
+                        <img 
+                          src={`${user.logo || user.avatar}?t=${new Date().getTime()}`} 
+                          alt={user.companyName || user.name} 
+                          className="w-full h-full object-cover" 
+                        />
                       ) : (
                         (user?.companyName || user?.name)?.charAt(0)?.toUpperCase() || 'P'
                       )}

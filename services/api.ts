@@ -232,15 +232,27 @@ async function apiRequest<T>(endpoint: string, options: RequestInit = {}): Promi
     ...(options.headers || {}),
   };
   
+  // Debug logging
+  console.log('=== API Request ===');
+  console.log('Endpoint:', endpoint);
+  console.log('Full URL:', `${API_BASE_URL}${endpoint}`);
+  console.log('Headers:', headers);
+  console.log('Token exists:', !!localStorage.getItem('token'));
+  
   const res = await fetch(`${API_BASE_URL}${endpoint}`, {
     ...options,
     headers,
   });
   
+  console.log('Response status:', res.status);
+  console.log('Response ok:', res.ok);
+  
   const data = await res.json();
+  console.log('Response data:', data);
   
   if (!res.ok) {
-    throw new Error(data.error || 'Request failed');
+    console.error('API Error:', data);
+    throw new Error(data.error || data.message || 'Request failed');
   }
   
   return data.data || data;
@@ -657,11 +669,12 @@ export const api = {
   },
 
   // Business Certificates
-  getBusinessCertificates: async (params?: { status?: string; search?: string; page?: number }) => {
+  getBusinessCertificates: async (params?: { status?: string; search?: string; page?: number; limit?: number }) => {
     const searchParams = new URLSearchParams();
     if (params?.status) searchParams.append('status', params.status);
     if (params?.search) searchParams.append('search', params.search);
     if (params?.page) searchParams.append('page', params.page.toString());
+    if (params?.limit) searchParams.append('limit', params.limit.toString());
     return apiRequest(`/business/certificates?${searchParams.toString()}`);
   },
 

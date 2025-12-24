@@ -3,6 +3,9 @@ import Booking from '../models/Booking';
 import Slot from '../models/Slot';
 import User from '../models/User';
 import Agency from '../models/Agency';
+import Business from '../models/Business';
+import BusinessCertificate from '../models/BusinessCertificate';
+import Certificate from '../models/Certificate';
 import Notification from '../models/Notification';
 import { sendSuccess, sendError } from '../utils/response';
 
@@ -174,8 +177,19 @@ export const updateBookingStatus = async (req: Request, res: Response) => {
       timestamp: new Date()
     });
 
-    // If completed, award eco points based on weight (5 points per 20kg)
+    // If completed, award eco points and generate certificates
     if (status === 'completed' && booking.ecoPointsEarned === 0) {
+      booking.completedAt = new Date();
+      
+      // Calculate total weight from items if not already set
+      if (!booking.totalWeight || booking.totalWeight === 0) {
+        const calculatedWeight = booking.items?.reduce((sum: number, item: any) => {
+          const itemWeight = item.estimatedWeight || item.weight || (item.quantity * 2);
+          return sum + itemWeight;
+        }, 0) || 0;
+        booking.totalWeight = calculatedWeight;
+      }
+      
       const totalWeight = booking.totalWeight || 0;
       // Formula: 5 points per 20kg = weight * 0.25, rounded to nearest integer
       const pointsEarned = Math.max(1, Math.round(totalWeight * 0.25)); // Minimum 1 point
@@ -185,7 +199,8 @@ export const updateBookingStatus = async (req: Request, res: Response) => {
       await User.findByIdAndUpdate(booking.userId, {
         $inc: { 
           ecoPoints: pointsEarned,
-          totalPickups: 1 // Increment pickups only when completed
+          totalPickups: 1, // Increment pickups only when completed
+          totalWasteRecycled: totalWeight
         }
       });
 
@@ -197,11 +212,138 @@ export const updateBookingStatus = async (req: Request, res: Response) => {
         message: `You earned ${pointsEarned} eco points for recycling ${totalWeight}kg of e-waste!`,
         icon: 'stars'
       });
+      
+      // Get user info for certificate generation
+      const user = await User.findById(booking.userId);
+      console.log('🎯 Booking completed for user:', user?.email, 'Role:', user?.role);
+      
+      // Check if this is a business user and generate BusinessCertificate
+      let business = await Business.findOne({ userId: booking.userId });
+      console.log('🏢 Business profile found:', business ? business.companyName : 'None');
+      
+      // If user has business role but no profile, create one automatically
+      if (!business && user?.role === 'business') {
+        console.log('✨ Creating business profile automatically for:', user.email);
+        business = await Business.create({
+          userId: booking.userId,
+          companyName: user.name + "'s Business",
+          email: user.email,
+          phone: user.phone || '',
+          industry: 'Technology',
+          address: user.address || {
+            street: '',
+            city: '',
+            state: '',
+            country: 'India',
+            zipCode: ''
+          }
+        });
+        console.log('✅ Business profile created:', business.companyName, 'ID:', business._id);
+      }
+      
+      if (business) {
+        // Generate Business Compliance Certificate
+        const items = booking.items?.map((item: any) => ({
+          name: item.description || item.type || 'E-Waste Item',
+          category: item.type || item.category || 'General',
+          quantity: item.quantity || 1,
+          weight: item.estimatedWeight || item.weight || 0
+        })) || [];
+
+        console.log('📜 Generating Compliance Certificate for business:', business.companyName);
+
+        const certificate = await BusinessCertificate.create({
+          businessId: business._id,
+          bookingId: booking._id,
+          agencyId: booking.agencyId,
+          type: 'compliance',
+          title: 'E-Waste Compliance Certificate',
+          items,
+          totalWeight: totalWeight,
+          totalItems: items.reduce((sum: number, item: any) => sum + (item.quantity || 1), 0),
+          co2Saved: totalWeight * 2.5, // kg of CO2 saved per kg of e-waste
+          materialsRecovered: [
+            { material: 'Metals', weight: totalWeight * 0.65 },
+            { material: 'Plastics', weight: totalWeight * 0.20 },
+            { material: 'Glass', weight: totalWeight * 0.10 },
+            { material: 'Other Materials', weight: totalWeight * 0.05 }
+          ],
+          complianceStandards: [
+            'EPA - E-Waste Management Guidelines',
+            'ISO 14001 - Environmental Management',
+            'R2 - Responsible Recycling',
+            'e-Stewards Certification',
+            'Ministry of Environment Guidelines'
+          ],
+          disposalMethod: 'Certified E-Waste Recycling - Environmentally Sound Management',
+          issuedBy: {
+            name: 'EcoCycle Platform',
+            designation: 'Authorized E-Waste Recycling Partner'
+          },
+          status: 'issued',
+          validUntil: new Date(Date.now() + 6 * 30 * 24 * 60 * 60 * 1000), // 6 months validity
+          issuedAt: new Date()
+        });
+
+        console.log('✅ Compliance Certificate created successfully!');
+        console.log('   Certificate ID:', certificate.certificateId);
+        console.log('   Business ID:', certificate.businessId);
+        console.log('   Booking ID:', certificate.bookingId);
+
+        // Create notification for business user
+        await Notification.create({
+          userId: booking.userId,
+          type: 'certificate',
+          title: 'Compliance Certificate Issued',
+          message: `Your E-Waste Compliance Certificate (${certificate.certificateId}) has been issued for ${totalWeight}kg of recycled e-waste.`,
+          icon: 'verified',
+          metadata: {
+            certificateId: certificate.certificateId,
+            type: 'compliance'
+          }
+        });
+
+        // Update business stats
+        await Business.findByIdAndUpdate(business._id, {
+          $inc: {
+            totalWasteProcessed: totalWeight,
+            co2Saved: totalWeight * 0.67
+          }
+        });
+        
+        console.log('✅ Certificate generation complete!');
+      } else {
+        // Generate regular user Certificate
+        console.log('📄 Generating regular certificate for user:', user?.email);
+        const itemsRecycled = booking.items?.map((item: any) => ({
+          type: item.type || item.category || 'E-Waste',
+          quantity: item.quantity || 1,
+          weight: item.estimatedWeight || item.weight || 0
+        })) || [];
+
+        await Certificate.create({
+          userId: booking.userId,
+          bookingId: booking._id,
+          agencyId: booking.agencyId,
+          issueDate: new Date(),
+          totalWeight: totalWeight,
+          itemsRecycled,
+          environmentalImpact: {
+            co2Saved: totalWeight * 2.5,
+            waterSaved: totalWeight * 100,
+            energySaved: totalWeight * 10
+          }
+        });
+        
+        booking.certificateIssued = true;
+        console.log('✅ Regular certificate generated!');
+      }
     }
 
     await booking.save();
     sendSuccess(res, booking);
   } catch (error: any) {
+    console.error('❌ Error in updateBookingStatus:', error);
     sendError(res, error.message);
   }
 };

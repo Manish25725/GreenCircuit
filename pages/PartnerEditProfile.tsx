@@ -24,6 +24,7 @@ interface PartnerProfile {
 const PartnerEditProfile = () => {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<PartnerProfile | null>(null);
+  const [avatarKey, setAvatarKey] = useState(Date.now());
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
@@ -49,6 +50,22 @@ const PartnerEditProfile = () => {
     const currentUser = getCurrentUser();
     setUser(currentUser);
     loadPartnerProfile();
+    
+    // Listen for user updates (logo/avatar changes)
+    const handleUserUpdate = () => {
+      const updatedUser = getCurrentUser();
+      setUser(updatedUser);
+      setAvatarKey(Date.now());
+      loadPartnerProfile();
+    };
+    
+    window.addEventListener('userUpdated', handleUserUpdate);
+    window.addEventListener('storage', handleUserUpdate);
+    
+    return () => {
+      window.removeEventListener('userUpdated', handleUserUpdate);
+      window.removeEventListener('storage', handleUserUpdate);
+    };
   }, []);
 
   const loadPartnerProfile = async () => {
@@ -92,7 +109,10 @@ const PartnerEditProfile = () => {
         description: profileData.description || '',
         services: profileData.services || ''
       });
-      setLogoPreview(profileData.logo || '');
+      // Set logo preview with cache busting if URL exists
+      const logoUrl = profileData.logo ? `${profileData.logo}?t=${Date.now()}` : '';
+      setLogoPreview(logoUrl);
+      console.log('Loaded partner logo:', profileData.logo);
     } catch (error) {
       console.error('Failed to load partner profile:', error);
     } finally {
@@ -153,17 +173,29 @@ const PartnerEditProfile = () => {
       }
 
       const data = await response.json();
+      console.log('Logo uploaded to Cloudinary:', data);
       
       if (data.secure_url) {
+        console.log('Logo URL:', data.secure_url);
         // Update logo in backend immediately
         await api.updateAgencyProfile({ logo: data.secure_url });
+        console.log('Logo saved to profile');
         
-        // Update local storage
+        // Update local storage with both avatar and logo
         const currentUser = getCurrentUser();
         if (currentUser) {
-          currentUser.avatar = data.secure_url;
+          (currentUser as any).avatar = data.secure_url;
+          (currentUser as any).logo = data.secure_url;
           localStorage.setItem('user', JSON.stringify(currentUser));
         }
+        
+        // Trigger reload by dispatching custom event
+        window.dispatchEvent(new Event('userUpdated'));
+        window.dispatchEvent(new Event('storage'));
+        
+        // Refresh avatar key
+        setAvatarKey(Date.now());
+        setLogoPreview(data.secure_url);
         
         setShowSuccess(true);
         setTimeout(() => setShowSuccess(false), 3000);
@@ -293,7 +325,7 @@ const PartnerEditProfile = () => {
                   >
                     <div 
                       className="size-8 rounded-full bg-cover bg-center ring-2 ring-white/10 group-hover:ring-[#8b5cf6]/50 transition-all" 
-                      style={{ backgroundImage: `url("${profile?.logo || user?.avatar || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user?.name || 'Partner') + '&background=8b5cf6&color=fff'}")`}}
+                      style={{ backgroundImage: `url("${profile?.logo || user?.avatar || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user?.name || 'Partner') + '&background=8b5cf6&color=fff'}${(profile?.logo || user?.avatar) ? '?t=' + avatarKey : ''}")`}}
                     ></div>
                     <span className="text-sm font-medium text-gray-200">{formData.companyName || user?.name || 'Partner'}</span>
                   </button>
@@ -302,7 +334,7 @@ const PartnerEditProfile = () => {
                     <div className="bg-[#151F26] border border-white/10 rounded-2xl p-4 shadow-2xl">
                       <div 
                         className="size-32 rounded-xl bg-cover bg-center ring-4 ring-[#8b5cf6]/30" 
-                        style={{ backgroundImage: `url("${profile?.logo || user?.avatar || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user?.name || 'Partner') + '&background=8b5cf6&color=fff'}")`}}
+                        style={{ backgroundImage: `url("${profile?.logo || user?.avatar || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user?.name || 'Partner') + '&background=8b5cf6&color=fff'}${(profile?.logo || user?.avatar) ? '?t=' + avatarKey : ''}")`}}
                       ></div>
                     </div>
                   </div>

@@ -7,7 +7,7 @@ export interface IBusinessCertificate extends Document {
   agencyId: mongoose.Types.ObjectId;
   // Certificate Info
   certificateId: string;
-  type: 'recycling' | 'destruction' | 'donation' | 'refurbishment';
+  type: 'recycling' | 'destruction' | 'donation' | 'refurbishment' | 'compliance';
   title: string;
   // E-waste Details
   items: {
@@ -73,7 +73,7 @@ const BusinessCertificateSchema = new Schema<IBusinessCertificate>({
   type: {
     type: String,
     required: true,
-    enum: ['recycling', 'destruction', 'donation', 'refurbishment']
+    enum: ['recycling', 'destruction', 'donation', 'refurbishment', 'compliance']
   },
   title: {
     type: String,

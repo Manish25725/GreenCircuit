@@ -98,7 +98,7 @@ const ResidentProfileSettings = () => {
                   >
                     <div 
                       className="size-8 rounded-full bg-cover bg-center ring-2 ring-white/10 group-hover:ring-[#10b981]/50 transition-all" 
-                      style={{ backgroundImage: `url("${user?.avatar || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user?.name || 'User') + '&background=10b981&color=fff'}")`}}
+                      style={{ backgroundImage: `url("${user?.avatar ? user.avatar + '?t=' + Date.now() : 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user?.name || 'User') + '&background=10b981&color=fff'}")` }}
                     ></div>
                     <span className="text-sm font-medium text-gray-200">{user?.name || 'User'}</span>
                   </button>
@@ -133,7 +133,7 @@ const ResidentProfileSettings = () => {
                   <div className="flex items-center gap-4 mb-2">
                     <div className="size-16 rounded-2xl bg-gradient-to-br from-[#10b981] to-[#3b82f6] flex items-center justify-center text-white font-bold text-2xl overflow-hidden shadow-lg">
                       {user?.avatar ? (
-                        <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
+                        <img src={`${user.avatar}?t=${Date.now()}`} alt={user.name} className="w-full h-full object-cover" />
                       ) : (
                         user?.name?.charAt(0)?.toUpperCase() || 'U'
                       )}

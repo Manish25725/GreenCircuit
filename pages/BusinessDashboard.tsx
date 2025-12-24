@@ -5,12 +5,16 @@ import { api, getCurrentUser, User, Booking } from '../services/api';
 
 const BusinessDashboard = () => {
   const [user, setUser] = useState<User | null>(getCurrentUser()); 
+  const [avatarKey, setAvatarKey] = useState(Date.now());
   const [activeBookings, setActiveBookings] = useState<Booking[]>([]);
   const [allBookings, setAllBookings] = useState<Booking[]>([]);
+  const [certificates, setCertificates] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAllBookings, setShowAllBookings] = useState(false);
   const [cancelling, setCancelling] = useState<string | null>(null);
   const [showCancelModal, setShowCancelModal] = useState<string | null>(null);
+  const [showDebug, setShowDebug] = useState(false);
+  const [debugInfo, setDebugInfo] = useState<any>(null);
   const [stats, setStats] = useState({
     totalRecycled: 0,
     co2Offset: 0,
@@ -20,6 +24,20 @@ const BusinessDashboard = () => {
 
   useEffect(() => {
     loadBusinessData();
+    
+    // Listen for user updates (avatar/logo changes)
+    const handleUserUpdate = () => {
+      setUser(getCurrentUser());
+      setAvatarKey(Date.now());
+    };
+    
+    window.addEventListener('userUpdated', handleUserUpdate);
+    window.addEventListener('storage', handleUserUpdate);
+    
+    return () => {
+      window.removeEventListener('userUpdated', handleUserUpdate);
+      window.removeEventListener('storage', handleUserUpdate);
+    };
   }, []);
 
   const loadBusinessData = async () => {
@@ -49,6 +67,50 @@ const BusinessDashboard = () => {
         setActiveBookings(active || []);
       } catch (e) {
         console.log('No bookings found');
+      }
+
+      // Get recent certificates
+      try {
+        console.log('Fetching certificates for business user...');
+        const certsData = await api.getBusinessCertificates({ page: 1, limit: 3 });
+        console.log('Certificates API response:', certsData);
+        console.log('Response type:', typeof certsData);
+        console.log('Response keys:', certsData ? Object.keys(certsData) : 'null');
+        
+        // Store for debug panel
+        setDebugInfo({
+          timestamp: new Date().toISOString(),
+          response: certsData,
+          user: { id: userData._id, email: userData.email, role: userData.role }
+        });
+        
+        // Handle multiple response formats
+        let certs = [];
+        if (Array.isArray(certsData)) {
+          certs = certsData;
+        } else if (certsData?.data?.certificates) {
+          certs = certsData.data.certificates;
+        } else if (certsData?.certificates) {
+          certs = certsData.certificates;
+        } else if (certsData?.data && Array.isArray(certsData.data)) {
+          certs = certsData.data;
+        }
+        
+        setCertificates(certs);
+        console.log('Loaded certificates count:', certs.length);
+        if (certs.length > 0) {
+          console.log('First certificate:', JSON.stringify(certs[0], null, 2));
+        }
+      } catch (e: any) {
+        console.error('Error loading certificates:', e);
+        console.error('Error details:', e.message);
+        console.error('Error response:', e.response?.data);
+        setDebugInfo({
+          timestamp: new Date().toISOString(),
+          error: e.message,
+          errorResponse: e.response?.data,
+          user: { id: userData._id, email: userData.email, role: userData.role }
+        });
       }
     } catch (error) {
       console.error('Failed to load business data:', error);
@@ -141,15 +203,27 @@ const BusinessDashboard = () => {
               <nav className="hidden md:flex flex-1 justify-center gap-1">
               </nav>
               <div className="flex items-center gap-4">
-                <button 
-                    onClick={() => window.location.hash = '#/profile'}
-                    className="hidden sm:flex items-center gap-3 pl-1 pr-4 py-1 rounded-full bg-[#151F26] border border-white/5 hover:bg-white/5 transition-colors group cursor-pointer"
-                >
-                  <div className="size-8 rounded-full bg-[#06b6d4] flex items-center justify-center ring-2 ring-white/10 group-hover:ring-[#06b6d4]/50 transition-all text-white font-bold text-sm">
-                    {user?.name?.charAt(0) || 'B'}
+                <div className="relative group">
+                  <button 
+                      onClick={() => window.location.hash = '#/profile'}
+                      className="hidden sm:flex items-center gap-3 pl-1 pr-4 py-1 rounded-full bg-[#151F26] border border-white/5 hover:bg-white/5 transition-colors cursor-pointer"
+                  >
+                    <div 
+                      className="size-8 rounded-full bg-cover bg-center ring-2 ring-white/10 group-hover:ring-[#06b6d4]/50 transition-all" 
+                      style={{ backgroundImage: `url("${(user?.logo || user?.avatar || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user?.name || user?.companyName || 'Business') + '&background=06b6d4&color=fff')}${(user?.logo || user?.avatar) ? '?t=' + avatarKey : ''}")` }}
+                    ></div>
+                    <span className="text-sm font-medium text-gray-200">{user?.name || 'Business'}</span>
+                  </button>
+                  {/* Hover Preview */}
+                  <div className="absolute top-14 right-0 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-[100]">
+                    <div className="bg-[#151F26] border border-white/10 rounded-2xl p-4 shadow-2xl">
+                      <div 
+                        className="size-32 rounded-xl bg-cover bg-center ring-4 ring-[#06b6d4]/30" 
+                        style={{ backgroundImage: `url("${(user?.logo || user?.avatar || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user?.name || user?.companyName || 'Business') + '&background=06b6d4&color=fff')}${(user?.logo || user?.avatar) ? '?t=' + avatarKey : ''}")` }}
+                      ></div>
+                    </div>
                   </div>
-                  <span className="text-sm font-medium text-gray-200">{user?.name || 'Business'}</span>
-                </button>
+                </div>
                 <button 
                   onClick={handleLogout}
                   className="p-2.5 rounded-full bg-[#151F26] border border-white/5 text-gray-400 hover:text-red-400 hover:bg-red-500/10 transition-colors"
@@ -429,6 +503,126 @@ const BusinessDashboard = () => {
                           </div>
                         </div>
                       </div>
+                    </section>
+
+                    {/* Recent Certificates Section */}
+                    <section className="flex flex-col gap-5">
+                      <div className="flex items-center justify-between">
+                        <h2 className="text-white text-2xl font-bold tracking-tight flex items-center gap-3">
+                          <span className="p-2 bg-amber-500/10 rounded-lg text-amber-400">
+                            <span className="material-symbols-outlined">verified_user</span>
+                          </span>
+                          Compliance Certificates
+                        </h2>
+                        <div className="flex items-center gap-2">
+                          <button 
+                            onClick={() => setShowDebug(!showDebug)}
+                            className="text-gray-500 hover:text-gray-300 text-sm font-medium flex items-center gap-1 transition-colors px-2 py-1 rounded-lg hover:bg-white/5"
+                            title="Show debug info"
+                          >
+                            <span className="material-symbols-outlined text-sm">bug_report</span>
+                          </button>
+                          <button 
+                            onClick={() => loadBusinessData()}
+                            className="text-gray-400 hover:text-white text-sm font-medium flex items-center gap-1 transition-colors px-3 py-1.5 rounded-lg hover:bg-white/5"
+                            title="Refresh certificates"
+                          >
+                            <span className="material-symbols-outlined text-sm">refresh</span>
+                            Refresh
+                          </button>
+                          <button 
+                            onClick={() => window.location.hash = '#/business/certificates'}
+                            className="text-[#06b6d4] hover:text-[#0891b2] text-sm font-medium flex items-center gap-1 transition-colors"
+                          >
+                            View All
+                            <span className="material-symbols-outlined text-sm">arrow_forward</span>
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Debug Panel */}
+                      {showDebug && debugInfo && (
+                        <div className="bg-black/50 rounded-xl p-4 border border-amber-500/30 font-mono text-xs">
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="text-amber-400 font-bold">Debug Info</span>
+                            <button onClick={() => setShowDebug(false)} className="text-gray-400 hover:text-white">
+                              <span className="material-symbols-outlined text-sm">close</span>
+                            </button>
+                          </div>
+                          <pre className="text-gray-300 overflow-auto max-h-60 whitespace-pre-wrap break-words">
+                            {JSON.stringify(debugInfo, null, 2)}
+                          </pre>
+                        </div>
+                      )}
+
+                      {loading ? (
+                        <div className="bg-[#151F26] rounded-2xl p-8 text-center border border-white/5">
+                          <Loader size="md" color="#f59e0b" className="mb-4" />
+                          <p className="text-gray-400">Loading certificates...</p>
+                        </div>
+                      ) : certificates.length === 0 ? (
+                        <div className="bg-[#151F26] rounded-2xl p-8 text-center border border-white/5">
+                          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-amber-500/10 flex items-center justify-center">
+                            <span className="material-symbols-outlined text-3xl text-amber-400">verified_user</span>
+                          </div>
+                          <h3 className="text-white text-lg font-bold mb-2">No Certificates Yet</h3>
+                          <p className="text-gray-400 text-sm mb-4">
+                            Complete your first pickup to receive a compliance certificate. Certificates are automatically generated when pickups are marked as completed by the agency.
+                          </p>
+                          <button 
+                            onClick={() => window.location.hash = '#/search'}
+                            className="inline-flex items-center gap-2 px-4 py-2 bg-[#06b6d4] text-white rounded-lg font-medium hover:bg-[#0891b2] transition-colors"
+                          >
+                            <span className="material-symbols-outlined text-sm">add</span>
+                            Schedule Pickup
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="grid grid-cols-1 gap-4">
+                          {certificates.slice(0, 3).map((cert) => (
+                            <div 
+                              key={cert._id}
+                              className="bg-[#151F26] rounded-xl p-5 border border-white/5 hover:border-amber-500/30 transition-all cursor-pointer group"
+                              onClick={() => window.location.hash = `#/business/certificates`}
+                            >
+                              <div className="flex items-center justify-between mb-3">
+                                <div className="flex items-center gap-3">
+                                  <div className="p-2 rounded-lg bg-amber-500/10">
+                                    <span className="material-symbols-outlined text-amber-400 text-xl">verified_user</span>
+                                  </div>
+                                  <div>
+                                    <h4 className="text-white font-bold text-sm group-hover:text-[#06b6d4] transition-colors">{cert.certificateId}</h4>
+                                    <p className="text-gray-500 text-xs">
+                                      {new Date(cert.issuedAt || cert.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
+                                    </p>
+                                  </div>
+                                </div>
+                                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border bg-amber-500/10 text-amber-400 border-amber-500/30">
+                                  <span className="material-symbols-outlined text-sm">verified_user</span>
+                                  Compliance
+                                </span>
+                              </div>
+                              <div className="grid grid-cols-3 gap-3 mt-3">
+                                <div className="bg-white/5 rounded-lg p-2">
+                                  <p className="text-gray-500 text-xs mb-0.5">Weight</p>
+                                  <p className="text-white font-semibold text-sm">{cert.totalWeight} kg</p>
+                                </div>
+                                <div className="bg-white/5 rounded-lg p-2">
+                                  <p className="text-gray-500 text-xs mb-0.5">CO₂ Saved</p>
+                                  <p className="text-[#10b981] font-semibold text-sm">{Math.round(cert.co2Saved || 0)} kg</p>
+                                </div>
+                                <div className="bg-white/5 rounded-lg p-2">
+                                  <p className="text-gray-500 text-xs mb-0.5">Status</p>
+                                  <p className="text-[#10b981] font-semibold text-sm flex items-center gap-1">
+                                    <span className="material-symbols-outlined text-xs">verified</span>
+                                    {cert.status === 'issued' ? 'Verified' : cert.status}
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </section>
                   </div>
 

@@ -615,20 +615,44 @@ export const getCertificates = async (req: Request, res: Response) => {
     const userId = (req as any).user._id || (req as any).user.id;
     const { type, status, page = 1, limit = 20 } = req.query;
 
+    console.log('=== GET CERTIFICATES DEBUG ===');
+    console.log('User ID:', userId);
+    
     const business = await Business.findOne({ userId });
     if (!business) {
+      console.log('No business profile found for user:', userId);
       return sendError(res, 'Business profile not found', 404);
     }
+    
+    console.log('Business found:', business.companyName, 'Business ID:', business._id);
 
     const query: any = { businessId: business._id };
     if (type) query.type = type;
     if (status) query.status = status;
+    
+    console.log('Certificate query:', JSON.stringify(query));
 
     const certificates = await BusinessCertificate.find(query)
       .populate('agencyId', 'name logo')
       .sort({ issuedAt: -1 })
       .skip((Number(page) - 1) * Number(limit))
       .limit(Number(limit));
+
+    console.log('Certificates found:', certificates.length);
+    if (certificates.length > 0) {
+      console.log('First certificate:', certificates[0].certificateId, 'Type:', certificates[0].type);
+    }
+    
+    // Also check total certificates in database for debugging
+    const allCerts = await BusinessCertificate.find({});
+    console.log('Total certificates in database:', allCerts.length);
+    if (allCerts.length > 0) {
+      console.log('Sample certificate businessIds:', allCerts.slice(0, 3).map(c => ({ 
+        id: c.certificateId, 
+        businessId: c.businessId?.toString(),
+        type: c.type 
+      })));
+    }
 
     const total = await BusinessCertificate.countDocuments(query);
 

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
 import Loader from '../components/Loader';
+import ComplianceCertificate from '../components/ComplianceCertificate';
 import { getCurrentUser, api } from '../services/api';
 
 interface CertificateItem {
@@ -52,19 +53,61 @@ const BusinessCertificates = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    console.log('=== USER CHECK ===');
+    const currentUser = getCurrentUser();
+    console.log('Current user:', currentUser);
+    console.log('User ID:', currentUser?._id);
+    console.log('User email:', currentUser?.email);
+    console.log('User role:', currentUser?.role);
     fetchCertificates();
   }, []);
 
   const fetchCertificates = async () => {
     try {
       setLoading(true);
-      const response: any = await api.getBusinessCertificates();
+      console.log('=== FETCHING CERTIFICATES (BusinessCertificates Page) ===');
+      console.log('Current user:', user);
+      
+      const response: any = await api.getBusinessCertificates({ page: 1, limit: 100 });
+      console.log('API Response:', response);
+      console.log('Response type:', typeof response);
+      console.log('Response keys:', response ? Object.keys(response) : 'null');
+      console.log('Full response JSON:', JSON.stringify(response, null, 2));
+      
       if (response) {
-        setCertificates(response.certificates || []);
-        setStats(response.stats || { totalCertificates: 0, totalWeight: 0, totalCo2Saved: 0 });
+        // Handle multiple response formats
+        // The API returns: { success: true, data: { certificates: [], stats: {}, pagination: {} } }
+        // After apiRequest processes it, we get: { certificates: [], stats: {}, pagination: {} }
+        let certs = [];
+        let statsData = { totalCertificates: 0, totalWeight: 0, totalCo2Saved: 0 };
+        
+        // Direct format (after apiRequest extraction)
+        if (response.certificates) {
+          certs = response.certificates;
+          statsData = response.stats || statsData;
+        }
+        // Nested data format
+        else if (response.data?.certificates) {
+          certs = response.data.certificates;
+          statsData = response.data.stats || statsData;
+        }
+        // Array format
+        else if (Array.isArray(response)) {
+          certs = response;
+        }
+        
+        console.log('Certificates loaded:', certs.length);
+        if (certs.length > 0) {
+          console.log('First certificate:', certs[0]);
+        }
+        
+        setCertificates(certs);
+        setStats(statsData);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to fetch certificates:', error);
+      console.error('Error message:', error.message);
+      console.error('Error response:', error.response?.data);
     } finally {
       setLoading(false);
     }
@@ -163,9 +206,32 @@ const BusinessCertificates = () => {
       'recycling': 'Recycling',
       'destruction': 'Data Destruction',
       'donation': 'Donation',
-      'refurbishment': 'Refurbishment'
+      'refurbishment': 'Refurbishment',
+      'compliance': 'Compliance Certificate'
     };
     return types[type] || type;
+  };
+
+  const getTypeIcon = (type: string) => {
+    const icons: Record<string, string> = {
+      'recycling': 'recycling',
+      'destruction': 'delete_forever',
+      'donation': 'volunteer_activism',
+      'refurbishment': 'build',
+      'compliance': 'verified_user'
+    };
+    return icons[type] || 'description';
+  };
+
+  const getTypeColor = (type: string) => {
+    const colors: Record<string, string> = {
+      'recycling': 'bg-[#10b981]/10 text-[#10b981] border-[#10b981]/30',
+      'destruction': 'bg-red-500/10 text-red-400 border-red-500/30',
+      'donation': 'bg-purple-500/10 text-purple-400 border-purple-500/30',
+      'refurbishment': 'bg-blue-500/10 text-blue-400 border-blue-500/30',
+      'compliance': 'bg-amber-500/10 text-amber-400 border-amber-500/30'
+    };
+    return colors[type] || 'bg-gray-500/10 text-gray-400 border-gray-500/30';
   };
 
   return (
@@ -340,9 +406,12 @@ const BusinessCertificates = () => {
                             <span className="md:hidden text-gray-600 text-sm mr-2">Date:</span>
                             {new Date(cert.issuedAt || cert.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
                           </div>
-                          <div className="text-white">
+                          <div>
                             <span className="md:hidden text-gray-600 text-sm mr-2">Type:</span>
-                            {getTypeDisplay(cert.type)}
+                            <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border ${getTypeColor(cert.type)}`}>
+                              <span className="material-symbols-outlined text-sm">{getTypeIcon(cert.type)}</span>
+                              {getTypeDisplay(cert.type)}
+                            </span>
                           </div>
                           <div className="text-white font-medium">
                             <span className="md:hidden text-gray-600 text-sm mr-2">Weight:</span>
@@ -377,14 +446,14 @@ const BusinessCertificates = () => {
                 </div>
 
                 {/* Compliance Note */}
-                <div className="mt-8 p-6 bg-gradient-to-r from-[#10b981]/10 to-[#06b6d4]/10 rounded-2xl border border-[#10b981]/20">
+                <div className="mt-8 p-6 bg-gradient-to-r from-amber-500/10 to-[#10b981]/10 rounded-2xl border border-amber-500/20">
                   <div className="flex items-start gap-4">
-                    <div className="p-3 bg-[#10b981]/20 rounded-xl">
-                      <span className="material-symbols-outlined text-[#10b981] text-2xl">security</span>
+                    <div className="p-3 bg-amber-500/20 rounded-xl">
+                      <span className="material-symbols-outlined text-amber-400 text-2xl">verified_user</span>
                     </div>
                     <div>
-                      <h4 className="text-white font-bold text-lg mb-1">Compliance Verified</h4>
-                      <p className="text-gray-400 text-sm">All your verified certificates are digitally signed and meet regulatory compliance standards. These certificates can be used for environmental audits and sustainability reporting.</p>
+                      <h4 className="text-white font-bold text-lg mb-1">Compliance Certificates</h4>
+                      <p className="text-gray-400 text-sm">All your compliance certificates are automatically generated when pickups are completed. These certificates verify proper e-waste disposal according to EPA guidelines, ISO 14001, R2, and e-Stewards standards. Use them for environmental audits, sustainability reporting, and regulatory compliance.</p>
                     </div>
                   </div>
                 </div>
@@ -417,13 +486,22 @@ const BusinessCertificates = () => {
               
               {/* Certificate Content */}
               <div className="p-8">
-                <div className="text-center mb-8">
-                  <div className="inline-block p-4 bg-[#10b981]/10 rounded-full mb-4">
-                    <span className="material-symbols-outlined text-[#10b981] text-5xl">workspace_premium</span>
-                  </div>
-                  <h2 className="text-2xl font-black text-white mb-2">{selectedCertificate.title}</h2>
-                  <p className="text-gray-500">{getTypeDisplay(selectedCertificate.type)} Certificate</p>
-                </div>
+                {selectedCertificate.type === 'compliance' ? (
+                  /* Show the official compliance certificate with stamps */
+                  <ComplianceCertificate certificate={selectedCertificate} />
+                ) : (
+                  /* Show regular certificate preview for other types */
+                  <>
+                    <div className="text-center mb-8">
+                      <div className="inline-block p-4 bg-[#10b981]/10 rounded-full mb-4">
+                        <span className="material-symbols-outlined text-[#10b981] text-5xl">{getTypeIcon(selectedCertificate.type)}</span>
+                      </div>
+                      <h2 className="text-2xl font-black text-white mb-2">{selectedCertificate.title}</h2>
+                      <span className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium border ${getTypeColor(selectedCertificate.type)}`}>
+                        <span className="material-symbols-outlined text-lg">{getTypeIcon(selectedCertificate.type)}</span>
+                        {getTypeDisplay(selectedCertificate.type)}
+                      </span>
+                    </div>
                 
                 <div className="grid grid-cols-2 gap-6 mb-6">
                   <div className="bg-white/5 rounded-xl p-4">
@@ -502,7 +580,7 @@ const BusinessCertificates = () => {
                   </div>
                 )}
                 
-                <div className="flex gap-4">
+                <div className="flex gap-4 mt-6">
                   {getDisplayStatus(selectedCertificate) === 'verified' && (
                     <button 
                       onClick={() => handleDownloadCertificate(selectedCertificate._id, selectedCertificate.certificateId)}
@@ -519,6 +597,8 @@ const BusinessCertificates = () => {
                     Close
                   </button>
                 </div>
+                </>
+                )}
               </div>
             </div>
           </div>
