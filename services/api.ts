@@ -522,20 +522,41 @@ export const api = {
 
   // Notifications
   getNotifications: async (unreadOnly = false) => {
-    const url = unreadOnly ? '/notifications?unreadOnly=true' : '/notifications';
-    return apiRequest(url);
+    try {
+      const url = unreadOnly ? '/notifications?unreadOnly=true' : '/notifications';
+      return await apiRequest(url);
+    } catch (error: any) {
+      console.error('Failed to fetch notifications:', error);
+      // Return empty array instead of throwing to prevent UI crashes
+      return { notifications: [], unreadCount: 0, pagination: { page: 1, limit: 20, total: 0, pages: 0 } };
+    }
   },
 
   markNotificationRead: async (id: string) => {
-    return apiRequest(`/notifications/${id}/read`, { method: 'PUT' });
+    try {
+      return await apiRequest(`/notifications/${id}/read`, { method: 'PUT' });
+    } catch (error: any) {
+      console.error('Failed to mark notification as read:', error);
+      return null;
+    }
   },
 
   markAllNotificationsRead: async () => {
-    return apiRequest('/notifications/read-all', { method: 'PUT' });
+    try {
+      return await apiRequest('/notifications/read-all', { method: 'PUT' });
+    } catch (error: any) {
+      console.error('Failed to mark all notifications as read:', error);
+      return null;
+    }
   },
 
   getUnreadCount: async () => {
-    return apiRequest('/notifications/unread-count');
+    try {
+      return await apiRequest('/notifications/unread-count');
+    } catch (error: any) {
+      console.error('Failed to fetch unread count:', error);
+      return { count: 0 };
+    }
   },
 
   // Admin

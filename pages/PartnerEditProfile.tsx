@@ -1,76 +1,36 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
+import Loader from '../components/Loader';
 import NotificationBell from '../components/NotificationBell';
-import { getCurrentUser } from '../services/api';
+import { api, getCurrentUser } from '../services/api';
 
-const PartnerProfile = () => {
-  const [user, setUser] = useState<any>(null);
+interface PartnerProfile {
+  _id: string;
+  userId: string;
+  name: string;
+  email: string;
+  companyName?: string;
+  registrationNumber?: string;
+  phone?: string;
+  address?: any;
+  logo?: string;
+  description?: string;
+  role?: string;
+}
 
-  useEffect(() => {
-    loadUserData();
-  }, []);
-
-  const loadUserData = async () => {
-    try {
-      const { api } = await import('../services/api');
-      const userData = await api.getMe();
-      setUser(userData);
-      localStorage.setItem('user', JSON.stringify(userData));
-    } catch (error) {
-      console.error('Failed to load user data:', error);
-      const { getCurrentUser } = await import('../services/api');
-      const currentUser = getCurrentUser();
-      setUser(currentUser);
-    }
-  };
-
-  const handleLogout = () => {
-    localStorage.clear();
-    window.location.hash = '#/login';
-  };
-
-  const settingsCards = [
-    {
-      id: 1,
-      title: 'Edit Profile',
-      description: 'Update your company information and logo',
-      icon: 'business',
-      color: '#8b5cf6',
-      link: '#/partner/edit-profile'
-    },
-    {
-      id: 2,
-      title: 'Change Password',
-      description: 'Update your password and secure your account',
-      icon: 'lock',
-      color: '#f59e0b',
-      link: '#/partner/security'
-    },
-    {
-      id: 3,
-      title: 'Notifications',
-      description: 'Manage notification preferences and alerts',
-      icon: 'notifications',
-      color: '#8b5cf6',
-      link: '#/notifications'
-    },
-    {
-      id: 4,
-      title: 'Security & Privacy',
-      description: 'Active sessions and security settings',
-      icon: 'security',
-      color: '#8b5cf6',
-      link: '#/partner/security'
-    },
-    {
-      id: 5,
-      title: 'App Settings',
-      description: 'Language, theme, and app preferences',
-      icon: 'settings',
-      color: '#8b5cf6',
-      link: '#/settings'
-    }
-  ];
+const PartnerEditProfile = () => {
+  const [user, setUser] = useState<PartnerProfile | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    companyName: '',
+    phone: '',
+    address: '',
+    description: '',
+    logo: ''
+  });
 
   // Helper to get address as string
   const getAddressString = (address: any): string => {
@@ -427,4 +387,4 @@ const PartnerProfile = () => {
   );
 };
 
-export default PartnerProfile;
+export default PartnerEditProfile;

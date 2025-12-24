@@ -40,7 +40,9 @@ const BusinessSecurity = () => {
     try {
       setPasswordLoading(true);
       const token = localStorage.getItem('token');
-      await axios.put(
+      
+      console.log('Sending password change request...');
+      const response = await axios.put(
         'http://localhost:3001/api/auth/security/change-password',
         {
           currentPassword: passwordData.currentPassword,
@@ -51,12 +53,15 @@ const BusinessSecurity = () => {
         }
       );
       
+      console.log('Password change response:', response.data);
       setPasswordMessage({ type: 'success', text: 'Password changed successfully!' });
       setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
     } catch (err: any) {
+      console.error('Password change error:', err);
+      const errorMsg = err.response?.data?.message || err.message || 'Failed to change password. Please try again.';
       setPasswordMessage({ 
         type: 'error', 
-        text: err.response?.data?.message || 'Failed to change password' 
+        text: errorMsg
       });
     } finally {
       setPasswordLoading(false);

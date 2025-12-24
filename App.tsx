@@ -200,7 +200,7 @@ const App = () => {
       case '#/agency/bookings':
         return <AgencyBookings />;
       case '#/agency/profile':
-        return <AgencyProfile />;
+        return <PartnerProfile />;
       case '#/partner/profile':
         return <PartnerProfile />;
       case '#/partner/security':
