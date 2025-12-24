@@ -3,6 +3,7 @@ import Layout from '../components/Layout';
 import { api, getCurrentUser, isAuthenticated } from '../services/api';
 import gsap from 'gsap';
 import Loader from '../components/Loader';
+import NotificationBell from '../components/NotificationBell';
 
 // Helper to get user role
 const getUserRole = (): 'User' | 'Business' | 'Agency' | 'Admin' => {
@@ -34,6 +35,7 @@ interface Item {
   type: string;
   quantity: number;
   description: string;
+  estimatedWeight: number;
 }
 
 interface Slot {
@@ -45,7 +47,7 @@ interface Slot {
 
 const SchedulePickup = () => {
   const [items, setItems] = useState<Item[]>([]);
-  const [newItem, setNewItem] = useState({ type: '', quantity: 1, description: '' });
+  const [newItem, setNewItem] = useState({ type: '', quantity: 1, description: '', estimatedWeight: 0 });
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedSlot, setSelectedSlot] = useState<Slot | null>(null);
   const [loadingSlots, setLoadingSlots] = useState(true);
@@ -230,7 +232,7 @@ const SchedulePickup = () => {
                         newItem.type === 'accessories' ? 'Cables & Accessories' : newItem.type;
       
       setItems([...items, { ...newItem, id: Date.now().toString(), type: typeLabel }]);
-      setNewItem({ type: '', quantity: 1, description: '' });
+      setNewItem({ type: '', quantity: 1, description: '', estimatedWeight: 0 });
     }
   };
 
@@ -537,17 +539,28 @@ const SchedulePickup = () => {
             <nav className="hidden md:flex flex-1 justify-center gap-1">
             </nav>
             <div className="flex items-center gap-4">
-                <button 
+                <div className="relative group">
+                  <button 
                     onClick={() => window.location.hash = '#/profile'}
-                    className="hidden sm:flex items-center gap-3 pl-1 pr-4 py-1 rounded-full bg-[#151F26] border border-white/5 hover:bg-white/5 transition-colors group cursor-pointer"
-                >
-                    <div className="size-8 rounded-full bg-cover bg-center ring-2 ring-white/10 group-hover:ring-[#10b981]/50 transition-all" style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuAreboopkKSy4YYDs4PFvd-l4xnboU1-dCb6q7kuogZsIpVK9icd7CNdE17iE4uQKdoqiJuI30CTaWxw7GK3QrR7H_FstEqPZBbUqkey_74QXoP8uhTfR9RY780_K4O8UAQpRMWJiKbRdh5-SdE7JAIX5lG3yPPg3Wisf3RGrXHACYJxJFU0vYynDCqaru_FI7DW3EV-buSFuzGK8Z7LP7p7c25u8kqkBUXlt5pQG5d-4WVmAzmNX9U0trABs1cC--zDVlgdRcgww")' }}></div>
+                    className="hidden sm:flex items-center gap-3 pl-1 pr-4 py-1 rounded-full bg-[#151F26] border border-white/5 hover:bg-white/5 transition-colors cursor-pointer"
+                  >
+                    <div 
+                      className="size-8 rounded-full bg-cover bg-center ring-2 ring-white/10 group-hover:ring-[#10b981]/50 transition-all" 
+                      style={{ backgroundImage: `url("${user?.avatar || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user?.name || 'User') + '&background=10b981&color=fff'}")` }}
+                    ></div>
                     <span className="text-sm font-medium text-gray-200">{user?.name || 'User'}</span>
-                </button>
-                <button className="relative p-2.5 rounded-full bg-[#151F26] border border-white/5 text-[#3b82f6] hover:text-[#3b82f6] hover:bg-[#3b82f6]/10 transition-colors">
-                    <span className="absolute top-2.5 right-3 size-2 bg-red-500 rounded-full border-2 border-[#151F26]"></span>
-                    <span className="material-symbols-outlined text-[20px]">notifications</span>
-                </button>
+                  </button>
+                  {/* Hover Preview */}
+                  <div className="absolute top-14 right-0 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-[100]">
+                    <div className="bg-[#151F26] border border-white/10 rounded-2xl p-4 shadow-2xl">
+                      <div 
+                        className="size-32 rounded-xl bg-cover bg-center ring-4 ring-[#10b981]/30" 
+                        style={{ backgroundImage: `url("${user?.avatar || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user?.name || 'User') + '&background=10b981&color=fff'}")` }}
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+                <NotificationBell />
             </div>
         </header>
 
@@ -599,7 +612,12 @@ const SchedulePickup = () => {
                             <div className="flex-1 min-w-0 py-1">
                                 <div className="flex justify-between items-start mb-1">
                                     <p className="text-sm font-bold text-white truncate">{item.type}</p>
-                                    <span className={`text-xs font-bold px-2 py-0.5 rounded border ${isBusiness ? 'bg-blue-500/10 text-blue-500 border-blue-500/20' : 'bg-[#10b981]/10 text-[#10b981] border-[#10b981]/20'}`}>Qty: {item.quantity}</span>
+                                    <div className="flex gap-2">
+                                      <span className={`text-xs font-bold px-2 py-0.5 rounded border ${isBusiness ? 'bg-blue-500/10 text-blue-500 border-blue-500/20' : 'bg-[#10b981]/10 text-[#10b981] border-[#10b981]/20'}`}>Qty: {item.quantity}</span>
+                                      {item.estimatedWeight > 0 && (
+                                        <span className={`text-xs font-bold px-2 py-0.5 rounded border ${isBusiness ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' : 'bg-amber-500/10 text-amber-400 border-amber-500/20'}`}>{item.estimatedWeight} kg</span>
+                                      )}
+                                    </div>
                                 </div>
                                 <p className="text-xs text-[#94a3b8] line-clamp-1">{item.description}</p>
                             </div>
@@ -640,7 +658,7 @@ const SchedulePickup = () => {
                           <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-[#94a3b8] pointer-events-none group-hover:text-white transition-colors">expand_more</span>
                         </div>
                       </div>
-                      <div className="space-y-2 md:col-span-4">
+                      <div className="space-y-2 md:col-span-2">
                         <label className="text-sm font-medium text-gray-300" htmlFor="item-count">Quantity</label>
                         <div className="relative">
                           <input 
@@ -650,6 +668,21 @@ const SchedulePickup = () => {
                             id="item-count" 
                             min="1" 
                             placeholder="1" 
+                            type="number"
+                          />
+                        </div>
+                      </div>
+                      <div className="space-y-2 md:col-span-2">
+                        <label className="text-sm font-medium text-gray-300" htmlFor="item-weight">Weight (kg)</label>
+                        <div className="relative">
+                          <input 
+                            value={newItem.estimatedWeight || ''}
+                            onChange={(e) => setNewItem({...newItem, estimatedWeight: parseFloat(e.target.value) || 0})}
+                            className={`w-full h-11 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/10 text-white focus:outline-none focus:ring-1 transition-all ${isBusiness ? 'focus:ring-blue-500 focus:border-blue-500' : 'focus:ring-[#10b981] focus:border-[#10b981]'}`} 
+                            id="item-weight" 
+                            min="0" 
+                            step="0.1"
+                            placeholder="0" 
                             type="number"
                           />
                         </div>

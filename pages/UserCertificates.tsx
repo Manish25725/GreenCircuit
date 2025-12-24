@@ -286,7 +286,6 @@ const UserCertificates = () => {
                             {formatDate(expiryDate.toISOString())}
                           </span>
                         </div>
-                      )}
                       </div>
 
                       {/* Action Buttons */}
@@ -317,9 +316,6 @@ const UserCertificates = () => {
                     </div>
                   );
                 })}
-                    <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-[#10b981]/5 rounded-full blur-2xl group-hover:bg-[#10b981]/10 transition-all"></div>
-                  </div>
-                ))}
               </div>
             )}
           </div>

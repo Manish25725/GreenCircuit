@@ -493,17 +493,7 @@ const UserDashboard = () => {
                           <span className="material-symbols-outlined text-gray-500 group-hover:text-white transition-colors">chevron_right</span>
                         </button>
                         <button 
-                          onClick={() => {
-                            if (completedBookings.length > 0) {
-                              // Go to most recent completed booking's certificate
-                              const mostRecent = completedBookings.sort((a, b) => 
-                                new Date(b.scheduledDate).getTime() - new Date(a.scheduledDate).getTime()
-                              )[0];
-                              window.location.hash = `#/certificate?booking=${mostRecent._id}`;
-                            } else {
-                              window.location.hash = '#/certificate';
-                            }
-                          }} 
+                          onClick={() => window.location.hash = '#/certificates'} 
                           className="flex w-full group cursor-pointer items-center justify-between overflow-hidden rounded-xl h-14 px-4 bg-white/5 text-gray-200 border border-white/5 hover:bg-white/10 hover:border-white/10 transition-all"
                         >
                           <div className="flex items-center gap-3">

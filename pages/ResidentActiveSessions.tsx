@@ -13,36 +13,46 @@ interface Session {
 
 const ActiveSessions = () => {
   const [user, setUser] = useState<User | null>(null);
-  const [sessions] = useState<Session[]>([
-    {
-      id: '1',
-      device: 'Windows PC - Chrome',
-      location: 'New York, USA',
-      ip: '192.168.1.1',
-      lastActive: 'Active now',
-      current: true
-    },
-    {
-      id: '2',
-      device: 'iPhone 14 Pro - Safari',
-      location: 'New York, USA',
-      ip: '192.168.1.45',
-      lastActive: '2 hours ago',
-      current: false
-    },
-    {
-      id: '3',
-      device: 'MacBook Pro - Chrome',
-      location: 'San Francisco, USA',
-      ip: '10.0.0.123',
-      lastActive: '1 day ago',
-      current: false
-    }
-  ]);
+  const [sessions, setSessions] = useState<Session[]>([]);
+
+  // Detect browser and OS
+  const getDeviceInfo = () => {
+    const ua = navigator.userAgent;
+    let browser = 'Unknown Browser';
+    let os = 'Unknown OS';
+
+    // Detect OS
+    if (ua.includes('Windows')) os = 'Windows PC';
+    else if (ua.includes('Mac')) os = 'MacBook';
+    else if (ua.includes('Linux')) os = 'Linux';
+    else if (ua.includes('iPhone')) os = 'iPhone';
+    else if (ua.includes('iPad')) os = 'iPad';
+    else if (ua.includes('Android')) os = 'Android';
+
+    // Detect Browser
+    if (ua.includes('Chrome') && !ua.includes('Edg')) browser = 'Chrome';
+    else if (ua.includes('Safari') && !ua.includes('Chrome')) browser = 'Safari';
+    else if (ua.includes('Firefox')) browser = 'Firefox';
+    else if (ua.includes('Edg')) browser = 'Edge';
+
+    return `${os} - ${browser}`;
+  };
 
   useEffect(() => {
     const currentUser = getCurrentUser();
     setUser(currentUser);
+
+    // Get current session
+    const currentSession: Session = {
+      id: '1',
+      device: getDeviceInfo(),
+      location: 'Current Location',
+      ip: 'Your IP Address',
+      lastActive: 'Active now',
+      current: true
+    };
+
+    setSessions([currentSession]);
   }, []);
 
   const handleLogout = () => {

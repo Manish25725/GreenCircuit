@@ -188,7 +188,7 @@ const ResidentSecurity = () => {
                       <p className="text-[#94a3b8] text-sm">View and manage all devices currently logged into your account. Log out sessions you don't recognize.</p>
                     </div>
                     <button 
-                      onClick={() => window.location.hash = '#/Resident/sessions'}
+                      onClick={() => window.location.hash = '#/resident/sessions'}
                       className="flex whitespace-nowrap min-w-[84px] cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg h-10 px-4 bg-[#10b981] text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-[#059669] transition-colors"
                     >
                       <span className="material-symbols-outlined text-[18px]">devices</span>

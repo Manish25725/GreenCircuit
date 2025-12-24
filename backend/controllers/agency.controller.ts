@@ -337,6 +337,16 @@ export const updateBookingStatus = async (req: Request, res: Response) => {
     if (status === 'completed') {
       booking.completedAt = new Date();
       
+      // Calculate total weight from items if not already set
+      if (!booking.totalWeight || booking.totalWeight === 0) {
+        const calculatedWeight = booking.items?.reduce((sum: number, item: any) => {
+          // Use estimatedWeight if available, otherwise use quantity * 2 (assume 2kg per item)
+          const itemWeight = item.estimatedWeight || item.weight || (item.quantity * 2);
+          return sum + itemWeight;
+        }, 0) || 0;
+        booking.totalWeight = calculatedWeight;
+      }
+      
       // Update agency stats
       await Agency.findByIdAndUpdate(agency._id, {
         $inc: {

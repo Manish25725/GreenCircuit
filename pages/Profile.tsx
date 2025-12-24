@@ -246,7 +246,7 @@ const Profile = () => {
                         <NotificationBell />
                     </div>
                     <button 
-                        onClick={() => window.location.hash = '#/security'}
+                        onClick={() => window.location.hash = '#/resident/security'}
                         className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/5 text-[#94a3b8] hover:text-white transition-colors w-full text-left cursor-pointer"
                     >
                         <span className="material-symbols-outlined text-[20px]">lock</span>
