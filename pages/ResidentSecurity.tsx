@@ -1,14 +1,67 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
 import { getCurrentUser, User } from '../services/api';
+import axios from 'axios';
 
 const ResidentSecurity = () => {
   const [user, setUser] = useState<User | null>(null);
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
+  });
+  const [passwordLoading, setPasswordLoading] = useState(false);
+  const [passwordMessage, setPasswordMessage] = useState({ type: '', text: '' });
 
   useEffect(() => {
     const currentUser = getCurrentUser();
     setUser(currentUser);
   }, []);
+
+  const handlePasswordChange = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPasswordMessage({ type: '', text: '' });
+
+    if (!passwordData.currentPassword || !passwordData.newPassword || !passwordData.confirmPassword) {
+      setPasswordMessage({ type: 'error', text: 'Please fill in all password fields' });
+      return;
+    }
+
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      setPasswordMessage({ type: 'error', text: 'New passwords do not match' });
+      return;
+    }
+
+    if (passwordData.newPassword.length < 6) {
+      setPasswordMessage({ type: 'error', text: 'Password must be at least 6 characters' });
+      return;
+    }
+
+    try {
+      setPasswordLoading(true);
+      const token = localStorage.getItem('token');
+      await axios.put(
+        'http://localhost:3001/api/auth/security/change-password',
+        {
+          currentPassword: passwordData.currentPassword,
+          newPassword: passwordData.newPassword
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+      
+      setPasswordMessage({ type: 'success', text: 'Password changed successfully!' });
+      setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
+    } catch (err: any) {
+      setPasswordMessage({ 
+        type: 'error', 
+        text: err.response?.data?.message || 'Failed to change password' 
+      });
+    } finally {
+      setPasswordLoading(false);
+    }
+  };
 
   const handleLogout = () => {
     localStorage.clear();
@@ -75,7 +128,23 @@ const ResidentSecurity = () => {
                       <h3 className="text-white text-lg font-bold leading-tight">Change Password</h3>
                       <p className="text-[#94a3b8] text-sm">Ensure your account is using a long, random password to stay secure.</p>
                     </div>
-                    <form className="flex flex-col gap-4" onSubmit={(e) => e.preventDefault()}>
+                    
+                    {passwordMessage.text && (
+                      <div className={`p-4 rounded-lg border ${
+                        passwordMessage.type === 'success' 
+                          ? 'bg-[#10b981]/10 border-[#10b981]/30 text-[#10b981]' 
+                          : 'bg-red-500/10 border-red-500/30 text-red-400'
+                      }`}>
+                        <div className="flex items-start gap-3">
+                          <span className="material-symbols-outlined text-[20px] mt-0.5">
+                            {passwordMessage.type === 'success' ? 'check_circle' : 'error'}
+                          </span>
+                          <p className="text-sm font-medium">{passwordMessage.text}</p>
+                        </div>
+                      </div>
+                    )}
+
+                    <form className="flex flex-col gap-4" onSubmit={handlePasswordChange}>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <label className="flex flex-col w-full">
                           <span className="text-white text-sm font-medium leading-normal pb-2">Current Password</span>
@@ -83,6 +152,8 @@ const ResidentSecurity = () => {
                             className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-[#10b981] focus:border-[#10b981] transition-all" 
                             placeholder="Enter current password" 
                             type="password"
+                            value={passwordData.currentPassword}
+                            onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
                           />
                         </label>
                       </div>
@@ -93,6 +164,8 @@ const ResidentSecurity = () => {
                             className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-[#10b981] focus:border-[#10b981] transition-all" 
                             placeholder="Enter new password" 
                             type="password"
+                            value={passwordData.newPassword}
+                            onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
                           />
                         </label>
                         <label className="flex flex-col w-full">
@@ -101,15 +174,18 @@ const ResidentSecurity = () => {
                             className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-[#10b981] focus:border-[#10b981] transition-all" 
                             placeholder="Confirm new password" 
                             type="password"
+                            value={passwordData.confirmPassword}
+                            onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
                           />
                         </label>
                       </div>
                       <div className="flex justify-end pt-2">
                         <button 
-                          className="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-[#10b981] text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-[#059669] transition-all" 
+                          className="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-[#10b981] text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-[#059669] transition-all disabled:opacity-50" 
                           type="submit"
+                          disabled={passwordLoading}
                         >
-                          Update Password
+                          {passwordLoading ? 'Updating...' : 'Update Password'}
                         </button>
                       </div>
                     </form>
