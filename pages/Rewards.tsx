@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
 import Loader from '../components/Loader';
+import NotificationBell from '../components/NotificationBell';
 import { api, getCurrentUser, Reward } from '../services/api';
 
 const Rewards = () => {
@@ -107,13 +108,7 @@ const Rewards = () => {
                     </div>
                   </div>
                 </div>
-                <button 
-                  onClick={() => window.location.hash = '#/notifications'}
-                  className="relative p-2.5 rounded-full bg-[#151F26] border border-white/5 text-[#3b82f6] hover:text-[#3b82f6] hover:bg-[#3b82f6]/10 transition-colors"
-                >
-                    <span className="absolute top-2.5 right-3 size-2 bg-red-500 rounded-full border-2 border-[#151F26]"></span>
-                    <span className="material-symbols-outlined text-[20px]">notifications</span>
-                </button>
+                <NotificationBell />
             </div>
         </header>
 

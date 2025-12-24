@@ -1,15 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Loader from '../components/Loader';
-import { api } from '../services/api';
+import { api, getCurrentUser } from '../services/api';
 
 const PartnerRegistration: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const currentUser = getCurrentUser();
+  
   const [formData, setFormData] = useState({
-    name: '',
+    name: currentUser?.name || '',
     headName: '',
-    email: '',
-    phone: '',
+    email: currentUser?.email || '',
+    phone: currentUser?.phone || '',
     gstNumber: '',
     udyamCertificate: '',
     businessType: '',
@@ -20,11 +22,17 @@ const PartnerRegistration: React.FC = () => {
       city: '',
       state: '',
       zipCode: '',
-      country: 'India'
+      country: 'India',
+      coordinates: {
+        lat: 0,
+        lng: 0
+      }
     },
     services: [] as string[],
     verificationDocuments: [] as string[]
   });
+  const [locationStatus, setLocationStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [locationError, setLocationError] = useState('');
 
   const serviceOptions = [
     'E-Waste Collection',
@@ -63,6 +71,47 @@ const PartnerRegistration: React.FC = () => {
     }));
   };
 
+  const handleGetLocation = () => {
+    setLocationStatus('loading');
+    setLocationError('');
+
+    if (!navigator.geolocation) {
+      setLocationError('Geolocation is not supported by your browser');
+      setLocationStatus('error');
+      return;
+    }
+
+    console.log('Requesting browser geolocation...');
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        console.log('Location obtained:', position.coords);
+        const { latitude, longitude } = position.coords;
+        setFormData(prev => ({
+          ...prev,
+          address: {
+            ...prev.address,
+            coordinates: {
+              lat: latitude,
+              lng: longitude
+            }
+          }
+        }));
+        setLocationStatus('success');
+      },
+      (error) => {
+        console.error('Geolocation error:', error);
+        setLocationError('Could not get location. This is optional - you can proceed without it.');
+        setLocationStatus('error');
+      },
+      {
+        enableHighAccuracy: false,
+        timeout: 5000,
+        maximumAge: 600000
+      }
+    );
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -76,6 +125,11 @@ const PartnerRegistration: React.FC = () => {
 
       if (!formData.address.street || !formData.address.city || !formData.address.state || !formData.address.zipCode) {
         throw new Error('Please complete the address details');
+      }
+
+      // Require location coordinates
+      if (!formData.address.coordinates?.lat || formData.address.coordinates?.lat === 0) {
+        throw new Error('Please share your location to help users find your agency on the map');
       }
 
       await api.post('/agencies', formData);
@@ -137,8 +191,12 @@ const PartnerRegistration: React.FC = () => {
                     value={formData.name}
                     onChange={handleInputChange}
                     className="w-full px-4 py-2.5 bg-[#0f1823] border border-cyan-500/30 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 text-white placeholder-gray-400 transition-all"
+                    placeholder={currentUser?.name ? '' : 'Enter agency name'}
                     required
                   />
+                  {currentUser?.name && (
+                    <p className="text-xs text-gray-400 mt-1">From your account: {currentUser.name}</p>
+                  )}
                 </div>
 
                 <div>
@@ -249,10 +307,11 @@ const PartnerRegistration: React.FC = () => {
                     type="email"
                     name="email"
                     value={formData.email}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-2.5 bg-[#0f1823] border border-cyan-500/30 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white placeholder-gray-400 transition-all"
+                    readOnly
+                    className="w-full px-4 py-2.5 bg-[#151f26] border border-cyan-500/20 rounded-lg text-gray-300 cursor-not-allowed"
                     required
                   />
+                  <p className="text-xs text-gray-400 mt-1">📧 From your account (cannot be changed)</p>
                 </div>
 
                 <div>
@@ -277,6 +336,66 @@ const PartnerRegistration: React.FC = () => {
                 <span className="material-symbols-outlined text-cyan-400">location_on</span>
                 Address Details
               </h2>
+
+              {/* Location Picker */}
+              <div className="mb-6 p-4 bg-cyan-500/10 border border-cyan-500/30 rounded-lg">
+                <div className="flex items-start gap-3">
+                  <span className="material-symbols-outlined text-cyan-400 text-[28px]">my_location</span>
+                  <div className="flex-1">
+                    <h3 className="text-white font-medium mb-1">Share Your Location <span className="text-cyan-400">*</span></h3>
+                    <p className="text-sm text-gray-300 mb-3">Required so users can find your agency on the map</p>
+                    
+                    <button
+                      type="button"
+                      onClick={handleGetLocation}
+                      disabled={locationStatus === 'loading'}
+                      className="flex items-center gap-2 px-4 py-2 bg-cyan-500 hover:bg-cyan-600 disabled:bg-cyan-500/50 text-white rounded-lg transition-all"
+                    >
+                      {locationStatus === 'loading' ? (
+                        <>
+                          <Loader size="sm" color="white" />
+                          <span>Detecting...</span>
+                        </>
+                      ) : (
+                        <>
+                          <span className="material-symbols-outlined text-[20px]">gps_fixed</span>
+                          <span>Share My Location</span>
+                        </>
+                      )}
+                    </button>
+
+                    {locationStatus === 'success' && formData.address.coordinates.lat !== 0 && (
+                      <div className="mt-3 p-3 bg-green-500/10 border border-green-500/30 rounded-lg">
+                        <div className="flex items-center gap-2 text-sm text-green-400 mb-1">
+                          <span className="material-symbols-outlined text-[20px]">check_circle</span>
+                          <span className="font-medium">Location captured successfully!</span>
+                        </div>
+                        <div className="text-xs text-gray-300 ml-7">
+                          Coordinates: {formData.address.coordinates.lat.toFixed(6)}, {formData.address.coordinates.lng.toFixed(6)}
+                        </div>
+                      </div>
+                    )}
+
+                    {locationError && (
+                      <div className="mt-3 p-3 bg-red-500/10 border border-red-500/30 rounded-lg">
+                        <div className="flex items-start gap-2 text-sm text-red-400 mb-2">
+                          <span className="material-symbols-outlined text-[20px]">error</span>
+                          <span>{locationError}</span>
+                        </div>
+                        <p className="text-xs text-gray-400">
+                          Please allow location access in your browser settings and try again. This is required for users to find you on the map.
+                        </p>
+                      </div>
+                    )}
+
+                    {!locationError && locationStatus === 'idle' && (
+                      <p className="mt-2 text-xs text-gray-400">
+                        💡 Click the button and allow location access when your browser asks
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
               
               <div className="space-y-4">
                 <div>

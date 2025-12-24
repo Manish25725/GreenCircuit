@@ -167,14 +167,25 @@ const SearchAgencies = () => {
 
     // Add markers for each agency
     agencies.forEach(agency => {
-      const city = agency.address?.city || '';
-      const cityData = Object.entries(worldCities).find(
-        ([key]) => key.toLowerCase() === city.toLowerCase()
-      );
+      let coords: [number, number] | null = null;
+      
+      // First try to use exact coordinates from agency
+      if (agency.address?.coordinates?.lat && agency.address?.coordinates?.lng) {
+        coords = [agency.address.coordinates.lat, agency.address.coordinates.lng];
+      } else {
+        // Fallback to city lookup
+        const city = agency.address?.city || '';
+        const cityData = Object.entries(worldCities).find(
+          ([key]) => key.toLowerCase() === city.toLowerCase()
+        );
+        if (cityData) {
+          coords = cityData[1].coords;
+        }
+      }
 
-      if (cityData) {
-        const [, { coords, country }] = cityData;
+      if (coords) {
         const isSelected = selectedAgency?._id === agency._id;
+        const country = agency.address?.country || 'India';
         
         // Beautiful animated marker with pulse effect
         const customIcon = L.divIcon({

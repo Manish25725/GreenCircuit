@@ -1,6 +1,7 @@
 import React from 'react';
-import { getCurrentUser } from '../services/api';
+import { getCurrentUser, api } from '../services/api';
 import Loader from './Loader';
+import NotificationBell from './NotificationBell';
 
 interface ProfileSidebarProps {
   activePage: 'profile' | 'notifications' | 'security' | 'settings';
@@ -114,17 +115,9 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ activePage }) => {
               <span className={`material-symbols-outlined text-[20px] ${activePage === 'profile' ? 'fill' : ''}`}>person</span>
               <p className="text-sm font-medium leading-normal">Profile Information</p>
             </button>
-            <button 
-              onClick={() => window.location.hash = '#/notifications'}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg w-full text-left cursor-pointer transition-colors ${
-                activePage === 'notifications'
-                  ? 'bg-[#10b981]/10 text-[#10b981] border border-[#10b981]/10'
-                  : 'hover:bg-white/5 text-[#94a3b8] hover:text-white'
-              }`}
-            >
-              <span className={`material-symbols-outlined text-[20px] ${activePage === 'notifications' ? 'fill' : ''}`}>notifications</span>
-              <p className="text-sm font-medium leading-normal">Notifications</p>
-            </button>
+            <div className="w-full">
+              <NotificationBell />
+            </div>
             <button 
               onClick={() => window.location.hash = '#/security'}
               className={`flex items-center gap-3 px-3 py-2.5 rounded-lg w-full text-left cursor-pointer transition-colors ${

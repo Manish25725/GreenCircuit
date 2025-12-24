@@ -57,6 +57,10 @@ export interface Agency {
     city: string;
     state: string;
     zipCode: string;
+    coordinates?: {
+      lat: number;
+      lng: number;
+    };
   };
   services: string[];
   rating: number;

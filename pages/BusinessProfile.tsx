@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
 import Loader from '../components/Loader';
+import NotificationBell from '../components/NotificationBell';
 import { api, getCurrentUser } from '../services/api';
 
 interface BusinessProfile {
@@ -262,12 +263,7 @@ const BusinessProfile = () => {
                     ></div>
                     <span className="text-sm font-medium text-gray-200">{business?.companyName || user?.name || 'Business'}</span>
                 </button>
-                <button 
-                    onClick={() => window.location.hash = '#/notifications'}
-                    className="relative p-2.5 rounded-full bg-[#151F26] border border-white/5 text-[#3b82f6] hover:text-[#3b82f6] hover:bg-[#3b82f6]/10 transition-colors">
-                    <span className="absolute top-2.5 right-3 size-2 bg-red-500 rounded-full border-2 border-[#151F26]"></span>
-                    <span className="material-symbols-outlined text-[20px]">notifications</span>
-                </button>
+                <NotificationBell />
             </div>
         </header>
 
@@ -319,13 +315,9 @@ const BusinessProfile = () => {
                         <span className="material-symbols-outlined fill text-[20px]">business</span>
                         <p className="text-sm font-medium leading-normal">Business Profile</p>
                     </button>
-                    <button 
-                        onClick={() => window.location.hash = '#/notifications'}
-                        className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/5 text-[#94a3b8] hover:text-white transition-colors w-full text-left cursor-pointer"
-                    >
-                        <span className="material-symbols-outlined text-[20px]">notifications</span>
-                        <p className="text-sm font-medium leading-normal">Notifications</p>
-                    </button>
+                    <div className="w-full">
+                        <NotificationBell />
+                    </div>
                     <button 
                         onClick={() => window.location.hash = '#/security'}
                         className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/5 text-[#94a3b8] hover:text-white transition-colors w-full text-left cursor-pointer"

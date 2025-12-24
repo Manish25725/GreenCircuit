@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
 import Loader from '../components/Loader';
+import NotificationBell from '../components/NotificationBell';
 import { api, getCurrentUser } from '../services/api';
 
 interface BusinessProfile {
@@ -168,16 +169,14 @@ const BusinessProfileSettings = () => {
                   </div>
 
                   {/* Notifications Card */}
-                  <div 
-                    onClick={() => window.location.hash = '#/notifications'}
-                    className="group bg-[#151F26] border border-white/5 hover:border-[#06b6d4]/30 rounded-xl p-6 cursor-pointer transition-all hover:bg-[#151F26]/80"
-                  >
+                  <div className="group bg-[#151F26] border border-white/5 hover:border-[#06b6d4]/30 rounded-xl p-6 transition-all hover:bg-[#151F26]/80">
                     <div className="flex items-start gap-4">
                       <div className="p-3 bg-[#06b6d4]/10 rounded-lg group-hover:bg-[#06b6d4]/20 transition-colors">
                         <span className="material-symbols-outlined text-[#06b6d4] text-[32px]">notifications</span>
                       </div>
                       <div className="flex-1">
                         <h3 className="text-lg font-bold text-white mb-1 group-hover:text-[#06b6d4] transition-colors">Notifications</h3>
+                        <NotificationBell />
                         <p className="text-gray-400 text-sm leading-relaxed mb-3">
                           Manage notification preferences and alerts
                         </p>

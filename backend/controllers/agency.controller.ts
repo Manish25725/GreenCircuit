@@ -17,11 +17,11 @@ export const getAgencies = async (req: Request, res: Response) => {
       rating, 
       verified,
       page = 1, 
-      limit = 10,
+      limit = 100,
       sort = 'rating'
     } = req.query;
 
-    const query: any = { isVerified: true };
+    const query: any = { isVerified: true, verificationStatus: 'approved' };
     
     if (city) query['address.city'] = new RegExp(city as string, 'i');
     if (service) query.services = service;
@@ -39,6 +39,8 @@ export const getAgencies = async (req: Request, res: Response) => {
       .limit(Number(limit));
 
     const total = await Agency.countDocuments(query);
+
+    console.log(`Found ${agencies.length} verified agencies out of ${total} total`);
 
     sendSuccess(res, {
       agencies,
