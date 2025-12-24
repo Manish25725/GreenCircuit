@@ -8,7 +8,7 @@ export default function GlobeDemo() {
     globeColor: "#001a4d",
     showAtmosphere: true,
     atmosphereColor: "#FFFFFF",
-    atmosphereAltitude: 0.25,
+    atmosphereAltitude: 0.15,
     emissive: "#0B1120",
     emissiveIntensity: 0.1,
     shininess: 0.9,

@@ -337,7 +337,7 @@ const Landing = () => {
                             </div>
                         </div>
                     </div>
-                    <div className="relative order-1 lg:order-2 h-[400px] lg:h-[500px] rounded-3xl overflow-hidden bg-[#0B1120] hero-image-container opacity-0 scale-95">
+                    <div className="relative order-1 lg:order-2 h-[400px] lg:h-[500px] rounded-3xl overflow-hidden bg-[#0B1120] hero-image-container opacity-0 scale-95 flex items-center justify-center">
                         <GlobeDemo />
                     </div>
                 </div>
