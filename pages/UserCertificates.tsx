@@ -282,7 +282,7 @@ const UserCertificates = () => {
                         </div>
                         <div className="flex items-center justify-between">
                           <span className="text-sm text-gray-400">Expiry Date</span>
-                          <span className={`text-sm font-medium ${isExpired(issueDate) ? 'text-red-400' : 'text-white'}`}>
+                          <span className={isExpired(issueDate) ? 'text-sm font-medium text-red-400' : 'text-sm font-medium text-white'}>
                             {formatDate(expiryDate.toISOString())}
                           </span>
                         </div>

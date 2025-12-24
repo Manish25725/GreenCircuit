@@ -7,6 +7,8 @@ import AgencyAnalytics from './pages/AgencyAnalytics';
 import ManageSlots from './pages/ManageSlots';
 import AgencyBookings from './pages/AgencyBookings';
 import AgencyProfile from './pages/AgencyProfile';
+import PartnerProfile from './pages/PartnerProfile';
+import PartnerSecurity from './pages/PartnerSecurity';
 import UserDashboard from './pages/UserDashboard';
 import Certificate from './pages/Certificate';
 import SearchAgencies from './pages/SearchAgencies';
@@ -199,6 +201,10 @@ const App = () => {
         return <AgencyBookings />;
       case '#/agency/profile':
         return <AgencyProfile />;
+      case '#/partner/profile':
+        return <PartnerProfile />;
+      case '#/partner/security':
+        return <PartnerSecurity />;
       case '#/partner/register':
         return <PartnerRegistration />;
       case '#/partner/pending':
@@ -261,7 +267,7 @@ const App = () => {
         if (userRole === 'business') {
           return <BusinessProfileSettings />;
         } else if (userRole === 'agency') {
-          return <AgencyProfile />;
+          return <PartnerProfile />;
         } else if (userRole === 'user') {
           return <ResidentProfileSettings />;
         }
