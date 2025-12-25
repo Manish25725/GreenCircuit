@@ -394,11 +394,11 @@ export default function GlobeDemo() {
   ];
 
   return (
-    <div className="flex flex-row items-center justify-center h-full w-full relative" style={{ backgroundColor: '#0B1120' }}>
-      <div className="max-w-7xl mx-auto w-full relative overflow-hidden h-full px-4" style={{ backgroundColor: '#0B1120' }}>
-        <div className="absolute w-full bottom-0 inset-x-0 h-40 pointer-events-none select-none z-40" style={{ background: 'linear-gradient(to bottom, transparent, #0B1120)' }} />
-        <div className="absolute w-full h-full z-10" style={{ backgroundColor: '#0B1120' }}>
-          <Suspense fallback={<div className="flex items-center justify-center h-full" style={{ backgroundColor: '#0B1120' }}><div className="text-[#34D399]">Loading globe...</div></div>}>
+    <div className="flex flex-row items-center justify-center h-full w-full relative">
+      <div className="max-w-7xl mx-auto w-full relative overflow-hidden h-full px-4">
+        <div className="absolute w-full bottom-0 inset-x-0 h-40 pointer-events-none select-none z-40" style={{ background: 'linear-gradient(to bottom, transparent, transparent)' }} />
+        <div className="absolute w-full h-full z-10">
+          <Suspense fallback={<div className="flex items-center justify-center h-full"><div className="text-[#34D399]">Loading globe...</div></div>}>
             <World data={sampleArcs} globeConfig={globeConfig} />
           </Suspense>
         </div>

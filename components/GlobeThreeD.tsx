@@ -237,7 +237,7 @@ export function WebGLRendererConfig() {
   useEffect(() => {
     gl.setPixelRatio(window.devicePixelRatio);
     gl.setSize(size.width, size.height);
-    gl.setClearColor(0x0B1120, 1);
+    gl.setClearColor(0x000000, 0);
   }, [gl, size]);
 
   return null;
@@ -250,7 +250,7 @@ export function World(props: WorldProps) {
     <Canvas 
       scene={scene} 
       camera={new PerspectiveCamera(50, aspect, 180, 1800)}
-      style={{ background: '#0B1120' }}
+      style={{ background: 'transparent' }}
     >
       <WebGLRendererConfig />
       <ambientLight color={globeConfig.ambientLight} intensity={0.6} />

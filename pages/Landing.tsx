@@ -354,13 +354,13 @@ const Landing = () => {
                             </div>
                         </div>
                     </div>
-                    <div className="relative h-[500px] rounded-3xl overflow-hidden bg-[#0B1120] hero-image-container opacity-0 scale-95 flex items-center justify-center">
+                    <div className="relative h-[500px] hero-image-container opacity-0 scale-95 flex items-center justify-center">
                         <GlobeDemo />
                     </div>
                 </div>
 
                 {/* Mobile: Globe */}
-                <div className="lg:hidden relative h-[400px] rounded-3xl overflow-hidden bg-[#0B1120] hero-image-container opacity-0 scale-95 flex items-center justify-center mb-8">
+                <div className="lg:hidden relative h-[400px] hero-image-container opacity-0 scale-95 flex items-center justify-center mb-8">
                     <GlobeDemo />
                 </div>
 
