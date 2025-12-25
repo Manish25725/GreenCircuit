@@ -53,26 +53,14 @@ const BusinessCertificates = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    console.log('=== USER CHECK ===');
-    const currentUser = getCurrentUser();
-    console.log('Current user:', currentUser);
-    console.log('User ID:', currentUser?._id);
-    console.log('User email:', currentUser?.email);
-    console.log('User role:', currentUser?.role);
     fetchCertificates();
   }, []);
 
   const fetchCertificates = async () => {
     try {
       setLoading(true);
-      console.log('=== FETCHING CERTIFICATES (BusinessCertificates Page) ===');
-      console.log('Current user:', user);
       
       const response: any = await api.getBusinessCertificates({ page: 1, limit: 100 });
-      console.log('API Response:', response);
-      console.log('Response type:', typeof response);
-      console.log('Response keys:', response ? Object.keys(response) : 'null');
-      console.log('Full response JSON:', JSON.stringify(response, null, 2));
       
       if (response) {
         // Handle multiple response formats
@@ -96,18 +84,10 @@ const BusinessCertificates = () => {
           certs = response;
         }
         
-        console.log('Certificates loaded:', certs.length);
-        if (certs.length > 0) {
-          console.log('First certificate:', certs[0]);
-        }
-        
         setCertificates(certs);
         setStats(statsData);
       }
     } catch (error: any) {
-      console.error('Failed to fetch certificates:', error);
-      console.error('Error message:', error.message);
-      console.error('Error response:', error.response?.data);
     } finally {
       setLoading(false);
     }
@@ -148,7 +128,6 @@ const BusinessCertificates = () => {
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
     } catch (error) {
-      console.error('Failed to download certificate:', error);
       alert('Failed to download certificate. Please try again.');
     }
   };

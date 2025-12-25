@@ -43,9 +43,6 @@ const AgencyDashboard = () => {
       const responseData = dashboardData.data?.data || dashboardData.data;
       const status = responseData?.status;
       
-      console.log('Agency dashboard - API response:', dashboardData.data);
-      console.log('Agency dashboard - Status:', status);
-      
       // If pending or rejected, redirect to pending page
       if (status === 'pending' || status === 'rejected') {
         window.location.hash = '#/partner/pending';
@@ -61,7 +58,6 @@ const AgencyDashboard = () => {
         window.location.hash = '#/partner/pending';
       }
     } catch (error: any) {
-      console.error('Failed to check agency status:', error);
       // If agency not found (404), redirect to registration form
       if (error.response?.status === 404) {
         window.location.hash = '#/partner/register';
@@ -105,10 +101,8 @@ const AgencyDashboard = () => {
           totalWasteCollected: totalWaste
         });
       } catch (e) {
-        console.log('No bookings found');
       }
     } catch (error) {
-      console.error('Failed to load agency data:', error);
     } finally {
       setLoading(false);
     }
@@ -121,7 +115,6 @@ const AgencyDashboard = () => {
       await loadAgencyData();
       setShowActionModal(null);
     } catch (error) {
-      console.error('Failed to update booking status:', error);
       alert('Failed to update booking. Please try again.');
     } finally {
       setActionLoading(null);

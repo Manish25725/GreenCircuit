@@ -28,7 +28,6 @@ const BusinessDashboard = () => {
     
     // Listen for user updates (avatar/logo changes)
     const handleUserUpdate = async () => {
-      console.log('User updated event received - fetching fresh data from API');
       // Fetch fresh data from API instead of using localStorage
       try {
         const userData = await api.getMe();
@@ -48,16 +47,12 @@ const BusinessDashboard = () => {
             userData.logo = businessData.logo;
           }
         } catch (err) {
-          console.error('Failed to fetch business profile:', err);
         }
         
-        console.log('Fresh user data from API:', userData);
-        console.log('Fresh logo URL:', userData?.logo);
         setUser(userData);
         setAvatarKey(Date.now());
         localStorage.setItem('user', JSON.stringify(userData));
       } catch (error) {
-        console.error('Failed to fetch fresh user data:', error);
       }
     };
     
@@ -72,7 +67,6 @@ const BusinessDashboard = () => {
     try {
       // Try to get fresh user data from API
       const userData = await api.getMe();
-      console.log('Business Dashboard - User Data:', userData);
       
       // Fetch business profile to get logo
       try {
@@ -86,17 +80,13 @@ const BusinessDashboard = () => {
         if (businessResponse.ok) {
           const result = await businessResponse.json();
           const businessData = result.data || result;
-          console.log('Business Profile Data:', businessData);
-          console.log('Logo URL from business profile:', businessData?.logo);
           
           // Merge business logo into user data
           userData.logo = businessData.logo;
         }
       } catch (err) {
-        console.error('Failed to fetch business profile:', err);
       }
       
-      console.log('Final user data with logo:', userData);
       setUser(userData);
       setAvatarKey(Date.now());
       localStorage.setItem('user', JSON.stringify(userData));
@@ -120,16 +110,11 @@ const BusinessDashboard = () => {
         );
         setActiveBookings(active || []);
       } catch (e) {
-        console.log('No bookings found');
       }
 
       // Get recent certificates
       try {
-        console.log('Fetching certificates for business user...');
         const certsData = await api.getBusinessCertificates({ page: 1, limit: 3 });
-        console.log('Certificates API response:', certsData);
-        console.log('Response type:', typeof certsData);
-        console.log('Response keys:', certsData ? Object.keys(certsData) : 'null');
         
         // Store for debug panel
         setDebugInfo({
@@ -151,14 +136,7 @@ const BusinessDashboard = () => {
         }
         
         setCertificates(certs);
-        console.log('Loaded certificates count:', certs.length);
-        if (certs.length > 0) {
-          console.log('First certificate:', JSON.stringify(certs[0], null, 2));
-        }
       } catch (e: any) {
-        console.error('Error loading certificates:', e);
-        console.error('Error details:', e.message);
-        console.error('Error response:', e.response?.data);
         setDebugInfo({
           timestamp: new Date().toISOString(),
           error: e.message,
@@ -167,7 +145,6 @@ const BusinessDashboard = () => {
         });
       }
     } catch (error) {
-      console.error('Failed to load business data:', error);
     } finally {
       setLoading(false);
     }
@@ -180,7 +157,6 @@ const BusinessDashboard = () => {
       await loadBusinessData();
       setShowCancelModal(null);
     } catch (error) {
-      console.error('Failed to cancel booking:', error);
       alert('Failed to cancel booking. Please try again.');
     } finally {
       setCancelling(null);

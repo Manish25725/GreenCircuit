@@ -84,7 +84,6 @@ const EditBusinessProfile = () => {
       });
       setLogoPreview(businessData.logo || '');
     } catch (error) {
-      console.error('Failed to load business profile:', error);
     } finally {
       setLoading(false);
     }
@@ -167,13 +166,11 @@ const EditBusinessProfile = () => {
           // Reload profile data
           await loadBusinessProfile();
         } catch (apiError) {
-          console.error('Failed to save logo to profile:', apiError);
           setErrorMessage('Logo uploaded but failed to save to profile. Please try saving your profile.');
           setTimeout(() => setErrorMessage(''), 5000);
         }
       }
     } catch (error) {
-      console.error('Failed to upload logo:', error);
       setErrorMessage('Failed to upload logo. Please try again.');
       setTimeout(() => setErrorMessage(''), 5000);
     } finally {
@@ -191,7 +188,6 @@ const EditBusinessProfile = () => {
         updateData.logo = logoPreview;
       }
       const response = await api.updateBusinessProfile(updateData);
-      console.log('Profile updated successfully:', response);
       
       // Show success notification
       setShowSuccess(true);
@@ -200,7 +196,6 @@ const EditBusinessProfile = () => {
       // Reload profile data
       await loadBusinessProfile();
     } catch (error: any) {
-      console.error('Failed to update business profile:', error);
       const message = error?.response?.data?.message || error?.message || 'Failed to update business profile. Please try again.';
       setErrorMessage(message);
       setTimeout(() => setErrorMessage(''), 5000);

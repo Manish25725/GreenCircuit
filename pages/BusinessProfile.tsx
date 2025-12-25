@@ -107,7 +107,6 @@ const BusinessProfile = () => {
         });
       }
     } catch (error) {
-      console.error('Failed to load business profile:', error);
     } finally {
       setLoading(false);
     }
@@ -176,12 +175,10 @@ const BusinessProfile = () => {
             alert('Logo updated successfully!');
           }
         } catch (apiError) {
-          console.error('Failed to save logo to profile:', apiError);
           alert('Logo uploaded but failed to save to profile. Please try saving your profile.');
         }
       }
     } catch (error) {
-      console.error('Failed to upload logo:', error);
       alert('Failed to upload logo. Please check your Cloudinary settings and try again.');
     } finally {
       setUploadingLogo(false);
@@ -210,7 +207,6 @@ const BusinessProfile = () => {
         throw new Error('Failed to update profile');
       }
     } catch (error) {
-      console.error('Failed to update profile:', error);
       alert('Failed to update profile');
     } finally {
       setSaving(false);

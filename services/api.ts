@@ -4,10 +4,6 @@
 // - Production: VITE_API_URL in .env.production (set to Render backend URL)
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 
-console.log('Environment:', import.meta.env.MODE);
-console.log('Production:', import.meta.env.PROD);
-console.log('API Base URL:', API_BASE_URL);
-
 // Set this to false to use real API calls to the backend server
 // Set to true to use internal mock data (useful for frontend preview without running server)
 const USE_MOCK_FALLBACK = false; 
@@ -234,26 +230,14 @@ async function apiRequest<T>(endpoint: string, options: RequestInit = {}): Promi
     ...(options.headers || {}),
   };
   
-  // Debug logging
-  console.log('=== API Request ===');
-  console.log('Endpoint:', endpoint);
-  console.log('Full URL:', `${API_BASE_URL}${endpoint}`);
-  console.log('Headers:', headers);
-  console.log('Token exists:', !!localStorage.getItem('token'));
-  
   const res = await fetch(`${API_BASE_URL}${endpoint}`, {
     ...options,
     headers,
   });
   
-  console.log('Response status:', res.status);
-  console.log('Response ok:', res.ok);
-  
   const data = await res.json();
-  console.log('Response data:', data);
   
   if (!res.ok) {
-    console.error('API Error:', data);
     throw new Error(data.error || data.message || 'Request failed');
   }
   
@@ -540,7 +524,6 @@ export const api = {
       const url = unreadOnly ? '/notifications?unreadOnly=true' : '/notifications';
       return await apiRequest(url);
     } catch (error: any) {
-      console.error('Failed to fetch notifications:', error);
       // Return empty array instead of throwing to prevent UI crashes
       return { notifications: [], unreadCount: 0, pagination: { page: 1, limit: 20, total: 0, pages: 0 } };
     }
@@ -550,7 +533,6 @@ export const api = {
     try {
       return await apiRequest(`/notifications/${id}/read`, { method: 'PUT' });
     } catch (error: any) {
-      console.error('Failed to mark notification as read:', error);
       return null;
     }
   },
@@ -559,7 +541,6 @@ export const api = {
     try {
       return await apiRequest('/notifications/read-all', { method: 'PUT' });
     } catch (error: any) {
-      console.error('Failed to mark all notifications as read:', error);
       return null;
     }
   },
@@ -568,7 +549,6 @@ export const api = {
     try {
       return await apiRequest('/notifications/unread-count');
     } catch (error: any) {
-      console.error('Failed to fetch unread count:', error);
       return { count: 0 };
     }
   },
@@ -809,7 +789,7 @@ export const getCurrentUser = (): User | null => {
     try {
       return JSON.parse(decodeURIComponent(userCookie));
     } catch (e) {
-      console.error('Error parsing user cookie:', e);
+      // Silent fail
     }
   }
   
@@ -821,7 +801,6 @@ export const getCurrentUser = (): User | null => {
   try {
     return JSON.parse(userStr);
   } catch (e) {
-    console.error('Error parsing user from localStorage:', e);
     return null;
   }
 };

@@ -149,7 +149,6 @@ const App = () => {
       if (token) {
         const isValid = await api.validateToken();
         if (!isValid) {
-          console.log('Invalid token detected - session cleared');
           // Token was invalid and has been cleared
           // If user is on a protected page, redirect to login
           const protectedPaths = ['#/dashboard', '#/profile', '#/rewards', '#/schedule', '#/search'];

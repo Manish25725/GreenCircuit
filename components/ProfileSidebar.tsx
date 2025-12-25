@@ -70,13 +70,11 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ activePage }) => {
           // Success - reload to show new avatar
           window.location.reload();
         } catch (apiError) {
-          console.error('Failed to save avatar to profile:', apiError);
           // Even if API fails, Cloudinary upload succeeded
           alert('Avatar uploaded but failed to save to profile. Please refresh the page.');
         }
       }
     } catch (error) {
-      console.error('Failed to upload avatar:', error);
       alert('Failed to upload avatar. Please check your Cloudinary settings and try again.');
     } finally {
       setUploadingAvatar(false);

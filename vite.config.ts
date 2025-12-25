@@ -6,10 +6,6 @@ export default defineConfig(({ mode }) => {
     // Load env files with VITE_ prefix
     const env = loadEnv(mode, process.cwd(), '');
     
-    // Log for debugging
-    console.log('Vite Mode:', mode);
-    console.log('VITE_API_URL:', env.VITE_API_URL);
-    
     return {
       server: {
         port: 3000,
@@ -32,6 +28,9 @@ export default defineConfig(({ mode }) => {
         alias: {
           '@': path.resolve(__dirname, '.'),
         }
-      }
+      },
+      esbuild: {
+        drop: mode === 'production' ? ['console', 'debugger'] : [],
+      },
     };
 });

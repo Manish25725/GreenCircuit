@@ -55,10 +55,8 @@ const UserDashboard = () => {
         const completed = bookings.filter((b: Booking) => b.status === 'completed');
         setCompletedBookings(completed || []);
       } catch (e) {
-        console.log('No bookings found');
       }
     } catch (error) {
-      console.error('Failed to load user data:', error);
       // If API fails, use cached user data
     } finally {
       setLoading(false);
@@ -73,7 +71,6 @@ const UserDashboard = () => {
       await loadUserData();
       setShowCancelModal(null);
     } catch (error) {
-      console.error('Failed to cancel booking:', error);
       alert('Failed to cancel booking. Please try again.');
     } finally {
       setCancelling(null);

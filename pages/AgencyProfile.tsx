@@ -74,7 +74,6 @@ const AgencyProfile = () => {
         }) || [];
         setCertifications(parsedCerts);
       } catch (error) {
-        console.error('Failed to fetch profile:', error);
       } finally {
         setLoading(false);
       }
@@ -84,9 +83,7 @@ const AgencyProfile = () => {
       try {
         const response = await api.getNotifications() as any;
         const notifData = response.data || response || [];
-        setNotifications(Array.isArray(notifData) ? notifData : []);
-      } catch (error) {
-        console.error('Failed to fetch notifications:', error);
+        setNotifications(Array.isArray(notifData) ? notifData : []);      } catch (error) {
         setNotifications([]);
       }
     };
@@ -116,7 +113,6 @@ const AgencyProfile = () => {
       const data = await response.json();
       return data.secure_url;
     } catch (error) {
-      console.error('Cloudinary upload failed:', error);
       throw error;
     }
   };
@@ -135,7 +131,6 @@ const AgencyProfile = () => {
       
       alert('Logo updated successfully!');
     } catch (error) {
-      console.error('Failed to upload logo:', error);
       alert('Failed to upload logo');
     } finally {
       setUploading(false);
@@ -172,7 +167,6 @@ const AgencyProfile = () => {
       setNewCert({ name: '', type: '', file: null });
       alert('Certification added successfully!');
     } catch (error) {
-      console.error('Failed to add certification:', error);
       alert('Failed to add certification');
     } finally {
       setUploading(false);
@@ -192,7 +186,6 @@ const AgencyProfile = () => {
       
       alert('Certification removed successfully!');
     } catch (error) {
-      console.error('Failed to remove certification:', error);
       alert('Failed to remove certification');
     }
   };
@@ -233,20 +226,6 @@ const AgencyProfile = () => {
         };
       }
       
-      console.log('Saving agency profile with data:', {
-        name: formData.companyName,
-        registrationNumber: formData.registrationNumber,
-        description: formData.description,
-        email: formData.email,
-        phone: formData.phone,
-        logo: agencyLogo,
-        address: addressData,
-        services: wasteTypes,
-        certifications: certifications.map(cert => JSON.stringify(cert)),
-        operatingRegions: regions,
-        operatingHours: operatingHours
-      });
-
       const response = await api.updateAgencyProfile({
         name: formData.companyName,
         registrationNumber: formData.registrationNumber,
@@ -261,11 +240,8 @@ const AgencyProfile = () => {
         operatingHours: operatingHours
       });
       
-      console.log('Profile update response:', response);
       alert('Profile updated successfully!');
     } catch (error: any) {
-      console.error('Failed to save profile:', error);
-      console.error('Error details:', error.response || error.message);
       alert(`Failed to update profile: ${error.response?.data?.message || error.message || 'Unknown error'}`);
     } finally {
       setSaving(false);

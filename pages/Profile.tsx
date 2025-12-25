@@ -55,7 +55,6 @@ const Profile = () => {
         });
       }
     } catch (error) {
-      console.error('Failed to load user profile:', error);
     } finally {
       setLoading(false);
     }
@@ -125,13 +124,11 @@ const Profile = () => {
           // Show success message
           alert('Avatar updated successfully!');
         } catch (apiError) {
-          console.error('Failed to save avatar to profile:', apiError);
           // Even if API fails, Cloudinary upload succeeded
           alert('Avatar uploaded but failed to save to profile. Please try saving your profile.');
         }
       }
     } catch (error) {
-      console.error('Failed to upload avatar:', error);
       alert('Failed to upload avatar. Please check your Cloudinary settings and try again.');
     } finally {
       setUploadingAvatar(false);
@@ -154,7 +151,6 @@ const Profile = () => {
         alert('Profile updated successfully!');
       }
     } catch (error) {
-      console.error('Failed to update profile:', error);
       alert('Failed to update profile');
     } finally {
       setSaving(false);

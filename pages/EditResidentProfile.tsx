@@ -88,7 +88,6 @@ const EditResidentProfile = () => {
         setAvatarPreview(currentUser.avatar || '');
       }
     } catch (error) {
-      console.error('Failed to load user profile:', error);
     } finally {
       setLoading(false);
     }
@@ -177,13 +176,11 @@ const EditResidentProfile = () => {
           setShowSuccess(true);
           setTimeout(() => setShowSuccess(false), 3000);
         } catch (apiError) {
-          console.error('Failed to save avatar to profile:', apiError);
           setErrorMessage('Avatar uploaded but failed to save to profile. Please try saving your profile.');
           setTimeout(() => setErrorMessage(''), 5000);
         }
       }
     } catch (error) {
-      console.error('Failed to upload avatar:', error);
       setErrorMessage('Failed to upload avatar. Please try again.');
       setTimeout(() => setErrorMessage(''), 5000);
     } finally {
@@ -202,7 +199,6 @@ const EditResidentProfile = () => {
       // No need to include it here as it's saved immediately on upload
       
       const response = await api.updateProfile(updateData);
-      console.log('Profile updated successfully:', response);
       
       // Update localStorage
       const storedUser = localStorage.getItem('user');
@@ -219,7 +215,6 @@ const EditResidentProfile = () => {
       // Reload profile data
       await loadUserProfile();
     } catch (error: any) {
-      console.error('Failed to update profile:', error);
       const message = error?.response?.data?.message || error?.message || 'Failed to update profile. Please try again.';
       setErrorMessage(message);
       setTimeout(() => setErrorMessage(''), 5000);

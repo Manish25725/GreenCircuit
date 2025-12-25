@@ -112,9 +112,7 @@ const PartnerEditProfile = () => {
       // Set logo preview with cache busting if URL exists
       const logoUrl = profileData.logo ? `${profileData.logo}?t=${Date.now()}` : '';
       setLogoPreview(logoUrl);
-      console.log('Loaded partner logo:', profileData.logo);
     } catch (error) {
-      console.error('Failed to load partner profile:', error);
     } finally {
       setLoading(false);
     }
@@ -178,13 +176,10 @@ const PartnerEditProfile = () => {
       }
 
       const data = await response.json();
-      console.log('Logo uploaded to Cloudinary:', data);
       
       if (data.secure_url) {
-        console.log('Logo URL:', data.secure_url);
         // Update logo in backend immediately
         await api.updateAgencyProfile({ logo: data.secure_url });
-        console.log('Logo saved to profile');
         
         // Update local storage with both avatar and logo
         const currentUser = getCurrentUser();
@@ -206,7 +201,6 @@ const PartnerEditProfile = () => {
         setTimeout(() => setShowSuccess(false), 3000);
       }
     } catch (error) {
-      console.error('Failed to upload logo:', error);
       setErrorMessage('Failed to upload logo. Please try again.');
       setTimeout(() => setErrorMessage(''), 3000);
     } finally {
@@ -243,7 +237,6 @@ const PartnerEditProfile = () => {
       };
 
       const response = await api.updateAgencyProfile(updateData);
-      console.log('Profile updated successfully:', response);
       
       // Update localStorage
       const storedUser = localStorage.getItem('user');
@@ -260,7 +253,6 @@ const PartnerEditProfile = () => {
       // Reload profile data
       await loadPartnerProfile();
     } catch (error: any) {
-      console.error('Failed to update profile:', error);
       const message = error?.response?.data?.message || error?.message || 'Failed to update profile. Please try again.';
       setErrorMessage(message);
       setTimeout(() => setErrorMessage(''), 5000);
