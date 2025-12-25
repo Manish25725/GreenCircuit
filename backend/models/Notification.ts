@@ -3,7 +3,7 @@ import mongoose, { Schema, Document } from 'mongoose';
 export interface INotification extends Document {
   _id: mongoose.Types.ObjectId;
   userId: mongoose.Types.ObjectId;
-  type: 'booking' | 'reward' | 'system' | 'agency' | 'promotion' | 'admin' | 'account' | 'alert' | 'success' | 'info';
+  type: 'booking' | 'reward' | 'system' | 'agency' | 'promotion' | 'admin' | 'account' | 'alert' | 'success' | 'info' | 'certificate';
   title: string;
   message: string;
   priority?: 'high' | 'normal' | 'low';
@@ -22,7 +22,7 @@ const NotificationSchema = new Schema<INotification>({
   },
   type: {
     type: String,
-    enum: ['booking', 'reward', 'system', 'agency', 'promotion', 'admin', 'account', 'alert', 'success', 'info'],
+    enum: ['booking', 'reward', 'system', 'agency', 'promotion', 'admin', 'account', 'alert', 'success', 'info', 'certificate'],
     default: 'system'
   },
   title: {

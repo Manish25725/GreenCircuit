@@ -275,7 +275,6 @@ export const sanitizeMongoOperators = (req: Request, res: Response, next: NextFu
     for (const key in obj) {
       // Remove MongoDB operators ($ne, $gt, etc.) and other dangerous patterns
       if (key.startsWith('$') || key.startsWith('__proto__') || key === 'constructor' || key === 'prototype') {
-        console.warn(`Sanitized dangerous key: ${key} from request ${req.ip}`);
         continue;
       }
       

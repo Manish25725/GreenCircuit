@@ -40,8 +40,6 @@ export const getAgencies = async (req: Request, res: Response) => {
 
     const total = await Agency.countDocuments(query);
 
-    console.log(`Found ${agencies.length} verified agencies out of ${total} total`);
-
     sendSuccess(res, {
       agencies,
       pagination: {
@@ -248,18 +246,24 @@ export const getAgencyDashboard = async (req: Request, res: Response) => {
 export const getAgencyBookings = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).user.id;
-    const { status, page = 1, limit = 10 } = req.query;
+    const userRole = (req as any).user.role;
+    const { status, page = 1, limit = 100 } = req.query;
 
+    // Find agency by userId
     const agency = await Agency.findOne({ userId });
     if (!agency) {
-      return sendError(res, 'Agency not found', 404);
+      // Return helpful debug info
+      const allAgencies = await Agency.find({}).select('_id name userId').limit(5);
+      return sendError(res, `Agency profile not found for userId: ${userId}. User role: ${userRole}. Please create an agency profile first or check if logged in with the correct account.`, 404);
     }
 
+    // Query bookings by agency._id
     const query: any = { agencyId: agency._id };
     if (status) query.status = status;
 
     const bookings = await Booking.find(query)
       .populate('userId', 'name email phone avatar')
+      .populate('agencyId', 'name logo rating')
       .sort({ scheduledDate: 1, createdAt: -1 })
       .skip((Number(page) - 1) * Number(limit))
       .limit(Number(limit));
@@ -268,6 +272,11 @@ export const getAgencyBookings = async (req: Request, res: Response) => {
 
     sendSuccess(res, {
       bookings,
+      agencyInfo: {
+        id: agency._id,
+        name: agency.name,
+        userId: agency.userId
+      },
       pagination: {
         page: Number(page),
         limit: Number(limit),
@@ -365,21 +374,12 @@ export const updateBookingStatus = async (req: Request, res: Response) => {
 
       // Get user info for certificate
       const user = await User.findById(booking.userId);
-      console.log('=== CERTIFICATE GENERATION DEBUG ===');
-      console.log('Booking completed for user:', user?.email, 'Role:', user?.role);
-      console.log('Booking ID:', booking._id);
-      console.log('User ID:', booking.userId);
-      console.log('Total Weight:', booking.totalWeight);
       
       // Check if this is a business user and generate BusinessCertificate
       let business = await Business.findOne({ userId: booking.userId });
-      console.log('Business profile search - userId:', booking.userId);
-      console.log('Business profile found:', business ? business.companyName : 'None');
-      console.log('Business _id:', business?._id);
       
       // If user has business role but no profile, create one automatically
       if (!business && user?.role === 'business') {
-        console.log('Creating business profile automatically for:', user.email);
         business = await Business.create({
           userId: booking.userId,
           companyName: user.name + "'s Business",
@@ -394,7 +394,6 @@ export const updateBookingStatus = async (req: Request, res: Response) => {
             zipCode: ''
           }
         });
-        console.log('Business profile created:', business.companyName, 'ID:', business._id);
       }
       
       if (business) {
@@ -406,8 +405,6 @@ export const updateBookingStatus = async (req: Request, res: Response) => {
             quantity: item.quantity || 1,
             weight: item.estimatedWeight || item.weight || 0
           })) || [];
-
-          console.log('Generating Compliance Certificate for business:', business.companyName, 'Business ID:', business._id);
 
           const totalWeight = booking.totalWeight || 0;
           const certificate = await BusinessCertificate.create({
@@ -443,13 +440,6 @@ export const updateBookingStatus = async (req: Request, res: Response) => {
             issuedAt: new Date()
           });
 
-          console.log('Compliance Certificate created successfully!');
-          console.log('Certificate ID:', certificate.certificateId);
-          console.log('Certificate _id:', certificate._id);
-          console.log('Business ID:', certificate.businessId);
-          console.log('Agency ID:', certificate.agencyId);
-          console.log('Status:', certificate.status);
-
           // Create notification for business user
           await Notification.create({
             userId: booking.userId,
@@ -471,8 +461,7 @@ export const updateBookingStatus = async (req: Request, res: Response) => {
             }
           });
         } catch (certError) {
-          console.error('❌ FAILED TO CREATE BUSINESS CERTIFICATE:',certError);
-          console.error('Certificate error details:', JSON.stringify(certError, null, 2));
+          // Certificate generation failed, but pickup still marked as complete
         }
       } else {
         // Generate regular user Certificate

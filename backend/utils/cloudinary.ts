@@ -29,7 +29,6 @@ export const extractPublicId = (url: string): string | null => {
     const publicId = match ? match[1] : null;
     return publicId;
   } catch (error) {
-    console.error('Error extracting public_id:', error);
     return null;
   }
 };
@@ -43,7 +42,6 @@ export const deleteImage = async (publicId: string): Promise<boolean> => {
     const result = await cloudinary.uploader.destroy(publicId);
     return result.result === 'ok';
   } catch (error) {
-    console.error('Error deleting image from Cloudinary:', error);
     return false;
   }
 };

@@ -52,9 +52,18 @@ const CertificateSchema = new Schema<ICertificate>({
     required: true
   },
   itemsRecycled: [{
-    type: String,
-    quantity: Number,
-    weight: Number
+    type: {
+      type: String,
+      required: true
+    },
+    quantity: {
+      type: Number,
+      required: true
+    },
+    weight: {
+      type: Number,
+      required: true
+    }
   }],
   environmentalImpact: {
     co2Saved: { type: Number, default: 0 },

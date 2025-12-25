@@ -107,7 +107,6 @@ app.get('/api/health', (req, res) => {
 
 // Error handling middleware
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
-  console.error(err.stack);
   res.status(500).json({ 
     success: false, 
     error: err.message || 'Internal Server Error' 
