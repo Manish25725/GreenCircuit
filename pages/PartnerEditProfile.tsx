@@ -160,8 +160,13 @@ const PartnerEditProfile = () => {
       uploadFormData.append('file', file);
       uploadFormData.append('upload_preset', 'ecocycle_uploads');
 
+      const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
+      if (!cloudName) {
+        throw new Error('Cloudinary cloud name not configured');
+      }
+
       const response = await fetch(
-        'https://api.cloudinary.com/v1_1/dideet7oz/image/upload',
+        `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
         {
           method: 'POST',
           body: uploadFormData

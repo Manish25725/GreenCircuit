@@ -81,7 +81,12 @@ export const protect = async (req: AuthRequest, res: Response, next: NextFunctio
   if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
     try {
       token = req.headers.authorization.split(' ')[1];
-      const decoded: any = jwt.verify(token, process.env.JWT_SECRET || 'fallback_secret');
+      
+      if (!process.env.JWT_SECRET) {
+        throw new Error('JWT_SECRET is not configured');
+      }
+      
+      const decoded: any = jwt.verify(token, process.env.JWT_SECRET);
 
       const user = await User.findById(decoded.id).select('-password');
       if (!user) {
@@ -181,7 +186,12 @@ export const optionalAuth = async (req: AuthRequest, res: Response, next: NextFu
   if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
     try {
       token = req.headers.authorization.split(' ')[1];
-      const decoded: any = jwt.verify(token, process.env.JWT_SECRET || 'fallback_secret');
+      
+      if (!process.env.JWT_SECRET) {
+        throw new Error('JWT_SECRET is not configured');
+      }
+      
+      const decoded: any = jwt.verify(token, process.env.JWT_SECRET);
       req.user = await User.findById(decoded.id).select('-password');
     } catch (error) {
       // Token invalid, but continue without user

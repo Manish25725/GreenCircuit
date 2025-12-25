@@ -5,7 +5,11 @@ import { sendSuccess, sendError } from '../utils/response';
 import { deleteImageByUrl } from '../utils/cloudinary';
 
 const generateToken = (id: string, role: string) => {
-  return jwt.sign({ id, role }, process.env.JWT_SECRET || 'fallback_secret', {
+  if (!process.env.JWT_SECRET) {
+    throw new Error('JWT_SECRET environment variable is not configured');
+  }
+  
+  return jwt.sign({ id, role }, process.env.JWT_SECRET, {
     expiresIn: '30d',
   });
 };

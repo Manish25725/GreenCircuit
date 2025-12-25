@@ -5,6 +5,7 @@ import User from '../models/User';
 import Notification from '../models/Notification';
 import { sendSuccess, sendError } from '../utils/response';
 
+
 // Get all rewards
 export const getRewards = async (req: Request, res: Response) => {
   try {

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
 import Loader from '../components/Loader';
 import { api, getCurrentUser, User, Booking } from '../services/api';
+import NotificationBell from '../components/NotificationBell';
 
 const BusinessDashboard = () => {
   const [user, setUser] = useState<User | null>(getCurrentUser()); 
@@ -295,6 +296,7 @@ const BusinessDashboard = () => {
                     </div>
                   </div>
                 </div>
+                <NotificationBell />
                 <button 
                   onClick={handleLogout}
                   className="p-2.5 rounded-full bg-[#151F26] border border-white/5 text-gray-400 hover:text-red-400 hover:bg-red-500/10 transition-colors"

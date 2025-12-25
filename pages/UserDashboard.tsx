@@ -3,6 +3,7 @@ import Layout from '../components/Layout';
 import Loader from '../components/Loader';
 import { api, getCurrentUser, User, Booking } from '../services/api';
 import { useLanguage } from '../contexts/LanguageContext';
+import NotificationBell from '../components/NotificationBell';
 
 const UserDashboard = () => {
   const { t } = useLanguage();
@@ -170,6 +171,7 @@ const UserDashboard = () => {
                     </div>
                   </div>
                 </div>
+                <NotificationBell />
                 <button 
                   onClick={handleLogout}
                   className="p-2.5 rounded-full bg-[#151F26] border border-white/5 text-gray-400 hover:text-red-400 hover:bg-red-500/10 transition-colors"
