@@ -46,13 +46,10 @@ const ProfileHeader: React.FC = () => {
       <div className="flex items-center gap-4">
         <button 
           onClick={() => window.location.hash = '#/profile'}
-          className="hidden sm:flex items-center gap-3 pl-1 pr-4 py-1 rounded-full bg-[#151F26] border border-white/5 hover:bg-white/5 transition-colors group cursor-pointer"
+          className="hidden sm:flex h-10 px-5 items-center justify-center gap-2 rounded-full bg-white/5 text-white hover:bg-white/10 border border-white/10 text-sm font-bold transition-all duration-300 cursor-pointer"
         >
-          <div 
-            className="size-8 rounded-full bg-cover bg-center ring-2 ring-white/10 group-hover:ring-[#10b981]/50 transition-all" 
-            style={{ backgroundImage: `url("${avatarUrl}")` }}
-          ></div>
-          <span className="text-sm font-medium text-gray-200">{user?.name || 'User'}</span>
+          <span className="material-symbols-outlined text-[18px]">person</span>
+          Profile
         </button>
         <NotificationBell />
       </div>

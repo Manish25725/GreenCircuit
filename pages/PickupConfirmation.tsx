@@ -289,26 +289,31 @@ const PickupConfirmation = () => {
               
               <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
                 <div className="flex flex-col gap-4">
-                  <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#34D399]/10 border border-[#34D399]/20 w-fit">
+                  <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border w-fit" style={{ backgroundColor: `${primaryColor}10`, borderColor: `${primaryColor}20` }}>
                     <span className="relative flex h-2 w-2">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#34D399] opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-2 w-2 bg-[#34D399]"></span>
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style={{ backgroundColor: primaryColor }}></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2" style={{ backgroundColor: primaryColor }}></span>
                     </span>
-                    <span className="text-[#34D399] text-sm font-bold">+{booking?.pointsEarned || 50} Eco-Points Earned</span>
+                    <span className="text-sm font-bold" style={{ color: primaryColor }}>+{booking?.pointsEarned || 50} Eco-Points Earned</span>
                   </div>
                   <h3 className="text-2xl sm:text-3xl font-bold text-white">
                     Pickup #{booking?._id?.slice(-6).toUpperCase() || 'XXXXXX'}
                   </h3>
                   <p className="text-slate-400 text-base">
                     {booking?.agency?.name ? (
-                      <>Handled by <span className="text-[#34D399] font-semibold">{booking.agency.name}</span> (Verified Partner)</>
+                      <>Handled by <span className="font-semibold" style={{ color: primaryColor }}>{booking.agency.name}</span> (Verified Partner)</>
                     ) : (
                       'Pickup scheduled successfully'
                     )}
                   </p>
                 </div>
-                <div className="float-element size-32 rounded-2xl bg-gradient-to-br from-[#34D399]/20 to-[#34D399]/5 border border-[#34D399]/20 flex items-center justify-center shadow-[0_0_30px_rgba(52,211,153,0.15)]">
-                  <span className="material-symbols-outlined text-[#34D399] text-6xl">recycling</span>
+                <div className="float-element size-32 rounded-2xl bg-gradient-to-br border flex items-center justify-center" 
+                  style={{ 
+                    backgroundColor: `${primaryColor}05`,
+                    borderColor: `${primaryColor}20`,
+                    boxShadow: `0 0 30px ${primaryColor}15`
+                  }}>
+                  <span className="material-symbols-outlined text-6xl" style={{ color: primaryColor }}>recycling</span>
                 </div>
               </div>
             </div>
@@ -322,7 +327,7 @@ const PickupConfirmation = () => {
                     <p className="text-slate-500 text-sm capitalize">Current: {booking?.status || 'pending'}</p>
                   </div>
                   <div className="text-right">
-                    <span className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-[#34D399] to-[#6EE7B7]">
+                    <span className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r" style={{ backgroundImage: `linear-gradient(to right, ${primaryColor}, ${primaryColorLight})` }}>
                       {getProgressPercentage(booking?.status || 'pending')}%
                     </span>
                   </div>
@@ -330,16 +335,20 @@ const PickupConfirmation = () => {
                 
                 <div className="relative w-full h-4 rounded-full bg-slate-800 overflow-hidden mt-2">
                   <div 
-                    className="absolute left-0 top-0 h-full rounded-full bg-gradient-to-r from-[#34D399] to-[#6EE7B7] shadow-[0_0_20px_rgba(52,211,153,0.5)] transition-all duration-1000" 
-                    style={{ width: `${getProgressPercentage(booking?.status || 'pending')}%` }}
+                    className="absolute left-0 top-0 h-full rounded-full bg-gradient-to-r transition-all duration-1000" 
+                    style={{ 
+                      width: `${getProgressPercentage(booking?.status || 'pending')}%`,
+                      backgroundImage: `linear-gradient(to right, ${primaryColor}, ${primaryColorLight})`,
+                      boxShadow: `0 0 20px ${primaryColor}50`
+                    }}
                   ></div>
                 </div>
                 
                 <div className="flex justify-between text-xs font-medium text-slate-500 mt-2">
-                  <span className={booking?.status === 'pending' ? 'text-[#34D399]' : ''}>Booked</span>
-                  <span className={booking?.status === 'confirmed' ? 'text-[#34D399]' : ''}>Confirmed</span>
-                  <span className={booking?.status === 'collected' ? 'text-[#34D399]' : ''}>Collected</span>
-                  <span className={booking?.status === 'completed' ? 'text-[#34D399]' : ''}>Complete</span>
+                  <span style={booking?.status === 'pending' ? { color: primaryColor } : {}}>Booked</span>
+                  <span style={booking?.status === 'confirmed' ? { color: primaryColor } : {}}>Confirmed</span>
+                  <span style={booking?.status === 'collected' ? { color: primaryColor } : {}}>Collected</span>
+                  <span style={booking?.status === 'completed' ? { color: primaryColor } : {}}>Complete</span>
                 </div>
               </div>
             </div>
@@ -347,10 +356,13 @@ const PickupConfirmation = () => {
             {/* Detailed Info Grid */}
             <div className="animate-card grid grid-cols-1 sm:grid-cols-2 gap-4">
               {/* Pickup ID */}
-              <div className="group rounded-2xl bg-gradient-to-b from-slate-800/50 to-slate-900/50 border border-white/5 p-6 hover:border-[#34D399]/20 transition-all duration-300">
+              <div className="group rounded-2xl bg-gradient-to-b from-slate-800/50 to-slate-900/50 border border-white/5 p-6 transition-all duration-300"
+                onMouseEnter={(e) => e.currentTarget.style.borderColor = `${primaryColor}20`}
+                onMouseLeave={(e) => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.05)'}
+              >
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="size-10 rounded-xl bg-[#34D399]/10 flex items-center justify-center">
-                    <span className="material-symbols-outlined text-[#34D399] text-xl">tag</span>
+                  <div className="size-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: `${primaryColor}10` }}>
+                    <span className="material-symbols-outlined text-xl" style={{ color: primaryColor }}>tag</span>
                   </div>
                   <span className="text-slate-400 text-sm font-medium">Pickup ID</span>
                 </div>
@@ -372,7 +384,10 @@ const PickupConfirmation = () => {
               </div>
 
               {/* Items */}
-              <div className="group rounded-2xl bg-gradient-to-b from-slate-800/50 to-slate-900/50 border border-white/5 p-6 hover:border-[#34D399]/20 transition-all duration-300">
+              <div className="group rounded-2xl bg-gradient-to-b from-slate-800/50 to-slate-900/50 border border-white/5 p-6 transition-all duration-300"
+                onMouseEnter={(e) => e.currentTarget.style.borderColor = `${primaryColor}20`}
+                onMouseLeave={(e) => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.05)'}
+              >
                 <div className="flex items-center gap-3 mb-3">
                   <div className="size-10 rounded-xl bg-[#A855F7]/10 flex items-center justify-center">
                     <span className="material-symbols-outlined text-[#A855F7] text-xl">inventory_2</span>
@@ -386,14 +401,17 @@ const PickupConfirmation = () => {
               </div>
 
               {/* Status */}
-              <div className="group rounded-2xl bg-gradient-to-b from-slate-800/50 to-slate-900/50 border border-white/5 p-6 hover:border-[#34D399]/20 transition-all duration-300">
+              <div className="group rounded-2xl bg-gradient-to-b from-slate-800/50 to-slate-900/50 border border-white/5 p-6 transition-all duration-300"
+                onMouseEnter={(e) => e.currentTarget.style.borderColor = `${primaryColor}20`}
+                onMouseLeave={(e) => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.05)'}
+              >
                 <div className="flex items-center gap-3 mb-3">
                   <div className="size-10 rounded-xl bg-[#F59E0B]/10 flex items-center justify-center">
                     <span className="material-symbols-outlined text-[#F59E0B] text-xl">pending_actions</span>
                   </div>
                   <span className="text-slate-400 text-sm font-medium">Status</span>
                 </div>
-                <p className="text-xl font-bold text-[#34D399] capitalize">{booking?.status || 'Pending'}</p>
+                <p className="text-xl font-bold capitalize" style={{ color: primaryColor }}>{booking?.status || 'Pending'}</p>
               </div>
             </div>
 
@@ -404,8 +422,8 @@ const PickupConfirmation = () => {
                   onClick={() => window.location.hash = userRole === 'User' ? `#/certificate?booking=${booking._id}` : dashboardPath}
                   className="relative group flex-1 h-14 rounded-full overflow-hidden cursor-pointer"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-r from-[#34D399] to-[#6EE7B7] transition-transform duration-300 group-hover:scale-105"></div>
-                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-r from-[#6EE7B7] to-[#34D399]"></div>
+                  <div className="absolute inset-0 bg-gradient-to-r transition-transform duration-300 group-hover:scale-105" style={{ backgroundImage: `linear-gradient(to right, ${primaryColor}, ${primaryColorLight})` }}></div>
+                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-r" style={{ backgroundImage: `linear-gradient(to right, ${primaryColorLight}, ${primaryColor})` }}></div>
                   <div className="relative z-10 flex items-center justify-center gap-2 h-full text-slate-900 font-bold">
                     <span className="material-symbols-outlined text-xl">{userRole === 'User' ? 'verified' : 'dashboard'}</span>
                     {userRole === 'User' ? 'View Digital Certificate' : 'Go to Dashboard'}
@@ -416,8 +434,8 @@ const PickupConfirmation = () => {
                   onClick={() => window.location.hash = dashboardPath}
                   className="relative group flex-1 h-14 rounded-full overflow-hidden cursor-pointer"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-r from-[#34D399] to-[#6EE7B7] transition-transform duration-300 group-hover:scale-105"></div>
-                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-r from-[#6EE7B7] to-[#34D399]"></div>
+                  <div className="absolute inset-0 bg-gradient-to-r transition-transform duration-300 group-hover:scale-105" style={{ backgroundImage: `linear-gradient(to right, ${primaryColor}, ${primaryColorLight})` }}></div>
+                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-r" style={{ backgroundImage: `linear-gradient(to right, ${primaryColorLight}, ${primaryColor})` }}></div>
                   <div className="relative z-10 flex items-center justify-center gap-2 h-full text-slate-900 font-bold">
                     <span className="material-symbols-outlined text-xl">dashboard</span>
                     Go to Dashboard
@@ -439,7 +457,18 @@ const PickupConfirmation = () => {
                 <span className="text-slate-500 text-xs font-semibold uppercase tracking-widest">Share Your Impact</span>
               </div>
               <div className="flex gap-3">
-                <button className="size-12 rounded-full bg-slate-800/50 border border-white/5 flex items-center justify-center text-slate-400 hover:text-white hover:border-[#34D399]/30 hover:bg-[#34D399]/10 transition-all duration-300 cursor-pointer">
+                <button className="size-12 rounded-full bg-slate-800/50 border border-white/5 flex items-center justify-center text-slate-400 transition-all duration-300 cursor-pointer"
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.color = 'white';
+                    e.currentTarget.style.borderColor = `${primaryColor}30`;
+                    e.currentTarget.style.backgroundColor = `${primaryColor}10`;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.color = 'rgb(148, 163, 184)';
+                    e.currentTarget.style.borderColor = 'rgba(255,255,255,0.05)';
+                    e.currentTarget.style.backgroundColor = 'rgba(30, 41, 59, 0.5)';
+                  }}
+                >
                   <span className="text-sm font-bold">X</span>
                 </button>
                   <button className="size-12 rounded-full bg-slate-800/50 border border-white/5 flex items-center justify-center text-slate-400 hover:text-white hover:border-[#3B82F6]/30 hover:bg-[#3B82F6]/10 transition-all duration-300 cursor-pointer">
