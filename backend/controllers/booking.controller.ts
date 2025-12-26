@@ -326,15 +326,18 @@ export const updateBookingStatus = async (req: Request, res: Response) => {
           booking.certificateIssued = true;
         }
       } catch (completionError: any) {
+        // Log certificate generation error but don't fail the request
+        console.error('Certificate generation failed:', completionError);
         // Still save the booking status change even if certificate generation fails
-        await booking.save();
-        return sendError(res, `Booking status updated but certificate generation failed: ${completionError.message}`, 500);
+        // Don't return error - the booking status update is what matters most
       }
     }
 
+    // Save booking outside the completion block so it always saves
     await booking.save();
     sendSuccess(res, booking);
   } catch (error: any) {
+    console.error('Failed to update booking status:', error);
     sendError(res, error.message || 'Failed to update booking status', 500);
   }
 };

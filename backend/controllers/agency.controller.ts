@@ -462,28 +462,34 @@ export const updateBookingStatus = async (req: Request, res: Response) => {
           });
         } catch (certError) {
           // Certificate generation failed, but pickup still marked as complete
+          console.error('Business certificate generation failed:', certError);
         }
       } else {
         // Generate regular user Certificate
-        const itemsRecycled = booking.items?.map((item: any) => ({
-          type: item.type || item.category || 'E-Waste',
-          quantity: item.quantity || 1,
-          weight: item.estimatedWeight || item.weight || 0
-        })) || [];
+        try {
+          const itemsRecycled = booking.items?.map((item: any) => ({
+            type: item.type || item.category || 'E-Waste',
+            quantity: item.quantity || 1,
+            weight: item.estimatedWeight || item.weight || 0
+          })) || [];
 
-        await Certificate.create({
-          userId: booking.userId,
-          bookingId: booking._id,
-          agencyId: agency._id,
-          issueDate: new Date(),
-          totalWeight: booking.totalWeight || 0,
-          itemsRecycled,
-          environmentalImpact: {
-            co2Saved: (booking.totalWeight || 0) * 0.67,
-            waterSaved: (booking.totalWeight || 0) * 1.2,
-            energySaved: (booking.totalWeight || 0) * 0.8
-          }
-        });
+          await Certificate.create({
+            userId: booking.userId,
+            bookingId: booking._id,
+            agencyId: agency._id,
+            issueDate: new Date(),
+            totalWeight: booking.totalWeight || 0,
+            itemsRecycled,
+            environmentalImpact: {
+              co2Saved: (booking.totalWeight || 0) * 0.67,
+              waterSaved: (booking.totalWeight || 0) * 1.2,
+              energySaved: (booking.totalWeight || 0) * 0.8
+            }
+          });
+        } catch (certError) {
+          // Certificate generation failed, but pickup still marked as complete
+          console.error('User certificate generation failed:', certError);
+        }
       }
     }
 
@@ -491,6 +497,7 @@ export const updateBookingStatus = async (req: Request, res: Response) => {
 
     sendSuccess(res, booking);
   } catch (error: any) {
+    console.error('Failed to update booking status:', error);
     sendError(res, error.message);
   }
 };
