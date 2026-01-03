@@ -64,7 +64,7 @@ const ResidentNotifications = () => {
                     </div>
                     <div>
                       <h1 className="text-2xl sm:text-3xl font-bold text-white">Notifications</h1>
-                      <p className="text-gray-400 text-sm">Manage your notification preferences and alerts</p>
+                      <p className="text-slate-400 text-sm">Manage your notification preferences and alerts</p>
                     </div>
                   </div>
                 </div>

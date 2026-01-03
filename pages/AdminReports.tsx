@@ -4,10 +4,10 @@ import Layout from '../components/Layout';
 const AdminReports = () => {
   return (
     <Layout title="" role="Admin" fullWidth>
-      <div className="flex flex-col h-screen overflow-hidden bg-[#0B1120] font-sans text-white">
+      <div className="flex flex-col h-screen overflow-hidden bg-[#0B1116] font-sans text-white">
         
         {/* Header */}
-        <header className="flex items-center justify-between border-b border-white/5 bg-[#0B1120]/95 backdrop-blur px-8 py-4 z-10 shrink-0 sticky top-0">
+        <header className="flex items-center justify-between border-b border-white/5 bg-[#0B1116]/95 backdrop-blur px-8 py-4 z-10 shrink-0 sticky top-0">
             <div className="flex items-center gap-4">
                 <h2 className="text-white text-xl font-bold tracking-tight">Platform Analytics</h2>
             </div>
@@ -38,7 +38,7 @@ const AdminReports = () => {
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
                     <div className="flex items-center bg-[#1E293B] border border-white/5 rounded-lg p-1">
-                        <button className="px-3 py-1.5 text-xs font-medium bg-[#0B1120] text-white rounded shadow-sm cursor-pointer border-none">Last 7 Days</button>
+                        <button className="px-3 py-1.5 text-xs font-medium bg-[#0B1116] text-white rounded shadow-sm cursor-pointer border-none">Last 7 Days</button>
                         <button className="px-3 py-1.5 text-xs font-medium text-slate-400 hover:text-white transition-colors bg-transparent border-none cursor-pointer">Last 30 Days</button>
                         <button className="px-3 py-1.5 text-xs font-medium text-slate-400 hover:text-white transition-colors bg-transparent border-none cursor-pointer">Month</button>
                         <button className="px-3 py-1.5 text-xs font-medium text-slate-400 hover:text-white transition-colors bg-transparent border-none cursor-pointer">Year</button>
@@ -49,7 +49,7 @@ const AdminReports = () => {
                     </button>
                 </div>
                 <div className="flex items-center gap-3">
-                    <button className="flex items-center gap-2 px-4 py-2 bg-[#1E293B] hover:bg-[#0B1120] text-white text-sm font-medium border border-white/5 rounded-lg transition-colors cursor-pointer">
+                    <button className="flex items-center gap-2 px-4 py-2 bg-[#1E293B] hover:bg-[#0B1116] text-white text-sm font-medium border border-white/5 rounded-lg transition-colors cursor-pointer">
                         <span className="material-symbols-outlined text-[18px]">filter_list</span> Filter
                     </button>
                     <button className="flex items-center gap-2 px-4 py-2 bg-[#34D399] hover:bg-[#6EE7B7] text-[#0B1120] text-sm font-bold rounded-lg shadow-[0_0_15px_rgba(52,211,153,0.3)] transition-colors cursor-pointer border-none">
@@ -60,7 +60,7 @@ const AdminReports = () => {
 
             {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div className="bg-[#1E293B] border border-white/5 rounded-2xl p-6 relative overflow-hidden group hover:border-white/10 transition-all shadow-xl">
+                <div className="bg-[#1E293B] border border-white/5 rounded-2xl p-6 relative overflow-hidden group hover:border-white/5 transition-all shadow-xl">
                     <div className="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
                         <span className="material-symbols-outlined text-6xl text-[#34D399]">recycling</span>
                     </div>
@@ -75,7 +75,7 @@ const AdminReports = () => {
                         <span className="text-slate-500 text-xs">vs last period</span>
                     </div>
                 </div>
-                <div className="bg-[#1E293B] border border-white/5 rounded-2xl p-6 relative overflow-hidden group hover:border-white/10 transition-all shadow-xl">
+                <div className="bg-[#1E293B] border border-white/5 rounded-2xl p-6 relative overflow-hidden group hover:border-white/5 transition-all shadow-xl">
                     <div className="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
                         <span className="material-symbols-outlined text-6xl text-blue-400">cloud_queue</span>
                     </div>
@@ -90,7 +90,7 @@ const AdminReports = () => {
                         <span className="text-slate-500 text-xs">vs last period</span>
                     </div>
                 </div>
-                <div className="bg-[#1E293B] border border-white/5 rounded-2xl p-6 relative overflow-hidden group hover:border-white/10 transition-all shadow-xl">
+                <div className="bg-[#1E293B] border border-white/5 rounded-2xl p-6 relative overflow-hidden group hover:border-white/5 transition-all shadow-xl">
                     <div className="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
                         <span className="material-symbols-outlined text-6xl text-yellow-400">group_add</span>
                     </div>
@@ -105,7 +105,7 @@ const AdminReports = () => {
                         <span className="text-slate-500 text-xs">vs last period</span>
                     </div>
                 </div>
-                <div className="bg-[#1E293B] border border-white/5 rounded-2xl p-6 relative overflow-hidden group hover:border-white/10 transition-all shadow-xl">
+                <div className="bg-[#1E293B] border border-white/5 rounded-2xl p-6 relative overflow-hidden group hover:border-white/5 transition-all shadow-xl">
                     <div className="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
                         <span className="material-symbols-outlined text-6xl text-purple-400">domain</span>
                     </div>
@@ -157,7 +157,7 @@ const AdminReports = () => {
                                 <circle cx="60" cy="35" fill="#0B1120" r="1.5" stroke="#34D399" strokeWidth="1" vectorEffect="non-scaling-stroke"></circle>
                                 <circle cx="90" cy="20" fill="#0B1120" r="1.5" stroke="#34D399" strokeWidth="1" vectorEffect="non-scaling-stroke"></circle>
                             </svg>
-                            <div className="absolute top-[20%] right-[10%] bg-[#0B1120] border border-white/10 px-3 py-1.5 rounded-lg shadow-xl">
+                            <div className="absolute top-[20%] right-[10%] bg-[#0B1116] border border-white/5 px-3 py-1.5 rounded-lg shadow-xl">
                                 <p className="text-xs text-slate-400 mb-0.5">Oct 24</p>
                                 <p className="text-sm font-bold text-white">3,240 kg</p>
                             </div>

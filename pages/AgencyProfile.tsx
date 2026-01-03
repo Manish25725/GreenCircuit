@@ -280,7 +280,7 @@ const AgencyProfile = () => {
                 <div className="relative">
                   <button 
                     onClick={() => setShowNotifications(!showNotifications)}
-                    className="p-2.5 rounded-full bg-[#151F26] border border-white/5 text-gray-400 hover:text-[#f59e0b] hover:bg-[#f59e0b]/10 transition-colors relative"
+                    className="p-2.5 rounded-full bg-[#151F26] border border-white/5 text-slate-400 hover:text-[#f59e0b] hover:bg-[#f59e0b]/10 transition-colors relative"
                     title="Notifications"
                   >
                     <span className="material-symbols-outlined text-[20px]">notifications</span>
@@ -291,7 +291,7 @@ const AgencyProfile = () => {
                   
                   {/* Notifications Panel */}
                   {showNotifications && (
-                    <div className="absolute right-0 top-14 w-96 bg-[#151F26] rounded-2xl border border-white/10 shadow-2xl z-50 max-h-[500px] overflow-hidden flex flex-col">
+                    <div className="absolute right-0 top-14 w-96 bg-[#151F26] rounded-2xl border border-white/5 shadow-2xl z-50 max-h-[500px] overflow-hidden flex flex-col">
                       <div className="p-4 border-b border-white/5 flex justify-between items-center">
                         <h3 className="text-white font-bold text-lg">Notifications</h3>
                         <button 
@@ -358,7 +358,7 @@ const AgencyProfile = () => {
                 </button>
                 <button 
                   onClick={handleLogout}
-                  className="p-2.5 rounded-full bg-[#151F26] border border-white/5 text-gray-400 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                  className="p-2.5 rounded-full bg-[#151F26] border border-white/5 text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-colors"
                   title="Logout"
                 >
                   <span className="material-symbols-outlined text-[20px]">logout</span>
@@ -462,7 +462,7 @@ const AgencyProfile = () => {
                       </h3>
                       <div className="flex flex-col gap-3">
                         {certifications.map((cert, i) => (
-                          <div key={i} className="flex items-center justify-between p-3 bg-[#0B1116] rounded-xl border border-white/5 hover:border-white/10 transition-colors group">
+                          <div key={i} className="flex items-center justify-between p-3 bg-[#0B1116] rounded-xl border border-white/5 hover:border-white/5 transition-colors group">
                             <div className="flex items-center gap-3">
                               <span className={`material-symbols-outlined ${cert.color}`}>{cert.icon}</span>
                               <div>
@@ -562,7 +562,7 @@ const AgencyProfile = () => {
                           <div className="flex flex-col gap-2">
                             <label className="text-sm font-medium text-slate-400">Company Name</label>
                             <input 
-                              className="w-full bg-[#0B1116] border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-[#f59e0b]/50 focus:border-[#f59e0b] outline-none transition-all placeholder-slate-600" 
+                              className="w-full bg-[#0B1116] border border-white/5 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-[#f59e0b]/50 focus:border-[#f59e0b] outline-none transition-all placeholder-slate-600" 
                               type="text" 
                               value={formData.companyName}
                               onChange={(e) => setFormData({...formData, companyName: e.target.value})}
@@ -571,7 +571,7 @@ const AgencyProfile = () => {
                           <div className="flex flex-col gap-2">
                             <label className="text-sm font-medium text-slate-400">Registration Number</label>
                             <input 
-                              className="w-full bg-[#0B1116] border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-[#f59e0b]/50 focus:border-[#f59e0b] outline-none transition-all placeholder-slate-600" 
+                              className="w-full bg-[#0B1116] border border-white/5 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-[#f59e0b]/50 focus:border-[#f59e0b] outline-none transition-all placeholder-slate-600" 
                               type="text" 
                               value={formData.registrationNumber}
                               onChange={(e) => setFormData({...formData, registrationNumber: e.target.value})}
@@ -580,7 +580,7 @@ const AgencyProfile = () => {
                           <div className="flex flex-col gap-2 md:col-span-2">
                             <label className="text-sm font-medium text-slate-400">Description of Services</label>
                             <textarea 
-                              className="w-full bg-[#0B1116] border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-[#f59e0b]/50 focus:border-[#f59e0b] outline-none transition-all placeholder-slate-600 resize-none" 
+                              className="w-full bg-[#0B1116] border border-white/5 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-[#f59e0b]/50 focus:border-[#f59e0b] outline-none transition-all placeholder-slate-600 resize-none" 
                               rows={4} 
                               value={formData.description}
                               onChange={(e) => setFormData({...formData, description: e.target.value})}
@@ -601,7 +601,7 @@ const AgencyProfile = () => {
                             <div className="relative">
                               <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-600 text-lg">mail</span>
                               <input 
-                                className="w-full bg-[#0B1116] border border-white/10 rounded-xl pl-10 pr-4 py-3 text-white focus:ring-2 focus:ring-[#f59e0b]/50 focus:border-[#f59e0b] outline-none transition-all placeholder-slate-600" 
+                                className="w-full bg-[#0B1116] border border-white/5 rounded-xl pl-10 pr-4 py-3 text-white focus:ring-2 focus:ring-[#f59e0b]/50 focus:border-[#f59e0b] outline-none transition-all placeholder-slate-600" 
                                 type="email" 
                                 value={formData.email}
                                 onChange={(e) => setFormData({...formData, email: e.target.value})}
@@ -613,7 +613,7 @@ const AgencyProfile = () => {
                             <div className="relative">
                               <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-600 text-lg">call</span>
                               <input 
-                                className="w-full bg-[#0B1116] border border-white/10 rounded-xl pl-10 pr-4 py-3 text-white focus:ring-2 focus:ring-[#f59e0b]/50 focus:border-[#f59e0b] outline-none transition-all placeholder-slate-600" 
+                                className="w-full bg-[#0B1116] border border-white/5 rounded-xl pl-10 pr-4 py-3 text-white focus:ring-2 focus:ring-[#f59e0b]/50 focus:border-[#f59e0b] outline-none transition-all placeholder-slate-600" 
                                 type="tel" 
                                 value={formData.phone}
                                 onChange={(e) => setFormData({...formData, phone: e.target.value})}
@@ -625,7 +625,7 @@ const AgencyProfile = () => {
                             <div className="relative">
                               <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-600 text-lg">location_on</span>
                               <input 
-                                className="w-full bg-[#0B1116] border border-white/10 rounded-xl pl-10 pr-4 py-3 text-white focus:ring-2 focus:ring-[#f59e0b]/50 focus:border-[#f59e0b] outline-none transition-all placeholder-slate-600" 
+                                className="w-full bg-[#0B1116] border border-white/5 rounded-xl pl-10 pr-4 py-3 text-white focus:ring-2 focus:ring-[#f59e0b]/50 focus:border-[#f59e0b] outline-none transition-all placeholder-slate-600" 
                                 type="text" 
                                 value={formData.address}
                                 onChange={(e) => setFormData({...formData, address: e.target.value})}
@@ -635,7 +635,7 @@ const AgencyProfile = () => {
                           <div className="flex flex-col gap-2">
                             <label className="text-sm font-medium text-slate-400">City</label>
                             <input 
-                              className="w-full bg-[#0B1116] border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-[#f59e0b]/50 focus:border-[#f59e0b] outline-none transition-all placeholder-slate-600" 
+                              className="w-full bg-[#0B1116] border border-white/5 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-[#f59e0b]/50 focus:border-[#f59e0b] outline-none transition-all placeholder-slate-600" 
                               type="text" 
                               value={formData.city}
                               onChange={(e) => setFormData({...formData, city: e.target.value})}
@@ -644,7 +644,7 @@ const AgencyProfile = () => {
                           <div className="flex flex-col gap-2">
                             <label className="text-sm font-medium text-slate-400">Zip Code</label>
                             <input 
-                              className="w-full bg-[#0B1116] border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-[#f59e0b]/50 focus:border-[#f59e0b] outline-none transition-all placeholder-slate-600" 
+                              className="w-full bg-[#0B1116] border border-white/5 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-[#f59e0b]/50 focus:border-[#f59e0b] outline-none transition-all placeholder-slate-600" 
                               type="text" 
                               value={formData.zipCode}
                               onChange={(e) => setFormData({...formData, zipCode: e.target.value})}
@@ -697,7 +697,7 @@ const AgencyProfile = () => {
                             ) : (
                               <button 
                                 onClick={() => setShowRegionInput(true)}
-                                className="bg-[#0B1116] border-2 border-dashed border-white/10 hover:border-[#f59e0b]/50 hover:text-[#f59e0b] text-slate-500 px-3 py-2 rounded-xl text-sm font-medium flex items-center gap-2 transition-all cursor-pointer"
+                                className="bg-[#0B1116] border-2 border-dashed border-white/5 hover:border-[#f59e0b]/50 hover:text-[#f59e0b] text-slate-500 px-3 py-2 rounded-xl text-sm font-medium flex items-center gap-2 transition-all cursor-pointer"
                               >
                                 <span className="material-symbols-outlined text-base">add</span>
                                 Add Region
@@ -721,7 +721,7 @@ const AgencyProfile = () => {
                                         setWasteTypes(wasteTypes.filter(t => t !== type));
                                       }
                                     }}
-                                    className="peer h-5 w-5 cursor-pointer appearance-none rounded-md border border-white/10 bg-[#0B1116] transition-all checked:border-[#f59e0b] checked:bg-[#f59e0b] hover:border-[#f59e0b]/50" 
+                                    className="peer h-5 w-5 cursor-pointer appearance-none rounded-md border border-white/5 bg-[#0B1116] transition-all checked:border-[#f59e0b] checked:bg-[#f59e0b] hover:border-[#f59e0b]/50" 
                                     type="checkbox"
                                   />
                                   <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white opacity-0 peer-checked:opacity-100 material-symbols-outlined text-sm font-bold">check</span>
@@ -736,13 +736,13 @@ const AgencyProfile = () => {
                           <h3 className="text-lg font-bold text-white mb-4">Operating Hours</h3>
                           <div className="grid grid-cols-1 gap-3">
                             {operatingHours.map((schedule, i) => (
-                              <div key={i} className="flex items-center justify-between p-4 bg-[#0B1116] rounded-xl border border-white/5 hover:border-white/10 transition-colors group">
+                              <div key={i} className="flex items-center justify-between p-4 bg-[#0B1116] rounded-xl border border-white/5 hover:border-white/5 transition-colors group">
                                 <div className="flex items-center gap-3">
                                   <input
                                     type="checkbox"
                                     checked={schedule.isOpen}
                                     onChange={(e) => handleUpdateOperatingHours(i, 'isOpen', e.target.checked)}
-                                    className="h-4 w-4 cursor-pointer appearance-none rounded border border-white/10 bg-[#0B1116] transition-all checked:border-[#f59e0b] checked:bg-[#f59e0b]"
+                                    className="h-4 w-4 cursor-pointer appearance-none rounded border border-white/5 bg-[#0B1116] transition-all checked:border-[#f59e0b] checked:bg-[#f59e0b]"
                                   />
                                   <span className="text-sm text-white font-medium">{schedule.day}</span>
                                 </div>
@@ -753,14 +753,14 @@ const AgencyProfile = () => {
                                         type="time" 
                                         value={schedule.open}
                                         onChange={(e) => handleUpdateOperatingHours(i, 'open', e.target.value)}
-                                        className="bg-[#0B1116] border border-white/10 rounded-lg px-2 py-1 text-sm text-white outline-none focus:border-[#f59e0b]"
+                                        className="bg-[#0B1116] border border-white/5 rounded-lg px-2 py-1 text-sm text-white outline-none focus:border-[#f59e0b]"
                                       />
                                       <span className="text-slate-500">-</span>
                                       <input 
                                         type="time" 
                                         value={schedule.close}
                                         onChange={(e) => handleUpdateOperatingHours(i, 'close', e.target.value)}
-                                        className="bg-[#0B1116] border border-white/10 rounded-lg px-2 py-1 text-sm text-white outline-none focus:border-[#f59e0b]"
+                                        className="bg-[#0B1116] border border-white/5 rounded-lg px-2 py-1 text-sm text-white outline-none focus:border-[#f59e0b]"
                                       />
                                     </>
                                   ) : (
@@ -784,7 +784,7 @@ const AgencyProfile = () => {
         {/* Certification Modal */}
         {showCertModal && (
           <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="bg-[#151F26] rounded-2xl p-6 max-w-md w-full border border-white/10 shadow-2xl">
+            <div className="bg-[#151F26] rounded-2xl p-6 max-w-md w-full border border-white/5 shadow-2xl">
               <div className="flex justify-between items-center mb-6">
                 <h3 className="text-xl font-bold text-white">Add Certification</h3>
                 <button 
@@ -803,7 +803,7 @@ const AgencyProfile = () => {
                     value={newCert.name}
                     onChange={(e) => setNewCert({ ...newCert, name: e.target.value })}
                     placeholder="e.g., ISO 14001"
-                    className="w-full bg-[#0B1116] border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-[#f59e0b]/50 focus:border-[#f59e0b] outline-none transition-all placeholder-slate-600"
+                    className="w-full bg-[#0B1116] border border-white/5 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-[#f59e0b]/50 focus:border-[#f59e0b] outline-none transition-all placeholder-slate-600"
                   />
                 </div>
                 
@@ -812,7 +812,7 @@ const AgencyProfile = () => {
                   <select
                     value={newCert.type}
                     onChange={(e) => setNewCert({ ...newCert, type: e.target.value })}
-                    className="w-full bg-[#0B1116] border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-[#f59e0b]/50 focus:border-[#f59e0b] outline-none transition-all"
+                    className="w-full bg-[#0B1116] border border-white/5 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-[#f59e0b]/50 focus:border-[#f59e0b] outline-none transition-all"
                   >
                     <option value="">Select type</option>
                     <option value="Environmental">Environmental</option>
@@ -833,7 +833,7 @@ const AgencyProfile = () => {
                   />
                   <button
                     onClick={() => certInputRef.current?.click()}
-                    className="w-full bg-[#0B1116] border border-white/10 rounded-xl px-4 py-3 text-slate-400 hover:border-[#f59e0b]/50 transition-all flex items-center justify-center gap-2"
+                    className="w-full bg-[#0B1116] border border-white/5 rounded-xl px-4 py-3 text-slate-400 hover:border-[#f59e0b]/50 transition-all flex items-center justify-center gap-2"
                   >
                     <span className="material-symbols-outlined">upload_file</span>
                     {newCert.file ? newCert.file.name : 'Choose file'}
@@ -843,7 +843,7 @@ const AgencyProfile = () => {
                 <div className="flex gap-3 pt-4">
                   <button
                     onClick={() => setShowCertModal(false)}
-                    className="flex-1 px-4 py-3 rounded-xl border border-white/10 text-slate-400 hover:bg-white/5 transition-all"
+                    className="flex-1 px-4 py-3 rounded-xl border border-white/5 text-slate-400 hover:bg-white/5 transition-all"
                   >
                     Cancel
                   </button>

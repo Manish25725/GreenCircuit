@@ -100,7 +100,7 @@ const Rewards = () => {
                   </button>
                   {/* Hover Preview */}
                   <div className="absolute top-14 right-0 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-[100]">
-                    <div className="bg-[#151F26] border border-white/10 rounded-2xl p-4 shadow-2xl">
+                    <div className="bg-[#151F26] border border-white/5 rounded-2xl p-4 shadow-2xl">
                       <div 
                         className="size-32 rounded-xl bg-cover bg-center ring-4 ring-[#10b981]/30" 
                         style={{ backgroundImage: `url("${user?.avatar || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user?.name || 'User') + '&background=10b981&color=fff'}")`}}
@@ -138,7 +138,7 @@ const Rewards = () => {
               </div>
             </div>
             <div className="mt-6 md:mt-0 flex gap-4">
-              <button className="bg-white/20 hover:bg-white/30 backdrop-blur-sm px-6 py-3 rounded-xl font-bold transition-all border border-white/10 cursor-pointer">
+              <button className="bg-white/20 hover:bg-white/30 backdrop-blur-sm px-6 py-3 rounded-xl font-bold transition-all border border-white/5 cursor-pointer">
                  History
               </button>
               <button onClick={() => window.location.hash = '#/search'} className="bg-white text-green-800 px-6 py-3 rounded-xl font-bold shadow-lg hover:bg-gray-100 transition-all cursor-pointer">
@@ -156,7 +156,7 @@ const Rewards = () => {
                 className={`px-5 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors cursor-pointer ${
                   selectedCategory === cat 
                     ? 'bg-[#10b981] text-white' 
-                    : 'bg-[#151F26] border border-white/10 text-[#94a3b8] hover:text-white hover:border-white/20'
+                    : 'bg-[#151F26] border border-white/5 text-[#94a3b8] hover:text-white hover:border-white/20'
                 }`}
               >
                 {cat}
@@ -185,14 +185,14 @@ const Rewards = () => {
                     </div>
                     <div className="p-5 flex-1 flex flex-col">
                        <h3 className="font-bold text-white text-lg mb-1">{reward.title}</h3>
-                       <p className="text-gray-400 text-sm mb-2 line-clamp-2">{reward.description}</p>
+                       <p className="text-slate-400 text-sm mb-2 line-clamp-2">{reward.description}</p>
                        <p className="text-[#10b981] font-bold text-sm mb-4">{reward.pointsCost.toLocaleString()} Points</p>
                        <button 
                          onClick={() => handleRedeem(reward._id, reward.pointsCost)}
                          disabled={(user?.ecoPoints || 0) < reward.pointsCost}
                          className={`w-full mt-auto py-2 rounded-lg font-medium transition-colors border cursor-pointer ${
                            (user?.ecoPoints || 0) >= reward.pointsCost
-                             ? 'bg-white/5 text-white hover:bg-[#10b981] hover:text-white border-white/10 hover:border-transparent'
+                             ? 'bg-white/5 text-white hover:bg-[#10b981] hover:text-white border-white/5 hover:border-transparent'
                              : 'bg-gray-800 text-gray-500 border-gray-700 cursor-not-allowed'
                          }`}
                        >

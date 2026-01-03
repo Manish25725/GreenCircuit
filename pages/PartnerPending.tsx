@@ -93,7 +93,7 @@ const PartnerPending: React.FC = () => {
         <div className="fixed bottom-0 right-0 w-full h-[500px] bg-blue-500/10 rounded-full blur-[120px] translate-y-1/2 pointer-events-none"></div>
         <div className="text-center relative z-10">
           <Loader size="lg" color="#06b6d4" className="mb-4" />
-          <p className="text-gray-300">Loading application status...</p>
+          <p className="text-gray-200">Loading application status...</p>
         </div>
       </div>
     );
@@ -126,7 +126,7 @@ const PartnerPending: React.FC = () => {
               <h1 className="text-3xl font-bold mb-3 bg-gradient-to-r from-red-400 to-orange-400 bg-clip-text text-transparent">
                 Application Rejected
               </h1>
-              <p className="text-gray-400 text-lg">
+              <p className="text-slate-400 text-lg">
                 Unfortunately, your partner registration has been rejected.
               </p>
             </div>
@@ -138,7 +138,7 @@ const PartnerPending: React.FC = () => {
                   <span className="material-symbols-outlined text-red-400 mt-0.5">error</span>
                   <div>
                     <h3 className="font-semibold text-red-400 mb-2">Reason for Rejection</h3>
-                    <p className="text-gray-300">{rejectionReason}</p>
+                    <p className="text-gray-200">{rejectionReason}</p>
                   </div>
                 </div>
               </div>
@@ -153,16 +153,16 @@ const PartnerPending: React.FC = () => {
                 </h3>
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
-                    <span className="text-gray-400 block mb-1">Agency Name</span>
+                    <span className="text-slate-400 block mb-1">Agency Name</span>
                     <span className="text-white font-medium">{agency.name}</span>
                   </div>
                   <div>
-                    <span className="text-gray-400 block mb-1">Email</span>
+                    <span className="text-slate-400 block mb-1">Email</span>
                     <span className="text-white font-medium">{agency.email}</span>
                   </div>
                   {agency.gstNumber && (
                     <div>
-                      <span className="text-gray-400 block mb-1">GST Number</span>
+                      <span className="text-slate-400 block mb-1">GST Number</span>
                       <span className="text-white font-medium">{agency.gstNumber}</span>
                     </div>
                   )}
@@ -222,7 +222,7 @@ const PartnerPending: React.FC = () => {
           <h1 className="text-4xl font-bold mb-3 bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
             Application Status Tracker
           </h1>
-          <p className="text-gray-400 text-lg">
+          <p className="text-slate-400 text-lg">
             Track the progress of your partner registration application
           </p>
         </div>
@@ -239,7 +239,7 @@ const PartnerPending: React.FC = () => {
                   </div>
                   <div>
                     <h2 className="text-xl font-bold text-white">Verification In Progress</h2>
-                    <p className="text-gray-400 text-sm">We're reviewing your application • Usually takes 24-48 hours</p>
+                    <p className="text-slate-400 text-sm">We're reviewing your application • Usually takes 24-48 hours</p>
                   </div>
                 </div>
                 <button
@@ -294,7 +294,7 @@ const PartnerPending: React.FC = () => {
                         )}
                       </div>
                       <p className={`text-sm ${
-                        step.status === 'pending' ? 'text-gray-600' : 'text-gray-400'
+                        step.status === 'pending' ? 'text-gray-600' : 'text-slate-400'
                       }`}>
                         {step.description}
                       </p>
@@ -316,22 +316,22 @@ const PartnerPending: React.FC = () => {
                 </h3>
                 <div className="space-y-3 text-sm">
                   <div className="flex justify-between items-center py-2 border-b border-white/5">
-                    <span className="text-gray-400">Agency Name</span>
+                    <span className="text-slate-400">Agency Name</span>
                     <span className="text-white font-medium">{agency.name}</span>
                   </div>
                   <div className="flex justify-between items-center py-2 border-b border-white/5">
-                    <span className="text-gray-400">Email</span>
+                    <span className="text-slate-400">Email</span>
                     <span className="text-white font-medium text-right">{agency.email}</span>
                   </div>
                   {agency.gstNumber && (
                     <div className="flex justify-between items-center py-2 border-b border-white/5">
-                      <span className="text-gray-400">GST Number</span>
+                      <span className="text-slate-400">GST Number</span>
                       <span className="text-white font-medium">{agency.gstNumber}</span>
                     </div>
                   )}
                   {agency.submittedAt && (
                     <div className="flex justify-between items-center py-2">
-                      <span className="text-gray-400">Submitted</span>
+                      <span className="text-slate-400">Submitted</span>
                       <span className="text-white font-medium">
                         {new Date(agency.submittedAt).toLocaleDateString('en-IN', {
                           day: 'numeric',
@@ -354,19 +354,19 @@ const PartnerPending: React.FC = () => {
               <ul className="space-y-3 text-sm">
                 <li className="flex items-start gap-2">
                   <span className="material-symbols-outlined text-cyan-400 text-lg mt-0.5">check_circle</span>
-                  <span className="text-gray-300">You'll receive an email once approved</span>
+                  <span className="text-gray-200">You'll receive an email once approved</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="material-symbols-outlined text-cyan-400 text-lg mt-0.5">check_circle</span>
-                  <span className="text-gray-300">Access your partner dashboard</span>
+                  <span className="text-gray-200">Access your partner dashboard</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="material-symbols-outlined text-cyan-400 text-lg mt-0.5">check_circle</span>
-                  <span className="text-gray-300">Start managing pickup requests</span>
+                  <span className="text-gray-200">Start managing pickup requests</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="material-symbols-outlined text-cyan-400 text-lg mt-0.5">check_circle</span>
-                  <span className="text-gray-300">Grow your recycling business</span>
+                  <span className="text-gray-200">Grow your recycling business</span>
                 </li>
               </ul>
             </div>
@@ -377,7 +377,7 @@ const PartnerPending: React.FC = () => {
                 <span className="material-symbols-outlined text-cyan-400">help</span>
                 Need Help?
               </h3>
-              <p className="text-gray-400 text-sm mb-4">
+              <p className="text-slate-400 text-sm mb-4">
                 Have questions about your application? Our support team is here to help.
               </p>
               <button
@@ -395,7 +395,7 @@ const PartnerPending: React.FC = () => {
         <div className="text-center mt-8">
           <button
             onClick={() => window.location.hash = '#/'}
-            className="text-gray-400 hover:text-white transition-colors flex items-center gap-2 mx-auto"
+            className="text-slate-400 hover:text-white transition-colors flex items-center gap-2 mx-auto"
           >
             <span className="material-symbols-outlined">arrow_back</span>
             Return to Home

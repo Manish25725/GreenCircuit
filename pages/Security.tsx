@@ -36,17 +36,17 @@ const Security = () => {
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <label className="flex flex-col w-full">
                                         <span className="text-white text-sm font-medium leading-normal pb-2">Current Password</span>
-                                        <input className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-[#10b981] focus:border-[#10b981] transition-all" placeholder="Enter current password" type="password"/>
+                                        <input className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/5 text-white focus:outline-none focus:ring-1 focus:ring-[#10b981] focus:border-[#10b981] transition-all" placeholder="Enter current password" type="password"/>
                                     </label>
                                 </div>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <label className="flex flex-col w-full">
                                         <span className="text-white text-sm font-medium leading-normal pb-2">New Password</span>
-                                        <input className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-[#10b981] focus:border-[#10b981] transition-all" placeholder="Enter new password" type="password"/>
+                                        <input className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/5 text-white focus:outline-none focus:ring-1 focus:ring-[#10b981] focus:border-[#10b981] transition-all" placeholder="Enter new password" type="password"/>
                                     </label>
                                     <label className="flex flex-col w-full">
                                         <span className="text-white text-sm font-medium leading-normal pb-2">Confirm New Password</span>
-                                        <input className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-[#10b981] focus:border-[#10b981] transition-all" placeholder="Confirm new password" type="password"/>
+                                        <input className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/5 text-white focus:outline-none focus:ring-1 focus:ring-[#10b981] focus:border-[#10b981] transition-all" placeholder="Confirm new password" type="password"/>
                                     </label>
                                 </div>
                                 <div className="flex justify-end pt-2">
@@ -68,7 +68,7 @@ const Security = () => {
                                 </div>
                                 <p className="text-[#94a3b8] text-sm">Add an extra layer of security to your account by requiring more than just a password to log in.</p>
                             </div>
-                            <button className="flex whitespace-nowrap min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-[#0B1116] text-[#10b981] border border-white/10 text-sm font-bold leading-normal tracking-[0.015em] hover:bg-[#10b981]/10 transition-colors">
+                            <button className="flex whitespace-nowrap min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-[#0B1116] text-[#10b981] border border-white/5 text-sm font-bold leading-normal tracking-[0.015em] hover:bg-[#10b981]/10 transition-colors">
                                 Enable 2FA
                             </button>
                         </div>
@@ -89,7 +89,7 @@ const Security = () => {
                                     </div>
                                     <label className="relative inline-flex items-center cursor-pointer">
                                         <input defaultChecked className="sr-only peer" type="checkbox"/>
-                                        <div className="w-11 h-6 bg-[#0B1116] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#10b981] border border-white/10"></div>
+                                        <div className="w-11 h-6 bg-[#0B1116] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#10b981] border border-white/5"></div>
                                     </label>
                                 </div>
                                 <div className="flex items-center justify-between py-2 pt-4">
@@ -99,7 +99,7 @@ const Security = () => {
                                     </div>
                                     <label className="relative inline-flex items-center cursor-pointer">
                                         <input className="sr-only peer" type="checkbox"/>
-                                        <div className="w-11 h-6 bg-[#0B1116] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#10b981] border border-white/10"></div>
+                                        <div className="w-11 h-6 bg-[#0B1116] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#10b981] border border-white/5"></div>
                                     </label>
                                 </div>
                             </div>
@@ -150,7 +150,7 @@ const Security = () => {
                                     <span className="text-white text-sm font-medium">Export Data</span>
                                     <span className="text-[#94a3b8] text-xs">Download a copy of your personal data.</span>
                                 </div>
-                                <button className="flex min-w-[120px] items-center justify-center rounded-lg h-9 px-4 bg-[#0B1116] text-white border border-white/10 text-sm font-medium hover:bg-white/5 transition-colors cursor-pointer">
+                                <button className="flex min-w-[120px] items-center justify-center rounded-lg h-9 px-4 bg-[#0B1116] text-white border border-white/5 text-sm font-medium hover:bg-white/5 transition-colors cursor-pointer">
                                     Export Data
                                 </button>
                             </div>

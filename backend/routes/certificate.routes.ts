@@ -3,7 +3,8 @@ import {
   generateCertificate,
   getUserCertificates,
   getCertificateById,
-  verifyCertificate
+  verifyCertificate,
+  downloadCertificate
 } from '../controllers/certificate.controller';
 import { protect, authorize } from '../middleware/auth.middleware';
 
@@ -15,6 +16,7 @@ router.get('/verify/:code', verifyCertificate);
 // User routes
 router.get('/', protect, getUserCertificates);
 router.get('/:id', protect, getCertificateById);
+router.get('/:id/download', protect, downloadCertificate);
 
 // Generate certificate (agency/admin)
 router.post('/generate', protect, authorize('agency', 'admin'), generateCertificate);

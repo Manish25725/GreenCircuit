@@ -353,7 +353,7 @@ const SchedulePickup = () => {
     <Layout title="" role={userRole} fullWidth hideSidebar>
       {/* Limit Exceeded UI */}
       {limitExceeded ? (
-        <div ref={limitPageRef} className="relative flex min-h-screen w-full flex-col font-display bg-[#0B1120] text-slate-300 selection:bg-[#f59e0b] selection:text-slate-900 overflow-x-hidden">
+        <div ref={limitPageRef} className="relative flex min-h-screen w-full flex-col font-display bg-[#0B1116] text-gray-200 selection:bg-[#f59e0b] selection:text-slate-900 overflow-x-hidden">
           
           {/* Background Effects */}
           <div className="fixed inset-0 pointer-events-none">
@@ -363,7 +363,7 @@ const SchedulePickup = () => {
 
           {/* Navbar */}
           <div className="w-full flex justify-center fixed top-0 left-0 right-0 z-50">
-            <header className="flex items-center justify-between w-full max-w-7xl px-4 sm:px-6 lg:px-10 py-4 bg-[#0B1120]/80 backdrop-blur-xl border-b border-white/5">
+            <header className="flex items-center justify-between w-full max-w-7xl px-4 sm:px-6 lg:px-10 py-4 bg-[#0B1116]/80 backdrop-blur-xl border-b border-white/5">
               <div className="flex items-center gap-3 cursor-pointer" onClick={() => window.location.hash = '#/'}>
                 <div className={`p-2 rounded-xl ${isBusiness ? 'bg-blue-500/10' : 'bg-[#10b981]/10'}`}>
                   <svg className={`h-6 w-6 ${isBusiness ? 'text-blue-500' : 'text-[#10b981]'}`} fill="currentColor" viewBox="0 0 48 48">
@@ -403,7 +403,7 @@ const SchedulePickup = () => {
 
               {/* Active Booking Card */}
               {activeBooking && (
-                <div className="limit-card bg-[#151F32]/80 backdrop-blur-sm rounded-2xl p-6 border border-white/10 shadow-xl mb-8">
+                <div className="limit-card bg-[#151F32]/80 backdrop-blur-sm rounded-2xl p-6 border border-white/5 shadow-xl mb-8">
                   <div className="flex items-center gap-4 mb-6">
                     <div className="w-14 h-14 rounded-xl bg-[#f59e0b]/10 flex items-center justify-center">
                       <span className="material-symbols-outlined text-2xl text-[#f59e0b]">local_shipping</span>
@@ -481,7 +481,7 @@ const SchedulePickup = () => {
                 </button>
                 <button 
                   onClick={() => window.location.hash = '#/'}
-                  className="px-8 py-4 rounded-xl bg-white/5 text-white font-bold border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all"
+                  className="px-8 py-4 rounded-xl bg-white/5 text-white font-bold border border-white/5 hover:bg-white/5 hover:border-white/20 transition-all"
                 >
                   <span className="flex items-center gap-2">
                     <span className="material-symbols-outlined">home</span>
@@ -552,7 +552,7 @@ const SchedulePickup = () => {
                   </button>
                   {/* Hover Preview */}
                   <div className="absolute top-14 right-0 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-[100]">
-                    <div className="bg-[#151F26] border border-white/10 rounded-2xl p-4 shadow-2xl">
+                    <div className="bg-[#151F26] border border-white/5 rounded-2xl p-4 shadow-2xl">
                       <div 
                         className="size-32 rounded-xl bg-cover bg-center ring-4 ring-[#10b981]/30" 
                         style={{ backgroundImage: `url("${user?.avatar || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user?.name || 'User') + '&background=10b981&color=fff'}")` }}
@@ -601,7 +601,7 @@ const SchedulePickup = () => {
                   
                   <div className="mb-8 space-y-3">
                     {items.map(item => (
-                        <div key={item.id} className="flex items-start gap-4 p-3 rounded-xl bg-[#0B1116] border border-white/5 group hover:border-white/10 transition-colors">
+                        <div key={item.id} className="flex items-start gap-4 p-3 rounded-xl bg-[#0B1116] border border-white/5 group hover:border-white/5 transition-colors">
                             <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-[#151F26] shadow-inner border border-white/5 ${isBusiness ? 'text-blue-500' : 'text-[#10b981]'}`}>
                                 <span className="material-symbols-outlined">
                                     {item.type.includes('Appliance') ? 'kitchen' : 
@@ -640,12 +640,12 @@ const SchedulePickup = () => {
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
                       <div className="space-y-2 md:col-span-8">
-                        <label className="text-sm font-medium text-gray-300" htmlFor="material-type">Type of Material</label>
+                        <label className="text-sm font-medium text-gray-200" htmlFor="material-type">Type of Material</label>
                         <div className="relative group">
                           <select 
                             value={newItem.type}
                             onChange={(e) => setNewItem({...newItem, type: e.target.value})}
-                            className={`w-full h-11 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/10 text-white focus:outline-none focus:ring-1 transition-all appearance-none cursor-pointer placeholder-gray-500 ${isBusiness ? 'focus:ring-blue-500 focus:border-blue-500' : 'focus:ring-[#10b981] focus:border-[#10b981]'}`} 
+                            className={`w-full h-11 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/5 text-white focus:outline-none focus:ring-1 transition-all appearance-none cursor-pointer placeholder-gray-500 ${isBusiness ? 'focus:ring-blue-500 focus:border-blue-500' : 'focus:ring-[#10b981] focus:border-[#10b981]'}`} 
                             id="material-type"
                           >
                             <option value="" disabled>Select category</option>
@@ -659,12 +659,12 @@ const SchedulePickup = () => {
                         </div>
                       </div>
                       <div className="space-y-2 md:col-span-2">
-                        <label className="text-sm font-medium text-gray-300" htmlFor="item-count">Quantity</label>
+                        <label className="text-sm font-medium text-gray-200" htmlFor="item-count">Quantity</label>
                         <div className="relative">
                           <input 
                             value={newItem.quantity}
                             onChange={(e) => setNewItem({...newItem, quantity: parseInt(e.target.value) || 0})}
-                            className={`w-full h-11 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/10 text-white focus:outline-none focus:ring-1 transition-all ${isBusiness ? 'focus:ring-blue-500 focus:border-blue-500' : 'focus:ring-[#10b981] focus:border-[#10b981]'}`} 
+                            className={`w-full h-11 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/5 text-white focus:outline-none focus:ring-1 transition-all ${isBusiness ? 'focus:ring-blue-500 focus:border-blue-500' : 'focus:ring-[#10b981] focus:border-[#10b981]'}`} 
                             id="item-count" 
                             min="1" 
                             placeholder="1" 
@@ -673,12 +673,12 @@ const SchedulePickup = () => {
                         </div>
                       </div>
                       <div className="space-y-2 md:col-span-2">
-                        <label className="text-sm font-medium text-gray-300" htmlFor="item-weight">Weight (kg)</label>
+                        <label className="text-sm font-medium text-gray-200" htmlFor="item-weight">Weight (kg)</label>
                         <div className="relative">
                           <input 
                             value={newItem.estimatedWeight || ''}
                             onChange={(e) => setNewItem({...newItem, estimatedWeight: parseFloat(e.target.value) || 0})}
-                            className={`w-full h-11 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/10 text-white focus:outline-none focus:ring-1 transition-all ${isBusiness ? 'focus:ring-blue-500 focus:border-blue-500' : 'focus:ring-[#10b981] focus:border-[#10b981]'}`} 
+                            className={`w-full h-11 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/5 text-white focus:outline-none focus:ring-1 transition-all ${isBusiness ? 'focus:ring-blue-500 focus:border-blue-500' : 'focus:ring-[#10b981] focus:border-[#10b981]'}`} 
                             id="item-weight" 
                             min="0" 
                             step="0.1"
@@ -688,11 +688,11 @@ const SchedulePickup = () => {
                         </div>
                       </div>
                       <div className="space-y-2 md:col-span-12">
-                        <label className="text-sm font-medium text-gray-300" htmlFor="item-details">Item Details / Description</label>
+                        <label className="text-sm font-medium text-gray-200" htmlFor="item-details">Item Details / Description</label>
                         <textarea 
                             value={newItem.description}
                             onChange={(e) => setNewItem({...newItem, description: e.target.value})}
-                            className={`w-full px-3 py-2 bg-[#0B1116] border rounded-xl border-white/10 text-white focus:outline-none focus:ring-1 resize-none transition-all placeholder:text-gray-600 ${isBusiness ? 'focus:ring-blue-500 focus:border-blue-500' : 'focus:ring-[#10b981] focus:border-[#10b981]'}`} 
+                            className={`w-full px-3 py-2 bg-[#0B1116] border rounded-xl border-white/5 text-white focus:outline-none focus:ring-1 resize-none transition-all placeholder:text-gray-600 ${isBusiness ? 'focus:ring-blue-500 focus:border-blue-500' : 'focus:ring-[#10b981] focus:border-[#10b981]'}`} 
                             id="item-details" 
                             placeholder="Please describe the condition and specifics (e.g., 'Broken screen on laptop', 'Old CRT Monitor')" 
                             rows={2}
@@ -757,7 +757,7 @@ const SchedulePickup = () => {
                                     ? (isBusiness ? 'bg-blue-500 text-white font-bold shadow-lg shadow-blue-500/20' : 'bg-[#10b981] text-[#0B1116] font-bold shadow-lg shadow-[#10b981]/20')
                                     : isPast
                                     ? 'text-gray-600 cursor-not-allowed'
-                                    : 'text-gray-300 hover:bg-white/5 hover:text-white cursor-pointer'
+                                    : 'text-gray-200 hover:bg-white/5 hover:text-white cursor-pointer'
                                 }
                             `}
                           >
@@ -817,7 +817,7 @@ const SchedulePickup = () => {
                                     className={`h-14 w-full rounded-xl border text-sm font-medium transition-all cursor-pointer flex items-center px-4 justify-between group
                                         ${selectedSlot?._id === slot._id 
                                             ? (isBusiness ? 'bg-blue-500/20 border-blue-500 text-blue-500' : 'bg-[#10b981]/20 border-[#10b981] text-[#10b981]')
-                                            : 'bg-[#0B1116] border-white/5 text-gray-300 hover:border-white/20 hover:bg-white/5'
+                                            : 'bg-[#0B1116] border-white/5 text-gray-200 hover:border-white/20 hover:bg-white/5'
                                         }
                                     `}
                                 >

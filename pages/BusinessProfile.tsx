@@ -227,7 +227,7 @@ const BusinessProfile = () => {
         <div className="bg-[#0B1116] min-h-screen flex items-center justify-center">
           <div className="text-center">
             <Loader size="md" color="#3b82f6" className="mb-4" />
-            <p className="text-gray-400">Loading profile...</p>
+            <p className="text-slate-400">Loading profile...</p>
           </div>
         </div>
       </Layout>
@@ -346,7 +346,7 @@ const BusinessProfile = () => {
                 <div className="flex flex-col gap-4 mt-8 pt-4 border-t border-white/5">
                     <button 
                     onClick={handleLogout}
-                    className="flex w-full min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-[#0B1116] text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-white/5 transition-colors border border-white/10"
+                    className="flex w-full min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-[#0B1116] text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-white/5 transition-colors border border-white/5"
                     >
                     <span className="truncate">Log Out</span>
                     </button>
@@ -413,7 +413,7 @@ const BusinessProfile = () => {
 
                     <form className="flex flex-col gap-8" onSubmit={handleSave}>
                         {/* Company Information */}
-                        <div className="flex flex-col gap-4 pb-6 border-b border-white/10">
+                        <div className="flex flex-col gap-4 pb-6 border-b border-white/5">
                           <div className="flex items-center gap-2">
                             <span className="material-symbols-outlined text-[#3b82f6] text-[24px]">domain</span>
                             <h3 className="text-white text-lg font-semibold">Company Information</h3>
@@ -422,7 +422,7 @@ const BusinessProfile = () => {
                             <label className="flex flex-col w-full">
                               <p className="text-white text-sm font-medium leading-normal pb-2">Company Name *</p>
                               <input 
-                                className="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-[#3b82f6] border border-white/10 bg-[#0B1116] h-12 placeholder:text-[#94a3b8] p-3 text-base font-normal leading-normal transition-all" 
+                                className="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-[#3b82f6] border border-white/5 bg-[#0B1116] h-12 placeholder:text-[#94a3b8] p-3 text-base font-normal leading-normal transition-all" 
                                 value={formData.companyName}
                                 onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
                                 required
@@ -431,7 +431,7 @@ const BusinessProfile = () => {
                             <label className="flex flex-col w-full">
                               <p className="text-white text-sm font-medium leading-normal pb-2">Industry *</p>
                               <select
-                                className="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-[#3b82f6] border border-white/10 bg-[#0B1116] h-12 px-3 text-base font-normal leading-normal transition-all"
+                                className="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-[#3b82f6] border border-white/5 bg-[#0B1116] h-12 px-3 text-base font-normal leading-normal transition-all"
                                 value={formData.industry}
                                 onChange={(e) => setFormData({ ...formData, industry: e.target.value })}
                                 required
@@ -445,7 +445,7 @@ const BusinessProfile = () => {
                           <label className="flex flex-col w-full">
                             <p className="text-white text-sm font-medium leading-normal pb-2">Company Description</p>
                             <textarea 
-                              className="w-full resize-y rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-[#3b82f6] border border-white/10 bg-[#0B1116] placeholder:text-[#94a3b8] p-3 text-base font-normal leading-normal transition-all" 
+                              className="w-full resize-y rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-[#3b82f6] border border-white/5 bg-[#0B1116] placeholder:text-[#94a3b8] p-3 text-base font-normal leading-normal transition-all" 
                               rows={3} 
                               value={formData.description}
                               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
@@ -455,7 +455,7 @@ const BusinessProfile = () => {
                         </div>
 
                         {/* Contact Details */}
-                        <div className="flex flex-col gap-4 pb-6 border-b border-white/10">
+                        <div className="flex flex-col gap-4 pb-6 border-b border-white/5">
                           <div className="flex items-center gap-2">
                             <span className="material-symbols-outlined text-blue-400 text-[24px]">contact_phone</span>
                             <h3 className="text-white text-lg font-semibold">Contact Details</h3>
@@ -465,7 +465,7 @@ const BusinessProfile = () => {
                               <p className="text-white text-sm font-medium leading-normal pb-2">Business Email *</p>
                               <input 
                                 type="email"
-                                className="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-[#3b82f6] border border-white/10 bg-[#0B1116] h-12 placeholder:text-[#94a3b8] p-3 text-base font-normal leading-normal transition-all" 
+                                className="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-[#3b82f6] border border-white/5 bg-[#0B1116] h-12 placeholder:text-[#94a3b8] p-3 text-base font-normal leading-normal transition-all" 
                                 value={formData.email}
                                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                                 required
@@ -474,7 +474,7 @@ const BusinessProfile = () => {
                             <label className="flex flex-col w-full">
                               <p className="text-white text-sm font-medium leading-normal pb-2">Phone Number</p>
                               <input 
-                                className="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-[#3b82f6] border border-white/10 bg-[#0B1116] h-12 placeholder:text-[#94a3b8] p-3 text-base font-normal leading-normal transition-all" 
+                                className="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-[#3b82f6] border border-white/5 bg-[#0B1116] h-12 placeholder:text-[#94a3b8] p-3 text-base font-normal leading-normal transition-all" 
                                 value={formData.phone}
                                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                                 placeholder="+1 (555) 123-4567"
@@ -485,7 +485,7 @@ const BusinessProfile = () => {
                             <p className="text-white text-sm font-medium leading-normal pb-2">Website</p>
                             <input 
                               type="url"
-                              className="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-[#3b82f6] border border-white/10 bg-[#0B1116] h-12 placeholder:text-[#94a3b8] p-3 text-base font-normal leading-normal transition-all" 
+                              className="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-[#3b82f6] border border-white/5 bg-[#0B1116] h-12 placeholder:text-[#94a3b8] p-3 text-base font-normal leading-normal transition-all" 
                               value={formData.website}
                               onChange={(e) => setFormData({ ...formData, website: e.target.value })}
                               placeholder="https://www.example.com"
@@ -494,7 +494,7 @@ const BusinessProfile = () => {
                         </div>
 
                         {/* Business Address */}
-                        <div className="flex flex-col gap-4 pb-6 border-b border-white/10">
+                        <div className="flex flex-col gap-4 pb-6 border-b border-white/5">
                           <div className="flex items-center gap-2">
                             <span className="material-symbols-outlined text-purple-400 text-[24px]">location_on</span>
                             <h3 className="text-white text-lg font-semibold">Business Address</h3>
@@ -502,7 +502,7 @@ const BusinessProfile = () => {
                           <label className="flex flex-col w-full">
                             <p className="text-white text-sm font-medium leading-normal pb-2">Street Address</p>
                             <input 
-                              className="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-[#3b82f6] border border-white/10 bg-[#0B1116] h-12 placeholder:text-[#94a3b8] p-3 text-base font-normal leading-normal transition-all" 
+                              className="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-[#3b82f6] border border-white/5 bg-[#0B1116] h-12 placeholder:text-[#94a3b8] p-3 text-base font-normal leading-normal transition-all" 
                               value={formData.address.street}
                               onChange={(e) => setFormData({ ...formData, address: { ...formData.address, street: e.target.value } })}
                               placeholder="123 Business Street"
@@ -512,7 +512,7 @@ const BusinessProfile = () => {
                             <label className="flex flex-col w-full">
                               <p className="text-white text-sm font-medium leading-normal pb-2">City</p>
                               <input 
-                                className="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-[#3b82f6] border border-white/10 bg-[#0B1116] h-12 placeholder:text-[#94a3b8] p-3 text-base font-normal leading-normal transition-all" 
+                                className="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-[#3b82f6] border border-white/5 bg-[#0B1116] h-12 placeholder:text-[#94a3b8] p-3 text-base font-normal leading-normal transition-all" 
                                 value={formData.address.city}
                                 onChange={(e) => setFormData({ ...formData, address: { ...formData.address, city: e.target.value } })}
                               />
@@ -520,7 +520,7 @@ const BusinessProfile = () => {
                             <label className="flex flex-col w-full">
                               <p className="text-white text-sm font-medium leading-normal pb-2">State</p>
                               <input 
-                                className="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-[#3b82f6] border border-white/10 bg-[#0B1116] h-12 placeholder:text-[#94a3b8] p-3 text-base font-normal leading-normal transition-all" 
+                                className="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-[#3b82f6] border border-white/5 bg-[#0B1116] h-12 placeholder:text-[#94a3b8] p-3 text-base font-normal leading-normal transition-all" 
                                 value={formData.address.state}
                                 onChange={(e) => setFormData({ ...formData, address: { ...formData.address, state: e.target.value } })}
                               />
@@ -530,7 +530,7 @@ const BusinessProfile = () => {
                             <label className="flex flex-col w-full">
                               <p className="text-white text-sm font-medium leading-normal pb-2">Zip Code</p>
                               <input 
-                                className="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-[#3b82f6] border border-white/10 bg-[#0B1116] h-12 placeholder:text-[#94a3b8] p-3 text-base font-normal leading-normal transition-all" 
+                                className="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-[#3b82f6] border border-white/5 bg-[#0B1116] h-12 placeholder:text-[#94a3b8] p-3 text-base font-normal leading-normal transition-all" 
                                 value={formData.address.zipCode}
                                 onChange={(e) => setFormData({ ...formData, address: { ...formData.address, zipCode: e.target.value } })}
                               />
@@ -538,7 +538,7 @@ const BusinessProfile = () => {
                             <label className="flex flex-col w-full">
                               <p className="text-white text-sm font-medium leading-normal pb-2">Country</p>
                               <input 
-                                className="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-[#3b82f6] border border-white/10 bg-[#0B1116] h-12 placeholder:text-[#94a3b8] p-3 text-base font-normal leading-normal transition-all" 
+                                className="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-[#3b82f6] border border-white/5 bg-[#0B1116] h-12 placeholder:text-[#94a3b8] p-3 text-base font-normal leading-normal transition-all" 
                                 value={formData.address.country}
                                 onChange={(e) => setFormData({ ...formData, address: { ...formData.address, country: e.target.value } })}
                               />
@@ -547,7 +547,7 @@ const BusinessProfile = () => {
                         </div>
 
                         {/* Contact Person */}
-                        <div className="flex flex-col gap-4 pb-6 border-b border-white/10">
+                        <div className="flex flex-col gap-4 pb-6 border-b border-white/5">
                           <div className="flex items-center gap-2">
                             <span className="material-symbols-outlined text-amber-400 text-[24px]">badge</span>
                             <h3 className="text-white text-lg font-semibold">Primary Contact Person</h3>
@@ -556,7 +556,7 @@ const BusinessProfile = () => {
                             <label className="flex flex-col w-full">
                               <p className="text-white text-sm font-medium leading-normal pb-2">Name</p>
                               <input 
-                                className="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-[#3b82f6] border border-white/10 bg-[#0B1116] h-12 placeholder:text-[#94a3b8] p-3 text-base font-normal leading-normal transition-all" 
+                                className="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-[#3b82f6] border border-white/5 bg-[#0B1116] h-12 placeholder:text-[#94a3b8] p-3 text-base font-normal leading-normal transition-all" 
                                 value={formData.contactPerson.name}
                                 onChange={(e) => setFormData({ ...formData, contactPerson: { ...formData.contactPerson, name: e.target.value } })}
                               />
@@ -564,7 +564,7 @@ const BusinessProfile = () => {
                             <label className="flex flex-col w-full">
                               <p className="text-white text-sm font-medium leading-normal pb-2">Role</p>
                               <input 
-                                className="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-[#3b82f6] border border-white/10 bg-[#0B1116] h-12 placeholder:text-[#94a3b8] p-3 text-base font-normal leading-normal transition-all" 
+                                className="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-[#3b82f6] border border-white/5 bg-[#0B1116] h-12 placeholder:text-[#94a3b8] p-3 text-base font-normal leading-normal transition-all" 
                                 value={formData.contactPerson.role}
                                 onChange={(e) => setFormData({ ...formData, contactPerson: { ...formData.contactPerson, role: e.target.value } })}
                                 placeholder="e.g., Facility Manager"
@@ -576,7 +576,7 @@ const BusinessProfile = () => {
                               <p className="text-white text-sm font-medium leading-normal pb-2">Email</p>
                               <input 
                                 type="email"
-                                className="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-[#3b82f6] border border-white/10 bg-[#0B1116] h-12 placeholder:text-[#94a3b8] p-3 text-base font-normal leading-normal transition-all" 
+                                className="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-[#3b82f6] border border-white/5 bg-[#0B1116] h-12 placeholder:text-[#94a3b8] p-3 text-base font-normal leading-normal transition-all" 
                                 value={formData.contactPerson.email}
                                 onChange={(e) => setFormData({ ...formData, contactPerson: { ...formData.contactPerson, email: e.target.value } })}
                               />
@@ -584,7 +584,7 @@ const BusinessProfile = () => {
                             <label className="flex flex-col w-full">
                               <p className="text-white text-sm font-medium leading-normal pb-2">Phone</p>
                               <input 
-                                className="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-[#3b82f6] border border-white/10 bg-[#0B1116] h-12 placeholder:text-[#94a3b8] p-3 text-base font-normal leading-normal transition-all" 
+                                className="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-[#3b82f6] border border-white/5 bg-[#0B1116] h-12 placeholder:text-[#94a3b8] p-3 text-base font-normal leading-normal transition-all" 
                                 value={formData.contactPerson.phone}
                                 onChange={(e) => setFormData({ ...formData, contactPerson: { ...formData.contactPerson, phone: e.target.value } })}
                               />
@@ -602,7 +602,7 @@ const BusinessProfile = () => {
                             <p className="text-white text-sm font-medium leading-normal pb-2">Monthly E-Waste Target (kg)</p>
                             <input 
                               type="number"
-                              className="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-[#3b82f6] border border-white/10 bg-[#0B1116] h-12 placeholder:text-[#94a3b8] p-3 text-base font-normal leading-normal transition-all" 
+                              className="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-[#3b82f6] border border-white/5 bg-[#0B1116] h-12 placeholder:text-[#94a3b8] p-3 text-base font-normal leading-normal transition-all" 
                               value={formData.monthlyTarget}
                               onChange={(e) => setFormData({ ...formData, monthlyTarget: parseInt(e.target.value) || 0 })}
                               min="0"
@@ -612,7 +612,7 @@ const BusinessProfile = () => {
 
                         <div className="flex justify-end gap-4 pt-4 border-t border-white/5">
                         <button 
-                            className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-[#0B1116] text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-white/5 transition-colors border border-white/10" 
+                            className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-[#0B1116] text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-white/5 transition-colors border border-white/5" 
                             type="button"
                             onClick={() => window.location.hash = '#/business'}
                         >

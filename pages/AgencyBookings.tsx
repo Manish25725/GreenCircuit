@@ -162,7 +162,7 @@ const AgencyBookings = () => {
                 </button>
                 <button 
                   onClick={handleLogout}
-                  className="p-2.5 rounded-full bg-[#151F26] border border-white/5 text-gray-400 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                  className="p-2.5 rounded-full bg-[#151F26] border border-white/5 text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-colors"
                   title="Logout"
                 >
                   <span className="material-symbols-outlined text-[20px]">logout</span>
@@ -191,7 +191,7 @@ const AgencyBookings = () => {
                   <button 
                     onClick={handleExportCSV}
                     disabled={filteredBookings.length === 0}
-                    className="flex items-center justify-center h-12 px-6 text-base font-bold leading-normal transition-all bg-white/5 text-gray-200 rounded-xl hover:bg-white/10 border border-white/5 hover:border-white/10 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex items-center justify-center h-12 px-6 text-base font-bold leading-normal transition-all bg-white/5 text-gray-200 rounded-xl hover:bg-white/5 border border-white/5 hover:border-white/5 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <span className="material-symbols-outlined mr-2">download</span>
                     <span className="truncate">Export CSV</span>
@@ -290,7 +290,7 @@ const AgencyBookings = () => {
                       <p>Loading bookings...</p>
                     </div>
                   ) : filteredBookings.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center py-20 gap-3 text-slate-500 border-2 border-dashed border-white/10 rounded-xl m-4">
+                    <div className="flex flex-col items-center justify-center py-20 gap-3 text-slate-500 border-2 border-dashed border-white/5 rounded-xl m-4">
                       <span className="material-symbols-outlined text-4xl opacity-50">inbox</span>
                       <p className="text-center">No bookings found.</p>
                       <p className="text-sm text-slate-600">Try adjusting your filters or search query</p>
@@ -375,7 +375,7 @@ const AgencyBookings = () => {
         {/* Action Confirmation Modal */}
         {actionModal && (
           <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
-            <div className="bg-[#151F26] border border-white/10 rounded-2xl p-6 max-w-md w-full shadow-2xl">
+            <div className="bg-[#151F26] border border-white/5 rounded-2xl p-6 max-w-md w-full shadow-2xl">
               <div className="flex items-center gap-4 mb-4">
                 <div className="size-12 rounded-xl bg-[#f59e0b]/10 flex items-center justify-center">
                   <span className="material-symbols-outlined text-[#f59e0b] text-2xl">
@@ -388,14 +388,14 @@ const AgencyBookings = () => {
                   <p className="text-sm text-slate-400">Booking #{actionModal.booking.id}</p>
                 </div>
               </div>
-              <p className="text-slate-300 mb-6">
+              <p className="text-gray-200 mb-6">
                 Are you sure you want to {actionModal.type === 'confirmed' ? 'confirm' : 
                 actionModal.type === 'in-progress' ? 'start pickup for' : 'complete'} this booking?
               </p>
               <div className="flex gap-3">
                 <button
                   onClick={() => setActionModal(null)}
-                  className="flex-1 py-2.5 rounded-xl border border-white/10 text-slate-300 hover:bg-white/5 transition-colors cursor-pointer"
+                  className="flex-1 py-2.5 rounded-xl border border-white/5 text-gray-200 hover:bg-white/5 transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>
@@ -414,7 +414,7 @@ const AgencyBookings = () => {
         {/* Booking Details Modal */}
         {selectedBooking && (
           <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
-            <div className="bg-[#151F26] border border-white/10 rounded-2xl p-6 max-w-lg w-full shadow-2xl">
+            <div className="bg-[#151F26] border border-white/5 rounded-2xl p-6 max-w-lg w-full shadow-2xl">
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-xl font-bold text-white">Booking Details</h3>
                 <button
@@ -467,7 +467,7 @@ const AgencyBookings = () => {
               </div>
               <button
                 onClick={() => setSelectedBooking(null)}
-                className="w-full mt-6 py-3 rounded-xl bg-white/5 text-white hover:bg-white/10 transition-colors cursor-pointer border border-white/5"
+                className="w-full mt-6 py-3 rounded-xl bg-white/5 text-white hover:bg-white/5 transition-colors cursor-pointer border border-white/5"
               >
                 Close
               </button>

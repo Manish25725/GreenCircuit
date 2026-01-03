@@ -34,6 +34,7 @@
     "pdfkit": "^0.17.2",
     "react": "^19.2.1",
     "react-dom": "^19.2.1",
+    "react-router-dom": "^7.11.0",
     "recharts": "^3.5.1",
     "tailwind-merge": "^3.4.0",
     "three": "^0.182.0",

@@ -121,7 +121,7 @@ const ResidentSecurity = () => {
                     </div>
                     <div>
                       <h1 className="text-2xl sm:text-3xl font-bold text-white">Security & Privacy</h1>
-                      <p className="text-gray-400 text-sm">Manage your password, login security, and privacy settings</p>
+                      <p className="text-slate-400 text-sm">Manage your password, login security, and privacy settings</p>
                     </div>
                   </div>
                 </div>
@@ -154,7 +154,7 @@ const ResidentSecurity = () => {
                         <label className="flex flex-col w-full">
                           <span className="text-white text-sm font-medium leading-normal pb-2">Current Password</span>
                           <input 
-                            className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-[#10b981] focus:border-[#10b981] transition-all" 
+                            className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/5 text-white focus:outline-none focus:ring-1 focus:ring-[#10b981] focus:border-[#10b981] transition-all" 
                             placeholder="Enter current password" 
                             type="password"
                             value={passwordData.currentPassword}
@@ -166,7 +166,7 @@ const ResidentSecurity = () => {
                         <label className="flex flex-col w-full">
                           <span className="text-white text-sm font-medium leading-normal pb-2">New Password</span>
                           <input 
-                            className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-[#10b981] focus:border-[#10b981] transition-all" 
+                            className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/5 text-white focus:outline-none focus:ring-1 focus:ring-[#10b981] focus:border-[#10b981] transition-all" 
                             placeholder="Enter new password" 
                             type="password"
                             value={passwordData.newPassword}
@@ -176,7 +176,7 @@ const ResidentSecurity = () => {
                         <label className="flex flex-col w-full">
                           <span className="text-white text-sm font-medium leading-normal pb-2">Confirm New Password</span>
                           <input 
-                            className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-[#10b981] focus:border-[#10b981] transition-all" 
+                            className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/5 text-white focus:outline-none focus:ring-1 focus:ring-[#10b981] focus:border-[#10b981] transition-all" 
                             placeholder="Confirm new password" 
                             type="password"
                             value={passwordData.confirmPassword}
@@ -207,7 +207,7 @@ const ResidentSecurity = () => {
                       </div>
                       <p className="text-[#94a3b8] text-sm">Add an extra layer of security to your account by requiring more than just a password to log in.</p>
                     </div>
-                    <button className="flex whitespace-nowrap min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-[#0B1116] text-[#10b981] border border-white/10 text-sm font-bold leading-normal tracking-[0.015em] hover:bg-[#10b981]/10 transition-colors">
+                    <button className="flex whitespace-nowrap min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-[#0B1116] text-[#10b981] border border-white/5 text-sm font-bold leading-normal tracking-[0.015em] hover:bg-[#10b981]/10 transition-colors">
                       Enable 2FA
                     </button>
                   </div>

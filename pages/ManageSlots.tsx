@@ -223,7 +223,7 @@ const ManageSlots = () => {
                 </button>
                 <button 
                   onClick={handleLogout}
-                  className="p-2.5 rounded-full bg-[#151F26] border border-white/5 text-gray-400 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                  className="p-2.5 rounded-full bg-[#151F26] border border-white/5 text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-colors"
                   title="Logout"
                 >
                   <span className="material-symbols-outlined text-[20px]">logout</span>
@@ -289,14 +289,14 @@ const ManageSlots = () => {
                       <div className="flex items-center justify-between mb-6">
                         <button 
                           onClick={handlePrevMonth}
-                          className="flex items-center justify-center text-slate-300 size-10 rounded-full hover:bg-white/5 hover:text-[#f59e0b] transition-colors"
+                          className="flex items-center justify-center text-gray-200 size-10 rounded-full hover:bg-white/5 hover:text-[#f59e0b] transition-colors"
                         >
                           <span className="material-symbols-outlined">chevron_left</span>
                         </button>
                         <p className="text-white text-xl font-bold leading-tight">{monthNames[currentMonth]} {currentYear}</p>
                         <button 
                           onClick={handleNextMonth}
-                          className="flex items-center justify-center text-slate-300 size-10 rounded-full hover:bg-white/5 hover:text-[#f59e0b] transition-colors"
+                          className="flex items-center justify-center text-gray-200 size-10 rounded-full hover:bg-white/5 hover:text-[#f59e0b] transition-colors"
                         >
                           <span className="material-symbols-outlined">chevron_right</span>
                         </button>
@@ -330,7 +330,7 @@ const ManageSlots = () => {
                                   ? 'bg-[#f59e0b]/20 text-white border-2 border-[#f59e0b] shadow-[0_0_15px_rgba(245,158,11,0.3)]' 
                                   : isToday
                                     ? 'bg-[#8b5cf6]/10 border border-[#8b5cf6]/30 text-white'
-                                    : 'bg-[#0B1116] border border-white/5 text-slate-300 hover:bg-white/5 hover:border-white/10'
+                                    : 'bg-[#0B1116] border border-white/5 text-gray-200 hover:bg-white/5 hover:border-white/5'
                                 }
                               `}
                             >
@@ -386,7 +386,7 @@ const ManageSlots = () => {
                             <p>Loading slots...</p>
                           </div>
                         ) : slots.length === 0 ? (
-                          <div className="flex flex-col items-center justify-center py-12 gap-3 text-slate-500 border-2 border-dashed border-white/10 rounded-xl">
+                          <div className="flex flex-col items-center justify-center py-12 gap-3 text-slate-500 border-2 border-dashed border-white/5 rounded-xl">
                             <span className="material-symbols-outlined text-4xl opacity-50">event_busy</span>
                             <p className="text-center">No slots configured for this date.</p>
                             <button 
@@ -403,7 +403,7 @@ const ManageSlots = () => {
                               className={`flex items-center justify-between p-4 rounded-xl border transition-all group
                                 ${slot.status === 'Available' ? 'bg-[#f59e0b]/5 border-[#f59e0b]/20 hover:border-[#f59e0b]/40' : ''}
                                 ${slot.status === 'Booked' ? 'bg-[#8b5cf6]/5 border-[#8b5cf6]/20 hover:border-[#8b5cf6]/40' : ''}
-                                ${slot.status === 'Unavailable' ? 'bg-[#0B1120]/50 border-white/5' : ''}
+                                ${slot.status === 'Unavailable' ? 'bg-[#0B1116]/50 border-white/5' : ''}
                               `}
                             >
                               <div className="flex items-center gap-4">
@@ -459,13 +459,13 @@ const ManageSlots = () => {
                     {/* Quick Actions */}
                     <div className="bg-[#151F26] rounded-2xl p-6 shadow-[0_10px_15px_-3px_rgba(0,0,0,0.3)] border border-white/5">
                       <h3 className="text-white text-lg font-bold mb-4 flex items-center gap-2">
-                        <span className="material-symbols-outlined text-gray-400">bolt</span>
+                        <span className="material-symbols-outlined text-slate-400">bolt</span>
                         Quick Actions
                       </h3>
                       <div className="flex flex-col gap-3">
                         <button 
                           onClick={() => window.location.hash = '#/agency'}
-                          className="flex w-full group cursor-pointer items-center justify-between overflow-hidden rounded-xl h-12 px-4 bg-white/5 text-gray-200 border border-white/5 hover:bg-white/10 hover:border-white/10 transition-all"
+                          className="flex w-full group cursor-pointer items-center justify-between overflow-hidden rounded-xl h-12 px-4 bg-white/5 text-gray-200 border border-white/5 hover:bg-white/5 hover:border-white/5 transition-all"
                         >
                           <div className="flex items-center gap-3">
                             <div className="size-7 rounded-lg bg-[#f59e0b]/20 text-[#f59e0b] flex items-center justify-center">
@@ -477,7 +477,7 @@ const ManageSlots = () => {
                         </button>
                         <button 
                           onClick={() => window.location.hash = '#/agency/bookings'}
-                          className="flex w-full group cursor-pointer items-center justify-between overflow-hidden rounded-xl h-12 px-4 bg-white/5 text-gray-200 border border-white/5 hover:bg-white/10 hover:border-white/10 transition-all"
+                          className="flex w-full group cursor-pointer items-center justify-between overflow-hidden rounded-xl h-12 px-4 bg-white/5 text-gray-200 border border-white/5 hover:bg-white/5 hover:border-white/5 transition-all"
                         >
                           <div className="flex items-center gap-3">
                             <div className="size-7 rounded-lg bg-[#8b5cf6]/20 text-[#8b5cf6] flex items-center justify-center">
@@ -505,13 +505,13 @@ const ManageSlots = () => {
             onClick={() => !addingSlot && setShowAddModal(false)}
           ></div>
           
-          <div className="relative bg-[#151F26] rounded-2xl p-6 sm:p-8 max-w-md w-full border border-white/10 shadow-2xl">
+          <div className="relative bg-[#151F26] rounded-2xl p-6 sm:p-8 max-w-md w-full border border-white/5 shadow-2xl">
             <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-[#f59e0b]/20 flex items-center justify-center">
               <span className="material-symbols-outlined text-4xl text-[#f59e0b]">schedule</span>
             </div>
             
             <h3 className="text-2xl font-bold text-white text-center mb-2">Add New Slot</h3>
-            <p className="text-gray-400 text-center mb-6">
+            <p className="text-slate-400 text-center mb-6">
               Create a pickup slot for {formatSelectedDate()}
             </p>
             
@@ -523,7 +523,7 @@ const ManageSlots = () => {
                     type="time" 
                     value={newSlot.startTime}
                     onChange={(e) => setNewSlot({ ...newSlot, startTime: e.target.value })}
-                    className="w-full bg-[#0B1116] border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-1 focus:ring-[#f59e0b] focus:border-[#f59e0b] outline-none transition-all"
+                    className="w-full bg-[#0B1116] border border-white/5 rounded-xl px-4 py-3 text-white focus:ring-1 focus:ring-[#f59e0b] focus:border-[#f59e0b] outline-none transition-all"
                   />
                 </div>
                 <div className="flex flex-col gap-2">
@@ -532,7 +532,7 @@ const ManageSlots = () => {
                     type="time" 
                     value={newSlot.endTime}
                     onChange={(e) => setNewSlot({ ...newSlot, endTime: e.target.value })}
-                    className="w-full bg-[#0B1116] border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-1 focus:ring-[#f59e0b] focus:border-[#f59e0b] outline-none transition-all"
+                    className="w-full bg-[#0B1116] border border-white/5 rounded-xl px-4 py-3 text-white focus:ring-1 focus:ring-[#f59e0b] focus:border-[#f59e0b] outline-none transition-all"
                   />
                 </div>
               </div>
@@ -544,7 +544,7 @@ const ManageSlots = () => {
                   max="20"
                   value={newSlot.capacity}
                   onChange={(e) => setNewSlot({ ...newSlot, capacity: parseInt(e.target.value) || 1 })}
-                  className="w-full bg-[#0B1116] border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-1 focus:ring-[#f59e0b] focus:border-[#f59e0b] outline-none transition-all"
+                  className="w-full bg-[#0B1116] border border-white/5 rounded-xl px-4 py-3 text-white focus:ring-1 focus:ring-[#f59e0b] focus:border-[#f59e0b] outline-none transition-all"
                 />
               </div>
             </div>
@@ -553,7 +553,7 @@ const ManageSlots = () => {
               <button
                 onClick={() => setShowAddModal(false)}
                 disabled={addingSlot}
-                className="flex-1 py-3 px-6 rounded-xl bg-white/5 text-white font-medium border border-white/10 hover:bg-white/10 transition-all disabled:opacity-50"
+                className="flex-1 py-3 px-6 rounded-xl bg-white/5 text-white font-medium border border-white/5 hover:bg-white/5 transition-all disabled:opacity-50"
               >
                 Cancel
               </button>
@@ -587,13 +587,13 @@ const ManageSlots = () => {
             onClick={() => !updatingSlot && setShowEditModal(false)}
           ></div>
           
-          <div className="relative bg-[#151F26] rounded-2xl p-6 sm:p-8 max-w-md w-full border border-white/10 shadow-2xl">
+          <div className="relative bg-[#151F26] rounded-2xl p-6 sm:p-8 max-w-md w-full border border-white/5 shadow-2xl">
             <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-[#f59e0b]/20 flex items-center justify-center">
               <span className="material-symbols-outlined text-4xl text-[#f59e0b]">edit_calendar</span>
             </div>
             
             <h3 className="text-2xl font-bold text-white text-center mb-2">Edit Slot</h3>
-            <p className="text-gray-400 text-center mb-6">
+            <p className="text-slate-400 text-center mb-6">
               Modify the pickup slot for {formatSelectedDate()}
             </p>
             
@@ -605,7 +605,7 @@ const ManageSlots = () => {
                     type="time" 
                     value={editSlotData.startTime}
                     onChange={(e) => setEditSlotData({ ...editSlotData, startTime: e.target.value })}
-                    className="w-full bg-[#0B1116] border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-1 focus:ring-[#f59e0b] focus:border-[#f59e0b] outline-none transition-all"
+                    className="w-full bg-[#0B1116] border border-white/5 rounded-xl px-4 py-3 text-white focus:ring-1 focus:ring-[#f59e0b] focus:border-[#f59e0b] outline-none transition-all"
                   />
                 </div>
                 <div className="flex flex-col gap-2">
@@ -614,7 +614,7 @@ const ManageSlots = () => {
                     type="time" 
                     value={editSlotData.endTime}
                     onChange={(e) => setEditSlotData({ ...editSlotData, endTime: e.target.value })}
-                    className="w-full bg-[#0B1116] border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-1 focus:ring-[#f59e0b] focus:border-[#f59e0b] outline-none transition-all"
+                    className="w-full bg-[#0B1116] border border-white/5 rounded-xl px-4 py-3 text-white focus:ring-1 focus:ring-[#f59e0b] focus:border-[#f59e0b] outline-none transition-all"
                   />
                 </div>
               </div>
@@ -626,7 +626,7 @@ const ManageSlots = () => {
                   max="20"
                   value={editSlotData.capacity}
                   onChange={(e) => setEditSlotData({ ...editSlotData, capacity: parseInt(e.target.value) || 1 })}
-                  className="w-full bg-[#0B1116] border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-1 focus:ring-[#f59e0b] focus:border-[#f59e0b] outline-none transition-all"
+                  className="w-full bg-[#0B1116] border border-white/5 rounded-xl px-4 py-3 text-white focus:ring-1 focus:ring-[#f59e0b] focus:border-[#f59e0b] outline-none transition-all"
                 />
               </div>
             </div>
@@ -638,7 +638,7 @@ const ManageSlots = () => {
                   setEditingSlot(null);
                 }}
                 disabled={updatingSlot}
-                className="flex-1 py-3 px-6 rounded-xl bg-white/5 text-white font-medium border border-white/10 hover:bg-white/10 transition-all disabled:opacity-50"
+                className="flex-1 py-3 px-6 rounded-xl bg-white/5 text-white font-medium border border-white/5 hover:bg-white/5 transition-all disabled:opacity-50"
               >
                 Cancel
               </button>

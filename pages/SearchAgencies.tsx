@@ -474,7 +474,7 @@ const SearchAgencies = () => {
                   </button>
                   {/* Hover Preview */}
                   <div className="absolute top-14 right-0 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-[100]">
-                    <div className="bg-[#151F26] border border-white/10 rounded-2xl p-4 shadow-2xl">
+                    <div className="bg-[#151F26] border border-white/5 rounded-2xl p-4 shadow-2xl">
                       <div className="size-32 rounded-xl ring-4 ring-[#06b6d4]/30 overflow-hidden bg-[#06b6d4] flex items-center justify-center">
                         {user?.logo || user?.avatar ? (
                           <img 
@@ -491,7 +491,7 @@ const SearchAgencies = () => {
                 </div>
                 <button 
                   onClick={() => window.location.hash = isBusiness ? '#/business/notifications' : '#/notifications'}
-                  className="p-2.5 rounded-full bg-[#151F26] border border-white/5 text-gray-400 hover:text-white hover:bg-white/5 transition-colors"
+                  className="p-2.5 rounded-full bg-[#151F26] border border-white/5 text-slate-400 hover:text-white hover:bg-white/5 transition-colors"
                   title="Notifications"
                 >
                   <span className="material-symbols-outlined text-[20px]">notifications</span>
@@ -532,7 +532,7 @@ const SearchAgencies = () => {
                        value={searchLocation}
                        onChange={(e) => setSearchLocation(e.target.value)}
                        onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                       className={`w-full pl-10 pr-20 py-2.5 rounded-lg bg-[#0B1116] border border-white/10 text-white text-sm focus:ring-2 outline-none transition-all placeholder:text-gray-600 ${isBusiness ? 'focus:ring-blue-500/50 focus:border-blue-500' : 'focus:ring-[#10b981]/50 focus:border-[#10b981]'}`} 
+                       className={`w-full pl-10 pr-20 py-2.5 rounded-lg bg-[#0B1116] border border-white/5 text-white text-sm focus:ring-2 outline-none transition-all placeholder:text-gray-600 ${isBusiness ? 'focus:ring-blue-500/50 focus:border-blue-500' : 'focus:ring-[#10b981]/50 focus:border-[#10b981]'}`} 
                      />
                      <button 
                        onClick={handleSearch}
@@ -551,7 +551,7 @@ const SearchAgencies = () => {
                           className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all flex items-center gap-1.5 ${
                             activeRegion === region.name 
                               ? (isBusiness ? 'bg-blue-500 text-white' : 'bg-[#10b981] text-white')
-                              : 'bg-white/5 text-[#94a3b8] hover:bg-white/10 hover:text-white'
+                              : 'bg-white/5 text-[#94a3b8] hover:bg-white/5 hover:text-white'
                           }`}
                         >
                           <span>{region.icon}</span>

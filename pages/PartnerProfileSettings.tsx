@@ -104,7 +104,7 @@ const PartnerProfileSettings = () => {
                   </button>
                   {/* Hover Preview */}
                   <div className="absolute top-14 right-0 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-[100]">
-                    <div className="bg-[#151F26] border border-white/10 rounded-2xl p-4 shadow-2xl">
+                    <div className="bg-[#151F26] border border-white/5 rounded-2xl p-4 shadow-2xl">
                       <div 
                         className="size-32 rounded-xl bg-cover bg-center ring-4 ring-[#8b5cf6]/30" 
                         style={{ backgroundImage: `url("${user?.avatar || user?.logo || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user?.name || user?.companyName || 'Partner') + '&background=8b5cf6&color=fff'}")`}}
@@ -140,10 +140,10 @@ const PartnerProfileSettings = () => {
                     </div>
                     <div>
                       <h1 className="text-2xl sm:text-3xl font-bold text-white">{user?.companyName || user?.name || 'Partner'}</h1>
-                      <p className="text-gray-400 text-sm mt-1">{user?.email || ''}</p>
+                      <p className="text-slate-400 text-sm mt-1">{user?.email || ''}</p>
                     </div>
                   </div>
-                  <p className="text-gray-400 text-sm">Manage your profile, security, and preferences</p>
+                  <p className="text-slate-400 text-sm">Manage your profile, security, and preferences</p>
                 </div>
 
                 {/* Settings Cards Grid */}
@@ -152,7 +152,7 @@ const PartnerProfileSettings = () => {
                     <div
                       key={card.id}
                       onClick={() => window.location.hash = card.link}
-                      className="bg-[#151F26] hover:bg-[#1a2730] p-6 rounded-xl border border-white/5 hover:border-white/10 transition-all cursor-pointer group"
+                      className="bg-[#151F26] hover:bg-[#1a2730] p-6 rounded-xl border border-white/5 hover:border-white/5 transition-all cursor-pointer group"
                     >
                       <div className="flex items-start gap-4">
                         <div 
@@ -170,7 +170,7 @@ const PartnerProfileSettings = () => {
                           <h3 className="text-white font-semibold text-lg mb-1 group-hover:text-[#8b5cf6] transition-colors">
                             {card.title}
                           </h3>
-                          <p className="text-gray-400 text-sm">
+                          <p className="text-slate-400 text-sm">
                             {card.description}
                           </p>
                         </div>
@@ -192,7 +192,7 @@ const PartnerProfileSettings = () => {
                           <span className="material-symbols-outlined text-[#8b5cf6]">event_available</span>
                         </div>
                         <div>
-                          <p className="text-gray-400 text-xs">Total Pickups</p>
+                          <p className="text-slate-400 text-xs">Total Pickups</p>
                           <p className="text-white text-2xl font-bold">{user?.totalPickups || 0}</p>
                         </div>
                       </div>
@@ -203,7 +203,7 @@ const PartnerProfileSettings = () => {
                           <span className="material-symbols-outlined text-[#8b5cf6]">recycling</span>
                         </div>
                         <div>
-                          <p className="text-gray-400 text-xs">Waste Collected</p>
+                          <p className="text-slate-400 text-xs">Waste Collected</p>
                           <p className="text-white text-2xl font-bold">{user?.totalWasteCollected || 0} kg</p>
                         </div>
                       </div>
@@ -214,7 +214,7 @@ const PartnerProfileSettings = () => {
                           <span className="material-symbols-outlined text-[#8b5cf6]">schedule</span>
                         </div>
                         <div>
-                          <p className="text-gray-400 text-xs">Active Slots</p>
+                          <p className="text-slate-400 text-xs">Active Slots</p>
                           <p className="text-white text-2xl font-bold">{user?.activeSlots || 0}</p>
                         </div>
                       </div>

@@ -169,7 +169,7 @@ const PartnerAppSettings = () => {
                         className={`p-4 rounded-xl border transition-all ${
                           settings.language === 'en'
                             ? 'bg-[#8b5cf6]/10 border-[#8b5cf6] text-[#8b5cf6]'
-                            : 'bg-[#0B1116] border-white/10 text-gray-300 hover:border-[#8b5cf6]/30 hover:bg-[#8b5cf6]/5'
+                            : 'bg-[#0B1116] border-white/5 text-gray-200 hover:border-[#8b5cf6]/30 hover:bg-[#8b5cf6]/5'
                         } ${saving ? 'opacity-50 cursor-not-allowed' : ''}`}
                       >
                         <div className="flex items-center gap-3">
@@ -183,7 +183,7 @@ const PartnerAppSettings = () => {
                         className={`p-4 rounded-xl border transition-all ${
                           settings.language === 'hi'
                             ? 'bg-[#8b5cf6]/10 border-[#8b5cf6] text-[#8b5cf6]'
-                            : 'bg-[#0B1116] border-white/10 text-gray-300 hover:border-[#8b5cf6]/30 hover:bg-[#8b5cf6]/5'
+                            : 'bg-[#0B1116] border-white/5 text-gray-200 hover:border-[#8b5cf6]/30 hover:bg-[#8b5cf6]/5'
                         } ${saving ? 'opacity-50 cursor-not-allowed' : ''}`}
                       >
                         <div className="flex items-center gap-3">
@@ -197,7 +197,7 @@ const PartnerAppSettings = () => {
                         className={`p-4 rounded-xl border transition-all ${
                           settings.language === 'es'
                             ? 'bg-[#8b5cf6]/10 border-[#8b5cf6] text-[#8b5cf6]'
-                            : 'bg-[#0B1116] border-white/10 text-gray-300 hover:border-[#8b5cf6]/30 hover:bg-[#8b5cf6]/5'
+                            : 'bg-[#0B1116] border-white/5 text-gray-200 hover:border-[#8b5cf6]/30 hover:bg-[#8b5cf6]/5'
                         } ${saving ? 'opacity-50 cursor-not-allowed' : ''}`}
                       >
                         <div className="flex items-center gap-3">
@@ -226,7 +226,7 @@ const PartnerAppSettings = () => {
                         className={`p-4 rounded-xl border transition-all ${
                           settings.theme === 'light'
                             ? 'bg-[#8b5cf6]/10 border-[#8b5cf6] text-[#8b5cf6]'
-                            : 'bg-[#0B1116] border-white/10 text-gray-300 hover:border-[#8b5cf6]/30 hover:bg-[#8b5cf6]/5'
+                            : 'bg-[#0B1116] border-white/5 text-gray-200 hover:border-[#8b5cf6]/30 hover:bg-[#8b5cf6]/5'
                         } ${saving ? 'opacity-50 cursor-not-allowed' : ''}`}
                       >
                         <div className="flex items-center gap-3">
@@ -240,7 +240,7 @@ const PartnerAppSettings = () => {
                         className={`p-4 rounded-xl border transition-all ${
                           settings.theme === 'dark'
                             ? 'bg-[#8b5cf6]/10 border-[#8b5cf6] text-[#8b5cf6]'
-                            : 'bg-[#0B1116] border-white/10 text-gray-300 hover:border-[#8b5cf6]/30 hover:bg-[#8b5cf6]/5'
+                            : 'bg-[#0B1116] border-white/5 text-gray-200 hover:border-[#8b5cf6]/30 hover:bg-[#8b5cf6]/5'
                         } ${saving ? 'opacity-50 cursor-not-allowed' : ''}`}
                       >
                         <div className="flex items-center gap-3">

@@ -92,7 +92,7 @@ const AdminDashboard = () => {
                   <h1 className="text-3xl sm:text-4xl font-bold text-white mb-2 bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent">
                     Admin Dashboard
                   </h1>
-                  <p className="text-gray-400 text-sm sm:text-base">Welcome back! Here's what's happening on your platform today.</p>
+                  <p className="text-slate-400 text-sm sm:text-base">Welcome back! Here's what's happening on your platform today.</p>
                 </div>
                 {/* Stats Grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
@@ -106,7 +106,7 @@ const AdminDashboard = () => {
                         </div>
                       </div>
                       <h3 className="text-3xl font-bold text-white mb-1">{stats.totalUsers.toLocaleString()}</h3>
-                      <p className="text-gray-400 text-sm font-medium">Total Users</p>
+                      <p className="text-slate-400 text-sm font-medium">Total Users</p>
                     </div>
                   </div>
 
@@ -145,7 +145,7 @@ const AdminDashboard = () => {
                         </div>
                       </div>
                       <h3 className="text-3xl font-bold text-white mb-1">{stats.verifiedPartners}</h3>
-                      <p className="text-gray-400 text-sm font-medium">Verified Partners</p>
+                      <p className="text-slate-400 text-sm font-medium">Verified Partners</p>
                     </div>
                   </div>
 
@@ -159,7 +159,7 @@ const AdminDashboard = () => {
                         </div>
                       </div>
                       <h3 className="text-3xl font-bold text-white mb-1">{stats.totalBookings}</h3>
-                      <p className="text-gray-400 text-sm font-medium">Total Bookings</p>
+                      <p className="text-slate-400 text-sm font-medium">Total Bookings</p>
                     </div>
                   </div>
                 </div>
@@ -177,7 +177,7 @@ const AdminDashboard = () => {
                     <div className="space-y-3">
                       <button 
                         onClick={() => window.location.hash = '#/admin/partners'}
-                        className="w-full flex items-center justify-between gap-3 p-4 rounded-xl hover:bg-pink-500/10 text-gray-300 hover:text-white transition-all border border-white/5 hover:border-pink-500/30 group"
+                        className="w-full flex items-center justify-between gap-3 p-4 rounded-xl hover:bg-pink-500/10 text-gray-200 hover:text-white transition-all border border-white/5 hover:border-pink-500/30 group"
                       >
                         <div className="flex items-center gap-3">
                           <div className="bg-pink-500/20 text-pink-400 p-2 rounded-lg group-hover:scale-110 transition-transform">
@@ -193,7 +193,7 @@ const AdminDashboard = () => {
                       
                       <button 
                         onClick={() => window.location.hash = '#/admin/users'}
-                        className="w-full flex items-center justify-between gap-3 p-4 rounded-xl hover:bg-purple-500/10 text-gray-300 hover:text-white transition-all border border-white/5 hover:border-purple-500/30 group"
+                        className="w-full flex items-center justify-between gap-3 p-4 rounded-xl hover:bg-purple-500/10 text-gray-200 hover:text-white transition-all border border-white/5 hover:border-purple-500/30 group"
                       >
                         <div className="flex items-center gap-3">
                           <div className="bg-purple-500/20 text-purple-400 p-2 rounded-lg group-hover:scale-110 transition-transform">
@@ -209,7 +209,7 @@ const AdminDashboard = () => {
                       
                       <button 
                         onClick={() => window.location.hash = '#/admin/agencies'}
-                        className="w-full flex items-center justify-between gap-3 p-4 rounded-xl hover:bg-pink-500/10 text-gray-300 hover:text-white transition-all border border-white/5 hover:border-pink-500/30 group"
+                        className="w-full flex items-center justify-between gap-3 p-4 rounded-xl hover:bg-pink-500/10 text-gray-200 hover:text-white transition-all border border-white/5 hover:border-pink-500/30 group"
                       >
                         <div className="flex items-center gap-3">
                           <div className="bg-pink-500/20 text-pink-400 p-2 rounded-lg group-hover:scale-110 transition-transform">
@@ -244,7 +244,7 @@ const AdminDashboard = () => {
                       
                       <div className="p-3 rounded-lg border border-white/5">
                         <div className="flex justify-between mb-2">
-                          <span className="text-xs text-gray-400">Active Sessions</span>
+                          <span className="text-xs text-slate-400">Active Sessions</span>
                           <span className="text-xs text-white font-medium">2,487</span>
                         </div>
                         <div className="w-full bg-white/5 rounded-full h-2">
@@ -254,7 +254,7 @@ const AdminDashboard = () => {
                       
                       <div className="p-3 rounded-lg border border-white/5">
                         <div className="flex justify-between mb-2">
-                          <span className="text-xs text-gray-400">API Response Time</span>
+                          <span className="text-xs text-slate-400">API Response Time</span>
                           <span className="text-xs text-white font-medium">142ms</span>
                         </div>
                         <div className="w-full bg-white/5 rounded-full h-2">
@@ -265,11 +265,11 @@ const AdminDashboard = () => {
                       <div className="grid grid-cols-2 gap-3 mt-4">
                         <div className="p-3 rounded-lg border border-white/5 text-center">
                           <p className="text-2xl font-bold text-white">{stats.totalBookings}</p>
-                          <p className="text-xs text-gray-400 mt-1">Total Bookings</p>
+                          <p className="text-xs text-slate-400 mt-1">Total Bookings</p>
                         </div>
                         <div className="p-3 rounded-lg border border-white/5 text-center">
                           <p className="text-2xl font-bold text-pink-400">{stats.verifiedPartners}</p>
-                          <p className="text-xs text-gray-400 mt-1">Active Partners</p>
+                          <p className="text-xs text-slate-400 mt-1">Active Partners</p>
                         </div>
                       </div>
                     </div>

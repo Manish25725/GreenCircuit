@@ -104,7 +104,7 @@ const ResidentProfileSettings = () => {
                   </button>
                   {/* Hover Preview */}
                   <div className="absolute top-14 right-0 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-[100]">
-                    <div className="bg-[#151F26] border border-white/10 rounded-2xl p-4 shadow-2xl">
+                    <div className="bg-[#151F26] border border-white/5 rounded-2xl p-4 shadow-2xl">
                       <div 
                         className="size-32 rounded-xl bg-cover bg-center ring-4 ring-[#10b981]/30" 
                         style={{ backgroundImage: `url("${user?.avatar || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user?.name || 'User') + '&background=10b981&color=fff'}")`}}
@@ -140,10 +140,10 @@ const ResidentProfileSettings = () => {
                     </div>
                     <div>
                       <h1 className="text-2xl sm:text-3xl font-bold text-white">{user?.name || 'User'}</h1>
-                      <p className="text-gray-400 text-sm mt-1">{user?.email || ''}</p>
+                      <p className="text-slate-400 text-sm mt-1">{user?.email || ''}</p>
                     </div>
                   </div>
-                  <p className="text-gray-400 text-sm">Manage your profile, security, and preferences</p>
+                  <p className="text-slate-400 text-sm">Manage your profile, security, and preferences</p>
                 </div>
 
                 {/* Settings Cards Grid */}
@@ -152,7 +152,7 @@ const ResidentProfileSettings = () => {
                     <div
                       key={card.id}
                       onClick={() => window.location.hash = card.link}
-                      className="bg-[#151F26] hover:bg-[#1a2730] p-6 rounded-xl border border-white/5 hover:border-white/10 transition-all cursor-pointer group"
+                      className="bg-[#151F26] hover:bg-[#1a2730] p-6 rounded-xl border border-white/5 hover:border-white/5 transition-all cursor-pointer group"
                     >
                       <div className="flex items-start gap-4">
                         <div 
@@ -170,7 +170,7 @@ const ResidentProfileSettings = () => {
                           <h3 className="text-white font-semibold text-lg mb-1 group-hover:text-[#10b981] transition-colors">
                             {card.title}
                           </h3>
-                          <p className="text-gray-400 text-sm">
+                          <p className="text-slate-400 text-sm">
                             {card.description}
                           </p>
                         </div>
@@ -192,7 +192,7 @@ const ResidentProfileSettings = () => {
                           <span className="material-symbols-outlined text-[#10b981]">stars</span>
                         </div>
                         <div>
-                          <p className="text-gray-400 text-xs">Eco Points</p>
+                          <p className="text-slate-400 text-xs">Eco Points</p>
                           <p className="text-white text-2xl font-bold">{user?.ecoPoints || 0}</p>
                         </div>
                       </div>
@@ -203,7 +203,7 @@ const ResidentProfileSettings = () => {
                           <span className="material-symbols-outlined text-[#10b981]">recycling</span>
                         </div>
                         <div>
-                          <p className="text-gray-400 text-xs">Waste Recycled</p>
+                          <p className="text-slate-400 text-xs">Waste Recycled</p>
                           <p className="text-white text-2xl font-bold">{user?.totalWasteRecycled || 0} kg</p>
                         </div>
                       </div>
@@ -214,7 +214,7 @@ const ResidentProfileSettings = () => {
                           <span className="material-symbols-outlined text-[#10b981]">local_shipping</span>
                         </div>
                         <div>
-                          <p className="text-gray-400 text-xs">Total Pickups</p>
+                          <p className="text-slate-400 text-xs">Total Pickups</p>
                           <p className="text-white text-2xl font-bold">{user?.totalPickups || 0}</p>
                         </div>
                       </div>

@@ -154,7 +154,7 @@ const AppSettings = () => {
         <div className="bg-[#0B1116] min-h-screen flex items-center justify-center">
           <div className="text-center">
             <Loader size="md" color="#10b981" />
-            <p className="text-gray-400 mt-4">Loading settings...</p>
+            <p className="text-slate-400 mt-4">Loading settings...</p>
           </div>
         </div>
       </Layout>
@@ -162,11 +162,11 @@ const AppSettings = () => {
   }
   return (
     <Layout title="" role="User" fullWidth hideSidebar>
-      <div className="bg-[#0B1116] font-sans text-gray-200 antialiased selection:bg-[#10b981] selection:text-white min-h-screen flex flex-col relative overflow-hidden">
+      <div className="bg-[#0B1116] font-sans text-gray-200 antialiased min-h-screen flex flex-col relative overflow-hidden">
         
         {/* Background Ambient Blobs */}
-        <div className="fixed top-0 left-0 w-full h-[500px] bg-[#10b981]/5 rounded-full blur-[120px] -translate-y-1/2 pointer-events-none"></div>
-        <div className="fixed bottom-0 right-0 w-full h-[500px] bg-[#3b82f6]/5 rounded-full blur-[120px] translate-y-1/2 pointer-events-none"></div>
+        <div className="fixed top-0 left-0 w-full h-[500px] fixed bg-[#10b981]/5 rounded-full blur-[120px] -translate-y-1/2 pointer-events-none"></div>
+        <div className="fixed bottom-0 right-0 w-full h-[500px] fixed bg-[#3b82f6]/5 rounded-full blur-[120px] translate-y-1/2 pointer-events-none"></div>
 
         <ProfileHeader />
 
@@ -176,12 +176,12 @@ const AppSettings = () => {
             <ProfileSidebar activePage="settings" />
             <div className="flex-1">
                 <div className="flex flex-col gap-8">
-                <div className="bg-[#151F26] p-6 md:p-8 rounded-xl border border-white/5">
+                <div className="bg-[#151F26] p-6 md:p-8 rounded-xl">
                     <div className="flex flex-col gap-8">
                         <div className="flex flex-wrap justify-between gap-3 border-b border-white/5 pb-6">
                             <div className="flex flex-col gap-1">
                                 <p className="text-white text-2xl font-bold leading-tight tracking-[-0.033em]">{t('appSettings')}</p>
-                                <p className="text-[#94a3b8] text-base font-normal leading-normal">{t('appSettingsDesc')}</p>
+                                <p className="text-slate-400 text-base font-normal leading-normal">{t('appSettingsDesc')}</p>
                             </div>
                         </div>
                         <div className="flex flex-col gap-8">
@@ -190,16 +190,16 @@ const AppSettings = () => {
                             <section className="flex flex-col gap-5">
                                 <h3 className="text-white text-lg font-bold leading-tight">{t('generalPreferences')}</h3>
                                 <div className="grid gap-6">
-                                    <div className="flex items-center justify-between p-4 bg-[#0B1116]/50 rounded-lg border border-white/5">
+                                    <div className="flex items-center justify-between p-4 bg-[#151F26] rounded-lg border-white/5 border">
                                         <div className="flex flex-col gap-1">
                                             <span className="text-white font-medium text-base">{t('languageSelection')}</span>
-                                            <span className="text-[#94a3b8] text-sm">{t('languageDesc')}</span>
+                                            <span className="text-slate-400 text-sm">{t('languageDesc')}</span>
                                         </div>
                                         <select 
                                             value={settings.language}
                                             onChange={(e) => handleLanguageChange(e.target.value)}
                                             disabled={saving}
-                                            className="bg-[#0B1116] border border-white/10 text-white rounded-lg px-4 py-2 text-sm focus:ring-1 focus:ring-[#10b981] focus:border-[#10b981] outline-none min-w-[140px] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                                            className="bg-[#0B1116] border border-white/5 text-gray-200 rounded-lg px-4 py-2 text-sm focus:ring-1 focus:ring-[#10b981] focus:border-[#10b981] outline-none min-w-[140px] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                                         >
                                             <option value="en">English (US)</option>
                                             <option value="es">Español</option>
@@ -207,13 +207,13 @@ const AppSettings = () => {
                                             <option value="de">Deutsch</option>
                                         </select>
                                     </div>
-                                    <div className="flex items-center justify-between p-4 bg-[#0B1116]/50 rounded-lg border border-white/5">
+                                    <div className="flex items-center justify-between p-4 bg-[#151F26] rounded-lg border-white/5 border">
                                         <div className="flex flex-col gap-1">
                                             <span className="text-white font-medium text-base">{t('displayTheme')}</span>
-                                            <span className="text-[#94a3b8] text-sm">{t('themeDesc')}</span>
+                                            <span className="text-slate-400 text-sm">{t('themeDesc')}</span>
                                         </div>
                                         <div className="flex items-center gap-3">
-                                            <span className="text-[#94a3b8] text-sm font-medium">{t('light')}</span>
+                                            <span className="text-slate-400 text-sm font-medium">{t('light')}</span>
                                             <label className="relative inline-flex items-center cursor-pointer">
                                                 <input 
                                                     checked={settings.theme === 'dark'}
@@ -221,7 +221,7 @@ const AppSettings = () => {
                                                     className="sr-only peer" 
                                                     type="checkbox" 
                                                 />
-                                                <div className="w-11 h-6 bg-[#0B1116] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#10b981] border border-white/10"></div>
+                                                <div className="w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#10b981] border border-white/5"></div>
                                             </label>
                                             <span className="text-white text-sm font-medium">{t('dark')}</span>
                                         </div>
@@ -232,7 +232,7 @@ const AppSettings = () => {
                             {/* Permissions */}
                             <section className="flex flex-col gap-5">
                                 <h3 className="text-white text-lg font-bold leading-tight">{t('permissions')}</h3>
-                                <div className="flex flex-col gap-1 bg-[#0B1116]/50 rounded-lg border border-white/5 divide-y divide-white/5">
+                                <div className="flex flex-col gap-1 bg-[#151F26] rounded-lg border-white/5 border divide-y border-white/5">
                                     <div className="flex items-center justify-between p-4">
                                         <div className="flex gap-4 items-center">
                                             <div className="size-10 rounded-full bg-[#151F26] flex items-center justify-center text-[#10b981] border border-white/5">
@@ -240,7 +240,7 @@ const AppSettings = () => {
                                             </div>
                                             <div className="flex flex-col">
                                                 <span className="text-white font-medium">{t('locationAccess')}</span>
-                                                <span className="text-[#94a3b8] text-sm">{t('locationDesc')}</span>
+                                                <span className="text-slate-400 text-sm">{t('locationDesc')}</span>
                                             </div>
                                         </div>
                                         <label className="relative inline-flex items-center cursor-pointer">
@@ -250,7 +250,7 @@ const AppSettings = () => {
                                                 className="sr-only peer" 
                                                 type="checkbox" 
                                             />
-                                            <div className="w-11 h-6 bg-[#0B1116] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#10b981] border border-white/10"></div>
+                                            <div className="w-11 h-6 bg-[#0B1116] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#10b981] border border-white/5"></div>
                                         </label>
                                     </div>
                                     <div className="flex items-center justify-between p-4">
@@ -270,7 +270,7 @@ const AppSettings = () => {
                                                 className="sr-only peer" 
                                                 type="checkbox" 
                                             />
-                                            <div className="w-11 h-6 bg-[#0B1116] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#10b981] border border-white/10"></div>
+                                            <div className="w-11 h-6 bg-[#0B1116] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#10b981] border border-white/5"></div>
                                         </label>
                                     </div>
                                 </div>
@@ -286,7 +286,7 @@ const AppSettings = () => {
                                     </div>
                                     <button 
                                         onClick={handleClearCache}
-                                        className="flex cursor-pointer items-center justify-center rounded-lg h-9 px-4 bg-[#151F26] hover:bg-white/5 border border-white/10 text-white text-sm font-medium transition-colors"
+                                        className="flex cursor-pointer items-center justify-center rounded-lg h-9 px-4 bg-[#151F26] hover:bg-white/5 border border-white/5 text-white text-sm font-medium transition-colors"
                                     >
                                         {t('clearCacheBtn')}
                                     </button>

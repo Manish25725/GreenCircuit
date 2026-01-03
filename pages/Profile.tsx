@@ -169,7 +169,7 @@ const Profile = () => {
         <div className="bg-[#0B1116] min-h-screen flex items-center justify-center">
           <div className="text-center">
             <Loader size="md" color="#10b981" className="mb-4" />
-            <p className="text-gray-400">Loading profile...</p>
+            <p className="text-slate-400">Loading profile...</p>
           </div>
         </div>
       </Layout>
@@ -277,7 +277,7 @@ const Profile = () => {
                 <div className="flex flex-col gap-4 mt-8 pt-4 border-t border-white/5">
                     <button 
                     onClick={handleLogout}
-                    className="flex w-full min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-[#0B1116] text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-white/5 transition-colors border border-white/10"
+                    className="flex w-full min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-[#0B1116] text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-white/5 transition-colors border border-white/5"
                     >
                     <span className="truncate">Log Out</span>
                     </button>
@@ -299,21 +299,21 @@ const Profile = () => {
                         <label className="flex flex-col w-full">
                             <p className="text-white text-sm font-medium leading-normal pb-2">Full Name</p>
                             <input 
-                              className="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-[#10b981] border border-white/10 bg-[#0B1116] h-12 placeholder:text-[#94a3b8] p-3 text-base font-normal leading-normal transition-all" 
+                              className="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-[#10b981] border border-white/5 bg-[#0B1116] h-12 placeholder:text-[#94a3b8] p-3 text-base font-normal leading-normal transition-all" 
                               value={formData.name}
                               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                             />
                         </label>
                         <label className="flex flex-col w-full">
                             <p className="text-white text-sm font-medium leading-normal pb-2">Email Address</p>
-                            <input className="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-[#94a3b8] focus:outline-none border border-white/10 bg-[#0B1116]/50 h-12 p-3 text-base font-normal leading-normal cursor-not-allowed" readOnly value={user?.email || ''} />
+                            <input className="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-[#94a3b8] focus:outline-none border border-white/5 bg-[#0B1116]/50 h-12 p-3 text-base font-normal leading-normal cursor-not-allowed" readOnly value={user?.email || ''} />
                         </label>
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                         <label className="flex flex-col w-full">
                             <p className="text-white text-sm font-medium leading-normal pb-2">Phone Number</p>
                             <input 
-                              className="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-[#10b981] border border-white/10 bg-[#0B1116] h-12 placeholder:text-[#94a3b8] p-3 text-base font-normal leading-normal transition-all" 
+                              className="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-[#10b981] border border-white/5 bg-[#0B1116] h-12 placeholder:text-[#94a3b8] p-3 text-base font-normal leading-normal transition-all" 
                               value={formData.phone}
                               onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                               placeholder="+1 (555) 123-4567"
@@ -324,7 +324,7 @@ const Profile = () => {
                         <label className="flex flex-col w-full">
                             <p className="text-white text-sm font-medium leading-normal pb-2">Primary Address</p>
                             <textarea 
-                              className="w-full resize-y rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-[#10b981] border border-white/10 bg-[#0B1116] placeholder:text-[#94a3b8] p-3 text-base font-normal leading-normal transition-all" 
+                              className="w-full resize-y rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-[#10b981] border border-white/5 bg-[#0B1116] placeholder:text-[#94a3b8] p-3 text-base font-normal leading-normal transition-all" 
                               rows={3} 
                               value={formData.address}
                               onChange={(e) => setFormData({ ...formData, address: e.target.value })}
@@ -334,7 +334,7 @@ const Profile = () => {
                         </div>
                         <div className="flex justify-end gap-4 pt-4 border-t border-white/5">
                         <button 
-                            className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-[#0B1116] text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-white/5 transition-colors border border-white/10" 
+                            className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-[#0B1116] text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-white/5 transition-colors border border-white/5" 
                             type="button"
                             onClick={() => window.location.hash = '#/dashboard'}
                         >

@@ -14,7 +14,7 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ progress }) => {
   if (progress === 100) statusText = "Ready!";
 
   return (
-    <div className="relative flex h-screen w-full flex-col bg-[#0B1120] group/design-root overflow-hidden font-sans selection:bg-[#34D399] selection:text-[#0B1120]">
+    <div className="relative flex h-screen w-full flex-col bg-[#0B1116] group/design-root overflow-hidden font-sans selection:bg-[#34D399] selection:text-[#0B1120]">
       {/* Background Ambient Effects - Matching Landing Page */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
         <div className="absolute top-[-10%] left-[-10%] w-[50vh] h-[50vh] bg-[#34D399]/10 rounded-full blur-[128px]"></div>
@@ -29,7 +29,7 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ progress }) => {
             {/* Central Visual Graphic */}
             <div className="relative flex items-center justify-center mb-12">
               {/* Outer pulsing ring simulation */}
-              <div className="w-32 h-32 rounded-full border border-[#34D399]/20 flex items-center justify-center relative bg-[#0B1120]/50 backdrop-blur-sm shadow-[0_0_40px_-10px_rgba(52,211,153,0.1)]">
+              <div className="w-32 h-32 rounded-full border border-[#34D399]/20 flex items-center justify-center relative bg-[#0B1116]/50 backdrop-blur-sm shadow-[0_0_40px_-10px_rgba(52,211,153,0.1)]">
                 {/* Inner Glow */}
                 <div className="absolute inset-0 bg-[#34D399]/5 rounded-full blur-xl animate-pulse"></div>
                 
@@ -68,7 +68,7 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ progress }) => {
               </div>
               
               {/* Premium Progress Bar */}
-              <div className="rounded-full bg-[#0B1120] h-1.5 w-full overflow-hidden border border-white/5">
+              <div className="rounded-full bg-[#0B1116] h-1.5 w-full overflow-hidden border border-white/5">
                 <div 
                   className="h-full rounded-full bg-[#34D399] shadow-[0_0_12px_rgba(52,211,153,0.6)] relative transition-all duration-300 ease-out" 
                   style={{ width: `${roundedProgress}%` }}

@@ -2,7 +2,7 @@ import React from 'react';
 
 const HowItWorks = () => {
   return (
-    <div className="relative flex min-h-screen flex-col bg-[#0B1120] font-sans text-slate-300 antialiased overflow-x-hidden selection:bg-[#34D399] selection:text-[#0B1120]">
+    <div className="relative flex min-h-screen flex-col bg-[#0B1116] font-sans text-gray-200 antialiased overflow-x-hidden selection:bg-[#34D399] selection:text-[#0B1120]">
         {/* Style for animations and specific elements */}
         <style>{`
             .timeline-line {
@@ -25,7 +25,7 @@ const HowItWorks = () => {
         `}</style>
 
         {/* Header - Logo Only */}
-        <header className="sticky top-0 z-50 flex items-center justify-center border-b border-white/5 bg-[#0B1120]/80 backdrop-blur-md px-6 py-4">
+        <header className="sticky top-0 z-50 flex items-center justify-center border-b border-white/5 bg-[#0B1116]/80 backdrop-blur-md px-6 py-4">
             <div className="flex items-center gap-3 cursor-pointer" onClick={() => window.history.back()}>
                 <svg className="w-6 h-6 text-[#34D399]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -75,7 +75,7 @@ const HowItWorks = () => {
                         </div>
                         {/* Center Icon */}
                         <div className="relative flex items-center justify-center order-1 md:order-2">
-                            <div className="w-16 h-16 rounded-full bg-[#0B1120] border-2 border-[#34D399] flex items-center justify-center shadow-[0_0_20px_rgba(52,211,153,0.3)] z-20 animate-pulse-glow">
+                            <div className="w-16 h-16 rounded-full bg-[#0B1116] border-2 border-[#34D399] flex items-center justify-center shadow-[0_0_20px_rgba(52,211,153,0.3)] z-20 animate-pulse-glow">
                                 <span className="material-symbols-outlined text-[#34D399] text-3xl">inventory_2</span>
                             </div>
                         </div>
@@ -85,7 +85,7 @@ const HowItWorks = () => {
                                 <div className="absolute inset-0 bg-cover bg-center opacity-60 mix-blend-overlay" style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuCmtR5a-dAhOP7_2dg3Y-YqqbtwN9VLgttPl32giV-Evax9rE2y4g2zsZnPi7zyay0Anc5lPVFxFkTwwKnXa-s3cNOGXLj1e3ft0ULg_NvixEUgJ16k41vW99GpJqTMRqZBuGXJGq6VXFo9Pa0yPah0bdv0RTnVfFxLr6I9ugS2UvAKir8mIVL6xzH4n5yNlAjwdXl-QrMsRHJM4xdflT9uYCb6em-ZyDsDhHCPi3Ia2usjwqDp6MCUXOCGxdGf76yNHzzwP8dLGW0')" }}></div>
                                 <div className="absolute inset-0 bg-gradient-to-t from-[#0B1120] to-transparent"></div>
                                 <div className="absolute bottom-4 left-4 right-4">
-                                    <div className="flex items-center gap-2 bg-black/40 backdrop-blur-sm p-2 rounded-lg border border-white/10 w-fit">
+                                    <div className="flex items-center gap-2 bg-black/40 backdrop-blur-sm p-2 rounded-lg border border-white/5 w-fit">
                                         <span className="material-symbols-outlined text-white text-sm">laptop_mac</span>
                                         <span className="text-xs text-white font-medium">Laptop selected</span>
                                     </div>
@@ -102,7 +102,7 @@ const HowItWorks = () => {
                                 <div className="absolute inset-0 bg-cover bg-center opacity-60 mix-blend-overlay" style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuDBQxrNFem1sljFKN8Fbycw_4FyF7KqfWgZXL8Ry0cjamrTItFm7tUVE1Cp-zJuHe3zgaZGAoJlFhTMB9ZqRRUnjFm6GZvPijuPfLyh-Ewwj_5NKd7H3MpLtnEOUfoIs_zdScDGQyUgaeG9K1xbPmmKnXyz23kzthSfdebXNpDU0g1TSHWZLJCEbF5z5UhAOOxKiRNinM_AvbJarKQfuVA4SNFs9f6dRi1IzLuTBiKd5F6Gg1jBMG6i2xZ6A146x1rQca1QLdHyKHk')" }}></div>
                                 <div className="absolute inset-0 bg-gradient-to-t from-[#0B1120] to-transparent"></div>
                                 <div className="absolute bottom-4 left-4 right-4">
-                                    <div className="flex items-center gap-2 bg-black/40 backdrop-blur-sm p-2 rounded-lg border border-white/10 w-fit">
+                                    <div className="flex items-center gap-2 bg-black/40 backdrop-blur-sm p-2 rounded-lg border border-white/5 w-fit">
                                         <span className="material-symbols-outlined text-[#34D399] text-sm">check_circle</span>
                                         <span className="text-xs text-white font-medium">Pickup Confirmed: Oct 24</span>
                                     </div>
@@ -111,7 +111,7 @@ const HowItWorks = () => {
                         </div>
                         {/* Center Icon */}
                         <div className="relative flex items-center justify-center order-1 md:order-2">
-                            <div className="w-16 h-16 rounded-full bg-[#0B1120] border-2 border-white/10 group-hover:border-[#34D399] flex items-center justify-center transition-all duration-300 z-20">
+                            <div className="w-16 h-16 rounded-full bg-[#0B1116] border-2 border-white/5 group-hover:border-[#34D399] flex items-center justify-center transition-all duration-300 z-20">
                                 <span className="material-symbols-outlined text-white group-hover:text-[#34D399] transition-colors text-3xl">calendar_month</span>
                             </div>
                         </div>
@@ -137,7 +137,7 @@ const HowItWorks = () => {
                         </div>
                         {/* Center Icon */}
                         <div className="relative flex items-center justify-center order-1 md:order-2">
-                            <div className="w-16 h-16 rounded-full bg-[#0B1120] border-2 border-white/10 group-hover:border-[#34D399] flex items-center justify-center transition-all duration-300 z-20">
+                            <div className="w-16 h-16 rounded-full bg-[#0B1116] border-2 border-white/5 group-hover:border-[#34D399] flex items-center justify-center transition-all duration-300 z-20">
                                 <span className="material-symbols-outlined text-white group-hover:text-[#34D399] transition-colors text-3xl">location_on</span>
                             </div>
                         </div>
@@ -161,7 +161,7 @@ const HowItWorks = () => {
                         <div className="w-full md:w-1/2 md:pr-12 order-3 md:order-1">
                             <div className="aspect-video w-full rounded-2xl overflow-hidden bg-[#1E293B]/50 border border-white/5 relative group-hover:border-[#34D399]/50 transition-colors duration-300 flex items-center justify-center">
                                 <div className="absolute inset-0 bg-cover bg-center opacity-40 mix-blend-overlay" style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuCI6zhCDfGVIhY5IWN8lrrnGbJJZTRuzdgM_3HODzUq8xphu6MoYQbRBmtlMf4i3t10tXWXjJcfbQX-awvrk8KqLenn_TcAv6D4gfXt8ZWQFkZDK0JR-PqKX9KQSwwVc5T19JoeuHBW7l4_y6foCd4abHa5Cvz1-h6ktAw6wFD98ac6t8m6Au5hleJYPd5oV-yLEkUTJOsnH1Q_emxCHVVhC8ZcalqD9lP7dxVkONcKYzGRYvzEknrfZTizdDW7V7rwb1UDlaCFDRY')" }}></div>
-                                <div className="relative z-10 bg-white/5 backdrop-blur-md border border-white/10 p-6 rounded-xl text-center max-w-[200px]">
+                                <div className="relative z-10 bg-white/5 backdrop-blur-md border border-white/5 p-6 rounded-xl text-center max-w-[200px]">
                                     <div className="text-[#34D399] mb-2">
                                         <span className="material-symbols-outlined text-4xl">verified</span>
                                     </div>
@@ -172,7 +172,7 @@ const HowItWorks = () => {
                         </div>
                         {/* Center Icon */}
                         <div className="relative flex items-center justify-center order-1 md:order-2">
-                            <div className="w-16 h-16 rounded-full bg-[#0B1120] border-2 border-white/10 group-hover:border-[#34D399] flex items-center justify-center transition-all duration-300 z-20">
+                            <div className="w-16 h-16 rounded-full bg-[#0B1116] border-2 border-white/5 group-hover:border-[#34D399] flex items-center justify-center transition-all duration-300 z-20">
                                 <span className="material-symbols-outlined text-white group-hover:text-[#34D399] transition-colors text-3xl">workspace_premium</span>
                             </div>
                         </div>
@@ -202,7 +202,7 @@ const HowItWorks = () => {
                         </p>
                         <button 
                             onClick={() => window.location.hash = '#/search'}
-                            className="bg-[#0B1120] text-white text-lg font-bold px-8 py-4 rounded-xl shadow-lg transition-all transform hover:scale-105"
+                            className="bg-[#0B1116] text-white text-lg font-bold px-8 py-4 rounded-xl shadow-lg transition-all transform hover:scale-105"
                         >
                             Schedule Pickup
                         </button>
@@ -216,7 +216,7 @@ const HowItWorks = () => {
         </main>
 
         {/* Footer */}
-        <footer className="border-t border-white/5 bg-[#0B1120] px-10 py-12">
+        <footer className="border-t border-white/5 bg-[#0B1116] px-10 py-12">
             <div className="mx-auto flex max-w-7xl flex-col gap-8 md:flex-row md:justify-between">
                 <div className="flex flex-col gap-4">
                     <div className="flex items-center gap-2 text-white">

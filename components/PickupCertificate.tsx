@@ -8,6 +8,7 @@ interface PickupCertificateProps {
   wasteTypes: string[];
   issueDate: string;
   ecoPoints: number;
+  bookingId?: string;
 }
 
 const PickupCertificate: React.FC<PickupCertificateProps> = ({
@@ -17,7 +18,8 @@ const PickupCertificate: React.FC<PickupCertificateProps> = ({
   wasteWeight,
   wasteTypes,
   issueDate,
-  ecoPoints
+  ecoPoints,
+  bookingId
 }) => {
   const certificateRef = useRef<HTMLDivElement>(null);
 
@@ -32,40 +34,60 @@ const PickupCertificate: React.FC<PickupCertificateProps> = ({
     return new Date(dateString).toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' });
   };
 
-  const handleDownload = () => {
-    if (certificateRef.current) {
-      // Create a new window for printing
-      const printWindow = window.open('', '_blank');
-      if (printWindow) {
-        const certificateHTML = certificateRef.current.innerHTML;
-        printWindow.document.write(`
-          <!DOCTYPE html>
-          <html>
-            <head>
-              <title>E-Waste Collection Certificate - ${pickupId}</title>
-              <style>
-                * { margin: 0; padding: 0; box-sizing: border-box; }
-                body { 
-                  font-family: 'Georgia', serif; 
-                  padding: 20px; 
-                  background: white;
-                }
-                @media print {
-                  body { padding: 0; }
-                  .no-print { display: none !important; }
-                }
-              </style>
-            </head>
-            <body>
-              ${certificateHTML}
-            </body>
-          </html>
-        `);
-        printWindow.document.close();
-        setTimeout(() => {
-          printWindow.print();
-        }, 250);
+  const handleDownload = async () => {
+    try {
+      const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+      const token = localStorage.getItem('token');
+      
+      if (!token) {
+        alert('Please login to download certificates');
+        return;
       }
+
+      if (!bookingId) {
+        alert('Booking ID not available');
+        return;
+      }
+
+      console.log('Downloading certificate for booking:', bookingId);
+      
+      const response = await fetch(`${API_BASE}/certificates/${bookingId}/download`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: 'Failed to download certificate' }));
+        console.error('Download error:', errorData);
+        throw new Error(errorData.error || errorData.message || 'Failed to download certificate');
+      }
+      
+      // Get the PDF blob
+      const blob = await response.blob();
+      
+      if (blob.size === 0) {
+        throw new Error('Downloaded file is empty');
+      }
+
+      console.log('PDF downloaded, size:', blob.size);
+      
+      // Create download link
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `certificate-${pickupId}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      
+      // Cleanup
+      setTimeout(() => {
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+      }, 100);
+    } catch (error: any) {
+      console.error('Certificate download error:', error);
+      alert(error.message || 'Failed to download certificate. Please try again.');
     }
   };
 
@@ -221,10 +243,10 @@ const PickupCertificate: React.FC<PickupCertificateProps> = ({
 
           {/* Certificate ID */}
           <div className="mt-8 text-center">
-            <p className="text-xs text-gray-400">
+            <p className="text-xs text-slate-400">
               Certificate ID: CERT-{pickupId}-{new Date(issueDate).getFullYear()}
             </p>
-            <p className="text-xs text-gray-400 mt-1">
+            <p className="text-xs text-slate-400 mt-1">
               Verify authenticity at www.ecocycle.com/verify
             </p>
           </div>

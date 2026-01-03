@@ -83,7 +83,7 @@ const AdminAgencies: React.FC = () => {
                 </button>
                 <div>
                   <h1 className="text-2xl font-bold text-white">Partner Agencies</h1>
-                  <p className="text-sm text-gray-400">View all verified partner agencies</p>
+                  <p className="text-sm text-slate-400">View all verified partner agencies</p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
@@ -94,7 +94,7 @@ const AdminAgencies: React.FC = () => {
                     placeholder="Search agencies..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10 pr-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-pink-500/50 w-64"
+                    className="pl-10 pr-4 py-2 bg-white/5 border border-white/5 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-pink-500/50 w-64"
                   />
                 </div>
               </div>
@@ -109,7 +109,7 @@ const AdminAgencies: React.FC = () => {
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                     statusFilter === status
                       ? 'bg-pink-500 text-white'
-                      : 'bg-white/5 text-gray-400 hover:bg-white/10'
+                      : 'bg-white/5 text-slate-400 hover:bg-white/5'
                   }`}
                 >
                   {status.charAt(0).toUpperCase() + status.slice(1)}
@@ -135,7 +135,7 @@ const AdminAgencies: React.FC = () => {
                       </div>
                       <div>
                         <p className="text-2xl font-bold text-white">{agencies.filter(a => a.isVerified).length}</p>
-                        <p className="text-sm text-gray-400">Active Partners</p>
+                        <p className="text-sm text-slate-400">Active Partners</p>
                       </div>
                     </div>
                   </div>
@@ -146,7 +146,7 @@ const AdminAgencies: React.FC = () => {
                       </div>
                       <div>
                         <p className="text-2xl font-bold text-white">{agencies.filter(a => a.verificationStatus === 'pending').length}</p>
-                        <p className="text-sm text-gray-400">Pending</p>
+                        <p className="text-sm text-slate-400">Pending</p>
                       </div>
                     </div>
                   </div>
@@ -159,7 +159,7 @@ const AdminAgencies: React.FC = () => {
                         <p className="text-2xl font-bold text-white">
                           {agencies.reduce((sum, a) => sum + (a.totalBookings || 0), 0)}
                         </p>
-                        <p className="text-sm text-gray-400">Total Bookings</p>
+                        <p className="text-sm text-slate-400">Total Bookings</p>
                       </div>
                     </div>
                   </div>
@@ -172,7 +172,7 @@ const AdminAgencies: React.FC = () => {
                         <p className="text-2xl font-bold text-white">
                           {(agencies.filter(a => a.rating).reduce((sum, a) => sum + (a.rating || 0), 0) / agencies.filter(a => a.rating).length || 0).toFixed(1)}
                         </p>
-                        <p className="text-sm text-gray-400">Avg Rating</p>
+                        <p className="text-sm text-slate-400">Avg Rating</p>
                       </div>
                     </div>
                   </div>
@@ -182,7 +182,7 @@ const AdminAgencies: React.FC = () => {
                 {filteredAgencies.length === 0 ? (
                   <div className="text-center py-20">
                     <span className="material-symbols-outlined text-6xl text-gray-600 mb-4">business</span>
-                    <p className="text-gray-400">No agencies found</p>
+                    <p className="text-slate-400">No agencies found</p>
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -195,7 +195,7 @@ const AdminAgencies: React.FC = () => {
                         <div className="flex items-start justify-between mb-4">
                           <div className="flex-1">
                             <h3 className="text-lg font-bold text-white mb-1">{agency.name}</h3>
-                            <p className="text-sm text-gray-400">{agency.email}</p>
+                            <p className="text-sm text-slate-400">{agency.email}</p>
                           </div>
                           <span className={`px-3 py-1 rounded-full text-xs font-bold border ${getStatusBadge(agency.verificationStatus, agency.isVerified)}`}>
                             {agency.isVerified ? 'Active' : agency.verificationStatus}
@@ -203,16 +203,16 @@ const AdminAgencies: React.FC = () => {
                         </div>
 
                         <div className="space-y-2 mb-4">
-                          <div className="flex items-center gap-2 text-sm text-gray-300">
+                          <div className="flex items-center gap-2 text-sm text-gray-200">
                             <span className="material-symbols-outlined text-[18px] text-pink-400">location_on</span>
                             <span>{agency.address.city}, {agency.address.state}</span>
                           </div>
-                          <div className="flex items-center gap-2 text-sm text-gray-300">
+                          <div className="flex items-center gap-2 text-sm text-gray-200">
                             <span className="material-symbols-outlined text-[18px] text-pink-400">phone</span>
                             <span>{agency.phone}</span>
                           </div>
                           {agency.rating && (
-                            <div className="flex items-center gap-2 text-sm text-gray-300">
+                            <div className="flex items-center gap-2 text-sm text-gray-200">
                               <span className="material-symbols-outlined text-[18px] text-yellow-400">star</span>
                               <span>{agency.rating.toFixed(1)} Rating</span>
                             </div>
@@ -232,7 +232,7 @@ const AdminAgencies: React.FC = () => {
                           )}
                         </div>
 
-                        <div className="flex justify-between items-center pt-4 border-t border-white/10">
+                        <div className="flex justify-between items-center pt-4 border-t border-white/5">
                           <span className="text-xs text-gray-500">
                             {agency.totalBookings || 0} bookings
                           </span>

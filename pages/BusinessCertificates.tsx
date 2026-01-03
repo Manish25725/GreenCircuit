@@ -103,6 +103,14 @@ const BusinessCertificates = () => {
     try {
       const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
       const token = localStorage.getItem('token');
+      
+      if (!token) {
+        alert('Please login to download certificates');
+        return;
+      }
+
+      console.log('Downloading certificate:', certId);
+      
       const response = await fetch(`${API_BASE}/business/certificates/${certId}/download`, {
         headers: {
           'Authorization': `Bearer ${token}`
@@ -110,11 +118,19 @@ const BusinessCertificates = () => {
       });
       
       if (!response.ok) {
-        throw new Error('Failed to download certificate');
+        const errorData = await response.json().catch(() => ({ error: 'Failed to download certificate' }));
+        console.error('Download error:', errorData);
+        throw new Error(errorData.error || errorData.message || 'Failed to download certificate');
       }
       
       // Get the PDF blob
       const blob = await response.blob();
+      
+      if (blob.size === 0) {
+        throw new Error('Downloaded file is empty');
+      }
+
+      console.log('PDF downloaded, size:', blob.size);
       
       // Create download link
       const url = window.URL.createObjectURL(blob);
@@ -125,10 +141,13 @@ const BusinessCertificates = () => {
       link.click();
       
       // Cleanup
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-    } catch (error) {
-      alert('Failed to download certificate. Please try again.');
+      setTimeout(() => {
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+      }, 100);
+    } catch (error: any) {
+      console.error('Certificate download error:', error);
+      alert(error.message || 'Failed to download certificate. Please try again.');
     }
   };
 
@@ -165,7 +184,7 @@ const BusinessCertificates = () => {
       case 'pending': return 'bg-amber-500/10 text-amber-400';
       case 'expired':
       case 'revoked': return 'bg-red-500/10 text-red-400';
-      default: return 'bg-gray-500/10 text-gray-400';
+      default: return 'bg-gray-500/10 text-slate-400';
     }
   };
 
@@ -210,7 +229,7 @@ const BusinessCertificates = () => {
       'refurbishment': 'bg-blue-500/10 text-blue-400 border-blue-500/30',
       'compliance': 'bg-amber-500/10 text-amber-400 border-amber-500/30'
     };
-    return colors[type] || 'bg-gray-500/10 text-gray-400 border-gray-500/30';
+    return colors[type] || 'bg-gray-500/10 text-slate-400 border-gray-500/30';
   };
 
   return (
@@ -243,7 +262,7 @@ const BusinessCertificates = () => {
                   </div>
                   <span className="text-sm font-medium text-gray-200">{user?.name || 'Business'}</span>
                 </button>
-                <button onClick={handleLogout} className="p-2.5 rounded-full bg-[#151F26] border border-white/5 text-gray-400 hover:text-red-400 hover:bg-red-500/10 transition-colors" title="Logout">
+                <button onClick={handleLogout} className="p-2.5 rounded-full bg-[#151F26] border border-white/5 text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-colors" title="Logout">
                   <span className="material-symbols-outlined text-[20px]">logout</span>
                 </button>
               </div>
@@ -322,13 +341,13 @@ const BusinessCertificates = () => {
                       placeholder="Search by certificate number, type, or agency..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full bg-[#151F26] border border-white/10 rounded-xl pl-12 pr-4 py-3 text-white placeholder-gray-500 focus:ring-2 focus:ring-[#06b6d4]/50 focus:border-[#06b6d4] outline-none transition-all"
+                      className="w-full bg-[#151F26] border border-white/5 rounded-xl pl-12 pr-4 py-3 text-white placeholder-gray-500 focus:ring-2 focus:ring-[#06b6d4]/50 focus:border-[#06b6d4] outline-none transition-all"
                     />
                   </div>
                   <select
                     value={filterStatus}
                     onChange={(e) => setFilterStatus(e.target.value)}
-                    className="bg-[#151F26] border border-white/10 text-white rounded-xl px-4 py-3 focus:ring-2 focus:ring-[#06b6d4]/50 focus:border-[#06b6d4] outline-none cursor-pointer"
+                    className="bg-[#151F26] border border-white/5 text-white rounded-xl px-4 py-3 focus:ring-2 focus:ring-[#06b6d4]/50 focus:border-[#06b6d4] outline-none cursor-pointer"
                   >
                     <option value="all">All Status</option>
                     <option value="issued">Verified</option>
@@ -353,12 +372,12 @@ const BusinessCertificates = () => {
                   {loading ? (
                     <div className="p-12 text-center">
                       <Loader size="md" color="#06b6d4" className="mb-4" />
-                      <p className="text-gray-400">Loading certificates...</p>
+                      <p className="text-slate-400">Loading certificates...</p>
                     </div>
                   ) : filteredCertificates.length === 0 ? (
                     <div className="p-12 text-center">
                       <span className="material-symbols-outlined text-5xl text-gray-600 mb-4">description</span>
-                      <p className="text-gray-400 text-lg">No certificates found</p>
+                      <p className="text-slate-400 text-lg">No certificates found</p>
                       <p className="text-gray-600 text-sm mt-1">
                         {certificates.length === 0 
                           ? "Certificates are issued when your pickups are completed" 
@@ -381,7 +400,7 @@ const BusinessCertificates = () => {
                               </span>
                             </div>
                           </div>
-                          <div className="text-gray-400">
+                          <div className="text-slate-400">
                             <span className="md:hidden text-gray-600 text-sm mr-2">Date:</span>
                             {new Date(cert.issuedAt || cert.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
                           </div>
@@ -396,7 +415,7 @@ const BusinessCertificates = () => {
                             <span className="md:hidden text-gray-600 text-sm mr-2">Weight:</span>
                             {cert.totalWeight} kg
                           </div>
-                          <div className="text-gray-400">
+                          <div className="text-slate-400">
                             <span className="md:hidden text-gray-600 text-sm mr-2">Agency:</span>
                             {cert.agencyId?.name || cert.issuedBy?.name || 'N/A'}
                           </div>
@@ -432,7 +451,7 @@ const BusinessCertificates = () => {
                     </div>
                     <div>
                       <h4 className="text-white font-bold text-lg mb-1">Compliance Certificates</h4>
-                      <p className="text-gray-400 text-sm">All your compliance certificates are automatically generated when pickups are completed. These certificates verify proper e-waste disposal according to EPA guidelines, ISO 14001, R2, and e-Stewards standards. Use them for environmental audits, sustainability reporting, and regulatory compliance.</p>
+                      <p className="text-slate-400 text-sm">All your compliance certificates are automatically generated when pickups are completed. These certificates verify proper e-waste disposal according to EPA guidelines, ISO 14001, R2, and e-Stewards standards. Use them for environmental audits, sustainability reporting, and regulatory compliance.</p>
                     </div>
                   </div>
                 </div>
@@ -444,9 +463,9 @@ const BusinessCertificates = () => {
         {/* Certificate Preview Modal */}
         {selectedCertificate && (
           <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setSelectedCertificate(null)}>
-            <div className="bg-[#151F26] rounded-3xl w-full max-w-2xl border border-white/10 overflow-hidden max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="bg-[#151F26] rounded-3xl w-full max-w-2xl border border-white/5 overflow-hidden max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
               {/* Modal Header */}
-              <div className="flex items-center justify-between p-6 border-b border-white/10 sticky top-0 bg-[#151F26]">
+              <div className="flex items-center justify-between p-6 border-b border-white/5 sticky top-0 bg-[#151F26]">
                 <div className="flex items-center gap-3">
                   <div className={`p-2 rounded-lg ${getStatusStyle(getDisplayStatus(selectedCertificate))}`}>
                     <span className="material-symbols-outlined">{getStatusIcon(getDisplayStatus(selectedCertificate))}</span>
@@ -458,7 +477,7 @@ const BusinessCertificates = () => {
                     </span>
                   </div>
                 </div>
-                <button onClick={() => setSelectedCertificate(null)} className="p-2 rounded-lg hover:bg-white/10 transition-colors text-gray-400 hover:text-white">
+                <button onClick={() => setSelectedCertificate(null)} className="p-2 rounded-lg hover:bg-white/5 transition-colors text-slate-400 hover:text-white">
                   <span className="material-symbols-outlined">close</span>
                 </button>
               </div>
@@ -536,7 +555,7 @@ const BusinessCertificates = () => {
                           {selectedCertificate.items.map((item, idx) => (
                             <tr key={idx} className="border-t border-white/5">
                               <td className="p-3 text-white">{item.name}</td>
-                              <td className="p-3 text-gray-400">{item.category}</td>
+                              <td className="p-3 text-slate-400">{item.category}</td>
                               <td className="p-3 text-white text-right">{item.quantity}</td>
                               <td className="p-3 text-white text-right">{item.weight} kg</td>
                             </tr>

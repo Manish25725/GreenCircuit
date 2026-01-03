@@ -202,7 +202,7 @@ const AdminAgencyDetail = () => {
         <div className="flex items-center justify-center min-h-screen">
           <div className="text-center">
             <span className="material-symbols-outlined text-6xl text-gray-600 mb-4 block">business_center</span>
-            <p className="text-gray-400">Agency not found</p>
+            <p className="text-slate-400">Agency not found</p>
           </div>
         </div>
       </Layout>
@@ -247,7 +247,7 @@ const AdminAgencyDetail = () => {
               </button>
               <div>
                 <h1 className="text-3xl font-bold text-white">Agency Details</h1>
-                <p className="text-gray-400 mt-1">View and manage agency account</p>
+                <p className="text-slate-400 mt-1">View and manage agency account</p>
               </div>
             </div>
 
@@ -311,9 +311,9 @@ const AdminAgencyDetail = () => {
                   {agency.name.charAt(0).toUpperCase()}
                 </div>
                 <h2 className="text-2xl font-bold text-white mb-1">{agency.name}</h2>
-                <p className="text-gray-400 text-sm mb-2">{agency.email}</p>
+                <p className="text-slate-400 text-sm mb-2">{agency.email}</p>
                 {agency.phone && (
-                  <p className="text-gray-400 text-sm mb-3 flex items-center justify-center gap-1">
+                  <p className="text-slate-400 text-sm mb-3 flex items-center justify-center gap-1">
                     <span className="material-symbols-outlined text-sm">call</span>
                     {agency.phone}
                   </p>
@@ -325,7 +325,7 @@ const AdminAgencyDetail = () => {
                 
                 {agency.suspended && agency.suspendedReason && (
                   <div className="mt-4 p-3 rounded-xl bg-red-500/10 border border-red-500/30">
-                    <p className="text-xs text-gray-400">{agency.suspendedReason}</p>
+                    <p className="text-xs text-slate-400">{agency.suspendedReason}</p>
                   </div>
                 )}
               </div>
@@ -336,19 +336,19 @@ const AdminAgencyDetail = () => {
               <div className="bg-[#15202e]/80 backdrop-blur-xl rounded-2xl p-6 border border-white/5">
                 <span className="material-symbols-outlined text-3xl text-purple-400 mb-2 block">local_shipping</span>
                 <p className="text-2xl font-bold text-white">{agency.completedBookings || 0}</p>
-                <p className="text-sm text-gray-400">Completed</p>
+                <p className="text-sm text-slate-400">Completed</p>
               </div>
               
               <div className="bg-[#15202e]/80 backdrop-blur-xl rounded-2xl p-6 border border-white/5">
                 <span className="material-symbols-outlined text-3xl text-blue-400 mb-2 block">recycling</span>
                 <p className="text-2xl font-bold text-white">{agency.totalWasteProcessed || 0} kg</p>
-                <p className="text-sm text-gray-400">Waste Processed</p>
+                <p className="text-sm text-slate-400">Waste Processed</p>
               </div>
               
               <div className="bg-[#15202e]/80 backdrop-blur-xl rounded-2xl p-6 border border-white/5">
                 <span className="material-symbols-outlined text-3xl text-yellow-400 mb-2 block">star</span>
                 <p className="text-2xl font-bold text-white">{agency.rating?.toFixed(1) || 'N/A'}</p>
-                <p className="text-sm text-gray-400">Rating</p>
+                <p className="text-sm text-slate-400">Rating</p>
               </div>
             </div>
           </div>
@@ -364,22 +364,22 @@ const AdminAgencyDetail = () => {
               
               <div className="space-y-4">
                 <div>
-                  <label className="text-sm text-gray-400 block mb-1">Agency ID</label>
+                  <label className="text-sm text-slate-400 block mb-1">Agency ID</label>
                   <p className="text-white font-mono text-sm">{agency._id}</p>
                 </div>
                 
                 <div>
-                  <label className="text-sm text-gray-400 block mb-1">License Number</label>
+                  <label className="text-sm text-slate-400 block mb-1">License Number</label>
                   <p className="text-white">{agency.licenseNumber || 'Not provided'}</p>
                 </div>
                 
                 <div>
-                  <label className="text-sm text-gray-400 block mb-1">Member Since</label>
+                  <label className="text-sm text-slate-400 block mb-1">Member Since</label>
                   <p className="text-white">{new Date(agency.createdAt).toLocaleDateString()}</p>
                 </div>
                 
                 <div>
-                  <label className="text-sm text-gray-400 block mb-1">Operating Hours</label>
+                  <label className="text-sm text-slate-400 block mb-1">Operating Hours</label>
                   <p className="text-white">{agency.operatingHours || 'Not specified'}</p>
                 </div>
               </div>
@@ -395,7 +395,7 @@ const AdminAgencyDetail = () => {
               <div className="space-y-4">
                 {agency.address && (
                   <div>
-                    <label className="text-sm text-gray-400 block mb-1">Address</label>
+                    <label className="text-sm text-slate-400 block mb-1">Address</label>
                     <p className="text-white">
                       {agency.address.street && `${agency.address.street}, `}
                       {agency.address.city && `${agency.address.city}, `}
@@ -407,7 +407,7 @@ const AdminAgencyDetail = () => {
                 
                 {agency.servicesOffered && agency.servicesOffered.length > 0 && (
                   <div>
-                    <label className="text-sm text-gray-400 block mb-2">Services Offered</label>
+                    <label className="text-sm text-slate-400 block mb-2">Services Offered</label>
                     <div className="flex flex-wrap gap-2">
                       {agency.servicesOffered.map((service, index) => (
                         <span
@@ -428,19 +428,19 @@ const AdminAgencyDetail = () => {
         {/* Suspend Modal */}
         {showSuspendModal && (
           <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="bg-[#15202e] rounded-2xl p-6 border border-white/10 max-w-md w-full">
+            <div className="bg-[#15202e] rounded-2xl p-6 border border-white/5 max-w-md w-full">
               <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
                 <span className="material-symbols-outlined text-red-400">block</span>
                 Suspend Agency Account
               </h3>
               
               <div className="mb-4">
-                <label className="text-sm text-gray-400 block mb-2">Reason for Suspension *</label>
+                <label className="text-sm text-slate-400 block mb-2">Reason for Suspension *</label>
                 <textarea
                   value={suspendReason}
                   onChange={(e) => setSuspendReason(e.target.value)}
                   placeholder="Enter the reason for suspending this agency..."
-                  className="w-full px-4 py-3 bg-[#0f1729] border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-red-500/50 resize-none"
+                  className="w-full px-4 py-3 bg-[#0f1729] border border-white/5 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-red-500/50 resize-none"
                   rows={4}
                 />
               </div>
@@ -448,7 +448,7 @@ const AdminAgencyDetail = () => {
               <div className="flex gap-3">
                 <button
                   onClick={() => setShowSuspendModal(false)}
-                  className="flex-1 px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-white hover:bg-white/10 transition-all"
+                  className="flex-1 px-4 py-2 rounded-xl bg-white/5 border border-white/5 text-white hover:bg-white/5 transition-all"
                 >
                   Cancel
                 </button>
@@ -467,19 +467,19 @@ const AdminAgencyDetail = () => {
         {/* Reject Modal */}
         {showRejectModal && (
           <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="bg-[#15202e] rounded-2xl p-6 border border-white/10 max-w-md w-full">
+            <div className="bg-[#15202e] rounded-2xl p-6 border border-white/5 max-w-md w-full">
               <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
                 <span className="material-symbols-outlined text-orange-400">cancel</span>
                 Reject Agency Application
               </h3>
               
               <div className="mb-4">
-                <label className="text-sm text-gray-400 block mb-2">Reason for Rejection *</label>
+                <label className="text-sm text-slate-400 block mb-2">Reason for Rejection *</label>
                 <textarea
                   value={rejectReason}
                   onChange={(e) => setRejectReason(e.target.value)}
                   placeholder="Enter the reason for rejecting this application..."
-                  className="w-full px-4 py-3 bg-[#0f1729] border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-orange-500/50 resize-none"
+                  className="w-full px-4 py-3 bg-[#0f1729] border border-white/5 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-orange-500/50 resize-none"
                   rows={4}
                 />
               </div>
@@ -487,7 +487,7 @@ const AdminAgencyDetail = () => {
               <div className="flex gap-3">
                 <button
                   onClick={() => setShowRejectModal(false)}
-                  className="flex-1 px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-white hover:bg-white/10 transition-all"
+                  className="flex-1 px-4 py-2 rounded-xl bg-white/5 border border-white/5 text-white hover:bg-white/5 transition-all"
                 >
                   Cancel
                 </button>
@@ -506,7 +506,7 @@ const AdminAgencyDetail = () => {
         {/* Message Modal */}
         {showMessageModal && (
           <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="bg-[#15202e] rounded-2xl p-6 border border-white/10 max-w-md w-full">
+            <div className="bg-[#15202e] rounded-2xl p-6 border border-white/5 max-w-md w-full">
               <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
                 <span className="material-symbols-outlined text-blue-400">mail</span>
                 Send Message to Agency
@@ -514,33 +514,33 @@ const AdminAgencyDetail = () => {
               
               <div className="space-y-4 mb-4">
                 <div>
-                  <label className="text-sm text-gray-400 block mb-2">Message Title *</label>
+                  <label className="text-sm text-slate-400 block mb-2">Message Title *</label>
                   <input
                     type="text"
                     value={messageTitle}
                     onChange={(e) => setMessageTitle(e.target.value)}
                     placeholder="Enter message title..."
-                    className="w-full px-4 py-2 bg-[#0f1729] border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-blue-500/50"
+                    className="w-full px-4 py-2 bg-[#0f1729] border border-white/5 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-blue-500/50"
                   />
                 </div>
                 
                 <div>
-                  <label className="text-sm text-gray-400 block mb-2">Message Content *</label>
+                  <label className="text-sm text-slate-400 block mb-2">Message Content *</label>
                   <textarea
                     value={messageContent}
                     onChange={(e) => setMessageContent(e.target.value)}
                     placeholder="Enter your message..."
-                    className="w-full px-4 py-3 bg-[#0f1729] border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-blue-500/50 resize-none"
+                    className="w-full px-4 py-3 bg-[#0f1729] border border-white/5 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-blue-500/50 resize-none"
                     rows={4}
                   />
                 </div>
                 
                 <div>
-                  <label className="text-sm text-gray-400 block mb-2">Priority</label>
+                  <label className="text-sm text-slate-400 block mb-2">Priority</label>
                   <select
                     value={messagePriority}
                     onChange={(e) => setMessagePriority(e.target.value as 'normal' | 'high')}
-                    className="w-full px-4 py-2 bg-[#0f1729] border border-white/10 rounded-xl text-white focus:outline-none focus:border-blue-500/50"
+                    className="w-full px-4 py-2 bg-[#0f1729] border border-white/5 rounded-xl text-white focus:outline-none focus:border-blue-500/50"
                   >
                     <option value="normal">Normal</option>
                     <option value="high">High Priority</option>
@@ -551,7 +551,7 @@ const AdminAgencyDetail = () => {
               <div className="flex gap-3">
                 <button
                   onClick={() => setShowMessageModal(false)}
-                  className="flex-1 px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-white hover:bg-white/10 transition-all"
+                  className="flex-1 px-4 py-2 rounded-xl bg-white/5 border border-white/5 text-white hover:bg-white/5 transition-all"
                 >
                   Cancel
                 </button>

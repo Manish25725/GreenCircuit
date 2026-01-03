@@ -138,7 +138,7 @@ const AdminUserDetail = () => {
         <div className="flex items-center justify-center min-h-screen">
           <div className="text-center">
             <span className="material-symbols-outlined text-6xl text-gray-600 mb-4 block">person_off</span>
-            <p className="text-gray-400">User not found</p>
+            <p className="text-slate-400">User not found</p>
           </div>
         </div>
       </Layout>
@@ -183,7 +183,7 @@ const AdminUserDetail = () => {
               </button>
               <div>
                 <h1 className="text-3xl font-bold text-white">User Details</h1>
-                <p className="text-gray-400 mt-1">View and manage user account</p>
+                <p className="text-slate-400 mt-1">View and manage user account</p>
               </div>
             </div>
 
@@ -227,7 +227,7 @@ const AdminUserDetail = () => {
                   {user.name.charAt(0).toUpperCase()}
                 </div>
                 <h2 className="text-2xl font-bold text-white mb-1">{user.name}</h2>
-                <p className="text-gray-400 text-sm mb-3">{user.email}</p>
+                <p className="text-slate-400 text-sm mb-3">{user.email}</p>
                 <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-lg text-sm font-medium border ${getRoleBadge(user.role)}`}>
                   {user.role.toUpperCase()}
                 </span>
@@ -239,7 +239,7 @@ const AdminUserDetail = () => {
                       Account Suspended
                     </div>
                     {user.suspendedReason && (
-                      <p className="text-xs text-gray-400 mt-1">{user.suspendedReason}</p>
+                      <p className="text-xs text-slate-400 mt-1">{user.suspendedReason}</p>
                     )}
                   </div>
                 )}
@@ -251,19 +251,19 @@ const AdminUserDetail = () => {
               <div className="bg-[#15202e]/80 backdrop-blur-xl rounded-2xl p-6 border border-white/5">
                 <span className="material-symbols-outlined text-3xl text-green-400 mb-2 block">eco</span>
                 <p className="text-2xl font-bold text-white">{user.ecoPoints || 0}</p>
-                <p className="text-sm text-gray-400">Eco Points</p>
+                <p className="text-sm text-slate-400">Eco Points</p>
               </div>
               
               <div className="bg-[#15202e]/80 backdrop-blur-xl rounded-2xl p-6 border border-white/5">
                 <span className="material-symbols-outlined text-3xl text-blue-400 mb-2 block">recycling</span>
                 <p className="text-2xl font-bold text-white">{user.totalWasteRecycled || 0} kg</p>
-                <p className="text-sm text-gray-400">Waste Recycled</p>
+                <p className="text-sm text-slate-400">Waste Recycled</p>
               </div>
               
               <div className="bg-[#15202e]/80 backdrop-blur-xl rounded-2xl p-6 border border-white/5">
                 <span className="material-symbols-outlined text-3xl text-purple-400 mb-2 block">local_shipping</span>
                 <p className="text-2xl font-bold text-white">{user.totalPickups || 0}</p>
-                <p className="text-sm text-gray-400">Total Pickups</p>
+                <p className="text-sm text-slate-400">Total Pickups</p>
               </div>
             </div>
           </div>
@@ -277,24 +277,24 @@ const AdminUserDetail = () => {
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="text-sm text-gray-400 block mb-1">User ID</label>
+                <label className="text-sm text-slate-400 block mb-1">User ID</label>
                 <p className="text-white font-mono text-sm">{user._id}</p>
               </div>
               
               <div>
-                <label className="text-sm text-gray-400 block mb-1">Member Since</label>
+                <label className="text-sm text-slate-400 block mb-1">Member Since</label>
                 <p className="text-white">{new Date(user.createdAt).toLocaleDateString()}</p>
               </div>
               
               {user.phone && (
                 <div>
-                  <label className="text-sm text-gray-400 block mb-1">Phone</label>
+                  <label className="text-sm text-slate-400 block mb-1">Phone</label>
                   <p className="text-white">{user.phone}</p>
                 </div>
               )}
               
               <div>
-                <label className="text-sm text-gray-400 block mb-1">Verification Status</label>
+                <label className="text-sm text-slate-400 block mb-1">Verification Status</label>
                 <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-lg text-sm ${user.isVerified ? 'bg-green-500/10 text-green-400' : 'bg-yellow-500/10 text-yellow-400'}`}>
                   {user.isVerified ? 'Verified' : 'Unverified'}
                 </span>
@@ -306,19 +306,19 @@ const AdminUserDetail = () => {
         {/* Suspend Modal */}
         {showSuspendModal && (
           <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="bg-[#15202e] rounded-2xl p-6 border border-white/10 max-w-md w-full">
+            <div className="bg-[#15202e] rounded-2xl p-6 border border-white/5 max-w-md w-full">
               <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
                 <span className="material-symbols-outlined text-red-400">block</span>
                 Suspend User Account
               </h3>
               
               <div className="mb-4">
-                <label className="text-sm text-gray-400 block mb-2">Reason for Suspension *</label>
+                <label className="text-sm text-slate-400 block mb-2">Reason for Suspension *</label>
                 <textarea
                   value={suspendReason}
                   onChange={(e) => setSuspendReason(e.target.value)}
                   placeholder="Enter the reason for suspending this account..."
-                  className="w-full px-4 py-3 bg-[#0f1729] border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-red-500/50 resize-none"
+                  className="w-full px-4 py-3 bg-[#0f1729] border border-white/5 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-red-500/50 resize-none"
                   rows={4}
                 />
               </div>
@@ -326,7 +326,7 @@ const AdminUserDetail = () => {
               <div className="flex gap-3">
                 <button
                   onClick={() => setShowSuspendModal(false)}
-                  className="flex-1 px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-white hover:bg-white/10 transition-all"
+                  className="flex-1 px-4 py-2 rounded-xl bg-white/5 border border-white/5 text-white hover:bg-white/5 transition-all"
                 >
                   Cancel
                 </button>
@@ -345,7 +345,7 @@ const AdminUserDetail = () => {
         {/* Message Modal */}
         {showMessageModal && (
           <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="bg-[#15202e] rounded-2xl p-6 border border-white/10 max-w-md w-full">
+            <div className="bg-[#15202e] rounded-2xl p-6 border border-white/5 max-w-md w-full">
               <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
                 <span className="material-symbols-outlined text-blue-400">mail</span>
                 Send Message to User
@@ -353,33 +353,33 @@ const AdminUserDetail = () => {
               
               <div className="space-y-4 mb-4">
                 <div>
-                  <label className="text-sm text-gray-400 block mb-2">Message Title *</label>
+                  <label className="text-sm text-slate-400 block mb-2">Message Title *</label>
                   <input
                     type="text"
                     value={messageTitle}
                     onChange={(e) => setMessageTitle(e.target.value)}
                     placeholder="Enter message title..."
-                    className="w-full px-4 py-2 bg-[#0f1729] border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-blue-500/50"
+                    className="w-full px-4 py-2 bg-[#0f1729] border border-white/5 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-blue-500/50"
                   />
                 </div>
                 
                 <div>
-                  <label className="text-sm text-gray-400 block mb-2">Message Content *</label>
+                  <label className="text-sm text-slate-400 block mb-2">Message Content *</label>
                   <textarea
                     value={messageContent}
                     onChange={(e) => setMessageContent(e.target.value)}
                     placeholder="Enter your message..."
-                    className="w-full px-4 py-3 bg-[#0f1729] border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-blue-500/50 resize-none"
+                    className="w-full px-4 py-3 bg-[#0f1729] border border-white/5 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-blue-500/50 resize-none"
                     rows={4}
                   />
                 </div>
                 
                 <div>
-                  <label className="text-sm text-gray-400 block mb-2">Priority</label>
+                  <label className="text-sm text-slate-400 block mb-2">Priority</label>
                   <select
                     value={messagePriority}
                     onChange={(e) => setMessagePriority(e.target.value as 'normal' | 'high')}
-                    className="w-full px-4 py-2 bg-[#0f1729] border border-white/10 rounded-xl text-white focus:outline-none focus:border-blue-500/50"
+                    className="w-full px-4 py-2 bg-[#0f1729] border border-white/5 rounded-xl text-white focus:outline-none focus:border-blue-500/50"
                   >
                     <option value="normal">Normal</option>
                     <option value="high">High Priority</option>
@@ -390,7 +390,7 @@ const AdminUserDetail = () => {
               <div className="flex gap-3">
                 <button
                   onClick={() => setShowMessageModal(false)}
-                  className="flex-1 px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-white hover:bg-white/10 transition-all"
+                  className="flex-1 px-4 py-2 rounded-xl bg-white/5 border border-white/5 text-white hover:bg-white/5 transition-all"
                 >
                   Cancel
                 </button>

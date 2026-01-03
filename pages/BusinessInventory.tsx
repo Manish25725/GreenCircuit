@@ -648,7 +648,7 @@ const BusinessInventory = () => {
       case 'ready-for-pickup': return 'bg-amber-500/10 text-amber-400';
       case 'scheduled': return 'bg-[#8b5cf6]/10 text-[#8b5cf6]';
       case 'recycled': return 'bg-[#10b981]/10 text-[#10b981]';
-      default: return 'bg-gray-500/10 text-gray-400';
+      default: return 'bg-gray-500/10 text-slate-400';
     }
   };
 
@@ -657,7 +657,7 @@ const BusinessInventory = () => {
       case 'working': return 'bg-[#10b981]/10 text-[#10b981]';
       case 'non-working': return 'bg-red-500/10 text-red-400';
       case 'damaged': return 'bg-amber-500/10 text-amber-400';
-      default: return 'bg-gray-500/10 text-gray-400';
+      default: return 'bg-gray-500/10 text-slate-400';
     }
   };
 
@@ -691,7 +691,7 @@ const BusinessInventory = () => {
                   </div>
                   <span className="text-sm font-medium text-gray-200">{user?.name || 'Business'}</span>
                 </button>
-                <button onClick={handleLogout} className="p-2.5 rounded-full bg-[#151F26] border border-white/5 text-gray-400 hover:text-red-400 hover:bg-red-500/10 transition-colors" title="Logout">
+                <button onClick={handleLogout} className="p-2.5 rounded-full bg-[#151F26] border border-white/5 text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-colors" title="Logout">
                   <span className="material-symbols-outlined text-[20px]">logout</span>
                 </button>
               </div>
@@ -787,13 +787,13 @@ const BusinessInventory = () => {
                       placeholder="Search by name or asset ID..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full bg-[#151F26] border border-white/10 rounded-xl pl-12 pr-4 py-3 text-white placeholder-gray-500 focus:ring-2 focus:ring-[#06b6d4]/50 focus:border-[#06b6d4] outline-none transition-all"
+                      className="w-full bg-[#151F26] border border-white/5 rounded-xl pl-12 pr-4 py-3 text-white placeholder-gray-500 focus:ring-2 focus:ring-[#06b6d4]/50 focus:border-[#06b6d4] outline-none transition-all"
                     />
                   </div>
                   <select
                     value={filterCategory}
                     onChange={(e) => setFilterCategory(e.target.value)}
-                    className="bg-[#151F26] border border-white/10 text-white rounded-xl px-4 py-3 focus:ring-2 focus:ring-[#06b6d4]/50 focus:border-[#06b6d4] outline-none cursor-pointer"
+                    className="bg-[#151F26] border border-white/5 text-white rounded-xl px-4 py-3 focus:ring-2 focus:ring-[#06b6d4]/50 focus:border-[#06b6d4] outline-none cursor-pointer"
                   >
                     <option value="all">All Categories</option>
                     {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
@@ -801,7 +801,7 @@ const BusinessInventory = () => {
                   <select
                     value={filterStatus}
                     onChange={(e) => setFilterStatus(e.target.value)}
-                    className="bg-[#151F26] border border-white/10 text-white rounded-xl px-4 py-3 focus:ring-2 focus:ring-[#06b6d4]/50 focus:border-[#06b6d4] outline-none cursor-pointer"
+                    className="bg-[#151F26] border border-white/5 text-white rounded-xl px-4 py-3 focus:ring-2 focus:ring-[#06b6d4]/50 focus:border-[#06b6d4] outline-none cursor-pointer"
                   >
                     <option value="all">All Status</option>
                     <option value="in-use">In Use</option>
@@ -817,7 +817,7 @@ const BusinessInventory = () => {
                   {loading ? (
                     <div className="p-12 text-center">
                       <Loader size="md" color="#06b6d4" className="mb-4" />
-                      <p className="text-gray-400">Loading inventory...</p>
+                      <p className="text-slate-400">Loading inventory...</p>
                     </div>
                   ) : (
                     <>
@@ -850,7 +850,7 @@ const BusinessInventory = () => {
                       {filteredInventory.length === 0 ? (
                         <div className="p-12 text-center">
                           <span className="material-symbols-outlined text-5xl text-gray-600 mb-4">inventory_2</span>
-                          <p className="text-gray-400 text-lg">No items found</p>
+                          <p className="text-slate-400 text-lg">No items found</p>
                           <p className="text-gray-600 text-sm mt-1">
                             {inventory.length === 0 ? 'Add your first item to get started' : 'Try adjusting your search or filters'}
                           </p>
@@ -896,7 +896,7 @@ const BusinessInventory = () => {
                                 <p className="text-gray-500 text-xs">{item.assetId}</p>
                               </div>
                             </div>
-                            <div className="text-gray-400">
+                            <div className="text-slate-400">
                               <span className="lg:hidden text-gray-600 text-sm mr-2">Category:</span>
                               {item.category}
                             </div>
@@ -914,14 +914,14 @@ const BusinessInventory = () => {
                                 {item.status?.replace(/-/g, ' ')}
                               </span>
                             </div>
-                            <div className="text-gray-400 text-sm">
+                            <div className="text-slate-400 text-sm">
                               <span className="lg:hidden text-gray-600 text-sm mr-2">Location:</span>
                               {item.location}
                             </div>
                             <div className="flex items-center justify-center gap-2">
                               <button 
                                 onClick={() => handleEditItem(item)}
-                                className="p-2 rounded-lg bg-white/5 text-gray-400 hover:text-[#06b6d4] hover:bg-[#06b6d4]/10 transition-colors" 
+                                className="p-2 rounded-lg bg-white/5 text-slate-400 hover:text-[#06b6d4] hover:bg-[#06b6d4]/10 transition-colors" 
                                 title="Edit"
                               >
                                 <span className="material-symbols-outlined text-lg">edit</span>
@@ -929,7 +929,7 @@ const BusinessInventory = () => {
                               <button 
                                 onClick={() => handleDeleteItem(item._id)}
                                 disabled={deleting === item._id}
-                                className="p-2 rounded-lg bg-white/5 text-gray-400 hover:text-red-400 hover:bg-red-500/10 transition-colors disabled:opacity-50" 
+                                className="p-2 rounded-lg bg-white/5 text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-colors disabled:opacity-50" 
                                 title="Delete"
                               >
                                 {deleting === item._id ? (
@@ -953,32 +953,32 @@ const BusinessInventory = () => {
         {/* Add Item Modal */}
         {showAddModal && (
           <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => !saving && setShowAddModal(false)}>
-            <div className="bg-[#151F26] rounded-3xl w-full max-w-lg border border-white/10 overflow-hidden max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-              <div className="flex items-center justify-between p-6 border-b border-white/10 sticky top-0 bg-[#151F26]">
+            <div className="bg-[#151F26] rounded-3xl w-full max-w-lg border border-white/5 overflow-hidden max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+              <div className="flex items-center justify-between p-6 border-b border-white/5 sticky top-0 bg-[#151F26]">
                 <h3 className="text-white font-bold text-lg">Add Inventory Item</h3>
-                <button onClick={() => !saving && setShowAddModal(false)} className="p-2 rounded-lg hover:bg-white/10 transition-colors text-gray-400 hover:text-white">
+                <button onClick={() => !saving && setShowAddModal(false)} className="p-2 rounded-lg hover:bg-white/5 transition-colors text-slate-400 hover:text-white">
                   <span className="material-symbols-outlined">close</span>
                 </button>
               </div>
               
               <div className="p-6 space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-2">Item Name *</label>
+                  <label className="block text-sm font-medium text-slate-400 mb-2">Item Name *</label>
                   <input
                     type="text"
                     value={newItem.name}
                     onChange={(e) => setNewItem({...newItem, name: e.target.value})}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:ring-2 focus:ring-[#06b6d4]/50 focus:border-[#06b6d4] outline-none"
+                    className="w-full bg-white/5 border border-white/5 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:ring-2 focus:ring-[#06b6d4]/50 focus:border-[#06b6d4] outline-none"
                     placeholder="e.g., Dell PowerEdge Servers"
                   />
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-2">Description</label>
+                  <label className="block text-sm font-medium text-slate-400 mb-2">Description</label>
                   <textarea
                     value={newItem.description}
                     onChange={(e) => setNewItem({...newItem, description: e.target.value})}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:ring-2 focus:ring-[#06b6d4]/50 focus:border-[#06b6d4] outline-none resize-none"
+                    className="w-full bg-white/5 border border-white/5 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:ring-2 focus:ring-[#06b6d4]/50 focus:border-[#06b6d4] outline-none resize-none"
                     placeholder="Additional details about the item..."
                     rows={2}
                   />
@@ -986,21 +986,21 @@ const BusinessInventory = () => {
                 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-400 mb-2">Category *</label>
+                    <label className="block text-sm font-medium text-slate-400 mb-2">Category *</label>
                     <select
                       value={newItem.category}
                       onChange={(e) => setNewItem({...newItem, category: e.target.value})}
-                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-[#06b6d4]/50 focus:border-[#06b6d4] outline-none cursor-pointer"
+                      className="w-full bg-white/5 border border-white/5 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-[#06b6d4]/50 focus:border-[#06b6d4] outline-none cursor-pointer"
                     >
                       {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-400 mb-2">Condition</label>
+                    <label className="block text-sm font-medium text-slate-400 mb-2">Condition</label>
                     <select
                       value={newItem.condition}
                       onChange={(e) => setNewItem({...newItem, condition: e.target.value})}
-                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-[#06b6d4]/50 focus:border-[#06b6d4] outline-none cursor-pointer"
+                      className="w-full bg-white/5 border border-white/5 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-[#06b6d4]/50 focus:border-[#06b6d4] outline-none cursor-pointer"
                     >
                       {conditions.map(c => <option key={c} value={c}>{c}</option>)}
                     </select>
@@ -1009,22 +1009,22 @@ const BusinessInventory = () => {
                 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-400 mb-2">Quantity *</label>
+                    <label className="block text-sm font-medium text-slate-400 mb-2">Quantity *</label>
                     <input
                       type="number"
                       value={newItem.quantity}
                       onChange={(e) => setNewItem({...newItem, quantity: parseInt(e.target.value) || 1})}
-                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-[#06b6d4]/50 focus:border-[#06b6d4] outline-none"
+                      className="w-full bg-white/5 border border-white/5 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-[#06b6d4]/50 focus:border-[#06b6d4] outline-none"
                       min="1"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-400 mb-2">Weight per unit (kg) *</label>
+                    <label className="block text-sm font-medium text-slate-400 mb-2">Weight per unit (kg) *</label>
                     <input
                       type="number"
                       value={newItem.weight}
                       onChange={(e) => setNewItem({...newItem, weight: parseFloat(e.target.value) || 0})}
-                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-[#06b6d4]/50 focus:border-[#06b6d4] outline-none"
+                      className="w-full bg-white/5 border border-white/5 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-[#06b6d4]/50 focus:border-[#06b6d4] outline-none"
                       min="0"
                       step="0.1"
                     />
@@ -1032,12 +1032,12 @@ const BusinessInventory = () => {
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-2">Location</label>
+                  <label className="block text-sm font-medium text-slate-400 mb-2">Location</label>
                   <input
                     type="text"
                     value={newItem.location}
                     onChange={(e) => setNewItem({...newItem, location: e.target.value})}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:ring-2 focus:ring-[#06b6d4]/50 focus:border-[#06b6d4] outline-none"
+                    className="w-full bg-white/5 border border-white/5 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:ring-2 focus:ring-[#06b6d4]/50 focus:border-[#06b6d4] outline-none"
                     placeholder="e.g., Warehouse A, Office Floor 2"
                   />
                 </div>
@@ -1073,10 +1073,10 @@ const BusinessInventory = () => {
         {/* Edit Item Modal */}
         {showEditModal && editingItem && (
           <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => !saving && setShowEditModal(false)}>
-            <div className="bg-[#151F26] rounded-3xl w-full max-w-lg border border-white/10 overflow-hidden max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-              <div className="flex items-center justify-between p-6 border-b border-white/10 sticky top-0 bg-[#151F26]">
+            <div className="bg-[#151F26] rounded-3xl w-full max-w-lg border border-white/5 overflow-hidden max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+              <div className="flex items-center justify-between p-6 border-b border-white/5 sticky top-0 bg-[#151F26]">
                 <h3 className="text-white font-bold text-lg">Edit Inventory Item</h3>
-                <button onClick={() => !saving && setShowEditModal(false)} className="p-2 rounded-lg hover:bg-white/10 transition-colors text-gray-400 hover:text-white">
+                <button onClick={() => !saving && setShowEditModal(false)} className="p-2 rounded-lg hover:bg-white/5 transition-colors text-slate-400 hover:text-white">
                   <span className="material-symbols-outlined">close</span>
                 </button>
               </div>
@@ -1084,46 +1084,46 @@ const BusinessInventory = () => {
               <div className="p-6 space-y-4">
                 <div className="bg-white/5 rounded-xl p-3 flex items-center gap-3">
                   <span className="material-symbols-outlined text-gray-500">tag</span>
-                  <span className="text-gray-400 text-sm">Asset ID: <span className="text-white font-mono">{editingItem.assetId}</span></span>
+                  <span className="text-slate-400 text-sm">Asset ID: <span className="text-white font-mono">{editingItem.assetId}</span></span>
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-2">Item Name *</label>
+                  <label className="block text-sm font-medium text-slate-400 mb-2">Item Name *</label>
                   <input
                     type="text"
                     value={editingItem.itemName}
                     onChange={(e) => setEditingItem({...editingItem, itemName: e.target.value})}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:ring-2 focus:ring-[#06b6d4]/50 focus:border-[#06b6d4] outline-none"
+                    className="w-full bg-white/5 border border-white/5 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:ring-2 focus:ring-[#06b6d4]/50 focus:border-[#06b6d4] outline-none"
                   />
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-2">Description</label>
+                  <label className="block text-sm font-medium text-slate-400 mb-2">Description</label>
                   <textarea
                     value={editingItem.description || ''}
                     onChange={(e) => setEditingItem({...editingItem, description: e.target.value})}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:ring-2 focus:ring-[#06b6d4]/50 focus:border-[#06b6d4] outline-none resize-none"
+                    className="w-full bg-white/5 border border-white/5 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:ring-2 focus:ring-[#06b6d4]/50 focus:border-[#06b6d4] outline-none resize-none"
                     rows={2}
                   />
                 </div>
                 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-400 mb-2">Category</label>
+                    <label className="block text-sm font-medium text-slate-400 mb-2">Category</label>
                     <select
                       value={editingItem.category}
                       onChange={(e) => setEditingItem({...editingItem, category: e.target.value})}
-                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-[#06b6d4]/50 focus:border-[#06b6d4] outline-none cursor-pointer"
+                      className="w-full bg-white/5 border border-white/5 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-[#06b6d4]/50 focus:border-[#06b6d4] outline-none cursor-pointer"
                     >
                       {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-400 mb-2">Condition</label>
+                    <label className="block text-sm font-medium text-slate-400 mb-2">Condition</label>
                     <select
                       value={editingItem.condition}
                       onChange={(e) => setEditingItem({...editingItem, condition: e.target.value as any})}
-                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-[#06b6d4]/50 focus:border-[#06b6d4] outline-none cursor-pointer"
+                      className="w-full bg-white/5 border border-white/5 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-[#06b6d4]/50 focus:border-[#06b6d4] outline-none cursor-pointer"
                     >
                       {conditions.map(c => <option key={c} value={c}>{c}</option>)}
                     </select>
@@ -1132,22 +1132,22 @@ const BusinessInventory = () => {
                 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-400 mb-2">Quantity</label>
+                    <label className="block text-sm font-medium text-slate-400 mb-2">Quantity</label>
                     <input
                       type="number"
                       value={editingItem.quantity}
                       onChange={(e) => setEditingItem({...editingItem, quantity: parseInt(e.target.value) || 1})}
-                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-[#06b6d4]/50 focus:border-[#06b6d4] outline-none"
+                      className="w-full bg-white/5 border border-white/5 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-[#06b6d4]/50 focus:border-[#06b6d4] outline-none"
                       min="1"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-400 mb-2">Weight per unit (kg)</label>
+                    <label className="block text-sm font-medium text-slate-400 mb-2">Weight per unit (kg)</label>
                     <input
                       type="number"
                       value={editingItem.weight}
                       onChange={(e) => setEditingItem({...editingItem, weight: parseFloat(e.target.value) || 0})}
-                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-[#06b6d4]/50 focus:border-[#06b6d4] outline-none"
+                      className="w-full bg-white/5 border border-white/5 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-[#06b6d4]/50 focus:border-[#06b6d4] outline-none"
                       min="0"
                       step="0.1"
                     />
@@ -1156,22 +1156,22 @@ const BusinessInventory = () => {
                 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-400 mb-2">Status</label>
+                    <label className="block text-sm font-medium text-slate-400 mb-2">Status</label>
                     <select
                       value={editingItem.status}
                       onChange={(e) => setEditingItem({...editingItem, status: e.target.value as any})}
-                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-[#06b6d4]/50 focus:border-[#06b6d4] outline-none cursor-pointer"
+                      className="w-full bg-white/5 border border-white/5 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-[#06b6d4]/50 focus:border-[#06b6d4] outline-none cursor-pointer"
                     >
                       {statuses.map(s => <option key={s} value={s}>{s.replace(/-/g, ' ')}</option>)}
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-400 mb-2">Location</label>
+                    <label className="block text-sm font-medium text-slate-400 mb-2">Location</label>
                     <input
                       type="text"
                       value={editingItem.location}
                       onChange={(e) => setEditingItem({...editingItem, location: e.target.value})}
-                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:ring-2 focus:ring-[#06b6d4]/50 focus:border-[#06b6d4] outline-none"
+                      className="w-full bg-white/5 border border-white/5 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:ring-2 focus:ring-[#06b6d4]/50 focus:border-[#06b6d4] outline-none"
                     />
                   </div>
                 </div>
@@ -1207,13 +1207,13 @@ const BusinessInventory = () => {
         {/* Schedule Pickup Modal */}
         {showPickupModal && (
           <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => !bookingPickup && setShowPickupModal(false)}>
-            <div className="bg-[#151F26] rounded-3xl w-full max-w-3xl border border-white/10 overflow-hidden max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-              <div className="flex items-center justify-between p-6 border-b border-white/10 sticky top-0 bg-[#151F26]">
+            <div className="bg-[#151F26] rounded-3xl w-full max-w-3xl border border-white/5 overflow-hidden max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+              <div className="flex items-center justify-between p-6 border-b border-white/5 sticky top-0 bg-[#151F26]">
                 <div>
                   <h3 className="text-white font-bold text-lg">Schedule Pickup</h3>
                   <p className="text-gray-500 text-sm">{selectedItems.length} items selected • {getSelectedTotalWeight().toFixed(1)} kg total</p>
                 </div>
-                <button onClick={() => !bookingPickup && setShowPickupModal(false)} className="p-2 rounded-lg hover:bg-white/10 transition-colors text-gray-400 hover:text-white">
+                <button onClick={() => !bookingPickup && setShowPickupModal(false)} className="p-2 rounded-lg hover:bg-white/5 transition-colors text-slate-400 hover:text-white">
                   <span className="material-symbols-outlined">close</span>
                 </button>
               </div>
@@ -1221,7 +1221,7 @@ const BusinessInventory = () => {
               <div className="p-6 space-y-6">
                 {/* Selected Items Summary */}
                 <div className="bg-white/5 rounded-xl p-4 max-h-40 overflow-y-auto">
-                  <p className="text-sm font-medium text-gray-400 mb-3">Items to pickup:</p>
+                  <p className="text-sm font-medium text-slate-400 mb-3">Items to pickup:</p>
                   <div className="space-y-2">
                     {getSelectedItemsData().map(item => (
                       <div key={item._id} className="flex justify-between items-center text-sm">
@@ -1234,9 +1234,9 @@ const BusinessInventory = () => {
 
                 {/* Select Agency with Map */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-2">Select Recycling Agency *</label>
+                  <label className="block text-sm font-medium text-slate-400 mb-2">Select Recycling Agency *</label>
                   {loadingAgencies ? (
-                    <div className="bg-white/5 border border-white/10 rounded-xl p-4 text-center">
+                    <div className="bg-white/5 border border-white/5 rounded-xl p-4 text-center">
                       <Loader size="sm" color="#06b6d4" className="mb-2" />
                       <p className="text-gray-500 text-sm mt-2">Loading agencies...</p>
                     </div>
@@ -1253,7 +1253,7 @@ const BusinessInventory = () => {
                             className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all ${
                               pickupData.agencyId === agency._id 
                                 ? 'border-[#06b6d4] bg-[#06b6d4]/10' 
-                                : 'border-white/10 bg-white/5 hover:border-white/20'
+                                : 'border-white/5 bg-white/5 hover:border-white/20'
                             }`}
                           >
                             <input
@@ -1283,7 +1283,7 @@ const BusinessInventory = () => {
                       <div className="relative">
                         <div 
                           ref={pickupMapRef} 
-                          className="h-64 rounded-xl overflow-hidden border border-white/10"
+                          className="h-64 rounded-xl overflow-hidden border border-white/5"
                           style={{ background: '#1a2634' }}
                         />
                       </div>
@@ -1294,21 +1294,21 @@ const BusinessInventory = () => {
                 {/* Schedule Date & Time */}
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-400 mb-2">Pickup Date *</label>
+                    <label className="block text-sm font-medium text-slate-400 mb-2">Pickup Date *</label>
                     <input
                       type="date"
                       value={pickupData.scheduledDate}
                       onChange={(e) => setPickupData({...pickupData, scheduledDate: e.target.value})}
                       min={new Date().toISOString().split('T')[0]}
-                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-[#06b6d4]/50 focus:border-[#06b6d4] outline-none"
+                      className="w-full bg-white/5 border border-white/5 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-[#06b6d4]/50 focus:border-[#06b6d4] outline-none"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-400 mb-2">Preferred Time</label>
+                    <label className="block text-sm font-medium text-slate-400 mb-2">Preferred Time</label>
                     <select
                       value={pickupData.scheduledTime}
                       onChange={(e) => setPickupData({...pickupData, scheduledTime: e.target.value})}
-                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-[#06b6d4]/50 focus:border-[#06b6d4] outline-none cursor-pointer"
+                      className="w-full bg-white/5 border border-white/5 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-[#06b6d4]/50 focus:border-[#06b6d4] outline-none cursor-pointer"
                     >
                       <option value="09:00">9:00 AM</option>
                       <option value="10:00">10:00 AM</option>
@@ -1324,11 +1324,11 @@ const BusinessInventory = () => {
 
                 {/* Notes */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-2">Special Instructions (Optional)</label>
+                  <label className="block text-sm font-medium text-slate-400 mb-2">Special Instructions (Optional)</label>
                   <textarea
                     value={pickupData.notes}
                     onChange={(e) => setPickupData({...pickupData, notes: e.target.value})}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:ring-2 focus:ring-[#06b6d4]/50 focus:border-[#06b6d4] outline-none resize-none"
+                    className="w-full bg-white/5 border border-white/5 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:ring-2 focus:ring-[#06b6d4]/50 focus:border-[#06b6d4] outline-none resize-none"
                     placeholder="Any special handling instructions, access codes, etc..."
                     rows={3}
                   />
@@ -1624,7 +1624,7 @@ const BusinessInventory = () => {
               </div>
               <button 
                 onClick={() => setNotification({ show: false, type: 'success', message: '' })}
-                className="p-1 hover:bg-white/10 rounded transition-colors"
+                className="p-1 hover:bg-white/5 rounded transition-colors"
               >
                 <span className="material-symbols-outlined text-lg">close</span>
               </button>

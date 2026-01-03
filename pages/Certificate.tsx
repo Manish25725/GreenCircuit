@@ -61,7 +61,7 @@ const Certificate = () => {
             <span className="material-symbols-outlined text-5xl text-gray-500">verified</span>
           </div>
           <h2 className="text-2xl font-bold text-white mb-4">No Certificate Available</h2>
-          <p className="text-gray-400 mb-8">
+          <p className="text-slate-400 mb-8">
             You don't have any completed pickups yet. Complete a pickup to receive your e-waste collection certificate.
           </p>
           <div className="flex flex-col gap-3">
@@ -73,7 +73,7 @@ const Certificate = () => {
             </button>
             <button
               onClick={() => window.location.hash = '#/history'}
-              className="bg-white/5 text-white px-6 py-3 rounded-xl font-bold hover:bg-white/10 transition-colors border border-white/10"
+              className="bg-white/5 text-white px-6 py-3 rounded-xl font-bold hover:bg-white/5 transition-colors border border-white/5"
             >
               View Pickup History
             </button>
@@ -106,6 +106,7 @@ const Certificate = () => {
       wasteTypes={wasteTypes}
       issueDate={completedBooking.completedAt || completedBooking.updatedAt || completedBooking.createdAt}
       ecoPoints={ecoPoints}
+      bookingId={completedBooking._id}
     />
   );
 };

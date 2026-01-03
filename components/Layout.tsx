@@ -73,10 +73,10 @@ const Layout: React.FC<LayoutProps> = ({ children, title, subtitle, role, fullWi
   };
 
   return (
-    <div className="flex min-h-screen w-full bg-[#0B1120] text-slate-300 font-sans selection:bg-[#34D399] selection:text-[#0B1120]">
+    <div className="flex min-h-screen w-full bg-[#0B1116] text-gray-200 font-sans">
       {/* Mobile Header */}
       {!hideSidebar && (
-        <header className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-[#0B1120] border-b border-white/5 flex items-center justify-between px-4 z-50">
+        <header className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-[#0B1116] border-b border-white/5 flex items-center justify-between px-4 z-50">
           <div className="flex items-center gap-2" onClick={() => window.location.hash = '#/'}>
             <div className="h-8 w-8 rounded-full bg-[#34D399]/10 text-[#34D399] flex items-center justify-center font-bold text-sm border border-[#34D399]/20">
               <span className="material-symbols-outlined text-lg">recycling</span>
@@ -106,7 +106,7 @@ const Layout: React.FC<LayoutProps> = ({ children, title, subtitle, role, fullWi
 
       {/* Sidebar */}
       {!hideSidebar && (
-        <aside className={`fixed top-0 left-0 h-screen w-64 border-r border-white/5 bg-[#0B1120] flex flex-col z-50 transition-transform duration-300 ${
+        <aside className={`fixed top-0 left-0 h-screen w-64 border-r border-white/5 bg-[#0B1116] flex flex-col z-50 transition-transform duration-300 ${
           isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
         } lg:translate-x-0`}>
           <div className="p-6">
@@ -116,7 +116,7 @@ const Layout: React.FC<LayoutProps> = ({ children, title, subtitle, role, fullWi
               </div>
               <div className="flex flex-col">
                 <h1 className="text-base font-bold text-white tracking-tight">{userName}</h1>
-                <p className="text-xs text-slate-500">{userEmail}</p>
+                <p className="text-xs text-slate-400">{userEmail}</p>
               </div>
             </div>
 
@@ -133,7 +133,7 @@ const Layout: React.FC<LayoutProps> = ({ children, title, subtitle, role, fullWi
                   className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all cursor-pointer ${
                     item.active || window.location.hash === item.path
                       ? 'bg-[#34D399]/10 text-[#34D399] border border-[#34D399]/10'
-                      : 'text-slate-400 hover:bg-white/5 hover:text-white hover:translate-x-1'
+                      : 'text-slate-400 hover:bg-white/5 hover:translate-x-1'
                   }`}
                 >
                   <span className={`material-symbols-outlined ${item.active ? 'fill' : ''} text-xl`}>

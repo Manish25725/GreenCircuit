@@ -144,7 +144,7 @@ const BusinessEditProfile = () => {
                     </div>
                     <div>
                       <h1 className="text-2xl sm:text-3xl font-bold text-white">Edit User Profile</h1>
-                      <p className="text-gray-400 text-sm">Update your personal account information</p>
+                      <p className="text-slate-400 text-sm">Update your personal account information</p>
                     </div>
                   </div>
                 </div>
@@ -182,7 +182,7 @@ const BusinessEditProfile = () => {
                       </div>
                       <div className="text-center">
                         <p className="text-white text-sm font-medium mb-1">Profile Picture</p>
-                        <p className="text-gray-400 text-xs">Click the camera icon to upload a new photo</p>
+                        <p className="text-slate-400 text-xs">Click the camera icon to upload a new photo</p>
                       </div>
                     </div>
 
@@ -196,7 +196,7 @@ const BusinessEditProfile = () => {
                           value={formData.name}
                           onChange={handleInputChange}
                           required
-                          className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-[#10b981] focus:border-[#10b981] transition-all"
+                          className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/5 text-white focus:outline-none focus:ring-1 focus:ring-[#10b981] focus:border-[#10b981] transition-all"
                           placeholder="Enter your full name"
                         />
                       </label>
@@ -211,7 +211,7 @@ const BusinessEditProfile = () => {
                             value={formData.email}
                             onChange={handleInputChange}
                             required
-                            className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-[#10b981] focus:border-[#10b981] transition-all"
+                            className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/5 text-white focus:outline-none focus:ring-1 focus:ring-[#10b981] focus:border-[#10b981] transition-all"
                             placeholder="your@email.com"
                           />
                         </label>
@@ -222,7 +222,7 @@ const BusinessEditProfile = () => {
                             name="phone"
                             value={formData.phone}
                             onChange={handleInputChange}
-                            className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-[#10b981] focus:border-[#10b981] transition-all"
+                            className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/5 text-white focus:outline-none focus:ring-1 focus:ring-[#10b981] focus:border-[#10b981] transition-all"
                             placeholder="+1 (555) 000-0000"
                           />
                         </label>
@@ -235,7 +235,7 @@ const BusinessEditProfile = () => {
                         <span className="material-symbols-outlined text-[#10b981] text-[20px] mt-0.5">info</span>
                         <div className="flex-1">
                           <p className="text-[#10b981] text-sm font-medium mb-1">Account Information</p>
-                          <p className="text-gray-400 text-xs leading-relaxed">
+                          <p className="text-slate-400 text-xs leading-relaxed">
                             This is your personal user account information. To update business details like company name or address, please use the business profile section.
                           </p>
                         </div>
@@ -247,7 +247,7 @@ const BusinessEditProfile = () => {
                       <button
                         type="button"
                         onClick={() => window.history.back()}
-                        className="flex min-w-[120px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-6 bg-[#0B1116] border border-white/10 text-gray-300 text-sm font-bold leading-normal tracking-[0.015em] hover:bg-white/5 transition-colors"
+                        className="flex min-w-[120px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-6 bg-[#0B1116] border border-white/5 text-gray-200 text-sm font-bold leading-normal tracking-[0.015em] hover:bg-white/5 transition-colors"
                       >
                         Cancel
                       </button>

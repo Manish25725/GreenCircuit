@@ -2,10 +2,10 @@ import React from 'react';
 
 const Services = () => {
   return (
-    <div className="relative flex min-h-screen flex-col bg-[#0B1120] font-sans text-slate-300 antialiased overflow-x-hidden selection:bg-[#34D399] selection:text-[#0B1120]">
+    <div className="relative flex min-h-screen flex-col bg-[#0B1116] font-sans text-gray-200 antialiased overflow-x-hidden selection:bg-[#34D399] selection:text-[#0B1120]">
       {/* Full Navbar */}
       <div className="w-full flex justify-center fixed top-0 left-0 right-0 z-50">
-        <div className="absolute inset-0 bg-[#0B1120]/80 backdrop-blur-md border-b border-white/5"></div>
+        <div className="absolute inset-0 bg-[#0B1116]/80 backdrop-blur-md border-b border-white/5"></div>
         <div className="w-full max-w-7xl px-4 sm:px-6 relative z-10">
           <header className="flex items-center justify-between h-16 sm:h-20">
             <div className="flex items-center gap-3">
@@ -27,7 +27,7 @@ const Services = () => {
             <div className="flex items-center gap-4">
               <button 
                 onClick={() => window.location.hash = '#/login'}
-                className="hidden sm:flex h-10 px-5 items-center justify-center rounded-full bg-white/5 text-white hover:bg-white/10 border border-white/10 text-sm font-bold transition-all duration-300 cursor-pointer"
+                className="hidden sm:flex h-10 px-5 items-center justify-center rounded-full bg-white/5 text-white hover:bg-white/5 border border-white/5 text-sm font-bold transition-all duration-300 cursor-pointer"
               >
                 Log In
               </button>
@@ -46,7 +46,7 @@ const Services = () => {
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 pt-24 sm:pt-28">
         <button 
           onClick={() => window.history.back()}
-          className="group flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-slate-400 hover:text-[#34D399] hover:border-[#34D399]/30 hover:bg-[#34D399]/10 transition-all duration-300 cursor-pointer backdrop-blur-sm"
+          className="group flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/5 text-slate-400 hover:text-[#34D399] hover:border-[#34D399]/30 hover:bg-[#34D399]/10 transition-all duration-300 cursor-pointer backdrop-blur-sm"
         >
           <svg className="w-4 h-4 transition-transform duration-300 group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -240,8 +240,8 @@ const Services = () => {
 
         {/* CTA Section */}
         <section className="w-full max-w-7xl px-4 sm:px-6 py-12">
-          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-[#34D399]/20 to-[#818CF8]/20 border border-white/10 p-8 md:p-12">
-            <div className="absolute inset-0 bg-[#0B1120]/50"></div>
+          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-[#34D399]/20 to-[#818CF8]/20 border border-white/5 p-8 md:p-12">
+            <div className="absolute inset-0 bg-[#0B1116]/50"></div>
             <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
               <div>
                 <h3 className="text-white text-2xl md:text-3xl font-bold mb-2">Ready to make a difference?</h3>
@@ -259,7 +259,7 @@ const Services = () => {
       </main>
 
       {/* Footer */}
-      <footer className="w-full border-t border-white/5 bg-[#0B1120]/80 backdrop-blur-md">
+      <footer className="w-full border-t border-white/5 bg-[#0B1116]/80 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-3">

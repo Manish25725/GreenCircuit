@@ -127,7 +127,7 @@ const NotificationPanel = () => {
         <div className="flex gap-3">
           <button
             onClick={() => setFilter(filter === 'all' ? 'unread' : 'all')}
-            className="px-4 py-2 rounded-xl bg-[#0f1729] border border-white/10 hover:border-[#34D399]/50 text-white text-sm font-medium transition-all"
+            className="px-4 py-2 rounded-xl bg-[#0f1729] border border-white/5 hover:border-[#34D399]/50 text-white text-sm font-medium transition-all"
           >
             {filter === 'all' ? 'Show Unread' : 'Show All'}
           </button>
@@ -161,7 +161,7 @@ const NotificationPanel = () => {
               className={`
                 relative bg-[#15202e]/80 backdrop-blur-xl rounded-2xl p-5 border transition-all cursor-pointer
                 ${notification.isRead 
-                  ? 'border-white/5 hover:border-white/10' 
+                  ? 'border-white/5 hover:border-white/5' 
                   : `bg-gradient-to-r ${getNotificationColor(notification.type, notification.priority)} border hover:scale-[1.01]`
                 }
                 group
@@ -191,14 +191,14 @@ const NotificationPanel = () => {
                 {/* Content */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between gap-3 mb-1">
-                    <h3 className={`font-semibold text-base leading-tight ${notification.isRead ? 'text-slate-300' : 'text-white'}`}>
+                    <h3 className={`font-semibold text-base leading-tight ${notification.isRead ? 'text-gray-200' : 'text-white'}`}>
                       {notification.title}
                     </h3>
                     <span className="text-xs text-slate-500 whitespace-nowrap">
                       {formatTimestamp(notification.createdAt)}
                     </span>
                   </div>
-                  <p className={`text-sm leading-relaxed ${notification.isRead ? 'text-slate-400' : 'text-slate-300'}`}>
+                  <p className={`text-sm leading-relaxed ${notification.isRead ? 'text-slate-400' : 'text-gray-200'}`}>
                     {notification.message}
                   </p>
 

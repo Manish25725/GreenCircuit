@@ -134,7 +134,7 @@ const BusinessContact = () => {
                     </div>
                     <div>
                       <h1 className="text-2xl sm:text-3xl font-bold text-white">Contact Information</h1>
-                      <p className="text-gray-400 text-sm">Update contact person and communication details</p>
+                      <p className="text-slate-400 text-sm">Update contact person and communication details</p>
                     </div>
                   </div>
                 </div>
@@ -158,7 +158,7 @@ const BusinessContact = () => {
                             value={formData.contactPersonName}
                             onChange={handleInputChange}
                             required
-                            className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-[#06b6d4] focus:border-[#06b6d4] transition-all"
+                            className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/5 text-white focus:outline-none focus:ring-1 focus:ring-[#06b6d4] focus:border-[#06b6d4] transition-all"
                             placeholder="Enter contact person name"
                           />
                         </label>
@@ -170,7 +170,7 @@ const BusinessContact = () => {
                             value={formData.contactPersonRole}
                             onChange={handleInputChange}
                             required
-                            className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-[#06b6d4] focus:border-[#06b6d4] transition-all"
+                            className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/5 text-white focus:outline-none focus:ring-1 focus:ring-[#06b6d4] focus:border-[#06b6d4] transition-all"
                             placeholder="e.g., Facility Manager"
                           />
                         </label>
@@ -186,7 +186,7 @@ const BusinessContact = () => {
                             value={formData.phone}
                             onChange={handleInputChange}
                             required
-                            className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-[#06b6d4] focus:border-[#06b6d4] transition-all"
+                            className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/5 text-white focus:outline-none focus:ring-1 focus:ring-[#06b6d4] focus:border-[#06b6d4] transition-all"
                             placeholder="+1 (555) 000-0000"
                           />
                         </label>
@@ -198,7 +198,7 @@ const BusinessContact = () => {
                             value={formData.email}
                             onChange={handleInputChange}
                             required
-                            className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-[#06b6d4] focus:border-[#06b6d4] transition-all"
+                            className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/5 text-white focus:outline-none focus:ring-1 focus:ring-[#06b6d4] focus:border-[#06b6d4] transition-all"
                             placeholder="contact@company.com"
                           />
                         </label>
@@ -211,7 +211,7 @@ const BusinessContact = () => {
                         <span className="material-symbols-outlined text-[#06b6d4] text-[20px] mt-0.5">info</span>
                         <div className="flex-1">
                           <p className="text-[#06b6d4] text-sm font-medium mb-1">Contact Information Usage</p>
-                          <p className="text-gray-400 text-xs leading-relaxed">
+                          <p className="text-slate-400 text-xs leading-relaxed">
                             This contact information will be used by our partner agencies to coordinate e-waste pickups and communicate important updates about your account.
                           </p>
                         </div>
@@ -223,7 +223,7 @@ const BusinessContact = () => {
                       <button
                         type="button"
                         onClick={() => window.history.back()}
-                        className="flex min-w-[120px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-6 bg-[#0B1116] border border-white/10 text-gray-300 text-sm font-bold leading-normal tracking-[0.015em] hover:bg-white/5 transition-colors"
+                        className="flex min-w-[120px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-6 bg-[#0B1116] border border-white/5 text-gray-200 text-sm font-bold leading-normal tracking-[0.015em] hover:bg-white/5 transition-colors"
                       >
                         Cancel
                       </button>

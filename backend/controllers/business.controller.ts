@@ -692,19 +692,47 @@ export const downloadCertificate = async (req: Request, res: Response) => {
     const userId = (req as any).user._id || (req as any).user.id;
     const { id } = req.params;
 
+    if (!id) {
+      return sendError(res, 'Certificate ID is required', 400);
+    }
+
+    console.log('Download certificate request:', { userId, certificateId: id });
+
     const business = await Business.findOne({ userId });
     if (!business) {
-      return sendError(res, 'Business profile not found', 404);
+      console.log('Business profile not found for user:', userId);
+      return sendError(res, 'Business profile not found. Please create a business profile first.', 404);
     }
 
-    const certificate = await BusinessCertificate.findOne({ 
-      $or: [{ _id: id }, { certificateId: id }],
-      businessId: business._id 
-    }).populate('agencyId', 'name email phone');
+    // Try to find certificate by _id or certificateId
+    let certificate;
+    try {
+      // Try as ObjectId first
+      if (id.length === 24) {
+        certificate = await BusinessCertificate.findOne({ 
+          _id: id,
+          businessId: business._id 
+        }).populate('agencyId', 'name email phone');
+      }
+      
+      // If not found, try by certificateId string
+      if (!certificate) {
+        certificate = await BusinessCertificate.findOne({ 
+          certificateId: id,
+          businessId: business._id 
+        }).populate('agencyId', 'name email phone');
+      }
+    } catch (err) {
+      console.error('Error finding certificate:', err);
+      return sendError(res, 'Invalid certificate ID format', 400);
+    }
 
     if (!certificate) {
-      return sendError(res, 'Certificate not found', 404);
+      console.log('Certificate not found:', { id, businessId: business._id });
+      return sendError(res, 'Certificate not found or you do not have access to it', 404);
     }
+
+    console.log('Certificate found, generating PDF:', certificate.certificateId);
 
     const agencyName = (certificate.agencyId as any)?.name || certificate.issuedBy?.name || 'Authorized Agency';
     const issueDate = new Date(certificate.issuedAt || certificate.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
@@ -723,9 +751,18 @@ export const downloadCertificate = async (req: Request, res: Response) => {
     // Set response headers for PDF download
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename="certificate-${certificate.certificateId}.pdf"`);
+    res.setHeader('Cache-Control', 'no-cache');
 
     // Pipe PDF to response
     doc.pipe(res);
+
+    // Handle stream errors
+    doc.on('error', (err) => {
+      console.error('PDF generation error:', err);
+      if (!res.headersSent) {
+        sendError(res, 'Failed to generate PDF');
+      }
+    });
 
     // Colors
     const primaryColor = '#10b981';
@@ -866,8 +903,12 @@ export const downloadCertificate = async (req: Request, res: Response) => {
 
     // Finalize PDF
     doc.end();
+    console.log('PDF generated successfully for certificate:', certificate.certificateId);
   } catch (error: any) {
-    sendError(res, error.message);
+    console.error('Error generating certificate PDF:', error);
+    if (!res.headersSent) {
+      sendError(res, error.message || 'Failed to generate certificate');
+    }
   }
 };
 

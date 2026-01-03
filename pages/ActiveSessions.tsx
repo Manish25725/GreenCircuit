@@ -113,7 +113,7 @@ const ActiveSessions = () => {
                       </div>
                       <div>
                         <h1 className="text-2xl sm:text-3xl font-bold text-white">Active Sessions</h1>
-                        <p className="text-gray-400 text-sm">View and manage your active login sessions</p>
+                        <p className="text-slate-400 text-sm">View and manage your active login sessions</p>
                       </div>
                     </div>
                     <button
@@ -132,7 +132,7 @@ const ActiveSessions = () => {
                     <span className="material-symbols-outlined text-[#06b6d4] text-[20px] mt-0.5">info</span>
                     <div className="flex-1">
                       <p className="text-[#06b6d4] text-sm font-medium mb-1">Session Security</p>
-                      <p className="text-gray-400 text-xs leading-relaxed">
+                      <p className="text-slate-400 text-xs leading-relaxed">
                         These are the devices currently logged into your account. If you see any suspicious activity, log out the session and change your password immediately.
                       </p>
                     </div>
@@ -162,7 +162,7 @@ const ActiveSessions = () => {
                                 </span>
                               )}
                             </div>
-                            <div className="flex flex-col gap-1 text-sm text-gray-400">
+                            <div className="flex flex-col gap-1 text-sm text-slate-400">
                               <div className="flex items-center gap-2">
                                 <span className="material-symbols-outlined text-[16px]">location_on</span>
                                 <span>{session.location}</span>

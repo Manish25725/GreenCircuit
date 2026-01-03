@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { api, getCurrentUser } from './services/api';
 import { LanguageProvider } from './contexts/LanguageContext';
 import { ThemeProvider } from './contexts/ThemeContext';
@@ -64,279 +65,196 @@ import AdminLogin from './pages/AdminLogin';
 import AdminUserDetail from './pages/AdminUserDetail';
 import AdminAgencyDetail from './pages/AdminAgencyDetail';
 
+// Protected Route wrapper component
+const ProtectedRoute = ({ children, allowedRoles }: { children: React.ReactNode, allowedRoles?: string[] }) => {
+  const user = getCurrentUser();
+  const userRole = user?.role || null;
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!userRole) {
+      navigate('/login', { replace: true });
+      return;
+    }
+
+    if (allowedRoles && !allowedRoles.includes(userRole)) {
+      // Redirect to correct dashboard
+      switch (userRole) {
+        case 'admin':
+          navigate('/admin', { replace: true });
+          break;
+        case 'agency':
+          navigate('/agency', { replace: true });
+          break;
+        case 'business':
+          navigate('/business', { replace: true });
+          break;
+        case 'user':
+          navigate('/dashboard', { replace: true });
+          break;
+      }
+    }
+  }, [userRole, allowedRoles, navigate]);
+
+  if (!userRole || (allowedRoles && !allowedRoles.includes(userRole))) {
+    return null;
+  }
+
+  return <>{children}</>;
+};
+
+// Profile router component
+const ProfileRoute = () => {
+  const user = getCurrentUser();
+  const userRole = user?.role;
+
+  if (userRole === 'business') {
+    return <BusinessProfileSettings />;
+  } else if (userRole === 'agency') {
+    return <PartnerProfile />;
+  } else if (userRole === 'user') {
+    return <ResidentProfileSettings />;
+  }
+  return <Profile />;
+};
+
+// Notifications router component
+const NotificationsRoute = () => {
+  const user = getCurrentUser();
+  const userRole = user?.role;
+
+  if (userRole === 'business') {
+    return <BusinessNotifications />;
+  } else if (userRole === 'user') {
+    return <ResidentNotifications />;
+  }
+  return <Notifications />;
+};
+
+// Security router component
+const SecurityRoute = () => {
+  const user = getCurrentUser();
+  const userRole = user?.role;
+
+  if (userRole === 'business') {
+    return <BusinessSecurity />;
+  } else if (userRole === 'user') {
+    return <ResidentSecurity />;
+  }
+  return <Security />;
+};
+
+// Settings router component
+const SettingsRoute = () => {
+  const user = getCurrentUser();
+  const userRole = user?.role;
+
+  if (userRole === 'business') {
+    return <BusinessAppSettings />;
+  } else if (userRole === 'user') {
+    return <ResidentAppSettings />;
+  }
+  return <AppSettings />;
+};
+
+// Scroll to top on route change
+const ScrollToTop = () => {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
+  return null;
+};
+
 const App = () => {
-  const [route, setRoute] = useState(window.location.hash || '#/');
-  // Removed loading screen to fix dark green screen issue
-  const [isLoading, setIsLoading] = useState(false);
-  const [progress, setProgress] = useState(100);
-
-  // Get current user role
-  const getCurrentUserRole = (): string | null => {
-    const user = getCurrentUser();
-    return user?.role || null;
-  };
-
-  // Check if user can access a route based on their role
-  const canAccessRoute = (path: string, userRole: string | null): boolean => {
-    // Public routes - anyone can access
-    const publicRoutes = ['#/', '#/login', '#/contact', '#/how-it-works', '#/about', '#/services', '#/partner/register', '#/partner/pending', '#/admin-login'];
-    if (publicRoutes.includes(path)) return true;
-
-    // Admin routes - anyone can access (no authentication required)
-    if (path.startsWith('#/admin')) {
-      return true;
-    }
-
-    // If no user is logged in, they can only access public routes
-    if (!userRole) return false;
-
-    // Agency/Partner routes - only agency can access
-    if (path.startsWith('#/agency')) {
-      return userRole === 'agency';
-    }
-
-    // Partner registration routes - accessible to logged-in users who want to become partners
-    if (path.startsWith('#/partner')) {
-      return true; // Allow any logged-in user to access partner registration
-    }
-
-    // Business routes - only business can access
-    if (path.startsWith('#/business')) {
-      return userRole === 'business';
-    }
-
-    // Resident routes - only residents/users can access
-    if (path.startsWith('#/resident')) {
-      return userRole === 'user';
-    }
-
-    // Common routes accessible by all logged-in users (user, business, agency, admin)
-    const commonRoutes = ['#/profile', '#/notifications', '#/security', '#/settings'];
-    if (commonRoutes.some(r => path.startsWith(r))) {
-      return userRole === 'user' || userRole === 'business' || userRole === 'agency' || userRole === 'admin';
-    }
-
-    // User-only routes (dashboard, rewards, etc.)
-    const userOnlyRoutes = ['#/dashboard', '#/rewards', '#/certificate', '#/certificates', '#/history'];
-    if (userOnlyRoutes.some(r => path.startsWith(r))) {
-      return userRole === 'user';
-    }
-
-    // Shared routes - users and business can access
-    const sharedRoutes = ['#/search', '#/schedule', '#/pickup-confirmation', '#/pickup-limit'];
-    if (sharedRoutes.some(r => path.startsWith(r))) {
-      return userRole === 'user' || userRole === 'business';
-    }
-
-    return false;
-  };
-
-  // Get the correct dashboard route for a user role
-  const getDashboardForRole = (role: string | null): string => {
-    switch (role) {
-      case 'admin': return '#/admin';
-      case 'agency': return '#/agency';
-      case 'business': return '#/business';
-      case 'user': return '#/dashboard';
-      default: return '#/login';
-    }
-  };
-
   // Validate token on app start
   useEffect(() => {
     const validateSession = async () => {
       const token = localStorage.getItem('token');
       if (token) {
-        const isValid = await api.validateToken();
-        if (!isValid) {
-          // Token was invalid and has been cleared
-          // If user is on a protected page, redirect to login
-          const protectedPaths = ['#/dashboard', '#/profile', '#/rewards', '#/schedule', '#/search'];
-          const currentPath = window.location.hash.split('?')[0];
-          if (protectedPaths.some(p => currentPath.startsWith(p))) {
-            window.location.hash = '#/login';
-          }
-        }
+        await api.validateToken();
       }
     };
     validateSession();
   }, []);
 
-  useEffect(() => {
-    const handleHashChange = () => {
-      setRoute(window.location.hash || '#/');
-      window.scrollTo(0, 0);
-    };
-
-    window.addEventListener('hashchange', handleHashChange);
-    return () => window.removeEventListener('hashchange', handleHashChange);
-  }, []);
-
-  const renderRoute = () => {
-    // Extract base path without query params
-    const basePath = route.split('?')[0];
-    const userRole = getCurrentUserRole();
-
-    // Check route access
-    if (!canAccessRoute(basePath, userRole)) {
-      // If logged in but trying to access wrong dashboard, redirect to correct one
-      if (userRole) {
-        const correctDashboard = getDashboardForRole(userRole);
-        window.location.hash = correctDashboard;
-        return null;
-      } else {
-        // Not logged in, redirect to login for protected routes
-        const publicRoutes = ['#/', '#/login', '#/contact', '#/how-it-works', '#/about'];
-        if (!publicRoutes.includes(basePath)) {
-          window.location.hash = '#/login';
-          return null;
-        }
-      }
-    }
-    
-    switch (basePath) {
-      case '#/agency':
-        return <AgencyDashboard />;
-      case '#/agency/slots':
-        return <ManageSlots />;
-      case '#/agency/bookings':
-        return <AgencyBookings />;
-      case '#/agency/profile':
-        return <PartnerProfile />;
-      case '#/partner/profile':
-        return <PartnerProfile />;
-      case '#/partner/edit-profile':
-        return <PartnerEditProfile />;
-      case '#/partner/security':
-        return <PartnerSecurity />;
-      case '#/partner/notifications':
-        return <PartnerNotifications />;
-      case '#/partner/settings':
-        return <PartnerAppSettings />;
-      case '#/partner/register':
-        return <PartnerRegistration />;
-      case '#/partner/pending':
-        return <PartnerPending />;
-      case '#/dashboard':
-        return <UserDashboard />;
-      case '#/rewards':
-        return <Rewards />;
-      case '#/certificate':
-        return <Certificate />;
-      case '#/certificates':
-        return <UserCertificates />;
-      case '#/search':
-        return <SearchAgencies />;
-      case '#/schedule':
-        return <SchedulePickup />;
-      case '#/pickup-confirmation':
-        return <PickupConfirmation />;
-      case '#/pickup-limit':
-        return <PickupLimitReached />;
-      case '#/history':
-        return <History />;
-      case '#/admin':
-        return <AdminDashboard />;
-      case '#/admin/vetting':
-        return <AdminVetting />;
-      case '#/admin/users':
-        return <AdminUsers />;
-      case '#/admin/agencies':
-        return <AdminAgencies />;
-      case '#/admin/partners':
-        return <AdminPartnerApproval />;
-    }
-    
-    // Dynamic routes - check if path matches pattern
-    if (basePath.startsWith('#/admin/users/')) {
-      return <AdminUserDetail />;
-    }
-    if (basePath.startsWith('#/admin/agencies/')) {
-      return <AdminAgencyDetail />;
-    }
-    
-    switch (basePath) {
-      case '#/admin/reports':
-        return <AdminReports />;
-      case '#/admin-login':
-        return <AdminLogin />;
-      case '#/login':
-        return <Login />;
-      case '#/contact':
-        return <ContactUs />;
-      case '#/how-it-works':
-        return <HowItWorks />;
-      case '#/about':
-        return <AboutUs />;
-      case '#/services':
-        return <Services />;
-      case '#/profile':
-        // Route to appropriate profile based on user role
-        if (userRole === 'business') {
-          return <BusinessProfileSettings />;
-        } else if (userRole === 'agency') {
-          return <PartnerProfile />;
-        } else if (userRole === 'user') {
-          return <ResidentProfileSettings />;
-        }
-        return <Profile />;
-      case '#/resident/profile':
-        return <EditResidentProfile />;
-      case '#/resident/sessions':
-        return <ResidentActiveSessions />;
-      case '#/business/profile':
-        return <EditBusinessProfile />;
-      case '#/business/edit-profile':
-        return <BusinessEditProfile />;
-      case '#/business/address':
-        return <BusinessAddress />;
-      case '#/business/contact':
-        return <BusinessContact />;
-      case '#/business/sessions':
-        return <ActiveSessions />;
-      case '#/notifications':
-        // Route to role-specific notifications
-        if (userRole === 'business') {
-          return <BusinessNotifications />;
-        } else if (userRole === 'user') {
-          return <ResidentNotifications />;
-        }
-        return <Notifications />;
-      case '#/security':
-        // Route to role-specific security
-        if (userRole === 'business') {
-          return <BusinessSecurity />;
-        } else if (userRole === 'user') {
-          return <ResidentSecurity />;
-        }
-        return <Security />;
-      case '#/settings':
-        // Route to role-specific settings
-        if (userRole === 'business') {
-          return <BusinessAppSettings />;
-        } else if (userRole === 'user') {
-          return <ResidentAppSettings />;
-        }
-        return <AppSettings />;
-      case '#/business':
-        return <BusinessDashboard />;
-      case '#/business/inventory':
-        return <BusinessInventory />;
-      case '#/business/certificates':
-        return <BusinessCertificates />;
-      case '#/business/analytics':
-        return <BusinessAnalytics />;
-      case '#/':
-      default:
-        return <Landing />;
-    }
-  };
-
-  // Loading screen removed - go directly to content
   return (
     <ThemeProvider>
       <LanguageProvider>
-        {renderRoute()}
+        <Router>
+          <ScrollToTop />
+          <Routes>
+            {/* Public Routes */}
+            <Route path="/" element={<Landing />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/admin-login" element={<AdminLogin />} />
+            <Route path="/contact" element={<ContactUs />} />
+            <Route path="/how-it-works" element={<HowItWorks />} />
+            <Route path="/about" element={<AboutUs />} />
+            <Route path="/services" element={<Services />} />
+            
+            {/* Partner Registration Routes */}
+            <Route path="/partner/register" element={<PartnerRegistration />} />
+            <Route path="/partner/pending" element={<PartnerPending />} />
+            
+            {/* Admin Routes - No auth required */}
+            <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/admin/vetting" element={<AdminVetting />} />
+            <Route path="/admin/users" element={<AdminUsers />} />
+            <Route path="/admin/users/:id" element={<AdminUserDetail />} />
+            <Route path="/admin/agencies" element={<AdminAgencies />} />
+            <Route path="/admin/agencies/:id" element={<AdminAgencyDetail />} />
+            <Route path="/admin/partners" element={<AdminPartnerApproval />} />
+            <Route path="/admin/reports" element={<AdminReports />} />
+            
+            {/* Agency/Partner Routes */}
+            <Route path="/agency" element={<ProtectedRoute allowedRoles={['agency']}><AgencyDashboard /></ProtectedRoute>} />
+            <Route path="/agency/slots" element={<ProtectedRoute allowedRoles={['agency']}><ManageSlots /></ProtectedRoute>} />
+            <Route path="/agency/bookings" element={<ProtectedRoute allowedRoles={['agency']}><AgencyBookings /></ProtectedRoute>} />
+            <Route path="/agency/profile" element={<ProtectedRoute allowedRoles={['agency']}><PartnerProfile /></ProtectedRoute>} />
+            <Route path="/partner/profile" element={<ProtectedRoute allowedRoles={['agency']}><PartnerProfile /></ProtectedRoute>} />
+            <Route path="/partner/edit-profile" element={<ProtectedRoute allowedRoles={['agency']}><PartnerEditProfile /></ProtectedRoute>} />
+            <Route path="/partner/security" element={<ProtectedRoute allowedRoles={['agency']}><PartnerSecurity /></ProtectedRoute>} />
+            <Route path="/partner/notifications" element={<ProtectedRoute allowedRoles={['agency']}><PartnerNotifications /></ProtectedRoute>} />
+            <Route path="/partner/settings" element={<ProtectedRoute allowedRoles={['agency']}><PartnerAppSettings /></ProtectedRoute>} />
+            
+            {/* User Routes */}
+            <Route path="/dashboard" element={<ProtectedRoute allowedRoles={['user']}><UserDashboard /></ProtectedRoute>} />
+            <Route path="/rewards" element={<ProtectedRoute allowedRoles={['user']}><Rewards /></ProtectedRoute>} />
+            <Route path="/certificate" element={<ProtectedRoute allowedRoles={['user']}><Certificate /></ProtectedRoute>} />
+            <Route path="/certificates" element={<ProtectedRoute allowedRoles={['user']}><UserCertificates /></ProtectedRoute>} />
+            <Route path="/history" element={<ProtectedRoute allowedRoles={['user']}><History /></ProtectedRoute>} />
+            
+            {/* Resident Routes */}
+            <Route path="/resident/profile" element={<ProtectedRoute allowedRoles={['user']}><EditResidentProfile /></ProtectedRoute>} />
+            <Route path="/resident/sessions" element={<ProtectedRoute allowedRoles={['user']}><ResidentActiveSessions /></ProtectedRoute>} />
+            
+            {/* Business Routes */}
+            <Route path="/business" element={<ProtectedRoute allowedRoles={['business']}><BusinessDashboard /></ProtectedRoute>} />
+            <Route path="/business/inventory" element={<ProtectedRoute allowedRoles={['business']}><BusinessInventory /></ProtectedRoute>} />
+            <Route path="/business/certificates" element={<ProtectedRoute allowedRoles={['business']}><BusinessCertificates /></ProtectedRoute>} />
+            <Route path="/business/analytics" element={<ProtectedRoute allowedRoles={['business']}><BusinessAnalytics /></ProtectedRoute>} />
+            <Route path="/business/profile" element={<ProtectedRoute allowedRoles={['business']}><EditBusinessProfile /></ProtectedRoute>} />
+            <Route path="/business/edit-profile" element={<ProtectedRoute allowedRoles={['business']}><BusinessEditProfile /></ProtectedRoute>} />
+            <Route path="/business/address" element={<ProtectedRoute allowedRoles={['business']}><BusinessAddress /></ProtectedRoute>} />
+            <Route path="/business/contact" element={<ProtectedRoute allowedRoles={['business']}><BusinessContact /></ProtectedRoute>} />
+            <Route path="/business/sessions" element={<ProtectedRoute allowedRoles={['business']}><ActiveSessions /></ProtectedRoute>} />
+            
+            {/* Shared Routes - User & Business */}
+            <Route path="/search" element={<ProtectedRoute allowedRoles={['user', 'business']}><SearchAgencies /></ProtectedRoute>} />
+            <Route path="/schedule" element={<ProtectedRoute allowedRoles={['user', 'business']}><SchedulePickup /></ProtectedRoute>} />
+            <Route path="/pickup-confirmation" element={<ProtectedRoute allowedRoles={['user', 'business']}><PickupConfirmation /></ProtectedRoute>} />
+            <Route path="/pickup-limit" element={<ProtectedRoute allowedRoles={['user', 'business']}><PickupLimitReached /></ProtectedRoute>} />
+            
+            {/* Common Routes - Role-based rendering */}
+            <Route path="/profile" element={<ProtectedRoute><ProfileRoute /></ProtectedRoute>} />
+            <Route path="/notifications" element={<ProtectedRoute><NotificationsRoute /></ProtectedRoute>} />
+            <Route path="/security" element={<ProtectedRoute><SecurityRoute /></ProtectedRoute>} />
+            <Route path="/settings" element={<ProtectedRoute><SettingsRoute /></ProtectedRoute>} />
+          </Routes>
+        </Router>
       </LanguageProvider>
     </ThemeProvider>
   );

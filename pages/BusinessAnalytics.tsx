@@ -194,7 +194,7 @@ const BusinessAnalytics = () => {
 
   // Default activity if none from API
   const displayActivity = recentActivity.length > 0 ? recentActivity : [
-    { action: 'No recent activity', detail: 'Schedule a pickup to get started', time: '', icon: 'info', color: 'text-gray-400' }
+    { action: 'No recent activity', detail: 'Schedule a pickup to get started', time: '', icon: 'info', color: 'text-slate-400' }
   ];
 
   return (
@@ -227,7 +227,7 @@ const BusinessAnalytics = () => {
                   </div>
                   <span className="text-sm font-medium text-gray-200">{user?.name || 'Business'}</span>
                 </button>
-                <button onClick={handleLogout} className="p-2.5 rounded-full bg-[#151F26] border border-white/5 text-gray-400 hover:text-red-400 hover:bg-red-500/10 transition-colors" title="Logout">
+                <button onClick={handleLogout} className="p-2.5 rounded-full bg-[#151F26] border border-white/5 text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-colors" title="Logout">
                   <span className="material-symbols-outlined text-[20px]">logout</span>
                 </button>
               </div>
@@ -254,7 +254,7 @@ const BusinessAnalytics = () => {
                         setEditTarget(monthlyTarget);
                         setShowTargetModal(true);
                       }}
-                      className="flex items-center gap-2 bg-[#151F26] border border-white/10 text-white text-sm rounded-xl px-4 py-2.5 hover:bg-white/5 transition-colors"
+                      className="flex items-center gap-2 bg-[#151F26] border border-white/5 text-white text-sm rounded-xl px-4 py-2.5 hover:bg-white/5 transition-colors"
                     >
                       <span className="material-symbols-outlined text-lg">flag</span>
                       <span className="hidden sm:inline">Target: {monthlyTarget} kg</span>
@@ -262,7 +262,7 @@ const BusinessAnalytics = () => {
                     <select 
                       value={timeRange}
                       onChange={(e) => setTimeRange(e.target.value)}
-                      className="bg-[#151F26] border border-white/10 text-white text-sm rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-[#06b6d4]/50 focus:border-[#06b6d4] outline-none cursor-pointer"
+                      className="bg-[#151F26] border border-white/5 text-white text-sm rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-[#06b6d4]/50 focus:border-[#06b6d4] outline-none cursor-pointer"
                     >
                       <option value="7d">Last 7 Days</option>
                       <option value="30d">Last 30 Days</option>
@@ -276,7 +276,7 @@ const BusinessAnalytics = () => {
                   <div className="flex items-center justify-center py-20">
                     <div className="text-center">
                       <Loader size="md" color="#06b6d4" />
-                      <p className="text-gray-400 mt-4">Loading analytics...</p>
+                      <p className="text-slate-400 mt-4">Loading analytics...</p>
                     </div>
                   </div>
                 ) : (
@@ -287,7 +287,7 @@ const BusinessAnalytics = () => {
                     <span className="material-symbols-outlined text-amber-400">info</span>
                     <div>
                       <p className="text-amber-400 font-semibold text-sm">Sample Data Preview</p>
-                      <p className="text-gray-400 text-xs">This is demo data. Complete your first pickup to see your real analytics.</p>
+                      <p className="text-slate-400 text-xs">This is demo data. Complete your first pickup to see your real analytics.</p>
                     </div>
                   </div>
                 )}
@@ -359,11 +359,11 @@ const BusinessAnalytics = () => {
                       <div className="flex items-center gap-4 text-xs">
                         <div className="flex items-center gap-2">
                           <div className="w-3 h-3 rounded-full bg-[#06b6d4]"></div>
-                          <span className="text-gray-400">Disposed</span>
+                          <span className="text-slate-400">Disposed</span>
                         </div>
                         <div className="flex items-center gap-2">
                           <div className="w-3 h-3 rounded-full bg-gray-600 border-2 border-dashed border-gray-400"></div>
-                          <span className="text-gray-400">Target</span>
+                          <span className="text-slate-400">Target</span>
                         </div>
                       </div>
                     </div>
@@ -412,7 +412,7 @@ const BusinessAnalytics = () => {
                         {categoryData.map((cat, idx) => (
                           <div key={idx} className="group">
                             <div className="flex items-center justify-between mb-2">
-                              <span className="text-sm text-gray-300 group-hover:text-white transition-colors">{cat.name}</span>
+                              <span className="text-sm text-gray-200 group-hover:text-white transition-colors">{cat.name}</span>
                               <span className="text-sm font-bold text-white">{cat.value}%</span>
                             </div>
                             <div className="h-2 bg-gray-800 rounded-full overflow-hidden">
@@ -434,11 +434,11 @@ const BusinessAnalytics = () => {
                     {/* Total */}
                     <div className="mt-6 pt-6 border-t border-white/5">
                       <div className="flex items-center justify-between">
-                        <span className="text-gray-400 text-sm">Total Disposed</span>
+                        <span className="text-slate-400 text-sm">Total Disposed</span>
                         <span className="text-2xl font-black text-white">{totalDisposed.toLocaleString()} <span className="text-sm font-medium text-gray-500">kg</span></span>
                       </div>
                       <div className="flex items-center justify-between mt-2">
-                        <span className="text-gray-400 text-sm">Total Bookings</span>
+                        <span className="text-slate-400 text-sm">Total Bookings</span>
                         <span className="text-lg font-bold text-[#06b6d4]">{totalBookings}</span>
                       </div>
                     </div>
@@ -485,7 +485,7 @@ const BusinessAnalytics = () => {
                         </div>
                         <div>
                           <p className="text-3xl font-black text-white">{treesEquivalent.toLocaleString()}</p>
-                          <p className="text-sm text-gray-400">Trees Equivalent Saved</p>
+                          <p className="text-sm text-slate-400">Trees Equivalent Saved</p>
                         </div>
                       </div>
                       
@@ -495,7 +495,7 @@ const BusinessAnalytics = () => {
                         </div>
                         <div>
                           <p className="text-3xl font-black text-white">{waterConserved.toLocaleString()} <span className="text-lg font-medium text-gray-500">L</span></p>
-                          <p className="text-sm text-gray-400">Water Conserved</p>
+                          <p className="text-sm text-slate-400">Water Conserved</p>
                         </div>
                       </div>
                       
@@ -505,7 +505,7 @@ const BusinessAnalytics = () => {
                         </div>
                         <div>
                           <p className="text-3xl font-black text-white">{energySaved.toLocaleString()} <span className="text-lg font-medium text-gray-500">kWh</span></p>
-                          <p className="text-sm text-gray-400">Energy Saved</p>
+                          <p className="text-sm text-slate-400">Energy Saved</p>
                         </div>
                       </div>
                     </div>
@@ -521,29 +521,29 @@ const BusinessAnalytics = () => {
         {/* Set Target Modal */}
         {showTargetModal && (
           <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setShowTargetModal(false)}>
-            <div className="bg-[#151F26] rounded-2xl w-full max-w-md border border-white/10 overflow-hidden" onClick={(e) => e.stopPropagation()}>
-              <div className="flex items-center justify-between p-6 border-b border-white/10">
+            <div className="bg-[#151F26] rounded-2xl w-full max-w-md border border-white/5 overflow-hidden" onClick={(e) => e.stopPropagation()}>
+              <div className="flex items-center justify-between p-6 border-b border-white/5">
                 <div className="flex items-center gap-3">
                   <div className="p-2 rounded-lg bg-amber-500/10 text-amber-400">
                     <span className="material-symbols-outlined">flag</span>
                   </div>
                   <h3 className="text-white font-bold text-lg">Set Monthly Target</h3>
                 </div>
-                <button onClick={() => setShowTargetModal(false)} className="p-2 rounded-lg hover:bg-white/10 transition-colors text-gray-400 hover:text-white">
+                <button onClick={() => setShowTargetModal(false)} className="p-2 rounded-lg hover:bg-white/5 transition-colors text-slate-400 hover:text-white">
                   <span className="material-symbols-outlined">close</span>
                 </button>
               </div>
               
               <div className="p-6">
-                <p className="text-gray-400 text-sm mb-4">Set your monthly e-waste disposal target in kilograms. This helps track your progress on the analytics chart.</p>
+                <p className="text-slate-400 text-sm mb-4">Set your monthly e-waste disposal target in kilograms. This helps track your progress on the analytics chart.</p>
                 
                 <div className="mb-6">
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Monthly Target (kg)</label>
+                  <label className="block text-sm font-medium text-gray-200 mb-2">Monthly Target (kg)</label>
                   <input
                     type="number"
                     value={editTarget}
                     onChange={(e) => setEditTarget(Math.max(0, parseInt(e.target.value) || 0))}
-                    className="w-full bg-[#0B1116] border border-white/10 rounded-xl px-4 py-3 text-white text-lg font-bold focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 outline-none"
+                    className="w-full bg-[#0B1116] border border-white/5 rounded-xl px-4 py-3 text-white text-lg font-bold focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 outline-none"
                     min="0"
                     step="50"
                   />
@@ -554,7 +554,7 @@ const BusinessAnalytics = () => {
                     <button
                       key={val}
                       onClick={() => setEditTarget(val)}
-                      className={`px-3 py-2 rounded-lg text-sm font-semibold transition-colors ${editTarget === val ? 'bg-amber-500 text-white' : 'bg-white/5 text-gray-400 hover:bg-white/10'}`}
+                      className={`px-3 py-2 rounded-lg text-sm font-semibold transition-colors ${editTarget === val ? 'bg-amber-500 text-white' : 'bg-white/5 text-slate-400 hover:bg-white/5'}`}
                     >
                       {val} kg
                     </button>

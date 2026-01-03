@@ -81,7 +81,7 @@ const Login = () => {
   };
 
   return (
-    <div className="relative flex min-h-screen w-full flex-col items-center justify-center bg-[#0B1120] font-sans text-slate-300 selection:bg-[#34D399] selection:text-slate-900 overflow-hidden">
+    <div className="relative flex min-h-screen w-full flex-col items-center justify-center bg-[#0B1116] font-sans text-gray-200 overflow-hidden">
       {/* Background Effects - Hidden on small screens */}
       <div className="absolute inset-0 bg-hero-pattern opacity-20 pointer-events-none"></div>
       <div className="absolute top-[-10%] left-[-10%] w-[300px] sm:w-[500px] h-[300px] sm:h-[500px] bg-[#34D399]/10 rounded-full blur-[120px] pointer-events-none"></div>
@@ -107,21 +107,21 @@ const Login = () => {
 
       {/* Main Content */}
       <main className="relative z-10 w-full max-w-md mx-4 sm:mx-0 p-4 sm:p-6 animate-fade-in-up">
-        <div className="bg-[#1E293B]/30 backdrop-blur-xl border border-white/10 rounded-3xl p-6 sm:p-8 shadow-2xl">
+        <div className="bg-[#151F26] backdrop-blur-xl rounded-3xl p-6 sm:p-8 shadow-2xl">
             <div className="text-center mb-6 sm:mb-8">
                 <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2 tracking-tight">{mode} to EcoCycle</h1>
                 <p className="text-sm sm:text-base text-slate-400">Welcome back! Please select your role to continue.</p>
             </div>
 
             {/* Toggle */}
-            <div className="bg-[#0B1120] p-1 rounded-xl flex mb-6">
+            <div className="bg-[#151F26] p-1 rounded-xl flex mb-6">
                 {['Login', 'Sign Up'].map((m) => (
                     <button
                         key={m}
                         onClick={() => setMode(m as 'Login' | 'Sign Up')}
                         className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all cursor-pointer border-none ${
                             mode === m 
-                            ? 'bg-[#34D399] text-[#0B1120] shadow-lg' 
+                            ? 'bg-[#34D399] text-white shadow-lg' 
                             : 'bg-transparent text-slate-400 hover:text-white'
                         }`}
                     >
@@ -144,7 +144,7 @@ const Login = () => {
                             className={`cursor-pointer rounded-xl border p-3 flex flex-col items-center gap-2 transition-all ${
                                 role === item.id 
                                 ? 'bg-[#34D399]/10 border-[#34D399] text-[#34D399]' 
-                                : 'bg-[#0B1120]/50 border-white/5 text-slate-400 hover:border-white/10 hover:bg-[#0B1120]'
+                                : 'bg-[#151F26] border-white/5 text-slate-400 hover:border-white/5 hover:bg-white/5'
                             }`}
                         >
                             <span className="material-symbols-outlined text-2xl">{item.icon}</span>
@@ -158,13 +158,13 @@ const Login = () => {
                     <div className="space-y-1.5">
                         <label className="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">Email Address</label>
                         <div className="relative group">
-                            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-[#34D399] transition-colors text-[20px]">mail</span>
+                            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#34D399] transition-colors text-[20px]">mail</span>
                             <input 
                                 type="email" 
                                 required
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                className="w-full bg-[#0B1120] border border-white/10 rounded-xl py-3 pl-10 pr-4 text-white placeholder-slate-600 focus:outline-none focus:border-[#34D399] focus:ring-1 focus:ring-[#34D399] transition-all"
+                                className="w-full bg-[#151F26] border border-white/5 rounded-xl py-3 pl-10 pr-4 text-gray-200 focus:outline-none focus:border-[#34D399] focus:ring-1 focus:ring-[#34D399] transition-all"
                                 placeholder="name@example.com"
                             />
                         </div>
@@ -173,13 +173,13 @@ const Login = () => {
                     <div className="space-y-1.5">
                         <label className="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">Full Name</label>
                         <div className="relative group">
-                            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-[#34D399] transition-colors text-[20px]">person</span>
+                            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#34D399] transition-colors text-[20px]">person</span>
                             <input 
                                 type="text" 
                                 required
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}
-                                className="w-full bg-[#0B1120] border border-white/10 rounded-xl py-3 pl-10 pr-4 text-white placeholder-slate-600 focus:outline-none focus:border-[#34D399] focus:ring-1 focus:ring-[#34D399] transition-all"
+                                className="w-full bg-[#151F26] border border-white/5 rounded-xl py-3 pl-10 pr-4 text-gray-200 focus:outline-none focus:border-[#34D399] focus:ring-1 focus:ring-[#34D399] transition-all"
                                 placeholder="John Doe"
                             />
                         </div>
@@ -188,13 +188,13 @@ const Login = () => {
                     <div className="space-y-1.5">
                         <label className="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">Password</label>
                         <div className="relative group">
-                            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-[#34D399] transition-colors text-[20px]">lock</span>
+                            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#34D399] transition-colors text-[20px]">lock</span>
                             <input 
                                 type="password" 
                                 required
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
-                                className="w-full bg-[#0B1120] border border-white/10 rounded-xl py-3 pl-10 pr-4 text-white placeholder-slate-600 focus:outline-none focus:border-[#34D399] focus:ring-1 focus:ring-[#34D399] transition-all"
+                                className="w-full bg-[#151F26] border border-white/5 rounded-xl py-3 pl-10 pr-4 text-gray-200 focus:outline-none focus:border-[#34D399] focus:ring-1 focus:ring-[#34D399] transition-all"
                                 placeholder="••••••••"
                             />
                         </div>
@@ -210,8 +210,8 @@ const Login = () => {
                 {/* Actions */}
                 <div className="flex items-center justify-between text-xs">
                     <label className="flex items-center gap-2 cursor-pointer group">
-                        <input type="checkbox" className="rounded border-white/10 bg-[#0B1120] text-[#34D399] focus:ring-[#34D399] focus:ring-offset-0" />
-                        <span className="text-slate-400 group-hover:text-slate-300 transition-colors">Remember me</span>
+                        <input type="checkbox" className="rounded border-white/5 bg-[#151F26] text-[#34D399] focus:ring-[#34D399] focus:ring-offset-0" />
+                        <span className="text-slate-400 group-hover:text-white transition-colors">Remember me</span>
                     </label>
                     <a href="#" className="text-[#34D399] hover:text-[#6EE7B7] font-medium transition-colors">Forgot password?</a>
                 </div>
@@ -219,14 +219,14 @@ const Login = () => {
                 <button 
                     type="submit"
                     disabled={loading}
-                    className="w-full py-3.5 rounded-xl bg-[#34D399] text-[#0B1120] font-bold text-base shadow-[0_0_20px_rgba(52,211,153,0.3)] hover:shadow-[0_0_25px_rgba(52,211,153,0.5)] hover:bg-[#6EE7B7] hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer border-none disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full py-3.5 rounded-xl bg-[#34D399] text-white font-bold text-base shadow-[0_0_20px_rgba(52,211,153,0.3)] hover:shadow-[0_0_25px_rgba(52,211,153,0.5)] hover:bg-[#6EE7B7] hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer border-none disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     {loading ? 'Please wait...' : (mode === 'Login' ? 'Sign In' : 'Create Account')}
                 </button>
                 
                 <div className="mt-2 flex items-center justify-center gap-2 border-t border-white/5 pt-6">
-                    <span className="material-symbols-outlined text-slate-500 text-[18px]">admin_panel_settings</span>
-                    <p className="text-xs text-slate-500">
+                    <span className="material-symbols-outlined text-slate-400 text-[18px]">admin_panel_settings</span>
+                    <p className="text-xs text-slate-400">
                     Are you an Administrator? 
                     <a className="font-medium text-[#34D399] hover:underline hover:text-[#34D399]/80 ml-1 cursor-pointer" onClick={() => window.location.hash = '#/admin-login'}>
                         Click here

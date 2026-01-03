@@ -77,7 +77,7 @@ const AdminUsers: React.FC = () => {
                 </button>
                 <div>
                   <h1 className="text-2xl font-bold text-white">User Management</h1>
-                  <p className="text-sm text-gray-400">Manage all platform users</p>
+                  <p className="text-sm text-slate-400">Manage all platform users</p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
@@ -88,7 +88,7 @@ const AdminUsers: React.FC = () => {
                     placeholder="Search users..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10 pr-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-pink-500/50 w-64"
+                    className="pl-10 pr-4 py-2 bg-white/5 border border-white/5 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-pink-500/50 w-64"
                   />
                 </div>
               </div>
@@ -103,7 +103,7 @@ const AdminUsers: React.FC = () => {
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                     roleFilter === role
                       ? 'bg-pink-500 text-white'
-                      : 'bg-white/5 text-gray-400 hover:bg-white/10'
+                      : 'bg-white/5 text-slate-400 hover:bg-white/5'
                   }`}
                 >
                   {role.charAt(0).toUpperCase() + role.slice(1)}
@@ -129,7 +129,7 @@ const AdminUsers: React.FC = () => {
                       </div>
                       <div>
                         <p className="text-2xl font-bold text-white">{users.length}</p>
-                        <p className="text-sm text-gray-400">Total Users</p>
+                        <p className="text-sm text-slate-400">Total Users</p>
                       </div>
                     </div>
                   </div>
@@ -140,7 +140,7 @@ const AdminUsers: React.FC = () => {
                       </div>
                       <div>
                         <p className="text-2xl font-bold text-white">{users.filter(u => u.role === 'user').length}</p>
-                        <p className="text-sm text-gray-400">Residents</p>
+                        <p className="text-sm text-slate-400">Residents</p>
                       </div>
                     </div>
                   </div>
@@ -151,7 +151,7 @@ const AdminUsers: React.FC = () => {
                       </div>
                       <div>
                         <p className="text-2xl font-bold text-white">{users.filter(u => u.role === 'business').length}</p>
-                        <p className="text-sm text-gray-400">Businesses</p>
+                        <p className="text-sm text-slate-400">Businesses</p>
                       </div>
                     </div>
                   </div>
@@ -162,7 +162,7 @@ const AdminUsers: React.FC = () => {
                       </div>
                       <div>
                         <p className="text-2xl font-bold text-white">{users.filter(u => u.role === 'agency').length}</p>
-                        <p className="text-sm text-gray-400">Partners</p>
+                        <p className="text-sm text-slate-400">Partners</p>
                       </div>
                     </div>
                   </div>
@@ -171,20 +171,20 @@ const AdminUsers: React.FC = () => {
                 {/* Users Table */}
                 <div className="bg-[#1E293B]/60 backdrop-blur-sm border border-pink-500/20 rounded-2xl overflow-hidden">
                   <table className="w-full">
-                    <thead className="bg-white/5 border-b border-white/10">
+                    <thead className="bg-white/5 border-b border-white/5">
                       <tr>
-                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">User</th>
-                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Email</th>
-                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Role</th>
-                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Eco Points</th>
-                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Joined</th>
-                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Actions</th>
+                        <th className="px-6 py-4 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">User</th>
+                        <th className="px-6 py-4 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Email</th>
+                        <th className="px-6 py-4 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Role</th>
+                        <th className="px-6 py-4 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Eco Points</th>
+                        <th className="px-6 py-4 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Joined</th>
+                        <th className="px-6 py-4 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Actions</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-white/5">
                       {filteredUsers.length === 0 ? (
                         <tr>
-                          <td colSpan={6} className="px-6 py-12 text-center text-gray-400">
+                          <td colSpan={6} className="px-6 py-12 text-center text-slate-400">
                             No users found
                           </td>
                         </tr>
@@ -198,11 +198,11 @@ const AdminUsers: React.FC = () => {
                                 </div>
                                 <div>
                                   <p className="font-medium text-white">{user.name}</p>
-                                  <p className="text-xs text-gray-400">{user._id.slice(-8)}</p>
+                                  <p className="text-xs text-slate-400">{user._id.slice(-8)}</p>
                                 </div>
                               </div>
                             </td>
-                            <td className="px-6 py-4 text-gray-300">{user.email}</td>
+                            <td className="px-6 py-4 text-gray-200">{user.email}</td>
                             <td className="px-6 py-4">
                               <span className={`px-3 py-1 rounded-full text-xs font-bold border ${getRoleBadge(user.role)}`}>
                                 {user.role}
@@ -211,7 +211,7 @@ const AdminUsers: React.FC = () => {
                             <td className="px-6 py-4">
                               <span className="text-pink-400 font-bold">{user.ecoPoints || 0}</span>
                             </td>
-                            <td className="px-6 py-4 text-gray-300 text-sm">
+                            <td className="px-6 py-4 text-gray-200 text-sm">
                               {new Date(user.createdAt).toLocaleDateString()}
                             </td>
                             <td className="px-6 py-4">

@@ -287,7 +287,7 @@ const EditBusinessProfile = () => {
                     </div>
                     <div>
                       <h1 className="text-2xl sm:text-3xl font-bold text-white">Edit Business Profile</h1>
-                      <p className="text-gray-400 text-sm">Update your company information, address, and contact details</p>
+                      <p className="text-slate-400 text-sm">Update your company information, address, and contact details</p>
                     </div>
                   </div>
                 </div>
@@ -325,7 +325,7 @@ const EditBusinessProfile = () => {
                         </div>
                         <div className="text-center">
                           <p className="text-white text-sm font-medium mb-1">Upload Company Logo</p>
-                          <p className="text-gray-400 text-xs">Click the camera icon • Square image • Min 256x256px</p>
+                          <p className="text-slate-400 text-xs">Click the camera icon • Square image • Min 256x256px</p>
                           <div className="flex items-center justify-center gap-2 mt-3">
                             <span className="px-3 py-1 bg-[#06b6d4]/10 border border-[#06b6d4]/30 rounded-full text-[#06b6d4] text-xs font-medium">JPG</span>
                             <span className="px-3 py-1 bg-[#06b6d4]/10 border border-[#06b6d4]/30 rounded-full text-[#06b6d4] text-xs font-medium">PNG</span>
@@ -350,7 +350,7 @@ const EditBusinessProfile = () => {
                             value={formData.companyName}
                             onChange={handleInputChange}
                             required
-                            className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-[#06b6d4] focus:border-[#06b6d4] transition-all"
+                            className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/5 text-white focus:outline-none focus:ring-1 focus:ring-[#06b6d4] focus:border-[#06b6d4] transition-all"
                             placeholder="Enter company name"
                           />
                         </label>
@@ -361,7 +361,7 @@ const EditBusinessProfile = () => {
                             value={formData.industry}
                             onChange={handleInputChange}
                             required
-                            className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-[#06b6d4] focus:border-[#06b6d4] transition-all"
+                            className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/5 text-white focus:outline-none focus:ring-1 focus:ring-[#06b6d4] focus:border-[#06b6d4] transition-all"
                           >
                             <option value="Technology">Technology</option>
                             <option value="Manufacturing">Manufacturing</option>
@@ -381,7 +381,7 @@ const EditBusinessProfile = () => {
                           value={formData.description}
                           onChange={handleInputChange}
                           rows={3}
-                          className="w-full px-3 py-2 bg-[#0B1116] border rounded-xl border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-[#06b6d4] focus:border-[#06b6d4] transition-all resize-none"
+                          className="w-full px-3 py-2 bg-[#0B1116] border rounded-xl border-white/5 text-white focus:outline-none focus:ring-1 focus:ring-[#06b6d4] focus:border-[#06b6d4] transition-all resize-none"
                           placeholder="Brief description of your company"
                         />
                       </label>
@@ -395,7 +395,7 @@ const EditBusinessProfile = () => {
                             value={formData.email}
                             onChange={handleInputChange}
                             required
-                            className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-[#06b6d4] focus:border-[#06b6d4] transition-all"
+                            className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/5 text-white focus:outline-none focus:ring-1 focus:ring-[#06b6d4] focus:border-[#06b6d4] transition-all"
                             placeholder="company@example.com"
                           />
                         </label>
@@ -407,7 +407,7 @@ const EditBusinessProfile = () => {
                             value={formData.phone}
                             onChange={handleInputChange}
                             required
-                            className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-[#06b6d4] focus:border-[#06b6d4] transition-all"
+                            className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/5 text-white focus:outline-none focus:ring-1 focus:ring-[#06b6d4] focus:border-[#06b6d4] transition-all"
                             placeholder="+1 (555) 000-0000"
                           />
                         </label>
@@ -420,7 +420,7 @@ const EditBusinessProfile = () => {
                           name="website"
                           value={formData.website}
                           onChange={handleInputChange}
-                          className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-[#06b6d4] focus:border-[#06b6d4] transition-all"
+                          className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/5 text-white focus:outline-none focus:ring-1 focus:ring-[#06b6d4] focus:border-[#06b6d4] transition-all"
                           placeholder="https://www.yourcompany.com"
                         />
                       </label>
@@ -440,7 +440,7 @@ const EditBusinessProfile = () => {
                           onChange={handleInputChange}
                           rows={2}
                           required
-                          className="w-full px-3 py-2 bg-[#0B1116] border rounded-xl border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-[#06b6d4] focus:border-[#06b6d4] transition-all resize-none"
+                          className="w-full px-3 py-2 bg-[#0B1116] border rounded-xl border-white/5 text-white focus:outline-none focus:ring-1 focus:ring-[#06b6d4] focus:border-[#06b6d4] transition-all resize-none"
                           placeholder="Enter street address"
                         />
                       </label>
@@ -454,7 +454,7 @@ const EditBusinessProfile = () => {
                             value={formData.city}
                             onChange={handleInputChange}
                             required
-                            className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-[#06b6d4] focus:border-[#06b6d4] transition-all"
+                            className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/5 text-white focus:outline-none focus:ring-1 focus:ring-[#06b6d4] focus:border-[#06b6d4] transition-all"
                             placeholder="City"
                           />
                         </label>
@@ -466,7 +466,7 @@ const EditBusinessProfile = () => {
                             value={formData.state}
                             onChange={handleInputChange}
                             required
-                            className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-[#06b6d4] focus:border-[#06b6d4] transition-all"
+                            className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/5 text-white focus:outline-none focus:ring-1 focus:ring-[#06b6d4] focus:border-[#06b6d4] transition-all"
                             placeholder="State/Province"
                           />
                         </label>
@@ -481,7 +481,7 @@ const EditBusinessProfile = () => {
                             value={formData.zipCode}
                             onChange={handleInputChange}
                             required
-                            className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-[#06b6d4] focus:border-[#06b6d4] transition-all"
+                            className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/5 text-white focus:outline-none focus:ring-1 focus:ring-[#06b6d4] focus:border-[#06b6d4] transition-all"
                             placeholder="ZIP/Postal Code"
                           />
                         </label>
@@ -493,7 +493,7 @@ const EditBusinessProfile = () => {
                             value={formData.country}
                             onChange={handleInputChange}
                             required
-                            className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-[#06b6d4] focus:border-[#06b6d4] transition-all"
+                            className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/5 text-white focus:outline-none focus:ring-1 focus:ring-[#06b6d4] focus:border-[#06b6d4] transition-all"
                             placeholder="Country"
                           />
                         </label>
@@ -515,7 +515,7 @@ const EditBusinessProfile = () => {
                             value={formData.contactPersonName}
                             onChange={handleInputChange}
                             required
-                            className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-[#06b6d4] focus:border-[#06b6d4] transition-all"
+                            className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/5 text-white focus:outline-none focus:ring-1 focus:ring-[#06b6d4] focus:border-[#06b6d4] transition-all"
                             placeholder="Contact person name"
                           />
                         </label>
@@ -527,7 +527,7 @@ const EditBusinessProfile = () => {
                             value={formData.contactPersonRole}
                             onChange={handleInputChange}
                             required
-                            className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-[#06b6d4] focus:border-[#06b6d4] transition-all"
+                            className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/5 text-white focus:outline-none focus:ring-1 focus:ring-[#06b6d4] focus:border-[#06b6d4] transition-all"
                             placeholder="e.g., Facility Manager"
                           />
                         </label>
@@ -542,7 +542,7 @@ const EditBusinessProfile = () => {
                             value={formData.contactPersonEmail}
                             onChange={handleInputChange}
                             required
-                            className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-[#06b6d4] focus:border-[#06b6d4] transition-all"
+                            className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/5 text-white focus:outline-none focus:ring-1 focus:ring-[#06b6d4] focus:border-[#06b6d4] transition-all"
                             placeholder="contact@example.com"
                           />
                         </label>
@@ -554,7 +554,7 @@ const EditBusinessProfile = () => {
                             value={formData.contactPersonPhone}
                             onChange={handleInputChange}
                             required
-                            className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-[#06b6d4] focus:border-[#06b6d4] transition-all"
+                            className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/5 text-white focus:outline-none focus:ring-1 focus:ring-[#06b6d4] focus:border-[#06b6d4] transition-all"
                             placeholder="+1 (555) 000-0000"
                           />
                         </label>
@@ -574,7 +574,7 @@ const EditBusinessProfile = () => {
                           value={formData.sustainabilityGoals}
                           onChange={handleInputChange}
                           rows={4}
-                          className="w-full px-3 py-2 bg-[#0B1116] border rounded-xl border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-[#06b6d4] focus:border-[#06b6d4] transition-all resize-none"
+                          className="w-full px-3 py-2 bg-[#0B1116] border rounded-xl border-white/5 text-white focus:outline-none focus:ring-1 focus:ring-[#06b6d4] focus:border-[#06b6d4] transition-all resize-none"
                           placeholder="Describe your company's sustainability goals and e-waste management objectives..."
                         />
                       </label>
@@ -586,7 +586,7 @@ const EditBusinessProfile = () => {
                     <button
                       type="button"
                       onClick={() => window.history.back()}
-                      className="flex min-w-[120px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-6 bg-[#0B1116] border border-white/10 text-gray-300 text-sm font-bold leading-normal tracking-[0.015em] hover:bg-white/5 transition-colors"
+                      className="flex min-w-[120px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-6 bg-[#0B1116] border border-white/5 text-gray-200 text-sm font-bold leading-normal tracking-[0.015em] hover:bg-white/5 transition-colors"
                     >
                       Cancel
                     </button>

@@ -93,6 +93,58 @@ const UserCertificates = () => {
     return booking.items?.map(item => item.type).join(', ') || 'E-Waste';
   };
 
+  const handleDownloadCertificate = async (bookingId: string, certNumber: string) => {
+    try {
+      const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+      const token = localStorage.getItem('token');
+      
+      if (!token) {
+        alert('Please login to download certificates');
+        return;
+      }
+
+      console.log('Downloading certificate for booking:', bookingId);
+      
+      const response = await fetch(`${API_BASE}/certificates/${bookingId}/download`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: 'Failed to download certificate' }));
+        console.error('Download error:', errorData);
+        throw new Error(errorData.error || errorData.message || 'Failed to download certificate');
+      }
+      
+      // Get the PDF blob
+      const blob = await response.blob();
+      
+      if (blob.size === 0) {
+        throw new Error('Downloaded file is empty');
+      }
+
+      console.log('PDF downloaded, size:', blob.size);
+      
+      // Create download link
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `certificate-${certNumber}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      
+      // Cleanup
+      setTimeout(() => {
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+      }, 100);
+    } catch (error: any) {
+      console.error('Certificate download error:', error);
+      alert(error.message || 'Failed to download certificate. Please try again.');
+    }
+  };
+
   return (
     <Layout title="" role="User" fullWidth hideSidebar>
       <div className="bg-[#0B1116] font-sans text-gray-200 antialiased selection:bg-[#10b981] selection:text-white min-h-screen flex flex-col relative overflow-hidden">
@@ -125,7 +177,7 @@ const UserCertificates = () => {
               </button>
               {/* Hover Preview */}
               <div className="absolute top-14 right-0 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-[100]">
-                <div className="bg-[#151F26] border border-white/10 rounded-2xl p-4 shadow-2xl">
+                <div className="bg-[#151F26] border border-white/5 rounded-2xl p-4 shadow-2xl">
                   <div 
                     className="size-32 rounded-xl bg-cover bg-center ring-4 ring-[#10b981]/30" 
                     style={{ backgroundImage: `url("${user?.avatar || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user?.name || 'User') + '&background=10b981&color=fff'}")`}}
@@ -158,7 +210,7 @@ const UserCertificates = () => {
                   </div>
                   <div>
                     <h1 className="text-3xl sm:text-4xl font-bold text-white">My Certificates</h1>
-                    <p className="text-gray-400 text-sm mt-1">Appreciation certificates from agencies</p>
+                    <p className="text-slate-400 text-sm mt-1">Appreciation certificates from agencies</p>
                   </div>
                 </div>
 
@@ -169,7 +221,7 @@ const UserCertificates = () => {
                     className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
                       filter === 'all'
                         ? 'bg-[#10b981] text-white'
-                        : 'bg-white/5 text-gray-400 hover:bg-white/10 border border-white/5'
+                        : 'bg-white/5 text-slate-400 hover:bg-white/5 border border-white/5'
                     }`}
                   >
                     All
@@ -179,7 +231,7 @@ const UserCertificates = () => {
                     className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
                       filter === 'active'
                         ? 'bg-[#10b981] text-white'
-                        : 'bg-white/5 text-gray-400 hover:bg-white/10 border border-white/5'
+                        : 'bg-white/5 text-slate-400 hover:bg-white/5 border border-white/5'
                     }`}
                   >
                     Active
@@ -189,7 +241,7 @@ const UserCertificates = () => {
                     className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
                       filter === 'expired'
                         ? 'bg-[#10b981] text-white'
-                        : 'bg-white/5 text-gray-400 hover:bg-white/10 border border-white/5'
+                        : 'bg-white/5 text-slate-400 hover:bg-white/5 border border-white/5'
                     }`}
                   >
                     Expired
@@ -203,7 +255,7 @@ const UserCertificates = () => {
               <div className="flex items-center justify-center py-20">
                 <div className="text-center">
                   <Loader size="md" color="#10b981" className="mb-4" />
-                  <p className="text-gray-400">Loading certificates...</p>
+                  <p className="text-slate-400">Loading certificates...</p>
                 </div>
               </div>
             ) : filteredBookings.length === 0 ? (
@@ -212,7 +264,7 @@ const UserCertificates = () => {
                   <span className="material-symbols-outlined text-gray-500 text-[48px]">workspace_premium</span>
                 </div>
                 <h3 className="text-xl font-semibold text-white mb-2">No certificates yet</h3>
-                <p className="text-gray-400 text-center max-w-md mb-6">
+                <p className="text-slate-400 text-center max-w-md mb-6">
                   Complete e-waste pickups to receive appreciation certificates from agencies
                 </p>
                 <button
@@ -249,7 +301,7 @@ const UserCertificates = () => {
                           <span className="material-symbols-outlined text-[#10b981]">recycling</span>
                         </div>
                         <div className="flex-1">
-                          <p className="text-sm text-gray-400">Certified by</p>
+                          <p className="text-sm text-slate-400">Certified by</p>
                           <h3 className="font-semibold text-white">{agencyName}</h3>
                         </div>
                       </div>
@@ -257,31 +309,31 @@ const UserCertificates = () => {
                       {/* Certificate Details */}
                       <div className="space-y-3 mb-4">
                         <div className="flex items-center justify-between">
-                          <span className="text-sm text-gray-400">Certificate No.</span>
+                          <span className="text-sm text-slate-400">Certificate No.</span>
                           <span className="text-sm font-medium text-white">
                             {booking.bookingId || `#${booking._id.slice(-6).toUpperCase()}`}
                           </span>
                         </div>
                         <div className="flex items-center justify-between">
-                          <span className="text-sm text-gray-400">Waste Items</span>
+                          <span className="text-sm text-slate-400">Waste Items</span>
                           <span className="text-sm font-medium text-white truncate ml-2" title={wasteTypes}>
                             {wasteTypes.length > 20 ? wasteTypes.substring(0, 20) + '...' : wasteTypes}
                           </span>
                         </div>
                         <div className="flex items-center justify-between">
-                          <span className="text-sm text-gray-400">Total Weight</span>
+                          <span className="text-sm text-slate-400">Total Weight</span>
                           <span className="text-sm font-medium text-white">{totalWeight.toFixed(1)} kg</span>
                         </div>
                         <div className="flex items-center justify-between">
-                          <span className="text-sm text-gray-400">EcoPoints</span>
+                          <span className="text-sm text-slate-400">EcoPoints</span>
                           <span className="text-sm font-bold text-[#10b981]">+{booking.ecoPointsEarned || 0}</span>
                         </div>
                         <div className="flex items-center justify-between">
-                          <span className="text-sm text-gray-400">Issue Date</span>
+                          <span className="text-sm text-slate-400">Issue Date</span>
                           <span className="text-sm font-medium text-white">{formatDate(issueDate)}</span>
                         </div>
                         <div className="flex items-center justify-between">
-                          <span className="text-sm text-gray-400">Expiry Date</span>
+                          <span className="text-sm text-slate-400">Expiry Date</span>
                           <span className={isExpired(issueDate) ? 'text-sm font-medium text-red-400' : 'text-sm font-medium text-white'}>
                             {formatDate(expiryDate.toISOString())}
                           </span>
@@ -303,9 +355,9 @@ const UserCertificates = () => {
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            window.location.hash = `#/certificate?booking=${booking._id}`;
+                            handleDownloadCertificate(booking._id, booking.bookingId || booking._id.slice(-6));
                           }}
-                          className="px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 font-medium text-sm flex items-center justify-center gap-2 transition-colors border border-white/5"
+                          className="px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/5 text-gray-200 font-medium text-sm flex items-center justify-center gap-2 transition-colors border border-white/5"
                         >
                           <span className="material-symbols-outlined text-[18px]">download</span>
                         </button>

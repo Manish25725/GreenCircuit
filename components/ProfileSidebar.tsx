@@ -160,7 +160,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ activePage }) => {
         <div className="flex flex-col gap-4 mt-8 pt-4 border-t border-white/5">
           <button 
             onClick={handleLogout}
-            className="flex w-full min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-[#0B1116] text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-white/5 transition-colors border border-white/10"
+            className="flex w-full min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-[#0B1116] text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-white/5 transition-colors border border-white/5"
           >
             <span className="truncate">Log Out</span>
           </button>

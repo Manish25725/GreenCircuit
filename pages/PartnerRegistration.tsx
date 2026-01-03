@@ -160,7 +160,7 @@ const PartnerRegistration: React.FC = () => {
             </div>
           </div>
           <h1 className="text-4xl font-bold mb-3 bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">Partner Registration</h1>
-          <p className="text-gray-300 text-lg">
+          <p className="text-gray-200 text-lg">
             Join our network of verified e-waste recycling partners. Please provide accurate information for verification.
           </p>
         </div>
@@ -195,7 +195,7 @@ const PartnerRegistration: React.FC = () => {
                     required
                   />
                   {currentUser?.name && (
-                    <p className="text-xs text-gray-400 mt-1">From your account: {currentUser.name}</p>
+                    <p className="text-xs text-slate-400 mt-1">From your account: {currentUser.name}</p>
                   )}
                 </div>
 
@@ -308,10 +308,10 @@ const PartnerRegistration: React.FC = () => {
                     name="email"
                     value={formData.email}
                     readOnly
-                    className="w-full px-4 py-2.5 bg-[#151f26] border border-cyan-500/20 rounded-lg text-gray-300 cursor-not-allowed"
+                    className="w-full px-4 py-2.5 bg-[#151F26] border border-cyan-500/20 rounded-lg text-gray-200 cursor-not-allowed"
                     required
                   />
-                  <p className="text-xs text-gray-400 mt-1">📧 From your account (cannot be changed)</p>
+                  <p className="text-xs text-slate-400 mt-1">📧 From your account (cannot be changed)</p>
                 </div>
 
                 <div>
@@ -343,7 +343,7 @@ const PartnerRegistration: React.FC = () => {
                   <span className="material-symbols-outlined text-cyan-400 text-[28px]">my_location</span>
                   <div className="flex-1">
                     <h3 className="text-white font-medium mb-1">Share Your Location <span className="text-cyan-400">*</span></h3>
-                    <p className="text-sm text-gray-300 mb-3">Required so users can find your agency on the map</p>
+                    <p className="text-sm text-gray-200 mb-3">Required so users can find your agency on the map</p>
                     
                     <button
                       type="button"
@@ -370,7 +370,7 @@ const PartnerRegistration: React.FC = () => {
                           <span className="material-symbols-outlined text-[20px]">check_circle</span>
                           <span className="font-medium">Location captured successfully!</span>
                         </div>
-                        <div className="text-xs text-gray-300 ml-7">
+                        <div className="text-xs text-gray-200 ml-7">
                           Coordinates: {formData.address.coordinates.lat.toFixed(6)}, {formData.address.coordinates.lng.toFixed(6)}
                         </div>
                       </div>
@@ -382,14 +382,14 @@ const PartnerRegistration: React.FC = () => {
                           <span className="material-symbols-outlined text-[20px]">error</span>
                           <span>{locationError}</span>
                         </div>
-                        <p className="text-xs text-gray-400">
+                        <p className="text-xs text-slate-400">
                           Please allow location access in your browser settings and try again. This is required for users to find you on the map.
                         </p>
                       </div>
                     )}
 
                     {!locationError && locationStatus === 'idle' && (
-                      <p className="mt-2 text-xs text-gray-400">
+                      <p className="mt-2 text-xs text-slate-400">
                         💡 Click the button and allow location access when your browser asks
                       </p>
                     )}
@@ -472,7 +472,7 @@ const PartnerRegistration: React.FC = () => {
                     className={`flex items-center p-3 border rounded-lg cursor-pointer transition-all ${
                       formData.services.includes(service)
                         ? 'bg-cyan-500/20 border-cyan-500/50 text-white'
-                        : 'bg-[#0f1823] border-cyan-500/20 text-gray-300 hover:bg-cyan-500/10 hover:border-cyan-500/40'
+                        : 'bg-[#0f1823] border-cyan-500/20 text-gray-200 hover:bg-cyan-500/10 hover:border-cyan-500/40'
                     }`}
                   >
                     <input

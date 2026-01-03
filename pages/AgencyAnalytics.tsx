@@ -143,7 +143,7 @@ const AgencyAnalytics = () => {
                     <div className="flex flex-col gap-3">
                         <button 
                             onClick={() => window.location.hash = '#/agency/slots'}
-                            className="flex items-center w-full p-3 rounded-xl bg-[#0B1120] hover:bg-[#252f3f] border border-white/5 transition-all group cursor-pointer"
+                            className="flex items-center w-full p-3 rounded-xl bg-[#0B1116] hover:bg-[#252f3f] border border-white/5 transition-all group cursor-pointer"
                         >
                             <div className="bg-[#34D399]/10 p-2 rounded-lg mr-3 text-[#34D399] group-hover:bg-[#34D399] group-hover:text-[#0B1120] transition-colors">
                                 <span className="material-symbols-outlined text-xl">add</span>
@@ -153,7 +153,7 @@ const AgencyAnalytics = () => {
                         </button>
                         <button 
                             onClick={() => window.location.hash = '#/agency/slots'}
-                            className="flex items-center w-full p-3 rounded-xl bg-[#0B1120] hover:bg-[#252f3f] border border-white/5 transition-all group cursor-pointer"
+                            className="flex items-center w-full p-3 rounded-xl bg-[#0B1116] hover:bg-[#252f3f] border border-white/5 transition-all group cursor-pointer"
                         >
                             <div className="bg-blue-500/10 p-2 rounded-lg mr-3 text-blue-400 group-hover:bg-blue-400 group-hover:text-[#0B1120] transition-colors">
                                 <span className="material-symbols-outlined text-xl">calendar_month</span>
@@ -161,7 +161,7 @@ const AgencyAnalytics = () => {
                             <span className="text-slate-200 font-medium text-sm flex-1 text-left">View Calendar</span>
                             <span className="material-symbols-outlined text-slate-500 text-sm">chevron_right</span>
                         </button>
-                        <button className="flex items-center w-full p-3 rounded-xl bg-[#0B1120] hover:bg-[#252f3f] border border-white/5 transition-all group cursor-pointer">
+                        <button className="flex items-center w-full p-3 rounded-xl bg-[#0B1116] hover:bg-[#252f3f] border border-white/5 transition-all group cursor-pointer">
                             <div className="bg-purple-500/10 p-2 rounded-lg mr-3 text-purple-400 group-hover:bg-purple-400 group-hover:text-[#0B1120] transition-colors">
                                 <span className="material-symbols-outlined text-xl">analytics</span>
                             </div>

@@ -128,14 +128,14 @@ const UserDashboard = () => {
 
   return (
     <Layout title="" role="User" fullWidth hideSidebar>
-      <div className="bg-[#0B1116] font-sans text-gray-200 antialiased selection:bg-[#10b981] selection:text-white min-h-screen">
+      <div className="bg-[#0B1116] font-sans text-gray-200 antialiased min-h-screen">
         <div className="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden">
-          <div className="fixed top-0 left-0 w-full h-[500px] bg-[#10b981]/5 rounded-full blur-[120px] -translate-y-1/2 pointer-events-none"></div>
-          <div className="fixed bottom-0 right-0 w-full h-[500px] bg-[#3b82f6]/5 rounded-full blur-[120px] translate-y-1/2 pointer-events-none"></div>
+          <div className="fixed top-0 left-0 w-full h-[500px] fixed bg-[#10b981]/5 rounded-full blur-[120px] -translate-y-1/2 pointer-events-none"></div>
+          <div className="fixed bottom-0 right-0 w-full h-[500px] fixed bg-[#3b82f6]/5 rounded-full blur-[120px] translate-y-1/2 pointer-events-none"></div>
           
           <div className="layout-container flex h-full grow flex-col relative z-10">
             {/* Header */}
-            <header className="flex items-center justify-between whitespace-nowrap border-b border-white/5 px-4 sm:px-6 lg:px-10 py-4 bg-[#0B1116]/80 backdrop-blur-md fixed top-0 left-0 right-0 z-50 transition-all duration-300">
+            <header className="flex items-center justify-between whitespace-nowrap border-b border-white/5 px-4 sm:px-6 lg:px-10 py-4 bg-[#0B1116] backdrop-blur-md fixed top-0 left-0 right-0 z-50 transition-all duration-300">
               <div className="flex items-center gap-3 text-white cursor-pointer" onClick={() => window.location.hash = '#/'}>
                 <div className="p-2 bg-[#10b981]/10 rounded-lg">
                   <svg className="h-6 w-6 text-[#10b981]" fill="currentColor" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
@@ -153,14 +153,14 @@ const UserDashboard = () => {
                       className="hidden sm:flex items-center gap-3 pl-1 pr-4 py-1 rounded-full bg-[#151F26] border border-white/5 hover:bg-white/5 transition-colors cursor-pointer"
                   >
                     <div 
-                      className="size-8 rounded-full bg-cover bg-center ring-2 ring-white/10 group-hover:ring-[#10b981]/50 transition-all" 
+                      className="size-8 rounded-full bg-cover bg-center ring-2 border-white/5 group-hover:ring-[#10b981]/50 transition-all" 
                       style={{ backgroundImage: `url("${user?.avatar || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user?.name || 'User') + '&background=10b981&color=fff'}")`}}
                     ></div>
                     <span className="text-sm font-medium text-gray-200">{user?.name || 'User'}</span>
                   </button>
                   {/* Hover Preview */}
                   <div className="absolute top-14 right-0 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-[100]">
-                    <div className="bg-[#151F26] border border-white/10 rounded-2xl p-4 shadow-2xl">
+                    <div className="bg-[#151F26] border border-white/5 rounded-2xl p-4 shadow-2xl">
                       <div 
                         className="size-32 rounded-xl bg-cover bg-center ring-4 ring-[#10b981]/30" 
                         style={{ backgroundImage: `url("${user?.avatar || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user?.name || 'User') + '&background=10b981&color=fff'}")`}}
@@ -171,7 +171,7 @@ const UserDashboard = () => {
                 <NotificationBell />
                 <button 
                   onClick={handleLogout}
-                  className="p-2.5 rounded-full bg-[#151F26] border border-white/5 text-gray-400 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                  className="p-2.5 rounded-full bg-[#151F26] border border-white/5 text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-colors"
                   title="Logout"
                 >
                   <span className="material-symbols-outlined text-[20px]">logout</span>
@@ -183,14 +183,14 @@ const UserDashboard = () => {
               <div className="layout-content-container flex flex-col w-full max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div className="flex flex-col md:flex-row justify-between items-end gap-6 py-8">
                   <div>
-                    <h1 className="text-white text-4xl sm:text-5xl font-black leading-tight tracking-tighter mb-2 bg-gradient-to-r from-white to-gray-500 bg-clip-text text-transparent">Hello, {user?.name?.split(' ')[0] || 'User'}!</h1>
-                    <p className="text-[#94a3b8] text-lg">Here's your environmental impact update.</p>
+                    <h1 className="text-white text-4xl sm:text-5xl font-black leading-tight tracking-tighter mb-2">Hello, {user?.name?.split(' ')[0] || 'User'}!</h1>
+                    <p className="text-slate-400 text-lg">Here's your environmental impact update.</p>
                   </div>
-                  <div className="flex items-center gap-3 bg-[#151F26]/50 p-1.5 pr-4 rounded-full border border-white/10 backdrop-blur-sm">
+                  <div className="flex items-center gap-3 bg-[#151F26] p-1.5 pr-4 rounded-full backdrop-blur-sm">
                     <div className="bg-[#10b981]/20 p-2 rounded-full text-[#10b981]">
                       <span className="material-symbols-outlined text-lg">calendar_today</span>
                     </div>
-                    <span className="text-sm font-medium text-gray-300">{formatDate()}</span>
+                    <span className="text-sm font-medium text-gray-200">{formatDate()}</span>
                   </div>
                 </div>
 
@@ -222,7 +222,7 @@ const UserDashboard = () => {
                         ) : activeBookings.length > 0 ? (
                           <div className="space-y-6">
                             {activeBookings.map((booking, bookingIndex) => (
-                              <div key={booking._id} className={`${bookingIndex > 0 ? 'pt-6 border-t border-white/10' : ''}`}>
+                              <div key={booking._id} className={`${bookingIndex > 0 ? 'pt-6 border-t border-white/5' : ''}`}>
                                 {/* Booking Header */}
                                 <div className="flex items-center justify-between mb-4">
                                   <div className="flex items-center gap-3">
@@ -231,7 +231,7 @@ const UserDashboard = () => {
                                     </div>
                                     <div>
                                       <p className="text-white font-bold">{booking.bookingId || `#REQ-${booking._id?.slice(-6).toUpperCase()}`}</p>
-                                      <p className="text-gray-400 text-sm">{formatDate(booking.scheduledDate)} • {formatTime(booking.scheduledTime)}</p>
+                                      <p className="text-slate-400 text-sm">{formatDate(booking.scheduledDate)} • {formatTime(booking.scheduledTime)}</p>
                                     </div>
                                   </div>
                                   <span className={`text-[10px] font-bold uppercase px-3 py-1.5 rounded-full border ${getStatusColor(booking.status)}`}>
@@ -280,10 +280,10 @@ const UserDashboard = () => {
                                 {/* Agency Info */}
                                 <div className="mt-4 p-3 bg-white/5 rounded-lg border border-white/5 flex items-center gap-3">
                                   <div className="size-10 rounded-full bg-gray-800 flex items-center justify-center shrink-0 border border-white/5">
-                                    <span className="material-symbols-outlined text-gray-400 text-sm">badge</span>
+                                    <span className="material-symbols-outlined text-slate-400 text-sm">badge</span>
                                   </div>
                                   <div className="overflow-hidden">
-                                    <p className="text-xs text-gray-400 truncate">Assigned Agency</p>
+                                    <p className="text-xs text-slate-400 truncate">Assigned Agency</p>
                                     <p className="text-sm font-semibold text-white truncate">
                                       {typeof booking.agencyId === 'object' ? booking.agencyId.name : 'Agency Assigned'}
                                     </p>
@@ -347,7 +347,7 @@ const UserDashboard = () => {
                         <div className="bg-[#151F26] rounded-2xl p-6 shadow-[0_10px_15px_-3px_rgba(0,0,0,0.3)] border border-white/5">
                           <div className="space-y-3">
                             {(showAllBookings ? allBookings : allBookings.slice(0, 5)).map(booking => (
-                              <div key={booking._id} className="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/5 hover:bg-white/10 hover:border-white/10 transition-all group">
+                              <div key={booking._id} className="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/5 hover:bg-white/5 hover:border-white/5 transition-all group">
                                 <div className="flex items-center gap-4">
                                   <div className={`p-3 rounded-xl ${getStatusColor(booking.status)}`}>
                                     <span className="material-symbols-outlined">
@@ -402,7 +402,7 @@ const UserDashboard = () => {
                         Your Impact
                       </h2>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="bg-[#151F26] rounded-2xl p-6 shadow-[0_4px_12px_0_rgba(0,0,0,0.07)] flex flex-col justify-between border border-white/5 hover:border-white/10 transition-colors relative overflow-hidden group">
+                        <div className="bg-[#151F26] rounded-2xl p-6 shadow-[0_4px_12px_0_rgba(0,0,0,0.07)] flex flex-col justify-between border border-white/5 hover:border-white/5 transition-colors relative overflow-hidden group">
                           <div className="absolute right-0 top-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
                             <span className="material-symbols-outlined text-8xl text-white">scale</span>
                           </div>
@@ -413,7 +413,7 @@ const UserDashboard = () => {
                             <p className="text-white text-5xl font-black leading-none tracking-tight">{user?.totalWasteRecycled?.toFixed(1) || '0'} <span className="text-2xl font-medium text-gray-500">kg</span></p>
                           </div>
                           <div className="mt-8">
-                            <div className="flex justify-between text-xs font-medium text-gray-400 mb-2">
+                            <div className="flex justify-between text-xs font-medium text-slate-400 mb-2">
                               <span>Progress</span>
                               <span>{Math.min(Math.round((user?.totalWasteRecycled || 0) / 100 * 100), 100)}% to Goal</span>
                             </div>
@@ -424,7 +424,7 @@ const UserDashboard = () => {
                             </div>
                           </div>
                         </div>
-                        <div className="bg-[#151F26] rounded-2xl p-6 shadow-[0_4px_12px_0_rgba(0,0,0,0.07)] flex flex-col justify-between border border-white/5 hover:border-white/10 transition-colors relative overflow-hidden group">
+                        <div className="bg-[#151F26] rounded-2xl p-6 shadow-[0_4px_12px_0_rgba(0,0,0,0.07)] flex flex-col justify-between border border-white/5 hover:border-white/5 transition-colors relative overflow-hidden group">
                           <div className="absolute right-0 top-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
                             <span className="material-symbols-outlined text-8xl text-white">cloud</span>
                           </div>
@@ -435,7 +435,7 @@ const UserDashboard = () => {
                             <p className="text-white text-5xl font-black leading-none tracking-tight">{stats.co2Offset.toFixed(1)} <span className="text-2xl font-medium text-gray-500">kg</span></p>
                           </div>
                           <div className="mt-8">
-                            <div className="flex justify-between text-xs font-medium text-gray-400 mb-2">
+                            <div className="flex justify-between text-xs font-medium text-slate-400 mb-2">
                               <span>Progress</span>
                               <span>{Math.min(Math.round(stats.co2Offset / 100 * 100), 100)}% to Goal</span>
                             </div>
@@ -462,7 +462,7 @@ const UserDashboard = () => {
                         </svg>
                         <span className="text-7xl font-black text-white ml-2 drop-shadow-sm tracking-tighter">{(user?.ecoPoints || 0).toLocaleString()}</span>
                       </div>
-                      <p className="text-sm text-gray-400 max-w-[200px] z-10">
+                      <p className="text-sm text-slate-400 max-w-[200px] z-10">
                         {(user?.ecoPoints || 0) >= 500 
                           ? 'You have enough points for rewards!' 
                           : `You're ${500 - (user?.ecoPoints || 0)} points away from your first reward!`}
@@ -478,11 +478,11 @@ const UserDashboard = () => {
 
                     <div className="bg-[#151F26] rounded-2xl p-6 shadow-[0_10px_15px_-3px_rgba(0,0,0,0.3)] border border-white/5">
                       <h2 className="text-white text-lg font-bold tracking-tight pb-4 flex items-center gap-2">
-                        <span className="material-symbols-outlined text-gray-400">bolt</span>
+                        <span className="material-symbols-outlined text-slate-400">bolt</span>
                         Quick Actions
                       </h2>
                       <div className="flex flex-col gap-3">
-                        <button onClick={() => window.location.hash = '#/search'} className="flex w-full group cursor-pointer items-center justify-between overflow-hidden rounded-xl h-14 px-4 bg-white/5 text-gray-200 border border-white/5 hover:bg-white/10 hover:border-white/10 transition-all">
+                        <button onClick={() => window.location.hash = '#/search'} className="flex w-full group cursor-pointer items-center justify-between overflow-hidden rounded-xl h-14 px-4 bg-white/5 text-gray-200 border border-white/5 hover:bg-white/5 hover:border-white/5 transition-all">
                           <div className="flex items-center gap-3">
                             <div className="size-8 rounded-lg bg-[#10b981]/20 text-[#10b981] flex items-center justify-center">
                               <span className="material-symbols-outlined text-xl">add</span>
@@ -493,7 +493,7 @@ const UserDashboard = () => {
                         </button>
                         <button 
                           onClick={() => window.location.hash = '#/certificates'} 
-                          className="flex w-full group cursor-pointer items-center justify-between overflow-hidden rounded-xl h-14 px-4 bg-white/5 text-gray-200 border border-white/5 hover:bg-white/10 hover:border-white/10 transition-all"
+                          className="flex w-full group cursor-pointer items-center justify-between overflow-hidden rounded-xl h-14 px-4 bg-white/5 text-gray-200 border border-white/5 hover:bg-white/5 hover:border-white/5 transition-all"
                         >
                           <div className="flex items-center gap-3">
                             <div className="size-8 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center">
@@ -508,7 +508,7 @@ const UserDashboard = () => {
                           </div>
                           <span className="material-symbols-outlined text-gray-500 group-hover:text-white transition-colors">chevron_right</span>
                         </button>
-                        <button onClick={() => window.location.hash = '#/history'} className="flex w-full group cursor-pointer items-center justify-between overflow-hidden rounded-xl h-14 px-4 bg-white/5 text-gray-200 border border-white/5 hover:bg-white/10 hover:border-white/10 transition-all">
+                        <button onClick={() => window.location.hash = '#/history'} className="flex w-full group cursor-pointer items-center justify-between overflow-hidden rounded-xl h-14 px-4 bg-white/5 text-gray-200 border border-white/5 hover:bg-white/5 hover:border-white/5 transition-all">
                           <div className="flex items-center gap-3">
                             <div className="size-8 rounded-lg bg-[#3b82f6]/20 text-[#3b82f6] flex items-center justify-center">
                               <span className="material-symbols-outlined text-xl">history</span>
@@ -517,7 +517,7 @@ const UserDashboard = () => {
                           </div>
                           <span className="material-symbols-outlined text-gray-500 group-hover:text-white transition-colors">chevron_right</span>
                         </button>
-                        <button onClick={() => window.location.hash = '#/contact'} className="flex w-full group cursor-pointer items-center justify-between overflow-hidden rounded-xl h-14 px-4 bg-white/5 text-gray-200 border border-white/5 hover:bg-white/10 hover:border-white/10 transition-all">
+                        <button onClick={() => window.location.hash = '#/contact'} className="flex w-full group cursor-pointer items-center justify-between overflow-hidden rounded-xl h-14 px-4 bg-white/5 text-gray-200 border border-white/5 hover:bg-white/5 hover:border-white/5 transition-all">
                           <div className="flex items-center gap-3">
                             <div className="size-8 rounded-lg bg-purple-500/20 text-purple-400 flex items-center justify-center">
                               <span className="material-symbols-outlined text-xl">support_agent</span>
@@ -546,14 +546,14 @@ const UserDashboard = () => {
           ></div>
           
           {/* Modal */}
-          <div className="relative bg-[#151F26] rounded-2xl p-6 sm:p-8 max-w-md w-full border border-white/10 shadow-2xl">
+          <div className="relative bg-[#151F26] rounded-2xl p-6 sm:p-8 max-w-md w-full border border-white/5 shadow-2xl">
             {/* Warning Icon */}
             <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-red-500/10 flex items-center justify-center">
               <span className="material-symbols-outlined text-4xl text-red-400">warning</span>
             </div>
             
             <h3 className="text-2xl font-bold text-white text-center mb-2">Cancel Pickup?</h3>
-            <p className="text-gray-400 text-center mb-8">
+            <p className="text-slate-400 text-center mb-8">
               Are you sure you want to cancel this pickup request? This action cannot be undone.
             </p>
             
@@ -561,7 +561,7 @@ const UserDashboard = () => {
               <button
                 onClick={() => setShowCancelModal(null)}
                 disabled={cancelling !== null}
-                className="flex-1 py-3 px-6 rounded-xl bg-white/5 text-white font-medium border border-white/10 hover:bg-white/10 transition-all disabled:opacity-50"
+                className="flex-1 py-3 px-6 rounded-xl bg-white/5 text-white font-medium border border-white/5 hover:bg-white/5 transition-all disabled:opacity-50"
               >
                 Keep Pickup
               </button>

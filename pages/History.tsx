@@ -114,7 +114,7 @@ const History = () => {
                   </button>
                   {/* Hover Preview */}
                   <div className="absolute top-14 right-0 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-[100]">
-                    <div className="bg-[#151F26] border border-white/10 rounded-2xl p-4 shadow-2xl">
+                    <div className="bg-[#151F26] border border-white/5 rounded-2xl p-4 shadow-2xl">
                       <div 
                         className="size-32 rounded-xl bg-cover bg-center ring-4 ring-[#10b981]/30" 
                         style={{ backgroundImage: `url("${user?.avatar || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user?.name || 'User') + '&background=10b981&color=fff'}")`}}
@@ -156,7 +156,7 @@ const History = () => {
                       </div>
                       <div>
                         <p className="text-2xl font-bold text-white">{stats.total}</p>
-                        <p className="text-xs text-gray-400">Total Pickups</p>
+                        <p className="text-xs text-slate-400">Total Pickups</p>
                       </div>
                     </div>
                   </div>
@@ -167,7 +167,7 @@ const History = () => {
                       </div>
                       <div>
                         <p className="text-2xl font-bold text-white">{stats.completed}</p>
-                        <p className="text-xs text-gray-400">Completed</p>
+                        <p className="text-xs text-slate-400">Completed</p>
                       </div>
                     </div>
                   </div>
@@ -178,7 +178,7 @@ const History = () => {
                       </div>
                       <div>
                         <p className="text-2xl font-bold text-white">{stats.pending}</p>
-                        <p className="text-xs text-gray-400">In Progress</p>
+                        <p className="text-xs text-slate-400">In Progress</p>
                       </div>
                     </div>
                   </div>
@@ -189,7 +189,7 @@ const History = () => {
                       </div>
                       <div>
                         <p className="text-2xl font-bold text-white">{stats.cancelled}</p>
-                        <p className="text-xs text-gray-400">Cancelled</p>
+                        <p className="text-xs text-slate-400">Cancelled</p>
                       </div>
                     </div>
                   </div>
@@ -204,7 +204,7 @@ const History = () => {
                       className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
                         filter === status 
                           ? 'bg-[#10b981] text-white' 
-                          : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white'
+                          : 'bg-white/5 text-slate-400 hover:bg-white/5 hover:text-white'
                       }`}
                     >
                       {status === 'all' ? 'All' : status.charAt(0).toUpperCase() + status.slice(1).replace('-', ' ')}
@@ -224,7 +224,7 @@ const History = () => {
                         <span className="material-symbols-outlined text-3xl text-gray-500">inbox</span>
                       </div>
                       <h3 className="text-lg font-bold text-white mb-2">No Pickups Found</h3>
-                      <p className="text-gray-400 mb-6">
+                      <p className="text-slate-400 mb-6">
                         {filter === 'all' 
                           ? "You haven't scheduled any pickups yet."
                           : `No ${filter} pickups found.`}
@@ -263,7 +263,7 @@ const History = () => {
                                     {booking.status}
                                   </span>
                                 </div>
-                                <p className="text-gray-400 text-sm mb-2">
+                                <p className="text-slate-400 text-sm mb-2">
                                   {formatDate(booking.scheduledDate)} • {booking.scheduledTime || 'TBD'}
                                 </p>
                                 <p className="text-gray-500 text-sm">
@@ -302,7 +302,7 @@ const History = () => {
                             <div className="mt-4 pt-4 border-t border-white/5">
                               <div className="flex flex-wrap gap-2">
                                 {booking.items.slice(0, 3).map((item, idx) => (
-                                  <span key={idx} className="px-3 py-1 bg-white/5 rounded-full text-xs text-gray-300">
+                                  <span key={idx} className="px-3 py-1 bg-white/5 rounded-full text-xs text-gray-200">
                                     {item.quantity}x {item.type}
                                   </span>
                                 ))}

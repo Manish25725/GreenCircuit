@@ -70,7 +70,7 @@ const AdminLogin = () => {
             )}
 
             <div className="space-y-2">
-              <label htmlFor="adminKey" className="block text-sm font-medium text-slate-300">
+              <label htmlFor="adminKey" className="block text-sm font-medium text-gray-200">
                 Admin Key
               </label>
               <div className="relative">
@@ -82,7 +82,7 @@ const AdminLogin = () => {
                   onChange={(e) => setAdminKey(e.target.value)}
                   placeholder="Enter your admin key"
                   required
-                  className="w-full pl-12 pr-4 py-3.5 bg-[#0f1729] border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#34D399]/50 focus:border-[#34D399]/50 transition-all"
+                  className="w-full pl-12 pr-4 py-3.5 bg-[#0f1729] border border-white/5 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#34D399]/50 focus:border-[#34D399]/50 transition-all"
                 />
               </div>
             </div>

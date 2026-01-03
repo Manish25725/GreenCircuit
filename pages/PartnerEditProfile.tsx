@@ -328,7 +328,7 @@ const PartnerEditProfile = () => {
                   </button>
                   {/* Hover Preview */}
                   <div className="absolute top-14 right-0 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-[100]">
-                    <div className="bg-[#151F26] border border-white/10 rounded-2xl p-4 shadow-2xl">
+                    <div className="bg-[#151F26] border border-white/5 rounded-2xl p-4 shadow-2xl">
                       <div 
                         className="size-32 rounded-xl bg-cover bg-center ring-4 ring-[#8b5cf6]/30" 
                         style={{ backgroundImage: `url("${profile?.logo || user?.avatar || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user?.name || 'Partner') + '&background=8b5cf6&color=fff'}${(profile?.logo || user?.avatar) ? '?t=' + avatarKey : ''}")`}}
@@ -360,7 +360,7 @@ const PartnerEditProfile = () => {
                     </div>
                     <div>
                       <h1 className="text-2xl sm:text-3xl font-bold text-white">Edit Company Profile</h1>
-                      <p className="text-gray-400 text-sm mt-1">Update your company information and details</p>
+                      <p className="text-slate-400 text-sm mt-1">Update your company information and details</p>
                     </div>
                   </div>
                 </div>
@@ -403,7 +403,7 @@ const PartnerEditProfile = () => {
                         </div>
                         <div className="text-center">
                           <p className="text-white text-sm font-medium mb-1">Upload Company Logo</p>
-                          <p className="text-gray-400 text-xs">
+                          <p className="text-slate-400 text-xs">
                             {uploadingLogo ? 'Uploading to cloud...' : 'Click the camera icon • Square image • Min 256x256px'}
                           </p>
                           <div className="flex items-center justify-center gap-2 mt-3">
@@ -430,7 +430,7 @@ const PartnerEditProfile = () => {
                             value={formData.companyName}
                             onChange={handleInputChange}
                             required
-                            className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-[#8b5cf6] focus:border-[#8b5cf6] transition-all"
+                            className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/5 text-white focus:outline-none focus:ring-1 focus:ring-[#8b5cf6] focus:border-[#8b5cf6] transition-all"
                             placeholder="Enter company name"
                           />
                         </label>
@@ -441,7 +441,7 @@ const PartnerEditProfile = () => {
                             name="registrationNumber"
                             value={formData.registrationNumber}
                             onChange={handleInputChange}
-                            className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-[#8b5cf6] focus:border-[#8b5cf6] transition-all"
+                            className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/5 text-white focus:outline-none focus:ring-1 focus:ring-[#8b5cf6] focus:border-[#8b5cf6] transition-all"
                             placeholder="Business registration number"
                           />
                         </label>
@@ -452,7 +452,7 @@ const PartnerEditProfile = () => {
                             name="name"
                             value={formData.name}
                             onChange={handleInputChange}
-                            className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-[#8b5cf6] focus:border-[#8b5cf6] transition-all"
+                            className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/5 text-white focus:outline-none focus:ring-1 focus:ring-[#8b5cf6] focus:border-[#8b5cf6] transition-all"
                             placeholder="Contact person name"
                           />
                         </label>
@@ -465,7 +465,7 @@ const PartnerEditProfile = () => {
                             onChange={handleInputChange}
                             required
                             disabled
-                            className="w-full h-12 px-3 py-2 bg-[#0B1116]/50 border rounded-xl border-white/10 text-gray-400 cursor-not-allowed"
+                            className="w-full h-12 px-3 py-2 bg-[#0B1116]/50 border rounded-xl border-white/5 text-slate-400 cursor-not-allowed"
                             placeholder="Email address"
                           />
                         </label>
@@ -477,7 +477,7 @@ const PartnerEditProfile = () => {
                             value={formData.phone}
                             onChange={handleInputChange}
                             required
-                            className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-[#8b5cf6] focus:border-[#8b5cf6] transition-all"
+                            className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/5 text-white focus:outline-none focus:ring-1 focus:ring-[#8b5cf6] focus:border-[#8b5cf6] transition-all"
                             placeholder="Contact phone number"
                           />
                         </label>
@@ -498,7 +498,7 @@ const PartnerEditProfile = () => {
                             name="address"
                             value={formData.address}
                             onChange={handleInputChange}
-                            className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-[#8b5cf6] focus:border-[#8b5cf6] transition-all"
+                            className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/5 text-white focus:outline-none focus:ring-1 focus:ring-[#8b5cf6] focus:border-[#8b5cf6] transition-all"
                             placeholder="Street address"
                           />
                         </label>
@@ -510,7 +510,7 @@ const PartnerEditProfile = () => {
                               name="city"
                               value={formData.city}
                               onChange={handleInputChange}
-                              className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-[#8b5cf6] focus:border-[#8b5cf6] transition-all"
+                              className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/5 text-white focus:outline-none focus:ring-1 focus:ring-[#8b5cf6] focus:border-[#8b5cf6] transition-all"
                               placeholder="City"
                             />
                           </label>
@@ -521,7 +521,7 @@ const PartnerEditProfile = () => {
                               name="state"
                               value={formData.state}
                               onChange={handleInputChange}
-                              className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-[#8b5cf6] focus:border-[#8b5cf6] transition-all"
+                              className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/5 text-white focus:outline-none focus:ring-1 focus:ring-[#8b5cf6] focus:border-[#8b5cf6] transition-all"
                               placeholder="State"
                             />
                           </label>
@@ -532,7 +532,7 @@ const PartnerEditProfile = () => {
                               name="zipCode"
                               value={formData.zipCode}
                               onChange={handleInputChange}
-                              className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-[#8b5cf6] focus:border-[#8b5cf6] transition-all"
+                              className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/5 text-white focus:outline-none focus:ring-1 focus:ring-[#8b5cf6] focus:border-[#8b5cf6] transition-all"
                               placeholder="ZIP code"
                             />
                           </label>
@@ -553,7 +553,7 @@ const PartnerEditProfile = () => {
                           value={formData.description}
                           onChange={handleInputChange}
                           rows={4}
-                          className="w-full px-3 py-2 bg-[#0B1116] border rounded-xl border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-[#8b5cf6] focus:border-[#8b5cf6] transition-all resize-none"
+                          className="w-full px-3 py-2 bg-[#0B1116] border rounded-xl border-white/5 text-white focus:outline-none focus:ring-1 focus:ring-[#8b5cf6] focus:border-[#8b5cf6] transition-all resize-none"
                           placeholder="Tell us about your recycling company..."
                         />
                       </label>
@@ -565,7 +565,7 @@ const PartnerEditProfile = () => {
                           value={formData.services}
                           onChange={handleInputChange}
                           rows={3}
-                          className="w-full px-3 py-2 bg-[#0B1116] border rounded-xl border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-[#8b5cf6] focus:border-[#8b5cf6] transition-all resize-none"
+                          className="w-full px-3 py-2 bg-[#0B1116] border rounded-xl border-white/5 text-white focus:outline-none focus:ring-1 focus:ring-[#8b5cf6] focus:border-[#8b5cf6] transition-all resize-none"
                           placeholder="List the services you provide (e.g., E-waste collection, Electronics recycling...)"
                         />
                       </label>
@@ -577,7 +577,7 @@ const PartnerEditProfile = () => {
                     <button
                       type="button"
                       onClick={() => window.history.back()}
-                      className="h-12 px-6 rounded-xl bg-[#151F26] border border-white/10 text-white font-semibold hover:bg-white/5 transition-all"
+                      className="h-12 px-6 rounded-xl bg-[#151F26] border border-white/5 text-white font-semibold hover:bg-white/5 transition-all"
                     >
                       Cancel
                     </button>

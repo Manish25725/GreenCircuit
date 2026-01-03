@@ -4,17 +4,17 @@ import Layout from '../components/Layout';
 const AdminVetting = () => {
   return (
     <Layout title="" role="Admin" fullWidth>
-      <div className="flex h-screen overflow-hidden bg-[#0B1120] font-sans text-slate-300">
+      <div className="flex h-screen overflow-hidden bg-[#0B1116] font-sans text-gray-200">
         
         {/* Left Panel: Request Queue */}
-        <div className="w-full lg:w-[400px] xl:w-[450px] border-r border-white/5 flex flex-col bg-[#0B1120] shrink-0">
+        <div className="w-full lg:w-[400px] xl:w-[450px] border-r border-white/5 flex flex-col bg-[#0B1116] shrink-0">
             {/* Header / Search */}
             <div className="p-4 border-b border-white/5">
                 <div className="relative mb-4">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <span className="material-symbols-outlined text-slate-500 text-[20px]">search</span>
                     </div>
-                    <input className="block w-full pl-10 pr-3 py-2.5 border border-white/10 rounded-xl bg-[#1E293B] text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-[#34D399] focus:border-[#34D399] text-sm transition-all" placeholder="Search requests..." type="text"/>
+                    <input className="block w-full pl-10 pr-3 py-2.5 border border-white/5 rounded-xl bg-[#1E293B] text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-[#34D399] focus:border-[#34D399] text-sm transition-all" placeholder="Search requests..." type="text"/>
                 </div>
 
                 <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
@@ -106,9 +106,9 @@ const AdminVetting = () => {
         </div>
 
         {/* Right Panel: Detailed Vetting View */}
-        <div className="flex-1 flex flex-col bg-[#0B1120] overflow-hidden relative">
+        <div className="flex-1 flex flex-col bg-[#0B1116] overflow-hidden relative">
             {/* Detail Header */}
-            <div className="px-8 py-6 border-b border-white/5 bg-[#0B1120]">
+            <div className="px-8 py-6 border-b border-white/5 bg-[#0B1116]">
                 <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
                     <div className="flex items-center gap-5">
                         <div className="size-20 rounded-2xl bg-[#1E293B] border border-white/5 p-1">
@@ -192,7 +192,7 @@ const AdminVetting = () => {
                                 {/* Placeholder Map */}
                                 <div className="absolute inset-0 opacity-40 bg-[url('https://lh3.googleusercontent.com/aida-public/AB6AXuAqgpi-nw1_f0IryPm0O-LD4cV6iyILzLWbXX1JwtRa2sM-EMgikfu0Yvbto6WtwR7Bk0syf3LEAF42nEIo0AnP-Tlq0IBu-S4TvTOGW1E9yFSDo5DL2Y0yZa_RNIplMVLp78z5s8XulSFo6QxnJ_tUjpZPDF9xgZvA27UkrKKNGseR1fkhWsF4Cn-hWIltw9iJv1Dfg_wK9hraZxM2TT1XChSEhZFvIXX9z4c9C-Fh-qB_8I2-0_NSFGhz8poxd7rZ23afzmXyqEs')] bg-cover bg-center"></div>
                                 <div className="absolute inset-0 flex items-center justify-center">
-                                    <div className="bg-[#1E293B]/90 backdrop-blur px-4 py-2 rounded-lg border border-white/10 flex items-center gap-2 shadow-lg">
+                                    <div className="bg-[#1E293B]/90 backdrop-blur px-4 py-2 rounded-lg border border-white/5 flex items-center gap-2 shadow-lg">
                                         <span className="material-symbols-outlined text-[#34D399]">location_on</span>
                                         <span className="text-white text-sm">Downtown District (Zones 1-4)</span>
                                     </div>
@@ -214,7 +214,7 @@ const AdminVetting = () => {
                             </h3>
                             <div className="space-y-3">
                                 {/* Doc Item 1 */}
-                                <div className="flex items-center gap-3 p-3 rounded-xl bg-[#0B1120] border border-white/5 hover:border-[#34D399]/50 cursor-pointer transition-all group">
+                                <div className="flex items-center gap-3 p-3 rounded-xl bg-[#0B1116] border border-white/5 hover:border-[#34D399]/50 cursor-pointer transition-all group">
                                     <div className="size-10 rounded-lg bg-red-500/20 flex items-center justify-center shrink-0">
                                         <span className="material-symbols-outlined text-red-400">picture_as_pdf</span>
                                     </div>
@@ -225,7 +225,7 @@ const AdminVetting = () => {
                                     <span className="material-symbols-outlined text-slate-500 group-hover:text-white">visibility</span>
                                 </div>
                                 {/* Doc Item 2 */}
-                                <div className="flex items-center gap-3 p-3 rounded-xl bg-[#0B1120] border border-white/5 hover:border-[#34D399]/50 cursor-pointer transition-all group">
+                                <div className="flex items-center gap-3 p-3 rounded-xl bg-[#0B1116] border border-white/5 hover:border-[#34D399]/50 cursor-pointer transition-all group">
                                     <div className="size-10 rounded-lg bg-blue-500/20 flex items-center justify-center shrink-0">
                                         <span className="material-symbols-outlined text-blue-400">image</span>
                                     </div>
@@ -236,7 +236,7 @@ const AdminVetting = () => {
                                     <span className="material-symbols-outlined text-slate-500 group-hover:text-white">visibility</span>
                                 </div>
                                 {/* Doc Item 3 */}
-                                <div className="flex items-center gap-3 p-3 rounded-xl bg-[#0B1120] border border-white/5 hover:border-[#34D399]/50 cursor-pointer transition-all group">
+                                <div className="flex items-center gap-3 p-3 rounded-xl bg-[#0B1116] border border-white/5 hover:border-[#34D399]/50 cursor-pointer transition-all group">
                                     <div className="size-10 rounded-lg bg-red-500/20 flex items-center justify-center shrink-0">
                                         <span className="material-symbols-outlined text-red-400">picture_as_pdf</span>
                                     </div>
@@ -257,7 +257,7 @@ const AdminVetting = () => {
                                 Internal Notes
                             </h3>
                             <div className="relative">
-                                <textarea className="w-full bg-[#0B1120] border border-white/10 rounded-xl p-3 text-sm text-white focus:ring-1 focus:ring-[#34D399] focus:border-transparent min-h-[120px] outline-none placeholder-slate-500" placeholder="Add private notes for other admins..."></textarea>
+                                <textarea className="w-full bg-[#0B1116] border border-white/5 rounded-xl p-3 text-sm text-white focus:ring-1 focus:ring-[#34D399] focus:border-transparent min-h-[120px] outline-none placeholder-slate-500" placeholder="Add private notes for other admins..."></textarea>
                                 <div className="absolute bottom-3 right-3">
                                     <button className="text-xs bg-white/10 text-white px-2 py-1 rounded hover:bg-white/20 transition-colors cursor-pointer">Save</button>
                                 </div>
@@ -270,7 +270,7 @@ const AdminVetting = () => {
             </div>
 
             {/* Sticky Action Footer */}
-            <div className="absolute bottom-0 left-0 right-0 p-4 bg-[#0B1120]/95 backdrop-blur border-t border-white/10 flex justify-between items-center z-10">
+            <div className="absolute bottom-0 left-0 right-0 p-4 bg-[#0B1116]/95 backdrop-blur border-t border-white/5 flex justify-between items-center z-10">
                 <div className="hidden sm:flex items-center gap-2">
                     <span className="text-slate-400 text-sm">Next in queue:</span>
                     <span className="text-white text-sm font-medium">TechCycle Solutions</span>
@@ -279,7 +279,7 @@ const AdminVetting = () => {
                     <button className="px-6 py-2.5 rounded-lg border border-red-500/30 text-red-400 hover:bg-red-500/10 font-semibold text-sm transition-colors flex items-center gap-2 cursor-pointer">
                         <span className="material-symbols-outlined text-[18px]">close</span> Reject
                     </button>
-                    <button className="px-6 py-2.5 rounded-lg border border-white/10 text-white hover:bg-white/5 font-semibold text-sm transition-colors flex items-center gap-2 cursor-pointer">
+                    <button className="px-6 py-2.5 rounded-lg border border-white/5 text-white hover:bg-white/5 font-semibold text-sm transition-colors flex items-center gap-2 cursor-pointer">
                         <span className="material-symbols-outlined text-[18px]">help</span> Request Info
                     </button>
                     <button className="px-8 py-2.5 rounded-lg bg-[#34D399] hover:bg-[#6EE7B7] text-[#0B1120] font-bold text-sm shadow-[0_0_20px_rgba(52,211,153,0.3)] transition-all flex items-center gap-2 transform active:scale-95 cursor-pointer">

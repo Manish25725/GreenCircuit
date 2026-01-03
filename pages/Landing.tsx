@@ -180,10 +180,10 @@ const Landing = () => {
   };
 
   return (
-    <div className="relative flex h-auto min-h-screen w-full flex-col font-display bg-[#0B1120] text-slate-300 selection:bg-[#34D399] selection:text-slate-900 overflow-x-hidden">
+    <div className="relative flex h-auto min-h-screen w-full flex-col font-display bg-[#0B1116] text-gray-200 selection:bg-[#34D399] selection:text-slate-900 overflow-x-hidden">
         {/* Navbar */}
         <div className="w-full flex justify-center fixed top-0 left-0 right-0 z-50 transition-all duration-300" id="navbar" ref={navbarRef}>
-            <div className="absolute inset-0 bg-[#0B1120]/80 backdrop-blur-md border-b border-white/5"></div>
+            <div className="absolute inset-0 bg-[#0B1116]/80 backdrop-blur-md border-b border-white/5"></div>
             <div className="w-full max-w-7xl px-4 sm:px-6 relative z-10">
                 <header className="flex items-center justify-between h-16 sm:h-20">
                     <div className="flex items-center gap-3 cursor-pointer" onClick={() => window.location.hash = '#/'}>
@@ -218,7 +218,7 @@ const Landing = () => {
                           <>
                             <button 
                                 onClick={() => window.location.hash = '#/login'}
-                                className="hidden sm:flex h-10 px-5 items-center justify-center rounded-full bg-white/5 text-white hover:bg-white/10 border border-white/10 text-sm font-bold transition-all duration-300 cursor-pointer"
+                                className="hidden sm:flex h-10 px-5 items-center justify-center rounded-full bg-white/5 text-white hover:bg-white/5 border border-white/5 text-sm font-bold transition-all duration-300 cursor-pointer"
                             >
                                 {t('logIn')}
                             </button>
@@ -250,7 +250,7 @@ const Landing = () => {
                                 // Redirect to home
                                 window.location.href = '/';
                               }}
-                              className="flex items-center gap-2 h-10 px-5 rounded-full bg-white/5 text-white hover:bg-white/10 border border-white/10 text-sm font-bold transition-all duration-300 cursor-pointer"
+                              className="flex items-center gap-2 h-10 px-5 rounded-full bg-white/5 text-white hover:bg-white/5 border border-white/5 text-sm font-bold transition-all duration-300 cursor-pointer"
                           >
                               <span className="material-symbols-outlined text-[#34D399]">logout</span>
                               <span className="hidden sm:inline">{t('logOut')}</span>
@@ -263,37 +263,37 @@ const Landing = () => {
 
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
-          <div className="md:hidden fixed top-16 sm:top-20 left-0 right-0 z-40 bg-[#0B1120]/95 backdrop-blur-lg border-b border-white/5 shadow-2xl">
+          <div className="md:hidden fixed top-16 sm:top-20 left-0 right-0 z-40 bg-[#0B1116]/95 backdrop-blur-lg border-b border-white/5 shadow-2xl">
             <nav className="flex flex-col p-4 gap-2">
               <button 
-                className="text-left text-slate-300 hover:text-[#34D399] hover:bg-white/5 px-4 py-3 rounded-lg text-sm font-medium transition-colors" 
+                className="text-left text-gray-200 hover:text-[#34D399] hover:bg-white/5 px-4 py-3 rounded-lg text-sm font-medium transition-colors" 
                 onClick={() => { window.location.hash = '#/how-it-works'; setIsMobileMenuOpen(false); }}
               >
                 {t('howItWorks')}
               </button>
               {isLoggedIn && (
                 <button 
-                  className="text-left text-slate-300 hover:text-[#34D399] hover:bg-white/5 px-4 py-3 rounded-lg text-sm font-medium transition-colors" 
+                  className="text-left text-gray-200 hover:text-[#34D399] hover:bg-white/5 px-4 py-3 rounded-lg text-sm font-medium transition-colors" 
                   onClick={() => { window.location.hash = '#/dashboard'; setIsMobileMenuOpen(false); }}
                 >
                   {t('dashboard')}
                 </button>
               )}
               <button 
-                className="text-left text-slate-300 hover:text-[#34D399] hover:bg-white/5 px-4 py-3 rounded-lg text-sm font-medium transition-colors" 
+                className="text-left text-gray-200 hover:text-[#34D399] hover:bg-white/5 px-4 py-3 rounded-lg text-sm font-medium transition-colors" 
                 onClick={() => { window.location.hash = '#/about'; setIsMobileMenuOpen(false); }}
               >
                 {t('about')}
               </button>
               <button 
-                className="text-left text-slate-300 hover:text-[#34D399] hover:bg-white/5 px-4 py-3 rounded-lg text-sm font-medium transition-colors" 
+                className="text-left text-gray-200 hover:text-[#34D399] hover:bg-white/5 px-4 py-3 rounded-lg text-sm font-medium transition-colors" 
                 onClick={() => { window.location.hash = '#/contact'; setIsMobileMenuOpen(false); }}
               >
                 {t('contact')}
               </button>
               {!isLoggedIn && (
                 <button 
-                  className="text-left text-slate-300 hover:text-[#34D399] hover:bg-white/5 px-4 py-3 rounded-lg text-sm font-medium transition-colors sm:hidden" 
+                  className="text-left text-gray-200 hover:text-[#34D399] hover:bg-white/5 px-4 py-3 rounded-lg text-sm font-medium transition-colors sm:hidden" 
                   onClick={() => { window.location.hash = '#/login'; setIsMobileMenuOpen(false); }}
                 >
                   {t('logIn')}
@@ -347,7 +347,7 @@ const Landing = () => {
                         <div className="hero-actions opacity-0 translate-y-8 flex gap-4 mt-4">
                             <div className="relative group">
                                 <div className="absolute -inset-0.5 bg-gradient-to-r from-[#34D399] to-[#3B82F6] rounded-full blur opacity-30 group-hover:opacity-60 transition duration-1000 group-hover:duration-200"></div>
-                                <button onClick={() => window.location.hash = '#/search'} className="relative flex items-center justify-center gap-2 h-12 px-8 rounded-full bg-[#1E293B] border border-white/10 text-white font-bold hover:bg-[#1E293B]/80 transition-all group-hover:translate-x-1 cursor-pointer">
+                                <button onClick={() => window.location.hash = '#/search'} className="relative flex items-center justify-center gap-2 h-12 px-8 rounded-full bg-[#1E293B] border border-white/5 text-white font-bold hover:bg-[#1E293B]/80 transition-all group-hover:translate-x-1 cursor-pointer">
                                     <span>{t('startRecycling')}</span>
                                     <span className="material-symbols-outlined text-[#34D399] text-xl transition-transform group-hover:translate-x-1">arrow_forward</span>
                                 </button>
@@ -372,7 +372,7 @@ const Landing = () => {
                     <div className="hero-actions opacity-0 translate-y-8 flex flex-col sm:flex-row gap-4 justify-center">
                         <div className="relative group w-full sm:w-auto">
                             <div className="absolute -inset-0.5 bg-gradient-to-r from-[#34D399] to-[#3B82F6] rounded-full blur opacity-30 group-hover:opacity-60 transition duration-1000 group-hover:duration-200"></div>
-                            <button onClick={() => window.location.hash = '#/search'} className="relative w-full sm:w-auto flex items-center justify-center gap-2 h-12 px-8 rounded-full bg-[#1E293B] border border-white/10 text-white font-bold hover:bg-[#1E293B]/80 transition-all group-hover:translate-x-1 cursor-pointer">
+                            <button onClick={() => window.location.hash = '#/search'} className="relative w-full sm:w-auto flex items-center justify-center gap-2 h-12 px-8 rounded-full bg-[#1E293B] border border-white/5 text-white font-bold hover:bg-[#1E293B]/80 transition-all group-hover:translate-x-1 cursor-pointer">
                                 <span>{t('startRecycling')}</span>
                                 <span className="material-symbols-outlined text-[#34D399] text-xl transition-transform group-hover:translate-x-1">arrow_forward</span>
                             </button>
@@ -421,7 +421,7 @@ const Landing = () => {
                                 <span className="material-symbols-outlined text-3xl font-bold">person</span>
                             </div>
                             <h3 className={`text-3xl font-bold mb-3 transition-colors ${user?.role === 'user' ? 'text-[#34D399]' : 'text-white'}`}>{t('residents')}</h3>
-                            <p className={`leading-relaxed ${user?.role === 'user' ? 'text-slate-300' : 'text-slate-400'}`}>
+                            <p className={`leading-relaxed ${user?.role === 'user' ? 'text-gray-200' : 'text-slate-400'}`}>
                                 {t('residentsDesc')}
                             </p>
                         </div>
@@ -466,7 +466,7 @@ const Landing = () => {
                                 <span className="material-symbols-outlined text-3xl font-bold">apartment</span>
                             </div>
                             <h3 className={`text-3xl font-bold mb-3 transition-colors ${user?.role === 'business' ? 'text-[#60A5FA]' : 'text-white'}`}>{t('businesses')}</h3>
-                            <p className={`leading-relaxed ${user?.role === 'business' ? 'text-slate-300' : 'text-slate-400'}`}>
+                            <p className={`leading-relaxed ${user?.role === 'business' ? 'text-gray-200' : 'text-slate-400'}`}>
                                 {t('businessesDesc')}
                             </p>
                         </div>
@@ -511,7 +511,7 @@ const Landing = () => {
                                 <span className="material-symbols-outlined text-3xl font-bold">recycling</span>
                             </div>
                             <h3 className={`text-3xl font-bold mb-3 transition-colors ${user?.role === 'agency' ? 'text-[#FBBF24]' : 'text-white'}`}>{t('partners')}</h3>
-                            <p className={`leading-relaxed ${user?.role === 'agency' ? 'text-slate-300' : 'text-slate-400'}`}>
+                            <p className={`leading-relaxed ${user?.role === 'agency' ? 'text-gray-200' : 'text-slate-400'}`}>
                                 {t('partnersDesc')}
                             </p>
                         </div>
@@ -556,16 +556,16 @@ const Landing = () => {
                             <div className="card-inner preserve-3d relative w-full h-full p-8 rounded-[2rem] bg-gradient-to-b from-[#1E293B] to-[#0B1120] border border-white/5 hover:border-[#34D399]/30 transition-all duration-500 overflow-hidden shadow-2xl hover:shadow-[0_20px_40px_-15px_rgba(52,211,153,0.15)] flex flex-col justify-between">
                                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(52,211,153,0.08),transparent_50%)] pointer-events-none"></div>
                                 <div className="flex flex-col items-start gap-6 relative z-10">
-                                    <div className="icon-wrapper size-20 rounded-2xl bg-[#FFFFFF]/5 border border-white/10 flex items-center justify-center text-slate-300 group-hover:bg-[#34D399] group-hover:text-slate-900 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 icon-glow" style={{ filter: 'drop-shadow(0 0 20px rgba(52, 211, 153, 0))' }}>
+                                    <div className="icon-wrapper size-20 rounded-2xl bg-[#FFFFFF]/5 border border-white/5 flex items-center justify-center text-gray-200 group-hover:bg-[#34D399] group-hover:text-slate-900 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 icon-glow" style={{ filter: 'drop-shadow(0 0 20px rgba(52, 211, 153, 0))' }}>
                                         <span className="material-symbols-outlined text-4xl">{item.icon}</span>
                                     </div>
                                     <div className="space-y-3">
                                         <h3 className="text-white text-2xl font-bold group-hover:text-[#34D399] transition-colors">{item.title}</h3>
-                                        <p className="text-slate-400 text-sm leading-relaxed border-l-2 border-white/10 pl-3 group-hover:border-[#34D399]/50 transition-colors">{item.desc}</p>
+                                        <p className="text-slate-400 text-sm leading-relaxed border-l-2 border-white/5 pl-3 group-hover:border-[#34D399]/50 transition-colors">{item.desc}</p>
                                     </div>
                                 </div>
-                                <div className="mt-8 pt-6 border-t border-white/5 flex items-center justify-between w-full group-hover:border-white/10 transition-colors">
-                                    <span className="text-xs font-medium text-slate-500 uppercase tracking-wider group-hover:text-slate-300 transition-colors">Start Recycle</span>
+                                <div className="mt-8 pt-6 border-t border-white/5 flex items-center justify-between w-full group-hover:border-white/5 transition-colors">
+                                    <span className="text-xs font-medium text-slate-500 uppercase tracking-wider group-hover:text-gray-200 transition-colors">Start Recycle</span>
                                     <div className="size-10 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-[#34D399] group-hover:text-slate-900 transition-all duration-300 transform group-hover:translate-x-1">
                                         <span className="material-symbols-outlined text-lg">arrow_forward</span>
                                     </div>
@@ -584,7 +584,7 @@ const Landing = () => {
                         <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-[#3B82F6]/10 rounded-full blur-[80px]"></div>
                     </div>
                     <div className="relative z-10 max-w-2xl w-full flex flex-col items-center gap-8 locator-content">
-                        <div className="size-20 rounded-2xl bg-gradient-to-br from-[#FFFFFF]/10 to-transparent flex items-center justify-center border border-white/10 shadow-2xl backdrop-blur-md mb-2 icon-float">
+                        <div className="size-20 rounded-2xl bg-gradient-to-br from-[#FFFFFF]/10 to-transparent flex items-center justify-center border border-white/5 shadow-2xl backdrop-blur-md mb-2 icon-float">
                             <span className="material-symbols-outlined text-4xl text-[#34D399] drop-shadow-[0_0_15px_rgba(52,211,153,0.5)]">location_on</span>
                         </div>
                         <div className="space-y-4">
@@ -657,13 +657,13 @@ const Landing = () => {
                         <div className="flex flex-col gap-3 sm:flex-row">
                             <button 
                                 onClick={() => window.location.hash = '#/search'}
-                                className="flex h-12 min-w-[160px] cursor-pointer items-center justify-center rounded-full bg-[#0B1120] px-6 text-white text-base font-bold transition-transform hover:scale-105"
+                                className="flex h-12 min-w-[160px] cursor-pointer items-center justify-center rounded-full bg-[#0B1116] px-6 text-white text-base font-bold transition-transform hover:scale-105"
                             >
                                 Book Pickup
                             </button>
                             <button 
                                 onClick={() => window.location.hash = '#/contact'}
-                                className="flex h-12 min-w-[160px] cursor-pointer items-center justify-center rounded-full border-2 border-[#0B1120] px-6 text-[#0B1120] text-base font-bold transition-colors hover:bg-[#0B1120]/10"
+                                className="flex h-12 min-w-[160px] cursor-pointer items-center justify-center rounded-full border-2 border-[#0B1120] px-6 text-[#0B1120] text-base font-bold transition-colors hover:bg-[#0B1116]/10"
                             >
                                 Contact Sales
                             </button>
@@ -674,7 +674,7 @@ const Landing = () => {
         </main>
 
         {/* Footer */}
-        <footer className="w-full border-t border-white/5 bg-[#0B1120] pt-16 pb-8 relative z-20">
+        <footer className="w-full border-t border-white/5 bg-[#0B1116] pt-16 pb-8 relative z-20">
             <div className="max-w-7xl mx-auto px-4 sm:px-6">
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
                     <div className="col-span-1 md:col-span-1">

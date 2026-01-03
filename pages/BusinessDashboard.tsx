@@ -257,7 +257,7 @@ const BusinessDashboard = () => {
                   </button>
                   {/* Hover Preview */}
                   <div className="absolute top-14 right-0 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-[100]">
-                    <div className="bg-[#151F26] border border-white/10 rounded-2xl p-4 shadow-2xl">
+                    <div className="bg-[#151F26] border border-white/5 rounded-2xl p-4 shadow-2xl">
                       <div className="size-32 rounded-xl ring-4 ring-[#06b6d4]/30 overflow-hidden bg-[#06b6d4] flex items-center justify-center">
                         {user?.logo || user?.avatar ? (
                           <img 
@@ -275,7 +275,7 @@ const BusinessDashboard = () => {
                 <NotificationBell />
                 <button 
                   onClick={handleLogout}
-                  className="p-2.5 rounded-full bg-[#151F26] border border-white/5 text-gray-400 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                  className="p-2.5 rounded-full bg-[#151F26] border border-white/5 text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-colors"
                   title="Logout"
                 >
                   <span className="material-symbols-outlined text-[20px]">logout</span>
@@ -291,11 +291,11 @@ const BusinessDashboard = () => {
                     <h1 className="text-white text-4xl sm:text-5xl font-black leading-tight tracking-tighter mb-2 bg-gradient-to-r from-white to-gray-500 bg-clip-text text-transparent">Welcome, {user?.name?.split(' ')[0] || 'Business'}!</h1>
                     <p className="text-[#94a3b8] text-lg">Manage your corporate e-waste disposal efficiently.</p>
                   </div>
-                  <div className="flex items-center gap-3 bg-[#151F26]/50 p-1.5 pr-4 rounded-full border border-white/10 backdrop-blur-sm">
+                  <div className="flex items-center gap-3 bg-[#151F26]/50 p-1.5 pr-4 rounded-full border border-white/5 backdrop-blur-sm">
                     <div className="bg-[#06b6d4]/20 p-2 rounded-full text-[#06b6d4]">
                       <span className="material-symbols-outlined text-lg">calendar_today</span>
                     </div>
-                    <span className="text-sm font-medium text-gray-300">{formatDate()}</span>
+                    <span className="text-sm font-medium text-gray-200">{formatDate()}</span>
                   </div>
                 </div>
 
@@ -327,7 +327,7 @@ const BusinessDashboard = () => {
                         ) : activeBookings.length > 0 ? (
                           <div className="space-y-6">
                             {activeBookings.map((booking, bookingIndex) => (
-                              <div key={booking._id} className={`${bookingIndex > 0 ? 'pt-6 border-t border-white/10' : ''}`}>
+                              <div key={booking._id} className={`${bookingIndex > 0 ? 'pt-6 border-t border-white/5' : ''}`}>
                                 {/* Booking Header */}
                                 <div className="flex items-center justify-between mb-4">
                                   <div className="flex items-center gap-3">
@@ -336,7 +336,7 @@ const BusinessDashboard = () => {
                                     </div>
                                     <div>
                                       <p className="text-white font-bold">{booking.bookingId || `#DSP-${booking._id?.slice(-6).toUpperCase()}`}</p>
-                                      <p className="text-gray-400 text-sm">{formatDate(booking.scheduledDate)} • {formatTime(booking.scheduledTime)}</p>
+                                      <p className="text-slate-400 text-sm">{formatDate(booking.scheduledDate)} • {formatTime(booking.scheduledTime)}</p>
                                     </div>
                                   </div>
                                   <span className={`text-[10px] font-bold uppercase px-3 py-1.5 rounded-full border ${getStatusColor(booking.status)}`}>
@@ -385,10 +385,10 @@ const BusinessDashboard = () => {
                                 {/* Agency Info */}
                                 <div className="mt-4 p-3 bg-white/5 rounded-lg border border-white/5 flex items-center gap-3">
                                   <div className="size-10 rounded-full bg-gray-800 flex items-center justify-center shrink-0 border border-white/5">
-                                    <span className="material-symbols-outlined text-gray-400 text-sm">business</span>
+                                    <span className="material-symbols-outlined text-slate-400 text-sm">business</span>
                                   </div>
                                   <div className="overflow-hidden">
-                                    <p className="text-xs text-gray-400 truncate">Disposal Partner</p>
+                                    <p className="text-xs text-slate-400 truncate">Disposal Partner</p>
                                     <p className="text-sm font-semibold text-white truncate">
                                       {typeof booking.agencyId === 'object' ? booking.agencyId.name : 'Partner Assigned'}
                                     </p>
@@ -452,7 +452,7 @@ const BusinessDashboard = () => {
                         <div className="bg-[#151F26] rounded-2xl p-6 shadow-[0_10px_15px_-3px_rgba(0,0,0,0.3)] border border-white/5">
                           <div className="space-y-3">
                             {(showAllBookings ? allBookings : allBookings.slice(0, 5)).map(booking => (
-                              <div key={booking._id} className="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/5 hover:bg-white/10 hover:border-white/10 transition-all group">
+                              <div key={booking._id} className="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/5 hover:bg-white/5 hover:border-white/5 transition-all group">
                                 <div className="flex items-center gap-4">
                                   <div className={`p-3 rounded-xl ${getStatusColor(booking.status)}`}>
                                     <span className="material-symbols-outlined">
@@ -507,7 +507,7 @@ const BusinessDashboard = () => {
                         Business Impact
                       </h2>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="bg-[#151F26] rounded-2xl p-6 shadow-[0_4px_12px_0_rgba(0,0,0,0.07)] flex flex-col justify-between border border-white/5 hover:border-white/10 transition-colors relative overflow-hidden group">
+                        <div className="bg-[#151F26] rounded-2xl p-6 shadow-[0_4px_12px_0_rgba(0,0,0,0.07)] flex flex-col justify-between border border-white/5 hover:border-white/5 transition-colors relative overflow-hidden group">
                           <div className="absolute right-0 top-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
                             <span className="material-symbols-outlined text-8xl text-white">scale</span>
                           </div>
@@ -518,7 +518,7 @@ const BusinessDashboard = () => {
                             <p className="text-white text-5xl font-black leading-none tracking-tight">{user?.totalWasteRecycled?.toFixed(1) || '0'} <span className="text-2xl font-medium text-gray-500">kg</span></p>
                           </div>
                           <div className="mt-8">
-                            <div className="flex justify-between text-xs font-medium text-gray-400 mb-2">
+                            <div className="flex justify-between text-xs font-medium text-slate-400 mb-2">
                               <span>Quarterly Target</span>
                               <span>{Math.min(Math.round((user?.totalWasteRecycled || 0) / 500 * 100), 100)}% Complete</span>
                             </div>
@@ -529,7 +529,7 @@ const BusinessDashboard = () => {
                             </div>
                           </div>
                         </div>
-                        <div className="bg-[#151F26] rounded-2xl p-6 shadow-[0_4px_12px_0_rgba(0,0,0,0.07)] flex flex-col justify-between border border-white/5 hover:border-white/10 transition-colors relative overflow-hidden group">
+                        <div className="bg-[#151F26] rounded-2xl p-6 shadow-[0_4px_12px_0_rgba(0,0,0,0.07)] flex flex-col justify-between border border-white/5 hover:border-white/5 transition-colors relative overflow-hidden group">
                           <div className="absolute right-0 top-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
                             <span className="material-symbols-outlined text-8xl text-white">savings</span>
                           </div>
@@ -540,7 +540,7 @@ const BusinessDashboard = () => {
                             <p className="text-white text-5xl font-black leading-none tracking-tight">₹{stats.costSavings.toLocaleString()} <span className="text-2xl font-medium text-gray-500"></span></p>
                           </div>
                           <div className="mt-8">
-                            <div className="flex justify-between text-xs font-medium text-gray-400 mb-2">
+                            <div className="flex justify-between text-xs font-medium text-slate-400 mb-2">
                               <span>vs Traditional Disposal</span>
                               <span className="text-[#06b6d4]">+32% Saved</span>
                             </div>
@@ -567,7 +567,7 @@ const BusinessDashboard = () => {
                         </svg>
                         <span className="text-7xl font-black text-white ml-2 drop-shadow-sm tracking-tighter">98%</span>
                       </div>
-                      <p className="text-sm text-gray-400 max-w-[200px] z-10">
+                      <p className="text-sm text-slate-400 max-w-[200px] z-10">
                         Excellent! Your e-waste disposal meets all regulatory requirements.
                       </p>
                       <button className="mt-8 w-full group relative overflow-hidden rounded-xl bg-[#06b6d4] text-white font-bold h-12 shadow-[0_0_20px_rgba(6,182,212,0.3)] hover:shadow-[0_0_30px_rgba(6,182,212,0.5)] transition-all z-10 cursor-pointer" onClick={() => window.location.hash = '#/business/certificates'}>
@@ -581,11 +581,11 @@ const BusinessDashboard = () => {
 
                     <div className="bg-[#151F26] rounded-2xl p-6 shadow-[0_10px_15px_-3px_rgba(0,0,0,0.3)] border border-white/5">
                       <h2 className="text-white text-lg font-bold tracking-tight pb-4 flex items-center gap-2">
-                        <span className="material-symbols-outlined text-gray-400">bolt</span>
+                        <span className="material-symbols-outlined text-slate-400">bolt</span>
                         Quick Actions
                       </h2>
                       <div className="flex flex-col gap-3">
-                        <button onClick={() => window.location.hash = '#/search'} className="flex w-full group cursor-pointer items-center justify-between overflow-hidden rounded-xl h-14 px-4 bg-white/5 text-gray-200 border border-white/5 hover:bg-white/10 hover:border-white/10 transition-all">
+                        <button onClick={() => window.location.hash = '#/search'} className="flex w-full group cursor-pointer items-center justify-between overflow-hidden rounded-xl h-14 px-4 bg-white/5 text-gray-200 border border-white/5 hover:bg-white/5 hover:border-white/5 transition-all">
                           <div className="flex items-center gap-3">
                             <div className="size-8 rounded-lg bg-[#06b6d4]/20 text-[#06b6d4] flex items-center justify-center">
                               <span className="material-symbols-outlined text-xl">add</span>
@@ -594,7 +594,7 @@ const BusinessDashboard = () => {
                           </div>
                           <span className="material-symbols-outlined text-gray-500 group-hover:text-white transition-colors">chevron_right</span>
                         </button>
-                        <button onClick={() => window.location.hash = '#/business/inventory'} className="flex w-full group cursor-pointer items-center justify-between overflow-hidden rounded-xl h-14 px-4 bg-white/5 text-gray-200 border border-white/5 hover:bg-white/10 hover:border-white/10 transition-all">
+                        <button onClick={() => window.location.hash = '#/business/inventory'} className="flex w-full group cursor-pointer items-center justify-between overflow-hidden rounded-xl h-14 px-4 bg-white/5 text-gray-200 border border-white/5 hover:bg-white/5 hover:border-white/5 transition-all">
                           <div className="flex items-center gap-3">
                             <div className="size-8 rounded-lg bg-[#8b5cf6]/20 text-[#8b5cf6] flex items-center justify-center">
                               <span className="material-symbols-outlined text-xl">inventory_2</span>
@@ -603,7 +603,7 @@ const BusinessDashboard = () => {
                           </div>
                           <span className="material-symbols-outlined text-gray-500 group-hover:text-white transition-colors">chevron_right</span>
                         </button>
-                        <button onClick={() => window.location.hash = '#/business/analytics'} className="flex w-full group cursor-pointer items-center justify-between overflow-hidden rounded-xl h-14 px-4 bg-white/5 text-gray-200 border border-white/5 hover:bg-white/10 hover:border-white/10 transition-all">
+                        <button onClick={() => window.location.hash = '#/business/analytics'} className="flex w-full group cursor-pointer items-center justify-between overflow-hidden rounded-xl h-14 px-4 bg-white/5 text-gray-200 border border-white/5 hover:bg-white/5 hover:border-white/5 transition-all">
                           <div className="flex items-center gap-3">
                             <div className="size-8 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center">
                               <span className="material-symbols-outlined text-xl">bar_chart</span>
@@ -613,7 +613,7 @@ const BusinessDashboard = () => {
                           <span className="material-symbols-outlined text-gray-500 group-hover:text-white transition-colors">chevron_right</span>
                         </button>
                         {/* Certifications quick action removed as requested */}
-                        <button onClick={() => window.location.hash = '#/contact'} className="flex w-full group cursor-pointer items-center justify-between overflow-hidden rounded-xl h-14 px-4 bg-white/5 text-gray-200 border border-white/5 hover:bg-white/10 hover:border-white/10 transition-all">
+                        <button onClick={() => window.location.hash = '#/contact'} className="flex w-full group cursor-pointer items-center justify-between overflow-hidden rounded-xl h-14 px-4 bg-white/5 text-gray-200 border border-white/5 hover:bg-white/5 hover:border-white/5 transition-all">
                           <div className="flex items-center gap-3">
                             <div className="size-8 rounded-lg bg-pink-500/20 text-pink-400 flex items-center justify-center">
                               <span className="material-symbols-outlined text-xl">support_agent</span>
@@ -642,14 +642,14 @@ const BusinessDashboard = () => {
           ></div>
           
           {/* Modal */}
-          <div className="relative bg-[#151F26] rounded-2xl p-6 sm:p-8 max-w-md w-full border border-white/10 shadow-2xl">
+          <div className="relative bg-[#151F26] rounded-2xl p-6 sm:p-8 max-w-md w-full border border-white/5 shadow-2xl">
             {/* Warning Icon */}
             <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-red-500/10 flex items-center justify-center">
               <span className="material-symbols-outlined text-4xl text-red-400">warning</span>
             </div>
             
             <h3 className="text-2xl font-bold text-white text-center mb-2">Cancel Request?</h3>
-            <p className="text-gray-400 text-center mb-8">
+            <p className="text-slate-400 text-center mb-8">
               Are you sure you want to cancel this disposal request? This action cannot be undone.
             </p>
             
@@ -657,7 +657,7 @@ const BusinessDashboard = () => {
               <button
                 onClick={() => setShowCancelModal(null)}
                 disabled={cancelling !== null}
-                className="flex-1 py-3 px-6 rounded-xl bg-white/5 text-white font-medium border border-white/10 hover:bg-white/10 transition-all disabled:opacity-50"
+                className="flex-1 py-3 px-6 rounded-xl bg-white/5 text-white font-medium border border-white/5 hover:bg-white/5 transition-all disabled:opacity-50"
               >
                 Keep Request
               </button>

@@ -137,7 +137,7 @@ const BusinessAddress = () => {
                     </div>
                     <div>
                       <h1 className="text-2xl sm:text-3xl font-bold text-white">Business Address</h1>
-                      <p className="text-gray-400 text-sm">Manage your business location details</p>
+                      <p className="text-slate-400 text-sm">Manage your business location details</p>
                     </div>
                   </div>
                 </div>
@@ -159,7 +159,7 @@ const BusinessAddress = () => {
                           value={formData.address}
                           onChange={handleInputChange}
                           rows={3}
-                          className="w-full px-3 py-2 bg-[#0B1116] border rounded-xl border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-[#f59e0b] focus:border-[#f59e0b] transition-all resize-none"
+                          className="w-full px-3 py-2 bg-[#0B1116] border rounded-xl border-white/5 text-white focus:outline-none focus:ring-1 focus:ring-[#f59e0b] focus:border-[#f59e0b] transition-all resize-none"
                           placeholder="Enter your business street address"
                         />
                       </label>
@@ -173,7 +173,7 @@ const BusinessAddress = () => {
                             name="city"
                             value={formData.city}
                             onChange={handleInputChange}
-                            className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-[#f59e0b] focus:border-[#f59e0b] transition-all"
+                            className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/5 text-white focus:outline-none focus:ring-1 focus:ring-[#f59e0b] focus:border-[#f59e0b] transition-all"
                             placeholder="Enter city"
                           />
                         </label>
@@ -184,7 +184,7 @@ const BusinessAddress = () => {
                             name="state"
                             value={formData.state}
                             onChange={handleInputChange}
-                            className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-[#f59e0b] focus:border-[#f59e0b] transition-all"
+                            className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/5 text-white focus:outline-none focus:ring-1 focus:ring-[#f59e0b] focus:border-[#f59e0b] transition-all"
                             placeholder="Enter state/province"
                           />
                         </label>
@@ -199,7 +199,7 @@ const BusinessAddress = () => {
                             name="zipCode"
                             value={formData.zipCode}
                             onChange={handleInputChange}
-                            className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-[#f59e0b] focus:border-[#f59e0b] transition-all"
+                            className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/5 text-white focus:outline-none focus:ring-1 focus:ring-[#f59e0b] focus:border-[#f59e0b] transition-all"
                             placeholder="Enter ZIP/postal code"
                           />
                         </label>
@@ -210,7 +210,7 @@ const BusinessAddress = () => {
                             name="country"
                             value={formData.country}
                             onChange={handleInputChange}
-                            className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-[#f59e0b] focus:border-[#f59e0b] transition-all"
+                            className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/5 text-white focus:outline-none focus:ring-1 focus:ring-[#f59e0b] focus:border-[#f59e0b] transition-all"
                             placeholder="Enter country"
                           />
                         </label>
@@ -222,7 +222,7 @@ const BusinessAddress = () => {
                       <button
                         type="button"
                         onClick={() => window.history.back()}
-                        className="flex min-w-[120px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-6 bg-[#0B1116] border border-white/10 text-gray-300 text-sm font-bold leading-normal tracking-[0.015em] hover:bg-white/5 transition-colors"
+                        className="flex min-w-[120px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-6 bg-[#0B1116] border border-white/5 text-gray-200 text-sm font-bold leading-normal tracking-[0.015em] hover:bg-white/5 transition-colors"
                       >
                         Cancel
                       </button>

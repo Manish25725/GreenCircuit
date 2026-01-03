@@ -96,7 +96,7 @@ const NotificationBell = () => {
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="relative flex items-center justify-center size-10 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-[#34D399]/30 transition-all"
+        className="relative flex items-center justify-center size-10 rounded-xl bg-white/5 border border-white/5 hover:bg-white/5 hover:border-[#34D399]/30 transition-all"
       >
         <span className="material-symbols-outlined text-gray-300">notifications</span>
         {unreadCount > 0 && (
@@ -108,9 +108,9 @@ const NotificationBell = () => {
 
       {/* Dropdown */}
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-96 bg-[#15202e] backdrop-blur-xl rounded-2xl border border-white/10 shadow-2xl shadow-black/50 z-50 overflow-hidden">
+        <div className="absolute right-0 mt-2 w-96 bg-[#15202e] backdrop-blur-xl rounded-2xl border border-white/5 shadow-2xl shadow-black/50 z-50 overflow-hidden">
           {/* Header */}
-          <div className="p-4 border-b border-white/10 bg-gradient-to-r from-[#34D399]/5 to-[#059669]/5">
+          <div className="p-4 border-b border-white/5 bg-gradient-to-r from-[#34D399]/5 to-[#059669]/5">
             <div className="flex items-center justify-between">
               <h3 className="text-white font-semibold text-lg">
                 Notifications
@@ -158,7 +158,7 @@ const NotificationBell = () => {
 
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between gap-2 mb-1">
-                          <h4 className={`font-medium text-sm leading-tight line-clamp-1 ${notification.isRead ? 'text-slate-300' : 'text-white'}`}>
+                          <h4 className={`font-medium text-sm leading-tight line-clamp-1 ${notification.isRead ? 'text-gray-200' : 'text-white'}`}>
                             {notification.title}
                           </h4>
                           {!notification.isRead && (
@@ -189,7 +189,7 @@ const NotificationBell = () => {
 
           {/* Footer */}
           {notifications.length > 0 && (
-            <div className="p-3 border-t border-white/10 bg-[#0f1729]">
+            <div className="p-3 border-t border-white/5 bg-[#0f1729]">
               <button
                 onClick={() => {
                   setIsOpen(false);

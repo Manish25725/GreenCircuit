@@ -2,13 +2,13 @@ import React from 'react';
 
 const AboutUs = () => {
   return (
-    <div className="relative flex h-auto min-h-screen w-full flex-col bg-[#0B1120] text-slate-300 font-sans group/design-root overflow-x-hidden selection:bg-[#34D399] selection:text-[#0B1120]">
+    <div className="relative flex h-auto min-h-screen w-full flex-col bg-[#0B1116] text-gray-200 font-sans group/design-root overflow-x-hidden selection:bg-[#34D399] selection:text-[#0B1120]">
       <div className="layout-container flex h-full grow flex-col">
         {/* Back Button */}
         <div className="w-full max-w-[960px] mx-auto px-4 sm:px-10 lg:px-0 pt-6">
             <button 
                 onClick={() => window.history.back()}
-                className="group flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-slate-400 hover:text-[#34D399] hover:border-[#34D399]/30 hover:bg-[#34D399]/10 transition-all duration-300 cursor-pointer backdrop-blur-sm"
+                className="group flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/5 text-slate-400 hover:text-[#34D399] hover:border-[#34D399]/30 hover:bg-[#34D399]/10 transition-all duration-300 cursor-pointer backdrop-blur-sm"
             >
                 <svg className="w-4 h-4 transition-transform duration-300 group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -36,7 +36,7 @@ const AboutUs = () => {
                     <h2 className="text-white text-4xl font-black leading-tight tracking-tight md:text-5xl max-w-2xl">
                         Rewiring the <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#34D399] to-[#6EE7B7]">Future</span>
                     </h2>
-                    <p className="text-slate-300 text-lg font-light leading-relaxed max-w-xl">
+                    <p className="text-gray-200 text-lg font-light leading-relaxed max-w-xl">
                         Building the circular economy of tomorrow, today.
                     </p>
                 </div>
@@ -102,21 +102,21 @@ const AboutUs = () => {
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div className="flex flex-col items-center text-center p-6 rounded-2xl bg-[#1E293B]/30 border border-white/5 hover:border-[#34D399]/30 transition-all">
-                        <div className="mb-4 p-3 rounded-xl bg-[#0B1120] border border-white/5 text-[#34D399]">
+                        <div className="mb-4 p-3 rounded-xl bg-[#0B1116] border border-white/5 text-[#34D399]">
                             <span className="material-symbols-outlined text-3xl">verified_user</span>
                         </div>
                         <h3 className="text-lg font-bold text-white mb-2">Transparency</h3>
                         <p className="text-slate-400 text-sm leading-relaxed">Real-time tracking of your e-waste from pickup to final processing.</p>
                     </div>
                     <div className="flex flex-col items-center text-center p-6 rounded-2xl bg-[#1E293B]/30 border border-white/5 hover:border-[#34D399]/30 transition-all">
-                        <div className="mb-4 p-3 rounded-xl bg-[#0B1120] border border-white/5 text-[#34D399]">
+                        <div className="mb-4 p-3 rounded-xl bg-[#0B1116] border border-white/5 text-[#34D399]">
                             <span className="material-symbols-outlined text-3xl">lightbulb</span>
                         </div>
                         <h3 className="text-lg font-bold text-white mb-2">Innovation</h3>
                         <p className="text-slate-400 text-sm leading-relaxed">Leveraging AI and blockchain to modernize the recycling supply chain.</p>
                     </div>
                     <div className="flex flex-col items-center text-center p-6 rounded-2xl bg-[#1E293B]/30 border border-white/5 hover:border-[#34D399]/30 transition-all">
-                        <div className="mb-4 p-3 rounded-xl bg-[#0B1120] border border-white/5 text-[#34D399]">
+                        <div className="mb-4 p-3 rounded-xl bg-[#0B1116] border border-white/5 text-[#34D399]">
                             <span className="material-symbols-outlined text-3xl">public</span>
                         </div>
                         <h3 className="text-lg font-bold text-white mb-2">Impact</h3>
@@ -188,13 +188,13 @@ const AboutUs = () => {
                     <div className="flex flex-col gap-3 sm:flex-row">
                         <button 
                             onClick={() => window.location.hash = '#/search'}
-                            className="flex h-12 min-w-[140px] cursor-pointer items-center justify-center rounded-full bg-[#0B1120] px-6 text-white text-base font-bold transition-transform hover:scale-105"
+                            className="flex h-12 min-w-[140px] cursor-pointer items-center justify-center rounded-full bg-[#0B1116] px-6 text-white text-base font-bold transition-transform hover:scale-105"
                         >
                             Book Pickup
                         </button>
                         <button 
                             onClick={() => window.location.hash = '#/contact'}
-                            className="flex h-12 min-w-[140px] cursor-pointer items-center justify-center rounded-full border-2 border-[#0B1120] px-6 text-[#0B1120] text-base font-bold transition-colors hover:bg-[#0B1120]/10"
+                            className="flex h-12 min-w-[140px] cursor-pointer items-center justify-center rounded-full border-2 border-[#0B1120] px-6 text-[#0B1120] text-base font-bold transition-colors hover:bg-[#0B1116]/10"
                         >
                             Contact Sales
                         </button>

@@ -70,7 +70,7 @@ const PickupLimitReached = () => {
   if (loading) {
     return (
       <Layout title="" role="User" fullWidth hideSidebar>
-        <div className="min-h-screen bg-[#0B1120] flex items-center justify-center">
+        <div className="min-h-screen bg-[#0B1116] flex items-center justify-center">
           <Loader size="lg" color="#f59e0b" />
         </div>
       </Layout>
@@ -79,7 +79,7 @@ const PickupLimitReached = () => {
 
   return (
     <Layout title="" role="User" fullWidth hideSidebar>
-      <div className="relative flex min-h-screen w-full flex-col font-display bg-[#0B1120] text-slate-300 selection:bg-[#f59e0b] selection:text-slate-900 overflow-x-hidden">
+      <div className="relative flex min-h-screen w-full flex-col font-display bg-[#0B1116] text-gray-200 selection:bg-[#f59e0b] selection:text-slate-900 overflow-x-hidden">
         
         {/* Background Effects */}
         <div className="fixed inset-0 pointer-events-none">
@@ -89,7 +89,7 @@ const PickupLimitReached = () => {
 
         {/* Navbar */}
         <div className="w-full flex justify-center fixed top-0 left-0 right-0 z-50">
-          <header className="flex items-center justify-between w-full max-w-7xl px-4 sm:px-6 lg:px-10 py-4 bg-[#0B1120]/80 backdrop-blur-xl border-b border-white/5">
+          <header className="flex items-center justify-between w-full max-w-7xl px-4 sm:px-6 lg:px-10 py-4 bg-[#0B1116]/80 backdrop-blur-xl border-b border-white/5">
             <div className="flex items-center gap-3 cursor-pointer" onClick={() => window.location.hash = '#/'}>
               <div className="p-2 bg-[#10b981]/10 rounded-xl">
                 <svg className="h-6 w-6 text-[#10b981]" fill="currentColor" viewBox="0 0 48 48">
@@ -125,7 +125,7 @@ const PickupLimitReached = () => {
 
             {/* Active Booking Card */}
             {activeBooking && (
-              <div className="limit-card bg-[#151F32]/80 backdrop-blur-sm rounded-2xl p-6 border border-white/10 shadow-xl mb-8">
+              <div className="limit-card bg-[#151F32]/80 backdrop-blur-sm rounded-2xl p-6 border border-white/5 shadow-xl mb-8">
                 <div className="flex items-center gap-4 mb-6">
                   <div className="w-14 h-14 rounded-xl bg-[#f59e0b]/10 flex items-center justify-center">
                     <span className="material-symbols-outlined text-2xl text-[#f59e0b]">local_shipping</span>
@@ -191,7 +191,7 @@ const PickupLimitReached = () => {
 
             {/* No Active Booking Message */}
             {!activeBooking && (
-              <div className="limit-card bg-[#151F32]/80 backdrop-blur-sm rounded-2xl p-8 border border-white/10 shadow-xl mb-8 text-center">
+              <div className="limit-card bg-[#151F32]/80 backdrop-blur-sm rounded-2xl p-8 border border-white/5 shadow-xl mb-8 text-center">
                 <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[#10b981]/10 flex items-center justify-center">
                   <span className="material-symbols-outlined text-3xl text-[#10b981]">check_circle</span>
                 </div>
@@ -214,7 +214,7 @@ const PickupLimitReached = () => {
               </button>
               <button 
                 onClick={() => window.location.hash = '#/'}
-                className="px-8 py-4 rounded-xl bg-white/5 text-white font-bold border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all"
+                className="px-8 py-4 rounded-xl bg-white/5 text-white font-bold border border-white/5 hover:bg-white/5 hover:border-white/20 transition-all"
               >
                 <span className="flex items-center gap-2">
                   <span className="material-symbols-outlined">home</span>

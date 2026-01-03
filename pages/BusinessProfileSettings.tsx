@@ -98,7 +98,7 @@ const BusinessProfileSettings = () => {
         <div className="bg-[#0B1116] min-h-screen flex items-center justify-center">
           <div className="text-center">
             <Loader size="md" color="#3b82f6" className="mb-4" />
-            <p className="text-gray-400">Loading profile...</p>
+            <p className="text-slate-400">Loading profile...</p>
           </div>
         </div>
       </Layout>
@@ -151,7 +151,7 @@ const BusinessProfileSettings = () => {
                   </button>
                   {/* Hover Preview */}
                   <div className="absolute top-14 right-0 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-[100]">
-                    <div className="bg-[#151F26] border border-white/10 rounded-2xl p-4 shadow-2xl">
+                    <div className="bg-[#151F26] border border-white/5 rounded-2xl p-4 shadow-2xl">
                       <div className="size-32 rounded-xl ring-4 ring-[#06b6d4]/30 overflow-hidden bg-[#06b6d4] flex items-center justify-center">
                         {(business?.logo || user?.avatar) ? (
                           <img 
@@ -168,7 +168,7 @@ const BusinessProfileSettings = () => {
                 </div>
                 <button
                   onClick={handleLogout}
-                  className="p-2.5 rounded-full bg-[#151F26] border border-white/5 text-gray-400 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                  className="p-2.5 rounded-full bg-[#151F26] border border-white/5 text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-colors"
                   title="Logout"
                 >
                   <span className="material-symbols-outlined text-[20px]">logout</span>
@@ -187,7 +187,7 @@ const BusinessProfileSettings = () => {
                     </div>
                     <div>
                       <h1 className="text-2xl sm:text-3xl font-bold text-white">Profile Settings</h1>
-                      <p className="text-gray-400 text-sm">Manage your account preferences and settings</p>
+                      <p className="text-slate-400 text-sm">Manage your account preferences and settings</p>
                     </div>
                   </div>
                 </div>
@@ -198,7 +198,7 @@ const BusinessProfileSettings = () => {
                     <div 
                       key={card.id}
                       onClick={() => window.location.hash = card.link}
-                      className="group bg-[#151F26] border border-white/5 hover:border-white/10 rounded-xl p-6 cursor-pointer transition-all hover:bg-[#1a2730]"
+                      className="group bg-[#151F26] border border-white/5 hover:border-white/5 rounded-xl p-6 cursor-pointer transition-all hover:bg-[#1a2730]"
                     >
                       <div className="flex items-start gap-4">
                         <div 
@@ -219,7 +219,7 @@ const BusinessProfileSettings = () => {
                           >
                             {card.title}
                           </h3>
-                          <p className="text-gray-400 text-sm leading-relaxed mb-3">
+                          <p className="text-slate-400 text-sm leading-relaxed mb-3">
                             {card.description}
                           </p>
                           <div 

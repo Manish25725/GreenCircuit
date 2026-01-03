@@ -290,7 +290,7 @@ const EditResidentProfile = () => {
                   </button>
                   {/* Hover Preview */}
                   <div className="absolute top-14 right-0 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-[100]">
-                    <div className="bg-[#151F26] border border-white/10 rounded-2xl p-4 shadow-2xl">
+                    <div className="bg-[#151F26] border border-white/5 rounded-2xl p-4 shadow-2xl">
                       <div 
                         className="size-32 rounded-xl bg-cover bg-center ring-4 ring-[#10b981]/30" 
                         style={{ backgroundImage: `url("${profile?.avatar || user?.avatar || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user?.name || 'User') + '&background=10b981&color=fff'}")`}}
@@ -322,7 +322,7 @@ const EditResidentProfile = () => {
                     </div>
                     <div>
                       <h1 className="text-2xl sm:text-3xl font-bold text-white">Edit Profile</h1>
-                      <p className="text-gray-400 text-sm mt-1">Update your personal information and preferences</p>
+                      <p className="text-slate-400 text-sm mt-1">Update your personal information and preferences</p>
                     </div>
                   </div>
                 </div>
@@ -365,7 +365,7 @@ const EditResidentProfile = () => {
                         </div>
                         <div className="text-center">
                           <p className="text-white text-sm font-medium mb-1">Upload Profile Picture</p>
-                          <p className="text-gray-400 text-xs">
+                          <p className="text-slate-400 text-xs">
                             {uploadingAvatar ? 'Uploading to cloud...' : 'Click the camera icon • Square image • Min 256x256px'}
                           </p>
                           <div className="flex items-center justify-center gap-2 mt-3">
@@ -392,7 +392,7 @@ const EditResidentProfile = () => {
                             value={formData.name}
                             onChange={handleInputChange}
                             required
-                            className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-[#10b981] focus:border-[#10b981] transition-all"
+                            className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/5 text-white focus:outline-none focus:ring-1 focus:ring-[#10b981] focus:border-[#10b981] transition-all"
                             placeholder="Enter your full name"
                           />
                         </label>
@@ -404,7 +404,7 @@ const EditResidentProfile = () => {
                             value={formData.email}
                             onChange={handleInputChange}
                             required
-                            className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-[#10b981] focus:border-[#10b981] transition-all"
+                            className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/5 text-white focus:outline-none focus:ring-1 focus:ring-[#10b981] focus:border-[#10b981] transition-all"
                             placeholder="your@email.com"
                           />
                         </label>
@@ -417,7 +417,7 @@ const EditResidentProfile = () => {
                           name="phone"
                           value={formData.phone}
                           onChange={handleInputChange}
-                          className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-[#10b981] focus:border-[#10b981] transition-all"
+                          className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/5 text-white focus:outline-none focus:ring-1 focus:ring-[#10b981] focus:border-[#10b981] transition-all"
                           placeholder="+1 (555) 123-4567"
                         />
                       </label>
@@ -439,7 +439,7 @@ const EditResidentProfile = () => {
                           name="address"
                           value={formData.address}
                           onChange={handleInputChange}
-                          className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-[#10b981] focus:border-[#10b981] transition-all"
+                          className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/5 text-white focus:outline-none focus:ring-1 focus:ring-[#10b981] focus:border-[#10b981] transition-all"
                           placeholder="123 Main Street, Apt 4B"
                         />
                       </label>
@@ -452,7 +452,7 @@ const EditResidentProfile = () => {
                             name="city"
                             value={formData.city}
                             onChange={handleInputChange}
-                            className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-[#10b981] focus:border-[#10b981] transition-all"
+                            className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/5 text-white focus:outline-none focus:ring-1 focus:ring-[#10b981] focus:border-[#10b981] transition-all"
                             placeholder="San Francisco"
                           />
                         </label>
@@ -463,7 +463,7 @@ const EditResidentProfile = () => {
                             name="state"
                             value={formData.state}
                             onChange={handleInputChange}
-                            className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-[#10b981] focus:border-[#10b981] transition-all"
+                            className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/5 text-white focus:outline-none focus:ring-1 focus:ring-[#10b981] focus:border-[#10b981] transition-all"
                             placeholder="California"
                           />
                         </label>
@@ -477,7 +477,7 @@ const EditResidentProfile = () => {
                             name="zipCode"
                             value={formData.zipCode}
                             onChange={handleInputChange}
-                            className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-[#10b981] focus:border-[#10b981] transition-all"
+                            className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/5 text-white focus:outline-none focus:ring-1 focus:ring-[#10b981] focus:border-[#10b981] transition-all"
                             placeholder="94102"
                           />
                         </label>
@@ -487,7 +487,7 @@ const EditResidentProfile = () => {
                             name="country"
                             value={formData.country}
                             onChange={handleInputChange}
-                            className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-[#10b981] focus:border-[#10b981] transition-all"
+                            className="w-full h-12 px-3 py-2 bg-[#0B1116] border rounded-xl border-white/5 text-white focus:outline-none focus:ring-1 focus:ring-[#10b981] focus:border-[#10b981] transition-all"
                           >
                             <option value="India">India</option>
                             <option value="USA">United States</option>
@@ -519,7 +519,7 @@ const EditResidentProfile = () => {
                           value={formData.sustainabilityGoals}
                           onChange={handleInputChange}
                           rows={4}
-                          className="w-full px-3 py-2 bg-[#0B1116] border rounded-xl border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-[#10b981] focus:border-[#10b981] transition-all resize-none"
+                          className="w-full px-3 py-2 bg-[#0B1116] border rounded-xl border-white/5 text-white focus:outline-none focus:ring-1 focus:ring-[#10b981] focus:border-[#10b981] transition-all resize-none"
                           placeholder="Share your personal sustainability goals and how you're working towards reducing e-waste..."
                         />
                       </label>
@@ -542,7 +542,7 @@ const EditResidentProfile = () => {
                                 <span className="material-symbols-outlined text-[#10b981]">stars</span>
                               </div>
                               <div>
-                                <p className="text-gray-400 text-xs">Eco Points</p>
+                                <p className="text-slate-400 text-xs">Eco Points</p>
                                 <p className="text-white text-xl font-bold">{profile.ecoPoints || 0}</p>
                               </div>
                             </div>
@@ -553,7 +553,7 @@ const EditResidentProfile = () => {
                                 <span className="material-symbols-outlined text-[#10b981]">recycling</span>
                               </div>
                               <div>
-                                <p className="text-gray-400 text-xs">Waste Recycled</p>
+                                <p className="text-slate-400 text-xs">Waste Recycled</p>
                                 <p className="text-white text-xl font-bold">{profile.totalWasteRecycled || 0} kg</p>
                               </div>
                             </div>
@@ -564,7 +564,7 @@ const EditResidentProfile = () => {
                                 <span className="material-symbols-outlined text-[#10b981]">local_shipping</span>
                               </div>
                               <div>
-                                <p className="text-gray-400 text-xs">Total Pickups</p>
+                                <p className="text-slate-400 text-xs">Total Pickups</p>
                                 <p className="text-white text-xl font-bold">{profile.totalPickups || 0}</p>
                               </div>
                             </div>
@@ -596,7 +596,7 @@ const EditResidentProfile = () => {
                     <button
                       type="button"
                       onClick={() => window.history.back()}
-                      className="h-12 px-6 rounded-xl bg-white/5 hover:bg-white/10 text-white font-semibold transition-all border border-white/10"
+                      className="h-12 px-6 rounded-xl bg-white/5 hover:bg-white/5 text-white font-semibold transition-all border border-white/5"
                     >
                       Cancel
                     </button>

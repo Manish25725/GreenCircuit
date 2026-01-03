@@ -148,7 +148,7 @@ const AdminPartnerApproval: React.FC = () => {
                 </button>
                 <div>
                   <h1 className="text-2xl font-bold text-white">Partner Applications</h1>
-                  <p className="text-sm text-gray-400">Review and approve partner registrations</p>
+                  <p className="text-sm text-slate-400">Review and approve partner registrations</p>
                 </div>
               </div>
             </div>
@@ -162,7 +162,7 @@ const AdminPartnerApproval: React.FC = () => {
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                     filter === status
                       ? 'bg-pink-500 text-white'
-                      : 'bg-white/5 text-gray-400 hover:bg-white/10'
+                      : 'bg-white/5 text-slate-400 hover:bg-white/5'
                   }`}
                 >
                   {status.charAt(0).toUpperCase() + status.slice(1)}
@@ -180,7 +180,7 @@ const AdminPartnerApproval: React.FC = () => {
             ) : agencies.length === 0 ? (
               <div className="text-center py-20">
                 <span className="material-symbols-outlined text-6xl text-gray-600 mb-4">inbox</span>
-                <p className="text-gray-400">No partner applications found</p>
+                <p className="text-slate-400">No partner applications found</p>
               </div>
             ) : (
               <div className="grid gap-4">
@@ -195,27 +195,27 @@ const AdminPartnerApproval: React.FC = () => {
                         
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4 text-sm">
                           <div>
-                            <span className="text-gray-400">Head Name:</span>
+                            <span className="text-slate-400">Head Name:</span>
                             <p className="font-medium text-white">{agency.headName || 'N/A'}</p>
                           </div>
                           <div>
-                            <span className="text-gray-400">Email:</span>
+                            <span className="text-slate-400">Email:</span>
                             <p className="font-medium text-white">{agency.email}</p>
                           </div>
                           <div>
-                            <span className="text-gray-400">Phone:</span>
+                            <span className="text-slate-400">Phone:</span>
                             <p className="font-medium text-white">{agency.phone}</p>
                           </div>
                           <div>
-                            <span className="text-gray-400">GST Number:</span>
+                            <span className="text-slate-400">GST Number:</span>
                             <p className="font-medium text-white">{agency.gstNumber || 'N/A'}</p>
                           </div>
                           <div>
-                            <span className="text-gray-400">Location:</span>
+                            <span className="text-slate-400">Location:</span>
                             <p className="font-medium text-white">{agency.address.city}, {agency.address.state}</p>
                           </div>
                           <div>
-                            <span className="text-gray-400">Submitted:</span>
+                            <span className="text-slate-400">Submitted:</span>
                             <p className="font-medium text-white">{new Date(agency.createdAt).toLocaleDateString()}</p>
                           </div>
                         </div>
@@ -239,11 +239,11 @@ const AdminPartnerApproval: React.FC = () => {
         {showModal && selectedAgency && (
           <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
             <div className="bg-[#1E293B] border border-pink-500/20 rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-              <div className="sticky top-0 bg-[#1E293B] border-b border-white/10 px-6 py-4 flex justify-between items-center">
+              <div className="sticky top-0 bg-[#1E293B] border-b border-white/5 px-6 py-4 flex justify-between items-center">
                 <h2 className="text-2xl font-bold text-white">Partner Details</h2>
                 <button
                   onClick={() => setShowModal(false)}
-                  className="text-gray-400 hover:text-white"
+                  className="text-slate-400 hover:text-white"
                 >
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -254,7 +254,7 @@ const AdminPartnerApproval: React.FC = () => {
               <div className="p-6 space-y-6">
                 {/* Status */}
                 <div className="flex items-center space-x-3">
-                  <span className="text-gray-300 font-medium">Status:</span>
+                  <span className="text-gray-200 font-medium">Status:</span>
                   {getStatusBadge(selectedAgency.verificationStatus)}
                 </div>
 
@@ -263,27 +263,27 @@ const AdminPartnerApproval: React.FC = () => {
                   <h3 className="text-lg font-semibold text-white mb-3">Business Information</h3>
                   <div className="grid grid-cols-2 gap-4 bg-white/5 p-4 rounded-lg">
                     <div>
-                      <span className="text-sm text-gray-400">Agency Name:</span>
+                      <span className="text-sm text-slate-400">Agency Name:</span>
                       <p className="font-medium text-white">{selectedAgency.name}</p>
                     </div>
                     <div>
-                      <span className="text-sm text-gray-400">Head/Owner Name:</span>
+                      <span className="text-sm text-slate-400">Head/Owner Name:</span>
                       <p className="font-medium text-white">{selectedAgency.headName || 'N/A'}</p>
                     </div>
                     <div>
-                      <span className="text-sm text-gray-400">GST Number:</span>
+                      <span className="text-sm text-slate-400">GST Number:</span>
                       <p className="font-medium text-white">{selectedAgency.gstNumber || 'N/A'}</p>
                     </div>
                     <div>
-                      <span className="text-sm text-gray-400">Udyam Certificate:</span>
+                      <span className="text-sm text-slate-400">Udyam Certificate:</span>
                       <p className="font-medium text-white">{selectedAgency.udyamCertificate || 'N/A'}</p>
                     </div>
                     <div>
-                      <span className="text-sm text-gray-400">Business Type:</span>
+                      <span className="text-sm text-slate-400">Business Type:</span>
                       <p className="font-medium text-white">{selectedAgency.businessType || 'N/A'}</p>
                     </div>
                     <div>
-                      <span className="text-sm text-gray-400">Established Year:</span>
+                      <span className="text-sm text-slate-400">Established Year:</span>
                       <p className="font-medium text-white">{selectedAgency.establishedYear || 'N/A'}</p>
                     </div>
                   </div>
@@ -294,11 +294,11 @@ const AdminPartnerApproval: React.FC = () => {
                   <h3 className="text-lg font-semibold text-white mb-3">Contact Information</h3>
                   <div className="grid grid-cols-2 gap-4 bg-white/5 p-4 rounded-lg">
                     <div>
-                      <span className="text-sm text-gray-400">Email:</span>
+                      <span className="text-sm text-slate-400">Email:</span>
                       <p className="font-medium text-white">{selectedAgency.email}</p>
                     </div>
                     <div>
-                      <span className="text-sm text-gray-400">Phone:</span>
+                      <span className="text-sm text-slate-400">Phone:</span>
                       <p className="font-medium text-white">{selectedAgency.phone}</p>
                     </div>
                   </div>
@@ -333,36 +333,36 @@ const AdminPartnerApproval: React.FC = () => {
                   <div>
                     <h3 className="text-lg font-semibold text-white mb-3">Description</h3>
                     <div className="bg-white/5 p-4 rounded-lg">
-                      <p className="text-gray-300">{selectedAgency.description}</p>
+                      <p className="text-gray-200">{selectedAgency.description}</p>
                     </div>
                   </div>
                 )}
 
                 {/* Action Section */}
                 {selectedAgency.verificationStatus === 'pending' && (
-                  <div className="space-y-4 border-t border-white/10 pt-6">
+                  <div className="space-y-4 border-t border-white/5 pt-6">
                     <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                      <label className="block text-sm font-medium text-gray-200 mb-2">
                         Approval Notes (Optional)
                       </label>
                       <textarea
                         value={approvalNotes}
                         onChange={(e) => setApprovalNotes(e.target.value)}
                         rows={3}
-                        className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:ring-2 focus:ring-pink-500 focus:outline-none"
+                        className="w-full px-4 py-2 bg-white/5 border border-white/5 rounded-lg text-white placeholder-gray-500 focus:ring-2 focus:ring-pink-500 focus:outline-none"
                         placeholder="Add any notes for the partner..."
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                      <label className="block text-sm font-medium text-gray-200 mb-2">
                         Rejection Reason (Required if rejecting)
                       </label>
                       <textarea
                         value={rejectionReason}
                         onChange={(e) => setRejectionReason(e.target.value)}
                         rows={3}
-                        className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:ring-2 focus:ring-red-500 focus:outline-none"
+                        className="w-full px-4 py-2 bg-white/5 border border-white/5 rounded-lg text-white placeholder-gray-500 focus:ring-2 focus:ring-red-500 focus:outline-none"
                         placeholder="Explain why this application is being rejected..."
                       />
                     </div>

@@ -161,7 +161,7 @@ const PickupConfirmation = () => {
   if (loading) {
     return (
       <Layout title="" role={userRole} fullWidth hideSidebar>
-        <div className="min-h-screen bg-[#0B1120] flex items-center justify-center">
+        <div className="min-h-screen bg-[#0B1116] flex items-center justify-center">
           <Loader size="lg" color={primaryColor} />
         </div>
       </Layout>
@@ -170,7 +170,7 @@ const PickupConfirmation = () => {
 
   return (
     <Layout title="" role={userRole} fullWidth hideSidebar>
-      <div className="relative flex min-h-screen w-full flex-col font-display bg-[#0B1120] text-slate-300 selection:bg-[#34D399] selection:text-slate-900 overflow-x-hidden">
+      <div className="relative flex min-h-screen w-full flex-col font-display bg-[#0B1116] text-gray-200 selection:bg-[#34D399] selection:text-slate-900 overflow-x-hidden">
         
         {/* Background Effects */}
         <div className="fixed inset-0 pointer-events-none">
@@ -186,7 +186,7 @@ const PickupConfirmation = () => {
 
         {/* Navbar - Matching Homepage */}
         <div className="w-full flex justify-center fixed top-0 left-0 right-0 z-50">
-          <div className="absolute inset-0 bg-[#0B1120]/80 backdrop-blur-md border-b border-white/5"></div>
+          <div className="absolute inset-0 bg-[#0B1116]/80 backdrop-blur-md border-b border-white/5"></div>
           <div className="w-full max-w-7xl px-4 sm:px-6 relative z-10">
             <header className="flex items-center justify-between h-16 sm:h-20">
               <div className="flex items-center gap-3 cursor-pointer" onClick={() => window.location.hash = '#/'}>
@@ -212,7 +212,7 @@ const PickupConfirmation = () => {
               <div className="flex items-center gap-4">
                 <button 
                   onClick={() => window.location.hash = dashboardPath}
-                  className="hidden sm:flex h-10 px-5 items-center justify-center rounded-full bg-white/5 text-white hover:bg-white/10 border border-white/10 text-sm font-bold transition-all duration-300 cursor-pointer"
+                  className="hidden sm:flex h-10 px-5 items-center justify-center rounded-full bg-white/5 text-white hover:bg-white/5 border border-white/5 text-sm font-bold transition-all duration-300 cursor-pointer"
                 >
                   <span className="material-symbols-outlined text-[18px] mr-2">person</span>
                   Profile
@@ -444,7 +444,7 @@ const PickupConfirmation = () => {
               )}
               <button 
                 onClick={() => window.location.hash = '#/search'}
-                className="flex-1 h-14 rounded-full border border-white/10 bg-white/5 text-white font-bold hover:bg-white/10 hover:border-white/20 transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer"
+                className="flex-1 h-14 rounded-full border border-white/5 bg-white/5 text-white font-bold hover:bg-white/5 hover:border-white/20 transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer"
               >
                 <span className="material-symbols-outlined text-xl">add_circle</span>
                 Schedule Another Pickup
