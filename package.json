@@ -5,12 +5,12 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "server": "nodemon --exec tsx server.ts",
-    "seed": "tsx backend/utils/seed.ts",
-    "seed:admin": "tsx backend/seeds/seedAdminBusiness.ts",
+    "server": "nodemon server.js",
+    "seed": "node backend/utils/seed.js",
+    "seed:admin": "node backend/seeds/seedAdminBusiness.js",
     "build": "vite build",
     "preview": "vite preview",
-    "start": "tsx server.ts"
+    "start": "node server.js"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.7",
@@ -41,17 +41,9 @@
     "three-globe": "^2.45.0"
   },
   "devDependencies": {
-    "@types/bcryptjs": "^2.4.6",
-    "@types/cors": "^2.8.17",
-    "@types/express": "^5.0.0",
-    "@types/jsonwebtoken": "^9.0.7",
-    "@types/node": "^22.14.0",
-    "@types/pdfkit": "^0.17.4",
     "@vitejs/plugin-react": "^5.0.0",
     "concurrently": "^9.1.2",
     "nodemon": "^3.1.11",
-    "tsx": "^4.19.2",
-    "typescript": "~5.8.2",
     "vite": "^6.2.0"
   }
 }
