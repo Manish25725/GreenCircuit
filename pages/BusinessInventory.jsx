@@ -141,11 +141,43 @@ const BusinessInventory = () => {
                     attributionControl: false,
                     scrollWheelZoom: true
                 });
-                // Use Stadia Maps dark theme (same as SearchAgencies)
-                L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png', {
-                    maxZoom: 20,
-                    attribution: ''
-                }).addTo(map);
+                const tileProviders = [
+                    {
+                        url: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+                        options: { subdomains: 'abcd', maxZoom: 20, attribution: '' }
+                    },
+                    {
+                        url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                        options: { maxZoom: 19, attribution: '' }
+                    },
+                    {
+                        url: 'https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png',
+                        options: { subdomains: 'abc', maxZoom: 20, attribution: '' }
+                    }
+                ];
+                const attachTileLayerWithFallback = (targetMap) => {
+                    let providerIndex = 0;
+                    let activeLayer = null;
+                    const useNextProvider = () => {
+                        if (activeLayer) {
+                            targetMap.removeLayer(activeLayer);
+                        }
+                        if (providerIndex >= tileProviders.length) {
+                            return;
+                        }
+                        const provider = tileProviders[providerIndex++];
+                        activeLayer = L.tileLayer(provider.url, provider.options).addTo(targetMap);
+                        let tileErrors = 0;
+                        activeLayer.on('tileerror', () => {
+                            tileErrors += 1;
+                            if (tileErrors >= 8) {
+                                useNextProvider();
+                            }
+                        });
+                    };
+                    useNextProvider();
+                };
+                attachTileLayerWithFallback(map);
                 // Add custom zoom control
                 L.control.zoom({ position: 'bottomright' }).addTo(map);
                 pickupMapInstance.current = map;

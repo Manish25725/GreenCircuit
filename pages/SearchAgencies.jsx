@@ -112,11 +112,43 @@ const SearchAgencies = () => {
                         zoomControl: false,
                         attributionControl: false,
                     });
-                    // Use Stadia Maps dark theme (shows correct boundaries)
-                    L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png', {
-                        maxZoom: 20,
-                        attribution: ''
-                    }).addTo(mapInstanceRef.current);
+                    const tileProviders = [
+                      {
+                        url: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+                        options: { subdomains: 'abcd', maxZoom: 20, attribution: '' }
+                      },
+                      {
+                        url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                        options: { maxZoom: 19, attribution: '' }
+                      },
+                      {
+                        url: 'https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png',
+                        options: { subdomains: 'abc', maxZoom: 20, attribution: '' }
+                      }
+                    ];
+                    const attachTileLayerWithFallback = (map) => {
+                      let providerIndex = 0;
+                      let activeLayer = null;
+                      const useNextProvider = () => {
+                        if (activeLayer) {
+                          map.removeLayer(activeLayer);
+                        }
+                        if (providerIndex >= tileProviders.length) {
+                          return;
+                        }
+                        const provider = tileProviders[providerIndex++];
+                        activeLayer = L.tileLayer(provider.url, provider.options).addTo(map);
+                        let tileErrors = 0;
+                        activeLayer.on('tileerror', () => {
+                          tileErrors += 1;
+                          if (tileErrors >= 8) {
+                            useNextProvider();
+                          }
+                        });
+                      };
+                      useNextProvider();
+                    };
+                    attachTileLayerWithFallback(mapInstanceRef.current);
                     // Add custom zoom control
                     L.control.zoom({ position: 'bottomright' }).addTo(mapInstanceRef.current);
                     // Force map to recalculate size
