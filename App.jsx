@@ -1,4 +1,3 @@
-import { Fragment as _Fragment, jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { api, getCurrentUser } from './services/api.js';
@@ -92,58 +91,58 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
     if (!userRole || (allowedRoles && !allowedRoles.includes(userRole))) {
         return null;
     }
-    return _jsx(_Fragment, { children: children });
+    return <>{children}</>;
 };
 // Profile router component
 const ProfileRoute = () => {
     const user = getCurrentUser();
     const userRole = user?.role;
     if (userRole === 'business') {
-        return _jsx(BusinessProfileSettings, {});
+        return <BusinessProfileSettings />;
     }
     else if (userRole === 'agency') {
-        return _jsx(PartnerProfile, {});
+        return <PartnerProfile />;
     }
     else if (userRole === 'user') {
-        return _jsx(ResidentProfileSettings, {});
+        return <ResidentProfileSettings />;
     }
-    return _jsx(Profile, {});
+    return <Profile />;
 };
 // Notifications router component
 const NotificationsRoute = () => {
     const user = getCurrentUser();
     const userRole = user?.role;
     if (userRole === 'business') {
-        return _jsx(BusinessNotifications, {});
+        return <BusinessNotifications />;
     }
     else if (userRole === 'user') {
-        return _jsx(ResidentNotifications, {});
+        return <ResidentNotifications />;
     }
-    return _jsx(Notifications, {});
+    return <Notifications />;
 };
 // Security router component
 const SecurityRoute = () => {
     const user = getCurrentUser();
     const userRole = user?.role;
     if (userRole === 'business') {
-        return _jsx(BusinessSecurity, {});
+        return <BusinessSecurity />;
     }
     else if (userRole === 'user') {
-        return _jsx(ResidentSecurity, {});
+        return <ResidentSecurity />;
     }
-    return _jsx(Security, {});
+    return <Security />;
 };
 // Settings router component
 const SettingsRoute = () => {
     const user = getCurrentUser();
     const userRole = user?.role;
     if (userRole === 'business') {
-        return _jsx(BusinessAppSettings, {});
+        return <BusinessAppSettings />;
     }
     else if (userRole === 'user') {
-        return _jsx(ResidentAppSettings, {});
+        return <ResidentAppSettings />;
     }
-    return _jsx(AppSettings, {});
+    return <AppSettings />;
 };
 // Scroll to top on route change
 const ScrollToTop = () => {
@@ -164,6 +163,81 @@ const App = () => {
         };
         validateSession();
     }, []);
-    return (_jsx(ThemeProvider, { children: _jsx(LanguageProvider, { children: _jsxs(Router, { children: [_jsx(ScrollToTop, {}), _jsxs(Routes, { children: [_jsx(Route, { path: "/", element: _jsx(Landing, {}) }), _jsx(Route, { path: "/login", element: _jsx(Login, {}) }), _jsx(Route, { path: "/admin-login", element: _jsx(AdminLogin, {}) }), _jsx(Route, { path: "/contact", element: _jsx(ContactUs, {}) }), _jsx(Route, { path: "/how-it-works", element: _jsx(HowItWorks, {}) }), _jsx(Route, { path: "/about", element: _jsx(AboutUs, {}) }), _jsx(Route, { path: "/services", element: _jsx(Services, {}) }), _jsx(Route, { path: "/partner/register", element: _jsx(PartnerRegistration, {}) }), _jsx(Route, { path: "/partner/pending", element: _jsx(PartnerPending, {}) }), _jsx(Route, { path: "/admin", element: _jsx(AdminDashboard, {}) }), _jsx(Route, { path: "/admin/vetting", element: _jsx(AdminVetting, {}) }), _jsx(Route, { path: "/admin/users", element: _jsx(AdminUsers, {}) }), _jsx(Route, { path: "/admin/users/:id", element: _jsx(AdminUserDetail, {}) }), _jsx(Route, { path: "/admin/agencies", element: _jsx(AdminAgencies, {}) }), _jsx(Route, { path: "/admin/agencies/:id", element: _jsx(AdminAgencyDetail, {}) }), _jsx(Route, { path: "/admin/partners", element: _jsx(AdminPartnerApproval, {}) }), _jsx(Route, { path: "/admin/reports", element: _jsx(AdminReports, {}) }), _jsx(Route, { path: "/agency", element: _jsx(ProtectedRoute, { allowedRoles: ['agency'], children: _jsx(AgencyDashboard, {}) }) }), _jsx(Route, { path: "/agency/slots", element: _jsx(ProtectedRoute, { allowedRoles: ['agency'], children: _jsx(ManageSlots, {}) }) }), _jsx(Route, { path: "/agency/bookings", element: _jsx(ProtectedRoute, { allowedRoles: ['agency'], children: _jsx(AgencyBookings, {}) }) }), _jsx(Route, { path: "/agency/profile", element: _jsx(ProtectedRoute, { allowedRoles: ['agency'], children: _jsx(PartnerProfile, {}) }) }), _jsx(Route, { path: "/partner/profile", element: _jsx(ProtectedRoute, { allowedRoles: ['agency'], children: _jsx(PartnerProfile, {}) }) }), _jsx(Route, { path: "/partner/edit-profile", element: _jsx(ProtectedRoute, { allowedRoles: ['agency'], children: _jsx(PartnerEditProfile, {}) }) }), _jsx(Route, { path: "/partner/security", element: _jsx(ProtectedRoute, { allowedRoles: ['agency'], children: _jsx(PartnerSecurity, {}) }) }), _jsx(Route, { path: "/partner/notifications", element: _jsx(ProtectedRoute, { allowedRoles: ['agency'], children: _jsx(PartnerNotifications, {}) }) }), _jsx(Route, { path: "/partner/settings", element: _jsx(ProtectedRoute, { allowedRoles: ['agency'], children: _jsx(PartnerAppSettings, {}) }) }), _jsx(Route, { path: "/dashboard", element: _jsx(ProtectedRoute, { allowedRoles: ['user'], children: _jsx(UserDashboard, {}) }) }), _jsx(Route, { path: "/rewards", element: _jsx(ProtectedRoute, { allowedRoles: ['user'], children: _jsx(Rewards, {}) }) }), _jsx(Route, { path: "/certificate", element: _jsx(ProtectedRoute, { allowedRoles: ['user'], children: _jsx(Certificate, {}) }) }), _jsx(Route, { path: "/certificates", element: _jsx(ProtectedRoute, { allowedRoles: ['user'], children: _jsx(UserCertificates, {}) }) }), _jsx(Route, { path: "/history", element: _jsx(ProtectedRoute, { allowedRoles: ['user'], children: _jsx(History, {}) }) }), _jsx(Route, { path: "/resident/profile", element: _jsx(ProtectedRoute, { allowedRoles: ['user'], children: _jsx(EditResidentProfile, {}) }) }), _jsx(Route, { path: "/resident/sessions", element: _jsx(ProtectedRoute, { allowedRoles: ['user'], children: _jsx(ResidentActiveSessions, {}) }) }), _jsx(Route, { path: "/business", element: _jsx(ProtectedRoute, { allowedRoles: ['business'], children: _jsx(BusinessDashboard, {}) }) }), _jsx(Route, { path: "/business/inventory", element: _jsx(ProtectedRoute, { allowedRoles: ['business'], children: _jsx(BusinessInventory, {}) }) }), _jsx(Route, { path: "/business/certificates", element: _jsx(ProtectedRoute, { allowedRoles: ['business'], children: _jsx(BusinessCertificates, {}) }) }), _jsx(Route, { path: "/business/analytics", element: _jsx(ProtectedRoute, { allowedRoles: ['business'], children: _jsx(BusinessAnalytics, {}) }) }), _jsx(Route, { path: "/business/profile", element: _jsx(ProtectedRoute, { allowedRoles: ['business'], children: _jsx(EditBusinessProfile, {}) }) }), _jsx(Route, { path: "/business/edit-profile", element: _jsx(ProtectedRoute, { allowedRoles: ['business'], children: _jsx(BusinessEditProfile, {}) }) }), _jsx(Route, { path: "/business/address", element: _jsx(ProtectedRoute, { allowedRoles: ['business'], children: _jsx(BusinessAddress, {}) }) }), _jsx(Route, { path: "/business/contact", element: _jsx(ProtectedRoute, { allowedRoles: ['business'], children: _jsx(BusinessContact, {}) }) }), _jsx(Route, { path: "/business/sessions", element: _jsx(ProtectedRoute, { allowedRoles: ['business'], children: _jsx(ActiveSessions, {}) }) }), _jsx(Route, { path: "/search", element: _jsx(ProtectedRoute, { allowedRoles: ['user', 'business'], children: _jsx(SearchAgencies, {}) }) }), _jsx(Route, { path: "/schedule", element: _jsx(ProtectedRoute, { allowedRoles: ['user', 'business'], children: _jsx(SchedulePickup, {}) }) }), _jsx(Route, { path: "/pickup-confirmation", element: _jsx(ProtectedRoute, { allowedRoles: ['user', 'business'], children: _jsx(PickupConfirmation, {}) }) }), _jsx(Route, { path: "/pickup-limit", element: _jsx(ProtectedRoute, { allowedRoles: ['user', 'business'], children: _jsx(PickupLimitReached, {}) }) }), _jsx(Route, { path: "/profile", element: _jsx(ProtectedRoute, { children: _jsx(ProfileRoute, {}) }) }), _jsx(Route, { path: "/notifications", element: _jsx(ProtectedRoute, { children: _jsx(NotificationsRoute, {}) }) }), _jsx(Route, { path: "/security", element: _jsx(ProtectedRoute, { children: _jsx(SecurityRoute, {}) }) }), _jsx(Route, { path: "/settings", element: _jsx(ProtectedRoute, { children: _jsx(SettingsRoute, {}) }) })] })] }) }) }));
+    return (
+        <ThemeProvider>
+            <LanguageProvider>
+                <Router>
+                    <ScrollToTop />
+                    <Routes>
+                        {/* Public Routes */}
+                        <Route path="/" element={<Landing />} />
+                        <Route path="/login" element={<Login />} />
+                        <Route path="/admin-login" element={<AdminLogin />} />
+                        <Route path="/contact" element={<ContactUs />} />
+                        <Route path="/how-it-works" element={<HowItWorks />} />
+                        <Route path="/about" element={<AboutUs />} />
+                        <Route path="/services" element={<Services />} />
+                        
+                        {/* Partner Public Routes */}
+                        <Route path="/partner/register" element={<PartnerRegistration />} />
+                        <Route path="/partner/pending" element={<PartnerPending />} />
+
+                        {/* Admin Routes */}
+                        <Route path="/admin" element={<AdminDashboard />} />
+                        <Route path="/admin/vetting" element={<AdminVetting />} />
+                        <Route path="/admin/users" element={<AdminUsers />} />
+                        <Route path="/admin/users/:id" element={<AdminUserDetail />} />
+                        <Route path="/admin/agencies" element={<AdminAgencies />} />
+                        <Route path="/admin/agencies/:id" element={<AdminAgencyDetail />} />
+                        <Route path="/admin/partners" element={<AdminPartnerApproval />} />
+                        <Route path="/admin/reports" element={<AdminReports />} />
+
+                        {/* Agency/Partner Routes */}
+                        <Route path="/agency" element={<ProtectedRoute allowedRoles={['agency']}><AgencyDashboard /></ProtectedRoute>} />
+                        <Route path="/agency/slots" element={<ProtectedRoute allowedRoles={['agency']}><ManageSlots /></ProtectedRoute>} />
+                        <Route path="/agency/bookings" element={<ProtectedRoute allowedRoles={['agency']}><AgencyBookings /></ProtectedRoute>} />
+                        <Route path="/agency/profile" element={<ProtectedRoute allowedRoles={['agency']}><PartnerProfile /></ProtectedRoute>} />
+                        <Route path="/partner/profile" element={<ProtectedRoute allowedRoles={['agency']}><PartnerProfile /></ProtectedRoute>} />
+                        <Route path="/partner/edit-profile" element={<ProtectedRoute allowedRoles={['agency']}><PartnerEditProfile /></ProtectedRoute>} />
+                        <Route path="/partner/security" element={<ProtectedRoute allowedRoles={['agency']}><PartnerSecurity /></ProtectedRoute>} />
+                        <Route path="/partner/notifications" element={<ProtectedRoute allowedRoles={['agency']}><PartnerNotifications /></ProtectedRoute>} />
+                        <Route path="/partner/settings" element={<ProtectedRoute allowedRoles={['agency']}><PartnerAppSettings /></ProtectedRoute>} />
+
+                        {/* Resident (User) Routes */}
+                        <Route path="/dashboard" element={<ProtectedRoute allowedRoles={['user']}><UserDashboard /></ProtectedRoute>} />
+                        <Route path="/rewards" element={<ProtectedRoute allowedRoles={['user']}><Rewards /></ProtectedRoute>} />
+                        <Route path="/certificate" element={<ProtectedRoute allowedRoles={['user']}><Certificate /></ProtectedRoute>} />
+                        <Route path="/certificates" element={<ProtectedRoute allowedRoles={['user']}><UserCertificates /></ProtectedRoute>} />
+                        <Route path="/history" element={<ProtectedRoute allowedRoles={['user']}><History /></ProtectedRoute>} />
+                        <Route path="/resident/profile" element={<ProtectedRoute allowedRoles={['user']}><EditResidentProfile /></ProtectedRoute>} />
+                        <Route path="/resident/sessions" element={<ProtectedRoute allowedRoles={['user']}><ResidentActiveSessions /></ProtectedRoute>} />
+
+                        {/* Business Routes */}
+                        <Route path="/business" element={<ProtectedRoute allowedRoles={['business']}><BusinessDashboard /></ProtectedRoute>} />
+                        <Route path="/business/inventory" element={<ProtectedRoute allowedRoles={['business']}><BusinessInventory /></ProtectedRoute>} />
+                        <Route path="/business/certificates" element={<ProtectedRoute allowedRoles={['business']}><BusinessCertificates /></ProtectedRoute>} />
+                        <Route path="/business/analytics" element={<ProtectedRoute allowedRoles={['business']}><BusinessAnalytics /></ProtectedRoute>} />
+                        <Route path="/business/profile" element={<ProtectedRoute allowedRoles={['business']}><EditBusinessProfile /></ProtectedRoute>} />
+                        <Route path="/business/edit-profile" element={<ProtectedRoute allowedRoles={['business']}><BusinessEditProfile /></ProtectedRoute>} />
+                        <Route path="/business/address" element={<ProtectedRoute allowedRoles={['business']}><BusinessAddress /></ProtectedRoute>} />
+                        <Route path="/business/contact" element={<ProtectedRoute allowedRoles={['business']}><BusinessContact /></ProtectedRoute>} />
+                        <Route path="/business/sessions" element={<ProtectedRoute allowedRoles={['business']}><ActiveSessions /></ProtectedRoute>} />
+
+                        {/* Shared Protected Routes (User & Business) */}
+                        <Route path="/search" element={<ProtectedRoute allowedRoles={['user', 'business']}><SearchAgencies /></ProtectedRoute>} />
+                        <Route path="/schedule" element={<ProtectedRoute allowedRoles={['user', 'business']}><SchedulePickup /></ProtectedRoute>} />
+                        <Route path="/pickup-confirmation" element={<ProtectedRoute allowedRoles={['user', 'business']}><PickupConfirmation /></ProtectedRoute>} />
+                        <Route path="/pickup-limit" element={<ProtectedRoute allowedRoles={['user', 'business']}><PickupLimitReached /></ProtectedRoute>} />
+
+                        {/* General Protected Routes (Any Role) */}
+                        <Route path="/profile" element={<ProtectedRoute><ProfileRoute /></ProtectedRoute>} />
+                        <Route path="/notifications" element={<ProtectedRoute><NotificationsRoute /></ProtectedRoute>} />
+                        <Route path="/security" element={<ProtectedRoute><SecurityRoute /></ProtectedRoute>} />
+                        <Route path="/settings" element={<ProtectedRoute><SettingsRoute /></ProtectedRoute>} />
+                    </Routes>
+                </Router>
+            </LanguageProvider>
+        </ThemeProvider>
+    );
 };
 export default App;
